@@ -21,7 +21,7 @@ def pearson_r(a, b, axis):
     -------
     res : ndarray
         Pearson's correlation coefficient.
- 
+
     See Also
     --------
     scipy.stats.pearsonr
