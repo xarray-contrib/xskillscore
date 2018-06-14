@@ -33,7 +33,7 @@ def pearson_r(a, b, axis):
     ma = np.mean(a, axis=0)
     mb = np.mean(b, axis=0)
     am, bm = a - ma, b - mb
-    r_num = np.add.reduce(am * bm)
+    r_num = np.sum(am * bm, axis=0)
     r_den = np.sqrt(np.sum(am*am, axis=0) * np.sum(bm*bm, axis=0))
     r = r_num / r_den
     res = np.clip(r, -1.0, 1.0)
