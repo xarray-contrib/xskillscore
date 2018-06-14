@@ -20,9 +20,8 @@ def test_pearson_r_nd(a, b):
             _a = a[:,i,j]
             _b = b[:,i,j]
             expected[i,j], p = stats.pearsonr(_a, _b)
-    if axis != 0:
-        a = np.rollaxis(a, axis)
-        b = np.rollaxis(b, axis)
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
     ma = np.mean(a, axis=0)
     mb = np.mean(b, axis=0)
     am, bm = a - ma, b - mb
@@ -39,9 +38,8 @@ def test_pearson_r_nd(a, b):
             _a = a[i,:,j]
             _b = b[i,:,j]
             expected[i,j], p = stats.pearsonr(_a, _b)
-    if axis != 0:
-        a = np.rollaxis(a, axis)
-        b = np.rollaxis(b, axis)
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
     ma = np.mean(a, axis=0)
     mb = np.mean(b, axis=0)
     am, bm = a - ma, b - mb
@@ -58,9 +56,8 @@ def test_pearson_r_nd(a, b):
             _a = a[i,j,:]
             _b = b[i,j,:]
             expected[i,j], p = stats.pearsonr(_a, _b)
-    if axis != 0:
-        a = np.rollaxis(a, axis)
-        b = np.rollaxis(b, axis)
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
     ma = np.mean(a, axis=0)
     mb = np.mean(b, axis=0)
     am, bm = a - ma, b - mb

@@ -27,9 +27,8 @@ def pearson_r(a, b, axis):
     scipy.stats.pearsonr
 
     """
-    if axis != 0:
-        a = np.rollaxis(a, axis)
-        b = np.rollaxis(b, axis)
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
     ma = np.mean(a, axis=0)
     mb = np.mean(b, axis=0)
     am, bm = a - ma, b - mb
