@@ -1,6 +1,7 @@
 from numpy.testing import assert_allclose
 import numpy as np
 from scipy import stats
+from sklearn.metrics import mean_squared_error
 import pytest
 
 
@@ -65,4 +66,41 @@ def test_pearson_r_nd(a, b):
     r_den = np.sqrt(np.sum(am*am, axis=0) * np.sum(bm*bm, axis=0))
     r = r_num / r_den
     actual = np.clip(r, -1.0, 1.0)
-    assert_allclose(actual, expected)  
+    assert_allclose(actual, expected)
+
+def test_rmse_nd(a, b):
+    axis = 0
+    expected = np.squeeze(a[0,:,:]).copy()
+    for i in range(np.shape(a)[1]):
+        for j in range(np.shape(a)[2]):
+            _a = a[:,i,j]
+            _b = b[:,i,j]
+            expected[i,j] = np.sqrt(mean_squared_error(_a, _b))
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    actual = np.sqrt(((a - b) ** 2).mean(axis=0))
+    assert_allclose(actual, expected)
+
+    axis = 1
+    expected = np.squeeze(a[:,0,:]).copy()
+    for i in range(np.shape(a)[0]):
+        for j in range(np.shape(a)[2]):
+            _a = a[i,:,j]
+            _b = b[i,:,j]
+            expected[i,j] = np.sqrt(mean_squared_error(_a, _b))
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    actual = np.sqrt(((a - b) ** 2).mean(axis=0))
+    assert_allclose(actual, expected)
+
+    axis = 2
+    expected = np.squeeze(a[:,:,0]).copy()
+    for i in range(np.shape(a)[0]):
+        for j in range(np.shape(a)[1]):
+            _a = a[i,j,:]
+            _b = b[i,j,:]
+            expected[i,j] = np.sqrt(mean_squared_error(_a, _b))
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    actual = np.sqrt(((a - b) ** 2).mean(axis=0))
+    assert_allclose(actual, expected)

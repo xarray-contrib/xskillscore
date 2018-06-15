@@ -37,3 +37,31 @@ def pearson_r(a, b, axis):
     r = r_num / r_den
     res = np.clip(r, -1.0, 1.0)
     return res
+
+
+def rmse(a, b, axis):
+    """
+    Root Mean Squared Error.
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int
+        The axis to apply the rmse along.
+
+    Returns
+    -------
+    res : ndarray
+        Root Mean Squared Error.
+
+    See Also
+    --------
+    sklearn.metrics.mean_squared_error
+
+    """
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    res = np.sqrt(((a - b) ** 2).mean(axis=0))    
