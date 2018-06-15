@@ -64,4 +64,5 @@ def rmse(a, b, axis):
     """
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
-    res = np.sqrt(((a - b) ** 2).mean(axis=0))    
+    res = np.sqrt(((a - b) ** 2).mean(axis=0))
+    return res 
