@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 
-from.np_deterministic import _pearson_r, _rmse
+from xskillscore.core.np_deterministic import _pearson_r, _rmse
 
 
 @pytest.fixture
