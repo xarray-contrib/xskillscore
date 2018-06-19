@@ -35,7 +35,7 @@ def test_pearson_r_xr(a, b, dim):
                             kwargs={'axis': -1})
     _a = a.values
     _b = b.values
-    axis = a.dims.index('time')
+    axis = a.dims.index(dim)
     res = _pearson_r(_a, _b, axis)
     expected = actual.copy()
     expected.values = res
@@ -48,7 +48,7 @@ def test_rmse_r_xr(a, b, dim):
                             kwargs={'axis': -1})
     _a = a.values
     _b = b.values
-    axis = a.dims.index('time')
+    axis = a.dims.index(dim)
     res = _rmse(_a, _b, axis)
     expected = actual.copy()
     expected.values = res    
