@@ -36,7 +36,9 @@ def test_pearson_r_xr(a, b, dim):
     _a = a.values
     _b = b.values
     axis = a.dims.index('time')
-    expected = _pearson_r(_a, _b, axis)
+    res = _pearson_r(_a, _b, axis)
+    expected = actual.copy()
+    expected.values = res
     assert_allclose(actual, expected)
     
 @pytest.mark.parametrize('dim', ('time', 'lat', 'lon'))
@@ -47,5 +49,7 @@ def test_rmse_r_xr(a, b, dim):
     _a = a.values
     _b = b.values
     axis = a.dims.index('time')
-    expected = _rmse(_a, _b, axis)
+    res = _rmse(_a, _b, axis)
+    expected = actual.copy()
+    expected.values = res    
     assert_allclose(actual, expected)    
