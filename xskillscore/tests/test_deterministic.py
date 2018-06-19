@@ -5,7 +5,8 @@ import numpy as np
 import pytest
 
 
-from xskillscore.core.np_deterministic import _pearson_r, _rmse
+from xskillscore.core.np_deterministic import (
+    _pearson_r, _pearson_r_p_value,_rmse)
 
 
 @pytest.fixture
@@ -40,6 +41,19 @@ def test_pearson_r_xr(a, b, dim):
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
+    
+@pytest.mark.parametrize('dim', ('time', 'lat', 'lon'))
+def test_pearson_r_p_value_xr(a, b, dim):
+    actual = xr.apply_ufunc(_pearson_r_p_value, a, b,
+                            input_core_dims=[[dim], [dim]],
+                            kwargs={'axis': -1})
+    _a = a.values
+    _b = b.values
+    axis = a.dims.index(dim)
+    res = _pearson_r_p_value(_a, _b, axis)
+    expected = actual.copy()
+    expected.values = res
+    assert_allclose(actual, expected)    
     
 @pytest.mark.parametrize('dim', ('time', 'lat', 'lon'))
 def test_rmse_r_xr(a, b, dim):

@@ -1,7 +1,8 @@
 import numpy as np
+from scipy import special
 
 
-__all__ = ['_pearson_r', '_rmse']
+__all__ = ['_pearson_r', '_pearson_r_p_value', '_rmse']
 
 
 def _pearson_r(a, b, axis):
@@ -38,6 +39,42 @@ def _pearson_r(a, b, axis):
     res = np.clip(r, -1.0, 1.0)
     return res
 
+
+def _pearson_r_p_value(a, b, axis):
+    """
+    ndarray implementation of scipy.stats.pearsonr.
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int
+        The axis to apply the correlation along.
+
+    Returns
+    -------
+    res : ndarray
+        2-tailed p-value.
+
+    See Also
+    --------
+    scipy.stats.pearsonr
+
+    """    
+    r = _pearson_r(a, b, axis)
+    a = np.rollaxis(a, axis)
+    df = a.shape[0] - 2
+    t_squared = r**2 * (df / ((1.0 - r) * (1.0 + r)))
+    _x = df/(df+t_squared)
+    _x = np.asarray(_x)
+    _x = np.where(_x < 1.0, _x, 1.0)
+    _a = 0.5*df
+    _b = 0.5
+    res = special.betainc(_a, _b, _x)
+    return res
+    
 
 def _rmse(a, b, axis):
     """
