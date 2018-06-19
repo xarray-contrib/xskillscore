@@ -1,68 +1,67 @@
-import numpy as np
+import xarray as xr
 
 
-__all__ = ['pearson_r']
+from.np_deterministic import _pearson_r, _rmse
 
 
-def pearson_r(a, b, axis):
+__all__ = ['pearson_r', 'rmse']
+
+
+def pearson_r(a, b, dim):
     """
-    ndarray implementation of scipy.stats.pearsonr.
+    Pearson's correlation coefficient.
 
     Parameters
     ----------
-    a : ndarray
-        Input array.
-    b : ndarray
-        Input array.
-    axis : int
-        The axis to apply the correlation along.
+    a : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
+        Mix of labeled and/or unlabeled arrays to which to apply the function.
+    b : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
+        Mix of labeled and/or unlabeled arrays to which to apply the function.
+    dim : str
+        The dimension to apply the correlation along.
 
     Returns
     -------
-    res : ndarray
+    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
+    numpy.ndarray, the first type on that list to appear on an input.
         Pearson's correlation coefficient.
 
     See Also
     --------
     scipy.stats.pearsonr
+    xarray.apply_unfunc
 
     """
-    a = np.rollaxis(a, axis)
-    b = np.rollaxis(b, axis)
-    ma = np.mean(a, axis=0)
-    mb = np.mean(b, axis=0)
-    am, bm = a - ma, b - mb
-    r_num = np.sum(am * bm, axis=0)
-    r_den = np.sqrt(np.sum(am*am, axis=0) * np.sum(bm*bm, axis=0))
-    r = r_num / r_den
-    res = np.clip(r, -1.0, 1.0)
-    return res
+    return xr.apply_ufunc(_pearson_r, a, b,
+                          input_core_dims=[[dim], [dim]],
+                          kwargs={'axis': -1})
 
 
-def rmse(a, b, axis):
+def rmse(a, b, dim):
     """
     Root Mean Squared Error.
 
     Parameters
     ----------
-    a : ndarray
-        Input array.
-    b : ndarray
-        Input array.
-    axis : int
-        The axis to apply the rmse along.
+    a : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
+        Mix of labeled and/or unlabeled arrays to which to apply the function.
+    b : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
+        Mix of labeled and/or unlabeled arrays to which to apply the function.
+    dim : str
+        The dimension to apply the correlation along.
 
     Returns
     -------
-    res : ndarray
+    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
+    numpy.ndarray, the first type on that list to appear on an input.
         Root Mean Squared Error.
 
     See Also
     --------
     sklearn.metrics.mean_squared_error
-
+    xarray.apply_unfunc    
+    
     """
-    a = np.rollaxis(a, axis)
-    b = np.rollaxis(b, axis)
-    res = np.sqrt(((a - b) ** 2).mean(axis=0))
-    return res 
+    return xr.apply_ufunc(_rmse, a, b,
+                          input_core_dims=[[dim], [dim]],
+                          kwargs={'axis': -1}) 
