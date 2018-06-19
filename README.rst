@@ -15,6 +15,7 @@ Examples
 --------
 
 .. code-block:: python
+
    import xarray as xr
    import pandas as pd
    import numpy as np
