@@ -8,7 +8,7 @@ AUTHOR = 'Ray Bell'
 AUTHOR_EMAIL = 'rjbell1987@gmail.com'
 DESCRIPTION = "xskillscore"
 URL = 'https://github.com/pydata/xarray'
-INSTALL_REQUIRES = ['scikit-learn', 'xarray']
+INSTALL_REQUIRES = ['scikit-learn', 'xarray','dask']
 TESTS_REQUIRE = ['pytest']
 PYTHON_REQUIRE = '>=3.6'
 
