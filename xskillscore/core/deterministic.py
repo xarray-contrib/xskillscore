@@ -34,9 +34,10 @@ def pearson_r(a, b, dim):
     """
     return xr.apply_ufunc(_pearson_r, a, b,
                           input_core_dims=[[dim], [dim]],
-                          kwargs={'axis': -1})
-    
-    
+                          kwargs={'axis': -1},
+                          dask='allowed')
+
+
 def pearson_r_p_value(a, b, dim):
     """
     2-tailed p-value associated with pearson's correlation coefficient.
@@ -64,7 +65,8 @@ def pearson_r_p_value(a, b, dim):
     """
     return xr.apply_ufunc(_pearson_r_p_value, a, b,
                           input_core_dims=[[dim], [dim]],
-                          kwargs={'axis': -1})
+                          kwargs={'axis': -1},
+                          dask='allowed')
 
 def rmse(a, b, dim):
     """
@@ -88,9 +90,10 @@ def rmse(a, b, dim):
     See Also
     --------
     sklearn.metrics.mean_squared_error
-    xarray.apply_unfunc    
-    
+    xarray.apply_unfunc
+
     """
     return xr.apply_ufunc(_rmse, a, b,
                           input_core_dims=[[dim], [dim]],
-                          kwargs={'axis': -1}) 
+                          kwargs={'axis': -1},
+                          dask='allowed')
