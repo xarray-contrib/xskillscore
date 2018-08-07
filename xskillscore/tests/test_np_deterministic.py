@@ -7,20 +7,22 @@ import pytest
 
 @pytest.fixture
 def a():
-    return np.random.rand(3,4,5)
+    return np.random.rand(3, 4, 5)
+
 
 @pytest.fixture
 def b():
-    return np.random.rand(3,4,5)
+    return np.random.rand(3, 4, 5)
+
 
 def test_pearson_r_nd(a, b):
     axis = 0
-    expected = np.squeeze(a[0,:,:]).copy()
+    expected = np.squeeze(a[0, :, :]).copy()
     for i in range(np.shape(a)[1]):
         for j in range(np.shape(a)[2]):
-            _a = a[:,i,j]
-            _b = b[:,i,j]
-            expected[i,j], p = stats.pearsonr(_a, _b)
+            _a = a[:, i, j]
+            _b = b[:, i, j]
+            expected[i, j], p = stats.pearsonr(_a, _b)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     ma = np.mean(a, axis=0)
@@ -33,12 +35,12 @@ def test_pearson_r_nd(a, b):
     assert_allclose(actual, expected)
 
     axis = 1
-    expected = np.squeeze(a[:,0,:]).copy()
+    expected = np.squeeze(a[:, 0, :]).copy()
     for i in range(np.shape(a)[0]):
         for j in range(np.shape(a)[2]):
-            _a = a[i,:,j]
-            _b = b[i,:,j]
-            expected[i,j], p = stats.pearsonr(_a, _b)
+            _a = a[i, :, j]
+            _b = b[i, :, j]
+            expected[i, j], p = stats.pearsonr(_a, _b)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     ma = np.mean(a, axis=0)
@@ -51,12 +53,12 @@ def test_pearson_r_nd(a, b):
     assert_allclose(actual, expected)
 
     axis = 2
-    expected = np.squeeze(a[:,:,0]).copy()
+    expected = np.squeeze(a[:, :, 0]).copy()
     for i in range(np.shape(a)[0]):
         for j in range(np.shape(a)[1]):
-            _a = a[i,j,:]
-            _b = b[i,j,:]
-            expected[i,j], p = stats.pearsonr(_a, _b)
+            _a = a[i, j, :]
+            _b = b[i, j, :]
+            expected[i, j], p = stats.pearsonr(_a, _b)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     ma = np.mean(a, axis=0)
@@ -67,15 +69,16 @@ def test_pearson_r_nd(a, b):
     r = r_num / r_den
     actual = np.clip(r, -1.0, 1.0)
     assert_allclose(actual, expected)
-    
+
+
 def test_pearson_r_p_value_nd(a, b):
     axis = 0
-    expected = np.squeeze(a[0,:,:]).copy()
+    expected = np.squeeze(a[0, :, :]).copy()
     for i in range(np.shape(a)[1]):
         for j in range(np.shape(a)[2]):
-            _a = a[:,i,j]
-            _b = b[:,i,j]
-            r, expected[i,j] = stats.pearsonr(_a, _b)
+            _a = a[:, i, j]
+            _b = b[:, i, j]
+            r, expected[i, j] = stats.pearsonr(_a, _b)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     ma = np.mean(a, axis=0)
@@ -92,16 +95,16 @@ def test_pearson_r_p_value_nd(a, b):
     _x = np.where(_x < 1.0, _x, 1.0)
     _a = 0.5*df
     _b = 0.5
-    actual = special.betainc(_a, _b, _x)    
+    actual = special.betainc(_a, _b, _x)
     assert_allclose(actual, expected)
 
     axis = 1
-    expected = np.squeeze(a[:,0,:]).copy()
+    expected = np.squeeze(a[:, 0, :]).copy()
     for i in range(np.shape(a)[0]):
         for j in range(np.shape(a)[2]):
-            _a = a[i,:,j]
-            _b = b[i,:,j]
-            p, expected[i,j] = stats.pearsonr(_a, _b)
+            _a = a[i, :, j]
+            _b = b[i, :, j]
+            p, expected[i, j] = stats.pearsonr(_a, _b)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     ma = np.mean(a, axis=0)
@@ -118,16 +121,16 @@ def test_pearson_r_p_value_nd(a, b):
     _x = np.where(_x < 1.0, _x, 1.0)
     _a = 0.5*df
     _b = 0.5
-    actual = special.betainc(_a, _b, _x)    
+    actual = special.betainc(_a, _b, _x)
     assert_allclose(actual, expected)
 
     axis = 2
-    expected = np.squeeze(a[:,:,0]).copy()
+    expected = np.squeeze(a[:, :, 0]).copy()
     for i in range(np.shape(a)[0]):
         for j in range(np.shape(a)[1]):
-            _a = a[i,j,:]
-            _b = b[i,j,:]
-            r, expected[i,j] = stats.pearsonr(_a, _b)
+            _a = a[i, j, :]
+            _b = b[i, j, :]
+            r, expected[i, j] = stats.pearsonr(_a, _b)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     ma = np.mean(a, axis=0)
@@ -144,41 +147,42 @@ def test_pearson_r_p_value_nd(a, b):
     _x = np.where(_x < 1.0, _x, 1.0)
     _a = 0.5*df
     _b = 0.5
-    actual = special.betainc(_a, _b, _x)    
-    assert_allclose(actual, expected)    
+    actual = special.betainc(_a, _b, _x)
+    assert_allclose(actual, expected)
+
 
 def test_rmse_nd(a, b):
     axis = 0
-    expected = np.squeeze(a[0,:,:]).copy()
+    expected = np.squeeze(a[0, :, :]).copy()
     for i in range(np.shape(a)[1]):
         for j in range(np.shape(a)[2]):
-            _a = a[:,i,j]
-            _b = b[:,i,j]
-            expected[i,j] = np.sqrt(mean_squared_error(_a, _b))
+            _a = a[:, i, j]
+            _b = b[:, i, j]
+            expected[i, j] = np.sqrt(mean_squared_error(_a, _b))
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     actual = np.sqrt(((a - b) ** 2).mean(axis=0))
     assert_allclose(actual, expected)
 
     axis = 1
-    expected = np.squeeze(a[:,0,:]).copy()
+    expected = np.squeeze(a[:, 0, :]).copy()
     for i in range(np.shape(a)[0]):
         for j in range(np.shape(a)[2]):
-            _a = a[i,:,j]
-            _b = b[i,:,j]
-            expected[i,j] = np.sqrt(mean_squared_error(_a, _b))
+            _a = a[i, :, j]
+            _b = b[i, :, j]
+            expected[i, j] = np.sqrt(mean_squared_error(_a, _b))
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     actual = np.sqrt(((a - b) ** 2).mean(axis=0))
     assert_allclose(actual, expected)
 
     axis = 2
-    expected = np.squeeze(a[:,:,0]).copy()
+    expected = np.squeeze(a[:, :, 0]).copy()
     for i in range(np.shape(a)[0]):
         for j in range(np.shape(a)[1]):
-            _a = a[i,j,:]
-            _b = b[i,j,:]
-            expected[i,j] = np.sqrt(mean_squared_error(_a, _b))
+            _a = a[i, j, :]
+            _b = b[i, j, :]
+            expected[i, j] = np.sqrt(mean_squared_error(_a, _b))
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     actual = np.sqrt(((a - b) ** 2).mean(axis=0))
