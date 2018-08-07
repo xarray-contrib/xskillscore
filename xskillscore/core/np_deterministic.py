@@ -62,7 +62,7 @@ def _pearson_r_p_value(a, b, axis):
     --------
     scipy.stats.pearsonr
 
-    """    
+    """
     r = _pearson_r(a, b, axis)
     a = np.rollaxis(a, axis)
     df = a.shape[0] - 2
@@ -74,7 +74,7 @@ def _pearson_r_p_value(a, b, axis):
     _b = 0.5
     res = special.betainc(_a, _b, _x)
     return res
-    
+
 
 def _rmse(a, b, axis):
     """
@@ -102,4 +102,4 @@ def _rmse(a, b, axis):
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     res = np.sqrt(((a - b) ** 2).mean(axis=0))
-    return res 
+    return res

@@ -68,6 +68,7 @@ def pearson_r_p_value(a, b, dim):
                           kwargs={'axis': -1},
                           dask='allowed')
 
+
 def rmse(a, b, dim):
     """
     Root Mean Squared Error.

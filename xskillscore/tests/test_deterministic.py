@@ -2,12 +2,11 @@ from xarray.tests import assert_allclose
 import xarray as xr
 import pandas as pd
 import numpy as np
-import dask
 import pytest
 
 
 from xskillscore.core.np_deterministic import (
-    _pearson_r, _pearson_r_p_value,_rmse)
+    _pearson_r, _pearson_r_p_value, _rmse)
 
 
 @pytest.fixture
@@ -20,6 +19,7 @@ def a():
                         coords=[dates, lats, lons],
                         dims=['time', 'lat', 'lon'])
 
+
 @pytest.fixture
 def b():
     dates = pd.date_range('1/1/2000', '1/3/2000', freq='D')
@@ -29,6 +29,7 @@ def b():
     return xr.DataArray(data,
                         coords=[dates, lats, lons],
                         dims=['time', 'lat', 'lon'])
+
 
 @pytest.fixture
 def a_dask():
@@ -40,6 +41,7 @@ def a_dask():
                         coords=[dates, lats, lons],
                         dims=['time', 'lat', 'lon']).chunk()
 
+
 @pytest.fixture
 def b_dask(b):
     dates = pd.date_range('1/1/2000', '1/3/2000', freq='D')
@@ -49,6 +51,7 @@ def b_dask(b):
     return xr.DataArray(data,
                         coords=[dates, lats, lons],
                         dims=['time', 'lat', 'lon']).chunk()
+
 
 @pytest.mark.parametrize('dim', ('time', 'lat', 'lon'))
 def test_pearson_r_xr(a, b, dim):
@@ -64,6 +67,7 @@ def test_pearson_r_xr(a, b, dim):
     expected.values = res
     assert_allclose(actual, expected)
 
+
 @pytest.mark.parametrize('dim', ('time', 'lat', 'lon'))
 def test_pearson_r_xr_dask(a_dask, b_dask, dim):
     actual = xr.apply_ufunc(_pearson_r, a_dask, b_dask,
@@ -77,6 +81,7 @@ def test_pearson_r_xr_dask(a_dask, b_dask, dim):
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
+
 
 @pytest.mark.parametrize('dim', ('time', 'lat', 'lon'))
 def test_pearson_r_p_value_xr(a, b, dim):
@@ -92,6 +97,7 @@ def test_pearson_r_p_value_xr(a, b, dim):
     expected.values = res
     assert_allclose(actual, expected)
 
+
 @pytest.mark.parametrize('dim', ('time', 'lat', 'lon'))
 def test_pearson_r_p_value_xr_dask(a_dask, b_dask, dim):
     actual = xr.apply_ufunc(_pearson_r_p_value, a_dask, b_dask,
@@ -106,6 +112,7 @@ def test_pearson_r_p_value_xr_dask(a_dask, b_dask, dim):
     expected.values = res
     assert_allclose(actual, expected)
 
+
 @pytest.mark.parametrize('dim', ('time', 'lat', 'lon'))
 def test_rmse_r_xr(a, b, dim):
     actual = xr.apply_ufunc(_rmse, a, b,
@@ -119,6 +126,7 @@ def test_rmse_r_xr(a, b, dim):
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
+
 
 @pytest.mark.parametrize('dim', ('time', 'lat', 'lon'))
 def test_rmse_r_xr_dask(a_dask, b_dask, dim):
