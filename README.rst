@@ -4,7 +4,7 @@ xskillscore: Verification of forecasts
 .. image:: https://travis-ci.org/raybellwaves/xskillscore.svg?branch=master
    :target: https://travis-ci.org/raybellwaves/xskillscore
 
-**xskillscore** is an open source project and Python package that provides verification metrics of deterministic and probabilistic forecasts with xarray.
+**xskillscore** is an open source project and Python package that provides verification metrics of deterministic (and probabilistic) forecasts with xarray.
 
 Installing
 ----------
