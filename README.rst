@@ -29,4 +29,7 @@ Examples
                       coords=[pd.date_range('1/1/2000', '1/3/2000', freq='D'),
                               np.arange(4), np.arange(3]],         
                       dims=['time', 'lat', 'lon'])
-   r = xs.pearson_r(obs, fct, 'time')    
+                      
+   r = xs.pearson_r(obs, fct, 'time')
+   
+   rmse = xs.rmse(obs, fct, 'time')
