@@ -8,7 +8,7 @@ AUTHOR = 'Ray Bell'
 AUTHOR_EMAIL = 'rjbell1987@gmail.com'
 DESCRIPTION = "xskillscore"
 URL = 'https://github.com/raybellwaves/xskillscore'
-INSTALL_REQUIRES = ['scikit-learn', 'xarray', 'dask']
+INSTALL_REQUIRES = ['scikit-learn', 'xarray', 'dask', 'scipy']
 TESTS_REQUIRE = ['pytest']
 PYTHON_REQUIRE = '>=3.6'
 
