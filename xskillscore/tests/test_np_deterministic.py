@@ -1,8 +1,8 @@
-from numpy.testing import assert_allclose
 import numpy as np
-from scipy import stats, special
-from sklearn.metrics import mean_squared_error
 import pytest
+from numpy.testing import assert_allclose
+from scipy import special, stats
+from sklearn.metrics import mean_squared_error
 
 
 @pytest.fixture

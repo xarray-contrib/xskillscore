@@ -1,7 +1,6 @@
 import numpy as np
 from scipy import special
 
-
 __all__ = ['_pearson_r', '_pearson_r_p_value', '_rmse']
 
 
@@ -102,4 +101,33 @@ def _rmse(a, b, axis):
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     res = np.sqrt(((a - b) ** 2).mean(axis=0))
+    return res
+
+
+def _mse(a, b, axis):
+    """
+    Mean Squared Error.
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int
+        The axis to apply the rmse along.
+
+    Returns
+    -------
+    res : ndarray
+        Mean Squared Error.
+
+    See Also
+    --------
+    sklearn.metrics.mean_squared_error
+
+    """
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    res = ((a - b) ** 2).mean(axis=0)
     return res
