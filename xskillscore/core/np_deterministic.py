@@ -1,7 +1,8 @@
 import numpy as np
 from scipy import special
 
-__all__ = ['_pearson_r', '_pearson_r_p_value', '_rmse']
+
+__all__ = ['_pearson_r', '_pearson_r_p_value', '_rmse', '_mse']
 
 
 def _pearson_r(a, b, axis):
