@@ -187,3 +187,41 @@ def test_rmse_nd(a, b):
     b = np.rollaxis(b, axis)
     actual = np.sqrt(((a - b) ** 2).mean(axis=0))
     assert_allclose(actual, expected)
+
+
+def test_mse_nd(a, b):
+    axis = 0
+    expected = np.squeeze(a[0, :, :]).copy()
+    for i in range(np.shape(a)[1]):
+        for j in range(np.shape(a)[2]):
+            _a = a[:, i, j]
+            _b = b[:, i, j]
+            expected[i, j] = mean_squared_error(_a, _b)
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    actual = ((a - b) ** 2).mean(axis=0)
+    assert_allclose(actual, expected)
+
+    axis = 1
+    expected = np.squeeze(a[:, 0, :]).copy()
+    for i in range(np.shape(a)[0]):
+        for j in range(np.shape(a)[2]):
+            _a = a[i, :, j]
+            _b = b[i, :, j]
+            expected[i, j] = mean_squared_error(_a, _b)
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    actual = ((a - b) ** 2).mean(axis=0)
+    assert_allclose(actual, expected)
+
+    axis = 2
+    expected = np.squeeze(a[:, :, 0]).copy()
+    for i in range(np.shape(a)[0]):
+        for j in range(np.shape(a)[1]):
+            _a = a[i, j, :]
+            _b = b[i, j, :]
+            expected[i, j] = mean_squared_error(_a, _b)
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    actual = ((a - b) ** 2).mean(axis=0)
+    assert_allclose(actual, expected)
