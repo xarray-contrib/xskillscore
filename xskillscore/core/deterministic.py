@@ -3,7 +3,7 @@ import xarray as xr
 from.np_deterministic import _pearson_r, _pearson_r_p_value, _rmse, _mse
 
 
-__all__ = ['pearson_r', 'rmse', 'mse']
+__all__ = ['pearson_r', 'pearson_r_p_value', 'rmse', 'mse']
 
 
 def pearson_r(a, b, dim):
