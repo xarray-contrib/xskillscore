@@ -2,7 +2,7 @@ import numpy as np
 from scipy import special
 
 
-__all__ = ['_pearson_r', '_pearson_r_p_value', '_rmse']
+__all__ = ['_pearson_r', '_pearson_r_p_value', '_rmse', '_mse', '_mae']
 
 
 def _pearson_r(a, b, axis):
@@ -102,4 +102,62 @@ def _rmse(a, b, axis):
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     res = np.sqrt(((a - b) ** 2).mean(axis=0))
+    return res
+
+
+def _mse(a, b, axis):
+    """
+    Mean Squared Error.
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int
+        The axis to apply the mse along.
+
+    Returns
+    -------
+    res : ndarray
+        Mean Squared Error.
+
+    See Also
+    --------
+    sklearn.metrics.mean_squared_error
+
+    """
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    res = ((a - b) ** 2).mean(axis=0)
+    return res
+
+
+def _mae(a, b, axis):
+    """
+    Mean Absolute Error.
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int
+        The axis to apply the mae along.
+
+    Returns
+    -------
+    res : ndarray
+        Mean Absolute Error.
+
+    See Also
+    --------
+    sklearn.metrics.mean_absolute_error
+
+    """
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    res = (np.absolute(a - b)).mean(axis=0)
     return res
