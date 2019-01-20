@@ -4,8 +4,8 @@ import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
 
-from xskillscore.core.np_deterministic import (_mae, _mse, _pearson_r,
-                                               _pearson_r_p_value, _rmse)
+from xskillscore.core.np_deterministic import (_pearson_r, _pearson_r_p_value,
+                                               _rmse, _mse, _mae)
 
 
 @pytest.fixture
