@@ -25,6 +25,7 @@ Examples
    import numpy as np
    import xskillscore as xs
 
+
    obs = xr.DataArray(np.random.rand(3, 4, 5),
                       coords=[pd.date_range('1/1/2000', '1/3/2000', freq='D'),
                               np.arange(4), np.arange(5)],
@@ -44,15 +45,11 @@ Examples
    #Coordinates:
    #  * lat      (lat) int64 0 1 2 3
    #  * lon      (lon) int64 0 1 2 3 4
-   
+  
+   r_p_value = xs.pearson_r_p_value(obs, fct, 'time')
+
    rmse = xs.rmse(obs, fct, 'time')
-   #>>> rmse
-   #<xarray.DataArray (lat: 4, lon: 5)>
-   #array([[0.273039, 0.614676, 0.09875 , 0.509139, 0.481294],
-   #       [0.330404, 0.334384, 0.37992 , 0.408778, 0.300474],
-   #       [0.520741, 0.33815 , 0.367493, 0.502364, 0.3562  ],
-   #       [0.246786, 0.356913, 0.2755  , 0.564677, 0.637155]])
-   #Coordinates:
-   #  * lat      (lat) int64 0 1 2 3
-   #  * lon      (lon) int64 0 1 2 3 4
-   
+
+   mse = xs.mse(obs, fct, 'time')
+
+   mae = xs.mae(obs, fct, 'time') 
