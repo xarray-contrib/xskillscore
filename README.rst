@@ -1,5 +1,5 @@
-xskillscore: Verification of forecasts
-======================================
+xskillscore: Metrics for verifying forecasts
+============================================
 
 .. image:: https://travis-ci.org/raybellwaves/xskillscore.svg?branch=master
    :target: https://travis-ci.org/raybellwaves/xskillscore
@@ -8,6 +8,8 @@ xskillscore: Verification of forecasts
 
 Installing
 ----------
+
+``pip install xskillscore``
 
 ``pip install git+https://github.com/raybellwaves/xskillscore``
 

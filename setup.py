@@ -7,6 +7,7 @@ LICENSE = 'Apache'
 AUTHOR = 'Ray Bell'
 AUTHOR_EMAIL = 'rayjohnbell0@gmail.com'
 DESCRIPTION = "xskillscore"
+LONG_DESCRIPTION = """Metrics for verifying forecasts"""
 URL = 'https://github.com/raybellwaves/xskillscore'
 INSTALL_REQUIRES = ['scikit-learn', 'xarray', 'dask', 'scipy']
 TESTS_REQUIRE = ['pytest']
