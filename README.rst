@@ -11,6 +11,8 @@ Installing
 
 ``pip install xskillscore``
 
+or
+
 ``pip install git+https://github.com/raybellwaves/xskillscore``
 
 Examples
