@@ -34,7 +34,8 @@ def pearson_r(a, b, dim):
     return xr.apply_ufunc(_pearson_r, a, b,
                           input_core_dims=[[dim], [dim]],
                           kwargs={'axis': -1},
-                          dask='allowed')
+                          dask='parallelized',
+                          output_dtypes=[float])
 
 
 def pearson_r_p_value(a, b, dim):
@@ -65,7 +66,8 @@ def pearson_r_p_value(a, b, dim):
     return xr.apply_ufunc(_pearson_r_p_value, a, b,
                           input_core_dims=[[dim], [dim]],
                           kwargs={'axis': -1},
-                          dask='allowed')
+                          dask='parallelized',
+                          output_dtypes=[float])
 
 
 def rmse(a, b, dim):
@@ -96,7 +98,8 @@ def rmse(a, b, dim):
     return xr.apply_ufunc(_rmse, a, b,
                           input_core_dims=[[dim], [dim]],
                           kwargs={'axis': -1},
-                          dask='allowed')
+                          dask='parallelized',
+                          output_dtypes=[float])
 
 
 def mse(a, b, dim):
@@ -127,7 +130,8 @@ def mse(a, b, dim):
     return xr.apply_ufunc(_mse, a, b,
                           input_core_dims=[[dim], [dim]],
                           kwargs={'axis': -1},
-                          dask='allowed')
+                          dask='parallelized',
+                          output_dtypes=[float])
 
 
 def mae(a, b, dim):
@@ -158,4 +162,5 @@ def mae(a, b, dim):
     return xr.apply_ufunc(_mae, a, b,
                           input_core_dims=[[dim], [dim]],
                           kwargs={'axis': -1},
-                          dask='allowed')
+                          dask='parallelized',
+                          output_dtypes=[float])
