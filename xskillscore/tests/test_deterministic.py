@@ -141,79 +141,79 @@ def test_pearson_r_p_value_xr_dask(a_dask, b_dask, dim):
     assert_allclose(actual, expected)
 
 
-# @pytest.mark.parametrize('dim', AXES)
-# def test_rmse_r_xr(a, b, dim):
-#     actual = rmse(a, b, dim)
-#     dim, axis = _preprocess(dim)
-#     _a = a.values
-#     _b = b.values
-#     axis = tuple(a.dims.index(d) for d in dim)
-#     res = _rmse(_a, _b, axis)
-#     expected = actual.copy()
-#     expected.values = res
-#     assert_allclose(actual, expected)
+@pytest.mark.parametrize('dim', AXES)
+def test_rmse_r_xr(a, b, dim):
+    actual = rmse(a, b, dim)
+    dim, axis = _preprocess(dim)
+    _a = a.values
+    _b = b.values
+    axis = tuple(a.dims.index(d) for d in dim)
+    res = _rmse(_a, _b, axis)
+    expected = actual.copy()
+    expected.values = res
+    assert_allclose(actual, expected)
 
 
-# @pytest.mark.parametrize('dim', AXES)
-# def test_rmse_r_xr_dask(a_dask, b_dask, dim):
-#     actual = rmse(a_dask, b_dask, dim)
-#     dim, axis = _preprocess(dim)
-#     _a_dask = a_dask.values
-#     _b_dask = b_dask.values
-#     axis = tuple(a_dask.dims.index(d) for d in dim)
-#     res = _rmse(_a_dask, _b_dask, axis)
-#     expected = actual.copy()
-#     expected.values = res
-#     assert_allclose(actual, expected)
+@pytest.mark.parametrize('dim', AXES)
+def test_rmse_r_xr_dask(a_dask, b_dask, dim):
+    actual = rmse(a_dask, b_dask, dim)
+    dim, axis = _preprocess(dim)
+    _a_dask = a_dask.values
+    _b_dask = b_dask.values
+    axis = tuple(a_dask.dims.index(d) for d in dim)
+    res = _rmse(_a_dask, _b_dask, axis)
+    expected = actual.copy()
+    expected.values = res
+    assert_allclose(actual, expected)
 
 
-# @pytest.mark.parametrize('dim', AXES)
-# def test_mse_r_xr(a, b, dim):
-#     actual = mse(a, b, dim)
-#     dim, axis = _preprocess(dim)
-#     _a = a.values
-#     _b = b.values
-#     axis = tuple(a.dims.index(d) for d in dim)
-#     res = _mse(_a, _b, axis)
-#     expected = actual.copy()
-#     expected.values = res
-#     assert_allclose(actual, expected)
+@pytest.mark.parametrize('dim', AXES)
+def test_mse_r_xr(a, b, dim):
+    actual = mse(a, b, dim)
+    dim, axis = _preprocess(dim)
+    _a = a.values
+    _b = b.values
+    axis = tuple(a.dims.index(d) for d in dim)
+    res = _mse(_a, _b, axis)
+    expected = actual.copy()
+    expected.values = res
+    assert_allclose(actual, expected)
 
 
-# @pytest.mark.parametrize('dim', AXES)
-# def test_mse_r_xr_dask(a_dask, b_dask, dim):
-#     actual = mse(a_dask, b_dask, dim)
-#     dim, axis = _preprocess(dim)
-#     _a_dask = a_dask.values
-#     _b_dask = b_dask.values
-#     axis = tuple(a_dask.dims.index(d) for d in dim)
-#     res = _mse(_a_dask, _b_dask, axis)
-#     expected = actual.copy()
-#     expected.values = res
-#     assert_allclose(actual, expected)
+@pytest.mark.parametrize('dim', AXES)
+def test_mse_r_xr_dask(a_dask, b_dask, dim):
+    actual = mse(a_dask, b_dask, dim)
+    dim, axis = _preprocess(dim)
+    _a_dask = a_dask.values
+    _b_dask = b_dask.values
+    axis = tuple(a_dask.dims.index(d) for d in dim)
+    res = _mse(_a_dask, _b_dask, axis)
+    expected = actual.copy()
+    expected.values = res
+    assert_allclose(actual, expected)
 
 
-# @pytest.mark.parametrize('dim', AXES)
-# def test_mae_r_xr(a, b, dim):
-#     actual = mae(a, b, dim)
-#     dim, axis = _preprocess(dim)
-#     _a = a.values
-#     _b = b.values
-#     axis = tuple(a.dims.index(d) for d in dim)
-#     res = _mae(_a, _b, axis)
-#     expected = actual.copy()
-#     expected.values = res
-#     assert_allclose(actual, expected)
+@pytest.mark.parametrize('dim', AXES)
+def test_mae_r_xr(a, b, dim):
+    actual = mae(a, b, dim)
+    dim, axis = _preprocess(dim)
+    _a = a.values
+    _b = b.values
+    axis = tuple(a.dims.index(d) for d in dim)
+    res = _mae(_a, _b, axis)
+    expected = actual.copy()
+    expected.values = res
+    assert_allclose(actual, expected)
 
 
-# @pytest.mark.parametrize('dim', AXES)
-# def test_mae_r_xr_dask(a_dask, b_dask, dim):
-#     actual = mae(a_dask, b_dask, dim)
-#     dim, axis = _preprocess(dim)
-#     _a_dask = a_dask.values
-#     _b_dask = b_dask.values
-#     axis = tuple(a_dask.dims.index(d) for d in dim)
-#     res = _mae(_a_dask, _b_dask, axis)
-#     expected = actual.copy()
-#     expected.values = res
-#     assert_allclose(actual, expected)
+@pytest.mark.parametrize('dim', AXES)
+def test_mae_r_xr_dask(a_dask, b_dask, dim):
+    actual = mae(a_dask, b_dask, dim)
+    dim, axis = _preprocess(dim)
+    _a_dask = a_dask.values
+    _b_dask = b_dask.values
+    axis = tuple(a_dask.dims.index(d) for d in dim)
+    res = _mae(_a_dask, _b_dask, axis)
+    expected = actual.copy()
+    expected.values = res
+    assert_allclose(actual, expected)
