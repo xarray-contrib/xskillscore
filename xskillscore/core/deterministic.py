@@ -38,11 +38,17 @@ def pearson_r(a, b, dim):
     xarray.apply_ufunc
 
     """
-    dim, axis = _preprocess(dim)
+    dim, _ = _preprocess(dim)
+    if len(dim) > 1:
+        new_dim = '_'.join(dim)
+        a = a.stack(**{new_dim: dim})
+        b = b.stack(**{new_dim: dim})
+    else:
+        new_dim = dim[0]
 
     return xr.apply_ufunc(_pearson_r, a, b,
-                          input_core_dims=[dim, dim],
-                          kwargs={'axis': axis},
+                          input_core_dims=[[new_dim], [new_dim]],
+                          kwargs={'axis': -1},
                           dask='parallelized',
                           output_dtypes=[float])
 
@@ -72,11 +78,17 @@ def pearson_r_p_value(a, b, dim):
     xarray.apply_ufunc
 
     """
-    dim, axis = _preprocess(dim)
+    dim, _ = _preprocess(dim)
+    if len(dim) > 1:
+        new_dim = '_'.join(dim)
+        a = a.stack(**{new_dim: dim})
+        b = b.stack(**{new_dim: dim})
+    else:
+        new_dim = dim[0]
 
     return xr.apply_ufunc(_pearson_r_p_value, a, b,
-                          input_core_dims=[dim, dim],
-                          kwargs={'axis': axis},
+                          input_core_dims=[[new_dim], [new_dim]],
+                          kwargs={'axis': -1},
                           dask='parallelized',
                           output_dtypes=[float])
 

@@ -28,11 +28,13 @@ def _pearson_r(a, b, axis):
     scipy.stats.pearsonr
 
     """
-    ma = np.mean(a, axis=axis)
-    mb = np.mean(b, axis=axis)
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    ma = np.mean(a, axis=0)
+    mb = np.mean(b, axis=0)
     am, bm = a - ma, b - mb
-    r_num = np.sum(am * bm, axis=axis)
-    r_den = np.sqrt(np.sum(am*am, axis=axis) * np.sum(bm*bm, axis=axis))
+    r_num = np.sum(am * bm, axis=0)
+    r_den = np.sqrt(np.sum(am*am, axis=0) * np.sum(bm*bm, axis=0))
     r = r_num / r_den
     res = np.clip(r, -1.0, 1.0)
     return res
@@ -62,6 +64,7 @@ def _pearson_r_p_value(a, b, axis):
 
     """
     r = _pearson_r(a, b, axis)
+    a = np.rollaxis(a, axis)
     df = a.shape[0] - 2
     t_squared = r**2 * (df / ((1.0 - r) * (1.0 + r)))
     _x = df/(df+t_squared)
