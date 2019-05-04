@@ -4,7 +4,7 @@ xskillscore: Verification of forecasts
 .. image:: https://travis-ci.org/raybellwaves/xskillscore.svg?branch=master
    :target: https://travis-ci.org/raybellwaves/xskillscore
 
-**xskillscore** is an open source project and Python package that provides verification metrics of deterministic (and probabilistic) forecasts with xarray.
+**xskillscore** is an open source project and Python package that provides verification metrics of deterministic (and probabilistic from `properscoring`) forecasts with xarray.
 
 Installing
 ----------
@@ -27,9 +27,9 @@ Examples
                       dims=['time', 'lat', 'lon'])
    fct = xr.DataArray(np.random.rand(3, 4, 5),
                       coords=[pd.date_range('1/1/2000', '1/3/2000', freq='D'),
-                              np.arange(4), np.arange(5)],         
+                              np.arange(4), np.arange(5)],
                       dims=['time', 'lat', 'lon'])
-                      
+
    r = xs.pearson_r(obs, fct, 'time')
    #>>> r
    #<xarray.DataArray (lat: 4, lon: 5)>
@@ -40,7 +40,7 @@ Examples
    #Coordinates:
    #  * lat      (lat) int64 0 1 2 3
    #  * lon      (lon) int64 0 1 2 3 4
-   
+
    rmse = xs.rmse(obs, fct, 'time')
    #>>> rmse
    #<xarray.DataArray (lat: 4, lon: 5)>
@@ -51,4 +51,3 @@ Examples
    #Coordinates:
    #  * lat      (lat) int64 0 1 2 3
    #  * lon      (lon) int64 0 1 2 3 4
-   
