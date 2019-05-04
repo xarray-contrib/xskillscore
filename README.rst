@@ -35,6 +35,7 @@ Examples
                               np.arange(4), np.arange(5)],
                       dims=['time', 'lat', 'lon'])
 
+   # deterministic
    r = xs.pearson_r(obs, fct, 'time')
    #>>> r
    #<xarray.DataArray (lat: 4, lon: 5)>
@@ -45,11 +46,17 @@ Examples
    #Coordinates:
    #  * lat      (lat) int64 0 1 2 3
    #  * lon      (lon) int64 0 1 2 3 4
-  
+
    r_p_value = xs.pearson_r_p_value(obs, fct, 'time')
 
    rmse = xs.rmse(obs, fct, 'time')
 
    mse = xs.mse(obs, fct, 'time')
 
-   mae = xs.mae(obs, fct, 'time') 
+   mae = xs.mae(obs, fct, 'time')
+
+
+   # probabilistic
+   crps_ensemble = xs.crps_ensemble(obs, fct)
+
+   crps_gaussian = xs.crps_gaussian(obs, fct.mean('time'), fct.std('time'))
