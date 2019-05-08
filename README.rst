@@ -4,7 +4,7 @@ xskillscore: Metrics for verifying forecasts
 .. image:: https://travis-ci.org/raybellwaves/xskillscore.svg?branch=master
    :target: https://travis-ci.org/raybellwaves/xskillscore
 
-**xskillscore** is an open source project and Python package that provides verification metrics of deterministic (and probabilistic from `properscoring`) forecasts with xarray.
+**xskillscore** is an open source project and Python package that provides verification metrics of deterministic (and probabilistic from `properscoring`) forecasts with `xarray`.
 
 Installing
 ----------
@@ -60,3 +60,5 @@ Examples
    crps_ensemble = xs.crps_ensemble(obs, fct)
 
    crps_gaussian = xs.crps_gaussian(obs, fct.mean('time'), fct.std('time'))
+
+   threshold_brier_score = xs.threshold_brier_score(obs, fct, 0.7)
