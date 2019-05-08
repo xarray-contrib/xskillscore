@@ -4,7 +4,21 @@ from properscoring import crps_ensemble, crps_gaussian
 
 def xr_crps_gaussian(observations, mu, sig):
     """
+    xarray version of properscoring.crps_gaussian.
 
+    Parameters
+    ----------
+    observations : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
+     scalars, Mix of labeled and/or unlabeled observations arrays.
+    mu : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
+     scalars, Mix of labeled and/or unlabeled forecasts mean arrays.
+    sig : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
+     scalars, Mix of labeled and/or unlabeled forecasts mean arrays.
+
+    Returns
+    -------
+    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
+    numpy.ndarray, the first type on that list to appear on an input.
 
     See Also
     --------
@@ -24,7 +38,19 @@ def xr_crps_gaussian(observations, mu, sig):
 
 def xr_crps_ensemble(observations, forecasts):
     """
+    xarray version of properscoring.crps_ensemble.
 
+    Parameters
+    ----------
+    observations : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
+     scalars, Mix of labeled and/or unlabeled observations arrays.
+    forecasts : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
+     scalars, Mix of labeled and/or unlabeled forecasts arrays.
+
+    Returns
+    -------
+    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
+    numpy.ndarray, the first type on that list to appear on an input.
 
     See Also
     --------
