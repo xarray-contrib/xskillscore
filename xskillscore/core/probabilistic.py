@@ -18,7 +18,7 @@ def xr_crps_gaussian(observations, mu, sig):
     Returns
     -------
     Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
-    numpy.ndarray, the first type on that list to appear on an input.
+     numpy.ndarray, the first type on that list to appear on an input.
 
     See Also
     --------
@@ -30,7 +30,10 @@ def xr_crps_gaussian(observations, mu, sig):
         observations, mu = xr.broadcast(observations, mu)
     if sig.dims != observations.dims:
         observations, sig = xr.broadcast(observations, sig)
-    return xr.apply_ufunc(crps_gaussian, observations, mu, sig,
+    return xr.apply_ufunc(crps_gaussian,
+                          observations,
+                          mu,
+                          sig,
                           input_core_dims=[[], [], []],
                           dask='parallelized',
                           output_dtypes=[float])
@@ -59,15 +62,22 @@ def xr_crps_ensemble(observations, forecasts):
     """
     if forecasts.dims != observations.dims:
         observations, forecasts = xr.broadcast(observations, forecasts)
-    return xr.apply_ufunc(crps_ensemble, observations, forecasts,
+    return xr.apply_ufunc(crps_ensemble,
+                          observations,
+                          forecasts,
                           input_core_dims=[[], []],
                           dask='parallelized',
                           output_dtypes=[float])
 
 
-def xr_threshold_brier_score(observations, forecasts, threshold, issorted=False, axis=-1):
+def xr_threshold_brier_score(observations,
+                             forecasts,
+                             threshold,
+                             issorted=False,
+                             axis=-1):
     """
-    xarray version of properscoring.threshold_brier_score: Calculate the Brier scores of an ensemble for exceeding given thresholds.
+    xarray version of properscoring.threshold_brier_score: Calculate the Brier
+     scores of an ensemble for exceeding given thresholds.
 
     Parameters
     ----------
@@ -107,8 +117,13 @@ def xr_threshold_brier_score(observations, forecasts, threshold, issorted=False,
     if forecasts.dims != observations.dims:
         observations, forecasts = xr.broadcast(observations, forecasts)
     return xr.apply_ufunc(threshold_brier_score,
-                          observations, forecasts, threshold,
+                          observations,
+                          forecasts,
+                          threshold,
                           input_core_dims=[[], [], []],
-                          kwargs={'axis': axis, 'issorted': issorted},
+                          kwargs={
+                              'axis': axis,
+                              'issorted': issorted
+                          },
                           dask='parallelized',
                           output_dtypes=[float])
