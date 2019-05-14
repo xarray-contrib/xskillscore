@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-from properscoring import (brier_score, crps_ensemble, crps_gaussian,
+from properscoring import (crps_ensemble, crps_gaussian,
                            threshold_brier_score)
-from xarray.tests import assert_allclose, assert_identical
+from xarray.tests import assert_identical
 
 from xskillscore.core.probabilistic import (xr_crps_ensemble, xr_crps_gaussian,
                                             xr_threshold_brier_score)
