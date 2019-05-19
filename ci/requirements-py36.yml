@@ -8,3 +8,5 @@ dependencies:
   - dask
   - scipy
   - pytest
+  - pip:
+    - properscoring
