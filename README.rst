@@ -53,8 +53,10 @@ Examples
 
    mse = xs.mse(obs, fct, 'time')
 
-   mae = xs.mae(obs, fct, 'time')
-
+   mae = xs.mae(obs, fct, 'time') 
+   
+   # You can also specify multiple axes for deterministic metrics
+   r = xs.pearson_r(obs, fct, ['lat', 'lon'])
 
    # probabilistic
    crps_ensemble = xs.crps_ensemble(obs, fct)

@@ -99,9 +99,7 @@ def _rmse(a, b, axis):
     sklearn.metrics.mean_squared_error
 
     """
-    a = np.rollaxis(a, axis)
-    b = np.rollaxis(b, axis)
-    res = np.sqrt(((a - b) ** 2).mean(axis=0))
+    res = np.sqrt(((a - b) ** 2).mean(axis=axis))
     return res
 
 
@@ -128,9 +126,7 @@ def _mse(a, b, axis):
     sklearn.metrics.mean_squared_error
 
     """
-    a = np.rollaxis(a, axis)
-    b = np.rollaxis(b, axis)
-    res = ((a - b) ** 2).mean(axis=0)
+    res = ((a - b) ** 2).mean(axis=axis)
     return res
 
 
@@ -157,7 +153,5 @@ def _mae(a, b, axis):
     sklearn.metrics.mean_absolute_error
 
     """
-    a = np.rollaxis(a, axis)
-    b = np.rollaxis(b, axis)
-    res = (np.absolute(a - b)).mean(axis=0)
+    res = (np.absolute(a - b)).mean(axis=axis)
     return res
