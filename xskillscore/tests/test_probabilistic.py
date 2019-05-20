@@ -77,7 +77,13 @@ def test_xr_crps_gaussian_dask_b_int(a_dask):
     assert actual is not None
 
 
-def test_xr_threshold_brier_score_dask_b_int(a_dask, b_dask):
+def test_xr_threshold_brier_score_dask_b_float(a_dask, b_dask):
     threshold = .5
+    actual = xr_threshold_brier_score(a_dask, b_dask, threshold)
+    assert actual is not None
+
+
+def test_xr_threshold_brier_score_dask_b_int(a_dask, b_dask):
+    threshold = 0
     actual = xr_threshold_brier_score(a_dask, b_dask, threshold)
     assert actual is not None
