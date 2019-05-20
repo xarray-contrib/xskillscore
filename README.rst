@@ -64,3 +64,16 @@ Examples
    crps_gaussian = xs.crps_gaussian(obs, fct.mean('time'), fct.std('time'))
 
    threshold_brier_score = xs.threshold_brier_score(obs, fct, 0.7)
+
+   # You can also use xskillscore as a method of your dataset.
+   ds = xr.Dataset()
+   ds['obs_var'] = obs
+   ds['fct_var'] = fct
+
+   # This is the equivalent of r = xs.pearson_r(obs, fct, 'time')
+   r = ds.xs.rmse('obs_var', 'fct_var', 'time')
+
+   # If fct is not a part of the dataset, inputting a separate
+   # DataArray as an argument works as well
+   ds = ds.drop('fct_var')
+   r = ds.xs.rmse('obs_var', fct, 'time')
