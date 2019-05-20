@@ -26,6 +26,10 @@ def xr_crps_gaussian(observations, mu, sig):
     xarray.apply_ufunc
     """
     # check if same dimensions
+    if isinstance(mu, (int, float)):
+        mu = xr.DataArray(mu)
+    if isinstance(sig, (int, float)):
+        sig = xr.DataArray(sig)
     if mu.dims != observations.dims:
         observations, mu = xr.broadcast(observations, mu)
     if sig.dims != observations.dims:

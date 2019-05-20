@@ -1,11 +1,10 @@
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
-from properscoring import (crps_ensemble, crps_gaussian,
-                           threshold_brier_score)
-from xarray.tests import assert_identical
 
+import xarray as xr
+from properscoring import crps_ensemble, crps_gaussian, threshold_brier_score
+from xarray.tests import assert_identical
 from xskillscore.core.probabilistic import (xr_crps_ensemble, xr_crps_gaussian,
                                             xr_threshold_brier_score)
 
@@ -69,3 +68,16 @@ def test_xr_threshold_brier_score_dask(a_dask, b_dask):
     assert actual.chunks is not None
     # show that crps_ensemble returns no chunks
     assert expected.chunks is None
+
+
+def test_xr_crps_gaussian_dask_b_int(a_dask):
+    mu = 0
+    sig = 1
+    actual = xr_crps_gaussian(a_dask, mu, sig)
+    assert actual is not None
+
+
+def test_xr_threshold_brier_score_dask_b_int(a_dask, b_dask):
+    threshold = .5
+    actual = xr_threshold_brier_score(a_dask, b_dask, threshold)
+    assert actual is not None
