@@ -77,3 +77,5 @@ Examples
    # DataArray as an argument works as well
    ds = ds.drop('fct_var')
    r = ds.xs.rmse('obs_var', fct, 'time')
+
+See https://github.com/bradyrx/climpred For a list of use cases with ``xskillscore``.
