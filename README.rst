@@ -9,11 +9,15 @@ xskillscore: Metrics for verifying forecasts
 Installing
 ----------
 
-``pip install xskillscore``
+``$ conda install -c conda-forge xskillscore``
 
 or
 
-``pip install git+https://github.com/raybellwaves/xskillscore``
+``$ pip install xskillscore``
+
+or
+
+``$ pip install git+https://github.com/raybellwaves/xskillscore``
 
 Examples
 --------
@@ -78,4 +82,7 @@ Examples
    ds = ds.drop('fct_var')
    r = ds.xs.rmse('obs_var', fct, 'time')
 
-See https://github.com/bradyrx/climpred For a list of use cases with ``xskillscore``.
+What projects leverage xskillscore?
+-----------------------------------
+
+- `climpred <https://climpred.readthedocs.io>`_: An xarray wrapper for analysis of ensemble forecast models for climate prediction. 

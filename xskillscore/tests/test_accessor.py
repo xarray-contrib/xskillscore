@@ -5,10 +5,9 @@ import xarray as xr
 from xarray.tests import assert_allclose
 
 from xskillscore.core.deterministic import (
-    pearson_r, pearson_r_p_value, rmse, mse, mae)
+    pearson_r, rmse, mae)
 from xskillscore.core.probabilistic import (
-    xr_crps_ensemble, xr_crps_gaussian, xr_threshold_brier_score)
-from xskillscore.core.accessor import XSkillScoreAccessor
+    xr_crps_gaussian)
 
 
 @pytest.fixture
