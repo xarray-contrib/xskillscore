@@ -10,7 +10,7 @@ from xskillscore.core.np_deterministic import (
     _mae, _mse, _pearson_r, _pearson_r_p_value, _rmse)
 
 
-AXES = ('time', 'lat', 'lon', ('lat', 'lon'), ('time', 'lat', 'lon'))
+AXES = ('time', 'lat', 'lon', ('lat', 'lon'))
 
 
 @pytest.fixture
