@@ -3,6 +3,8 @@ xskillscore: Metrics for verifying forecasts
 
 .. image:: https://travis-ci.org/raybellwaves/xskillscore.svg?branch=master
    :target: https://travis-ci.org/raybellwaves/xskillscore
+.. image:: https://img.shields.io/pypi/v/xskillscore.svg
+   :target: https://pypi.python.org/pypi/xskillscore/
 
 **xskillscore** is an open source project and Python package that provides verification metrics of deterministic (and probabilistic from `properscoring`) forecasts with `xarray`.
 
