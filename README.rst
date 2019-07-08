@@ -90,4 +90,4 @@ What projects leverage xskillscore?
 -----------------------------------
 
 - `climpred <https://climpred.readthedocs.io>`_: An xarray wrapper for analysis of ensemble forecast models for climate prediction.
-- `esmlab <https://esmlab.readthedocs.io`_: Tools for working with earth system multi-model analyses with xarray. 
+- `esmlab <https://esmlab.readthedocs.io>`_: Tools for working with earth system multi-model analyses with xarray. 
