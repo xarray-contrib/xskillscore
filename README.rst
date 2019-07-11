@@ -79,12 +79,12 @@ Examples
    ds['fct_var'] = fct
 
    # This is the equivalent of r = xs.pearson_r(obs, fct, 'time')
-   r = ds.xs.rmse('obs_var', 'fct_var', 'time')
+   r = ds.xs.pearson_r('obs_var', 'fct_var', 'time')
 
    # If fct is not a part of the dataset, inputting a separate
    # DataArray as an argument works as well
    ds = ds.drop('fct_var')
-   r = ds.xs.rmse('obs_var', fct, 'time')
+   r = ds.xs.pearson_r('obs_var', fct, 'time')
 
 What projects leverage xskillscore?
 -----------------------------------
