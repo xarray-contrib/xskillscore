@@ -6,7 +6,7 @@ xskillscore: Metrics for verifying forecasts
 .. image:: https://img.shields.io/pypi/v/xskillscore.svg
    :target: https://pypi.python.org/pypi/xskillscore/
 .. image:: https://anaconda.org/conda-forge/xskillscore/badges/version.svg
-   :target: https://anaconda.org/conda-forge/xskillscore/ 
+   :target: https://anaconda.org/conda-forge/xskillscore/
 
 **xskillscore** is an open source project and Python package that provides verification metrics of deterministic (and probabilistic from `properscoring`) forecasts with `xarray`.
 
@@ -61,8 +61,8 @@ Examples
 
    mse = xs.mse(obs, fct, 'time')
 
-   mae = xs.mae(obs, fct, 'time') 
-   
+   mae = xs.mae(obs, fct, 'time')
+
    # You can also specify multiple axes for deterministic metrics
    r = xs.pearson_r(obs, fct, ['lat', 'lon'])
 
@@ -72,6 +72,8 @@ Examples
    crps_gaussian = xs.crps_gaussian(obs, fct.mean('time'), fct.std('time'))
 
    threshold_brier_score = xs.threshold_brier_score(obs, fct, 0.7)
+
+   brier_score = xs.brier_score(obs > .5, fct)
 
    # You can also use xskillscore as a method of your dataset.
    ds = xr.Dataset()
@@ -90,4 +92,4 @@ What projects leverage xskillscore?
 -----------------------------------
 
 - `climpred <https://climpred.readthedocs.io>`_: An xarray wrapper for analysis of ensemble forecast models for climate prediction.
-- `esmlab <https://esmlab.readthedocs.io>`_: Tools for working with earth system multi-model analyses with xarray. 
+- `esmlab <https://esmlab.readthedocs.io>`_: Tools for working with earth system multi-model analyses with xarray.

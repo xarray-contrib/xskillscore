@@ -6,7 +6,7 @@ import xarray as xr
 from properscoring import crps_ensemble, crps_gaussian, threshold_brier_score
 from xarray.tests import assert_identical
 from xskillscore.core.probabilistic import (xr_crps_ensemble, xr_crps_gaussian,
-                                            xr_threshold_brier_score)
+                                            xr_threshold_brier_score, xr_brier_score)
 
 
 @pytest.fixture
@@ -64,9 +64,9 @@ def test_xr_threshold_brier_score_dask(a_dask, b_dask):
     expected = xr.DataArray(expected, coords=a_dask.coords)
     # test for numerical identity of xr_threshold and threshold
     assert_identical(actual, expected)
-    # test that xr_crps_ensemble returns chunks
+    # test that xr_threshold_brier_score returns chunks
     assert actual.chunks is not None
-    # show that crps_ensemble returns no chunks
+    # show that xr_threshold_brier_score returns no chunks
     assert expected.chunks is None
 
 
@@ -86,4 +86,9 @@ def test_xr_threshold_brier_score_dask_b_float(a_dask, b_dask):
 def test_xr_threshold_brier_score_dask_b_int(a_dask, b_dask):
     threshold = 0
     actual = xr_threshold_brier_score(a_dask, b_dask, threshold)
+    assert actual is not None
+
+
+def test_xr_brier_score_dask(a_dask, b_dask):
+    actual = xr_brier_score((a_dask > .5), b_dask)
     assert actual is not None
