@@ -43,7 +43,8 @@ def xr_crps_gaussian(observations, mu, sig):
                           output_dtypes=[float])
 
 
-def xr_crps_ensemble(observations, forecasts):
+def xr_crps_ensemble(observations, forecasts, weights=None, issorted=False,
+                     axis=-1):
     """
     xarray version of properscoring.crps_ensemble.
 
@@ -53,6 +54,17 @@ def xr_crps_ensemble(observations, forecasts):
      scalars, Mix of labeled and/or unlabeled observations arrays.
     forecasts : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
      scalars, Mix of labeled and/or unlabeled forecasts arrays.
+    weights : array_like, optional
+     If provided, the CRPS is calculated exactly with the assigned
+     probability weights to each forecast. Weights should be positive, but
+     do not need to be normalized. By default, each forecast is weighted
+     equally.
+    issorted : bool, optional
+     Optimization flag to indicate that the elements of `ensemble` are
+     already sorted along `axis`.
+    axis : int, optional
+     Axis in forecasts and weights which corresponds to different ensemble
+     members, along which to calculate CRPS.
 
     Returns
     -------
@@ -64,12 +76,15 @@ def xr_crps_ensemble(observations, forecasts):
     properscoring.crps_ensemble
     xarray.apply_ufunc
     """
-    if forecasts.dims != observations.dims:
-        observations, forecasts = xr.broadcast(observations, forecasts)
     return xr.apply_ufunc(crps_ensemble,
                           observations,
                           forecasts,
                           input_core_dims=[[], []],
+                          kwargs={
+                              'axis': axis,
+                              'issorted': issorted,
+                              'weights': weights
+                          },
                           dask='parallelized',
                           output_dtypes=[float])
 

@@ -87,3 +87,21 @@ def test_xr_threshold_brier_score_dask_b_int(a_dask, b_dask):
     threshold = 0
     actual = xr_threshold_brier_score(a_dask, b_dask, threshold)
     assert actual is not None
+
+
+def test_xr_crps_ensemble_shape_minus_1_probabilistic(a_dask, b_dask):
+    o = a_dask.isel(time=0).rename({'time': 'member'})
+    o['member'] = 1
+    f = b_dask.rename({'time': 'member'})
+    f['member'] = np.arange(1, 4)
+    member_axis = list(f.dims)
+    member_axis = member_axis.index('member')
+    print('axis=', member_axis)
+    print(o.shape, f.shape)
+    actual_probabilistic = xr_crps_ensemble(o, f, axis=member_axis)
+    f, o = xr.broadcast(f, o)
+    print(o.shape, f.shape)
+    actual_deterministic = xr_crps_ensemble(o, f)
+    print(actual_deterministic, actual_probabilistic)
+    print(actual_deterministic.shape, actual_probabilistic.shape)
+    assert actual_deterministic.shape != actual_probabilistic.shape
