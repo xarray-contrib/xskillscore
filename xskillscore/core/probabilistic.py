@@ -1,4 +1,5 @@
 import xarray as xr
+import warnings
 from properscoring import crps_ensemble, crps_gaussian, threshold_brier_score
 
 
@@ -44,7 +45,7 @@ def xr_crps_gaussian(observations, mu, sig):
 
 
 def xr_crps_ensemble(observations, forecasts, weights=None, issorted=False,
-                     axis=-1):
+                     axis=-1, dim='member'):
     """
     xarray version of properscoring.crps_ensemble.
 
@@ -53,8 +54,10 @@ def xr_crps_ensemble(observations, forecasts, weights=None, issorted=False,
     observations : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
      scalars, Mix of labeled and/or unlabeled observations arrays.
     forecasts : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled forecasts arrays.
-    weights : array_like, optional
+     scalars, Mix of labeled and/or unlabeled forecasts arrays with required
+     member dimension `dim`.
+    weights : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
+     scalars, Mix of labeled and/or unlabeled, optional
      If provided, the CRPS is calculated exactly with the assigned
      probability weights to each forecast. Weights should be positive, but
      do not need to be normalized. By default, each forecast is weighted
@@ -65,6 +68,8 @@ def xr_crps_ensemble(observations, forecasts, weights=None, issorted=False,
     axis : int, optional
      Axis in forecasts and weights which corresponds to different ensemble
      members, along which to calculate CRPS.
+    dim : str, optional
+     Name of ensemble member dimension. By default, 'member'.
 
     Returns
     -------
@@ -79,21 +84,23 @@ def xr_crps_ensemble(observations, forecasts, weights=None, issorted=False,
     return xr.apply_ufunc(crps_ensemble,
                           observations,
                           forecasts,
-                          input_core_dims=[[], []],
+                          input_core_dims=[[], [dim]],
                           kwargs={
                               'axis': axis,
                               'issorted': issorted,
                               'weights': weights
                           },
                           dask='parallelized',
-                          output_dtypes=[float])
+                          output_dtypes=[float]
+                          )
 
 
 def xr_threshold_brier_score(observations,
                              forecasts,
                              threshold,
                              issorted=False,
-                             axis=-1):
+                             axis=-1,
+                             dim='member'):
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
      scores of an ensemble for exceeding given thresholds.
@@ -103,7 +110,8 @@ def xr_threshold_brier_score(observations,
     observations : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
      scalars, Mix of labeled and/or unlabeled observations arrays.
     forecasts : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled forecasts arrays.
+     scalars, Mix of labeled and/or unlabeled forecasts arrays with required
+     member dimension `dim`.
     threshold : scalar (not yet implemented: or 1d scalar threshold value(s) at
      which to calculate) exceedence Brier scores.
     issorted : bool, optional
@@ -112,6 +120,8 @@ def xr_threshold_brier_score(observations,
     axis : int, optional
         Axis in forecasts which corresponds to different ensemble members,
         along which to calculate the threshold decomposition.
+    dim : str, optional
+     Name of ensemble member dimension. By default, 'member'.
 
 
     Returns
@@ -120,7 +130,7 @@ def xr_threshold_brier_score(observations,
     numpy.ndarray, the first type on that list to appear on an input. (If
     ``threshold`` is a scalar, the result will have the same shape as
     observations. Otherwise, it will have an additional final dimension
-    corresponding to the threshold levels.)
+    corresponding to the threshold levels. Not implemented yet.)
 
     References
     ----------
@@ -133,13 +143,11 @@ def xr_threshold_brier_score(observations,
     properscoring.threshold_brier_score
     xarray.apply_ufunc
     """
-    if forecasts.dims != observations.dims:
-        observations, forecasts = xr.broadcast(observations, forecasts)
     return xr.apply_ufunc(threshold_brier_score,
                           observations,
                           forecasts,
                           threshold,
-                          input_core_dims=[[], [], []],
+                          input_core_dims=[[], [dim], []],
                           kwargs={
                               'axis': axis,
                               'issorted': issorted
