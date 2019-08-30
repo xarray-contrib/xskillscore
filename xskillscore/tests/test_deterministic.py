@@ -60,6 +60,7 @@ def b_dask(b):
 @pytest.mark.parametrize('dim', AXES)
 def test_pearson_r_xr(a, b, dim):
     actual = pearson_r(a, b, dim)
+    assert actual.chunks is None
 
     dim, _ = _preprocess(dim)
     if len(dim) > 1:
@@ -81,6 +82,7 @@ def test_pearson_r_xr(a, b, dim):
 @pytest.mark.parametrize('dim', AXES)
 def test_pearson_r_xr_dask(a_dask, b_dask, dim):
     actual = pearson_r(a_dask, b_dask, dim)
+    assert actual.chunks is not None
 
     dim, _ = _preprocess(dim)
     if len(dim) > 1:
@@ -102,6 +104,7 @@ def test_pearson_r_xr_dask(a_dask, b_dask, dim):
 @pytest.mark.parametrize('dim', AXES)
 def test_pearson_r_p_value_xr(a, b, dim):
     actual = pearson_r_p_value(a, b, dim)
+    assert actual.chunks is None
 
     dim, _ = _preprocess(dim)
     if len(dim) > 1:
@@ -123,6 +126,7 @@ def test_pearson_r_p_value_xr(a, b, dim):
 @pytest.mark.parametrize('dim', AXES)
 def test_pearson_r_p_value_xr_dask(a_dask, b_dask, dim):
     actual = pearson_r_p_value(a_dask, b_dask, dim)
+    assert actual.chunks is not None
 
     dim, _ = _preprocess(dim)
     if len(dim) > 1:
@@ -144,6 +148,8 @@ def test_pearson_r_p_value_xr_dask(a_dask, b_dask, dim):
 @pytest.mark.parametrize('dim', AXES)
 def test_rmse_r_xr(a, b, dim):
     actual = rmse(a, b, dim)
+    assert actual.chunks is None
+
     dim, axis = _preprocess(dim)
     _a = a.values
     _b = b.values
@@ -157,6 +163,8 @@ def test_rmse_r_xr(a, b, dim):
 @pytest.mark.parametrize('dim', AXES)
 def test_rmse_r_xr_dask(a_dask, b_dask, dim):
     actual = rmse(a_dask, b_dask, dim)
+    assert actual.chunks is not None
+
     dim, axis = _preprocess(dim)
     _a_dask = a_dask.values
     _b_dask = b_dask.values
@@ -170,6 +178,8 @@ def test_rmse_r_xr_dask(a_dask, b_dask, dim):
 @pytest.mark.parametrize('dim', AXES)
 def test_mse_r_xr(a, b, dim):
     actual = mse(a, b, dim)
+    assert actual.chunks is None
+
     dim, axis = _preprocess(dim)
     _a = a.values
     _b = b.values
@@ -183,6 +193,8 @@ def test_mse_r_xr(a, b, dim):
 @pytest.mark.parametrize('dim', AXES)
 def test_mse_r_xr_dask(a_dask, b_dask, dim):
     actual = mse(a_dask, b_dask, dim)
+    assert actual.chunks is not None
+
     dim, axis = _preprocess(dim)
     _a_dask = a_dask.values
     _b_dask = b_dask.values
@@ -196,6 +208,7 @@ def test_mse_r_xr_dask(a_dask, b_dask, dim):
 @pytest.mark.parametrize('dim', AXES)
 def test_mae_r_xr(a, b, dim):
     actual = mae(a, b, dim)
+    assert actual.chunks is None
     dim, axis = _preprocess(dim)
     _a = a.values
     _b = b.values
@@ -209,6 +222,7 @@ def test_mae_r_xr(a, b, dim):
 @pytest.mark.parametrize('dim', AXES)
 def test_mae_r_xr_dask(a_dask, b_dask, dim):
     actual = mae(a_dask, b_dask, dim)
+    assert actual.chunks is not None
     dim, axis = _preprocess(dim)
     _a_dask = a_dask.values
     _b_dask = b_dask.values

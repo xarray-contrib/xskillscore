@@ -3,10 +3,11 @@ import pandas as pd
 import pytest
 
 import xarray as xr
-from properscoring import crps_ensemble, crps_gaussian, threshold_brier_score
+from properscoring import crps_ensemble, crps_gaussian, threshold_brier_score, crps_quadrature
 from xarray.tests import assert_identical, assert_allclose
 from xskillscore.core.probabilistic import (xr_crps_ensemble, xr_crps_gaussian,
-                                            xr_threshold_brier_score)
+                                            xr_threshold_brier_score, xr_crps_quadrature)
+import scipy
 
 
 @pytest.fixture
@@ -47,6 +48,20 @@ def test_xr_crps_gaussian_dask(o_dask, f_dask):
     sig = f_dask.std('member')
     actual = xr_crps_gaussian(o_dask, mu, sig)
     expected = crps_gaussian(o_dask, mu, sig)
+    expected = xr.DataArray(expected, coords=o_dask.coords)
+    # test for numerical identity of xr_crps and crps
+    assert_allclose(actual, expected)
+    # test that xr_crps_ensemble returns chunks
+    assert actual.chunks is not None
+    # show that crps_ensemble returns no chunks
+    assert expected.chunks is None
+
+
+def test_xr_crps_quadrature_dask(o_dask, f_dask):
+    xmin, xmax, tol = 0, 1, 0.01
+    cdf_or_dist = scipy.stats.t
+    actual = xr_crps_quadrature(o_dask, cdf_or_dist, xmin, xmax, tol)
+    expected = crps_quadrature(o_dask, cdf_or_dist, xmin, xmax, tol)
     expected = xr.DataArray(expected, coords=o_dask.coords)
     # test for numerical identity of xr_crps and crps
     assert_allclose(actual, expected)
@@ -100,4 +115,14 @@ def test_xr_threshold_brier_score_multiple_thresholds(o_dask, f_dask):
 def test_xr_threshold_brier_score_multiple_thresholds_dask(o_dask, f_dask):
     threshold = xr.DataArray([.1, .3, .5]).chunk()
     actual = xr_threshold_brier_score(o_dask, f_dask, threshold)
+    assert actual.chunks is not None
+
+
+def test_xr_brier_score(a_dask, b_dask):
+    actual = xr_brier_score((a_dask > .5).compute(), b_dask.compute())
+    assert actual.chunks is None
+
+
+def test_xr_brier_score_dask(a_dask, b_dask):
+    actual = xr_brier_score((a_dask > .5), b_dask)
     assert actual.chunks is not None
