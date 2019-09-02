@@ -1,4 +1,4 @@
-name: test_env
+name: xskillscore-dev
 channels:
   - conda-forge
 dependencies:
@@ -10,5 +10,6 @@ dependencies:
   - pytest
   - flake8
   - pip
+  - numba
   - pip:
     - properscoring

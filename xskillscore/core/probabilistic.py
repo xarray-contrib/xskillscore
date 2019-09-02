@@ -1,6 +1,9 @@
-import xarray as xr
 import warnings
-from properscoring import crps_ensemble, crps_gaussian, crps_quadrature, threshold_brier_score
+
+import numpy as np
+import xarray as xr
+from properscoring import (brier_score, crps_ensemble, crps_gaussian,
+                           crps_quadrature, threshold_brier_score)
 
 
 def xr_crps_gaussian(observations, mu, sig):
@@ -64,19 +67,6 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
     properscoring.crps_quadratic
     xarray.apply_ufunc
     """
-    # check if same dimensions
-    if isinstance(xmin, (int, float)):
-        xmin = xr.DataArray(xmin)
-    if isinstance(xmax, (int, float)):
-        xmax = xr.DataArray(xmax)
-    if isinstance(tol, (int, float)):
-        tol = xr.DataArray(tol)
-    if xmin.dims != x.dims:
-        x, xmin = xr.broadcast(x, xmin)
-    if xmax.dims != x.dims:
-        x, xmax = xr.broadcast(x, xmax)
-    if tol.dims != x.dims:
-        x, tol = xr.broadcast(x, tol)
     return xr.apply_ufunc(crps_quadrature,
                           x,
                           cdf_or_dist,
@@ -89,7 +79,7 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
 
 
 def xr_crps_ensemble(observations, forecasts, weights=None, issorted=False,
-                     axis=-1, dim='member'):
+                     dim='member'):
     """
     xarray version of properscoring.crps_ensemble.
 
@@ -109,9 +99,6 @@ def xr_crps_ensemble(observations, forecasts, weights=None, issorted=False,
     issorted : bool, optional
      Optimization flag to indicate that the elements of `ensemble` are
      already sorted along `axis`.
-    axis : int, optional
-     Axis in forecasts and weights which corresponds to different ensemble
-     members, along which to calculate CRPS.
     dim : str, optional
      Name of ensemble member dimension. By default, 'member'.
 
@@ -130,7 +117,7 @@ def xr_crps_ensemble(observations, forecasts, weights=None, issorted=False,
                           forecasts,
                           input_core_dims=[[], [dim]],
                           kwargs={
-                              'axis': axis,
+                              'axis': -1,
                               'issorted': issorted,
                               'weights': weights
                           },
@@ -179,7 +166,6 @@ def xr_threshold_brier_score(observations,
                              forecasts,
                              threshold,
                              issorted=False,
-                             axis=-1,
                              dim='member'):
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
@@ -197,9 +183,6 @@ def xr_threshold_brier_score(observations,
     issorted : bool, optional
         Optimization flag to indicate that the elements of `ensemble` are
         already sorted along `axis`.
-    axis : int, optional
-        Axis in forecasts which corresponds to different ensemble members,
-        along which to calculate the threshold decomposition.
     dim : str, optional
      Name of ensemble member dimension. By default, 'member'.
 
@@ -223,14 +206,30 @@ def xr_threshold_brier_score(observations,
     properscoring.threshold_brier_score
     xarray.apply_ufunc
     """
+    if isinstance(threshold, list):
+        threshold.sort()
+        threshold = xr.DataArray(threshold, dims='threshold')
+        threshold['threshold'] = np.arange(1, 1+threshold.threshold.size)
+
+    if isinstance(threshold, (xr.DataArray, xr.Dataset)):
+        if 'threshold' not in threshold.dims:
+            raise ValueError('please provide threshold with threshold dim')
+        input_core_dims = [[], [dim], ['threshold']]
+        output_core_dims = [['threshold']]
+    elif isinstance(threshold, (int, float)):
+        input_core_dims = [[], [dim], []]
+        output_core_dims = [[]]
+    else:
+        raise ValueError('Please provide threshold as list, int, float')
     return xr.apply_ufunc(threshold_brier_score,
                           observations,
                           forecasts,
                           threshold,
-                          input_core_dims=[[], [dim], []],
+                          input_core_dims=input_core_dims,
                           kwargs={
-                              'axis': axis,
+                              'axis': -1,
                               'issorted': issorted
                           },
+                          output_core_dims=output_core_dims,
                           dask='parallelized',
                           output_dtypes=[float])

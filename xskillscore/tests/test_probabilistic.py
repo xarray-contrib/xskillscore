@@ -1,13 +1,15 @@
 import numpy as np
 import pandas as pd
 import pytest
-
 import xarray as xr
-from properscoring import crps_ensemble, crps_gaussian, threshold_brier_score, crps_quadrature
-from xarray.tests import assert_identical, assert_allclose
-from xskillscore.core.probabilistic import (xr_crps_ensemble, xr_crps_gaussian,
-                                            xr_threshold_brier_score, xr_crps_quadrature)
-import scipy
+from properscoring import (brier_score, crps_ensemble, crps_gaussian,
+                           crps_quadrature, threshold_brier_score)
+from scipy.stats import norm
+from xarray.tests import assert_allclose, assert_identical
+from xskillscore.core.probabilistic import (xr_brier_score, xr_crps_ensemble,
+                                            xr_crps_gaussian,
+                                            xr_crps_quadrature,
+                                            xr_threshold_brier_score)
 
 
 @pytest.fixture
@@ -58,8 +60,22 @@ def test_xr_crps_gaussian_dask(o_dask, f_dask):
 
 
 def test_xr_crps_quadrature_dask(o_dask, f_dask):
-    xmin, xmax, tol = 0, 1, 0.01
-    cdf_or_dist = scipy.stats.t
+    xmin, xmax, tol = 0.01, 0.99, 0.01
+    cdf_or_dist = norm
+    actual = xr_crps_quadrature(o_dask, cdf_or_dist)
+    expected = crps_quadrature(o_dask, cdf_or_dist)
+    expected = xr.DataArray(expected, coords=o_dask.coords)
+    # test for numerical identity of xr_crps and crps
+    assert_allclose(actual, expected)
+    # test that xr_crps_ensemble returns chunks
+    assert actual.chunks is not None
+    # show that crps_ensemble returns no chunks
+    assert expected.chunks is None
+
+
+def test_xr_crps_quadrature_args(o_dask, f_dask):
+    xmin, xmax, tol = -10, 10, 1e-6
+    cdf_or_dist = norm
     actual = xr_crps_quadrature(o_dask, cdf_or_dist, xmin, xmax, tol)
     expected = crps_quadrature(o_dask, cdf_or_dist, xmin, xmax, tol)
     expected = xr.DataArray(expected, coords=o_dask.coords)
@@ -103,26 +119,32 @@ def test_xr_threshold_brier_score_dask_b_int(o_dask, f_dask):
     assert actual is not None
 
 
-@pytest.mark.skip(reason="multiple thresholds not implemented")
-def test_xr_threshold_brier_score_multiple_thresholds(o_dask, f_dask):
+def test_xr_threshold_brier_score_multiple_thresholds_list(o_dask, f_dask):
     threshold = [.1, .3, .5]
     actual = xr_threshold_brier_score(
         o_dask.compute(), f_dask.compute(), threshold)
     assert actual.chunks is None
 
 
-@pytest.mark.skip(reason="multiple thresholds not implemented")
-def test_xr_threshold_brier_score_multiple_thresholds_dask(o_dask, f_dask):
-    threshold = xr.DataArray([.1, .3, .5]).chunk()
-    actual = xr_threshold_brier_score(o_dask, f_dask, threshold)
-    assert actual.chunks is not None
-
-
-def test_xr_brier_score(a_dask, b_dask):
-    actual = xr_brier_score((a_dask > .5).compute(), b_dask.compute())
+def test_xr_threshold_brier_score_multiple_thresholds_xr(o_dask, f_dask):
+    threshold = xr.DataArray([.1, .3, .5], dims='threshold')
+    actual = xr_threshold_brier_score(
+        o_dask.compute(), f_dask.compute(), threshold)
     assert actual.chunks is None
 
 
-def test_xr_brier_score_dask(a_dask, b_dask):
-    actual = xr_brier_score((a_dask > .5), b_dask)
+def test_xr_threshold_brier_score_multiple_thresholds_dask(o_dask, f_dask):
+    threshold = xr.DataArray([.1, .3, .5], dims='threshold').chunk()
+    actual = xr_threshold_brier_score(
+        o_dask, f_dask, threshold)
+    assert actual.chunks is not None
+
+
+def test_xr_brier_score(o_dask, f_dask):
+    actual = xr_brier_score((o_dask > .5).compute(), f_dask.compute())
+    assert actual.chunks is None
+
+
+def test_xr_brier_score_dask(o_dask, f_dask):
+    actual = xr_brier_score((o_dask > .5), f_dask)
     assert actual.chunks is not None
