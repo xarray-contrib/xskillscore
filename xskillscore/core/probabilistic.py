@@ -178,8 +178,8 @@ def xr_threshold_brier_score(observations,
     forecasts : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
      scalars, Mix of labeled and/or unlabeled forecasts arrays with required
      member dimension `dim`.
-    threshold : scalar (not yet implemented: or 1d scalar threshold value(s) at
-     which to calculate) exceedence Brier scores.
+    threshold : scalar or 1d scalar threshold values at
+     which to calculate exceedence Brier scores.
     issorted : bool, optional
         Optimization flag to indicate that the elements of `ensemble` are
         already sorted along `axis`.
@@ -213,14 +213,16 @@ def xr_threshold_brier_score(observations,
 
     if isinstance(threshold, (xr.DataArray, xr.Dataset)):
         if 'threshold' not in threshold.dims:
-            raise ValueError('please provide threshold with threshold dim')
+            raise ValueError(
+                'please provide threshold with threshold dim, found', threshold.dims)
         input_core_dims = [[], [dim], ['threshold']]
         output_core_dims = [['threshold']]
     elif isinstance(threshold, (int, float)):
         input_core_dims = [[], [dim], []]
         output_core_dims = [[]]
     else:
-        raise ValueError('Please provide threshold as list, int, float')
+        raise ValueError(
+            'Please provide threshold as list, int, float or xr.object with threshold dimension; found', type(threshold))
     return xr.apply_ufunc(threshold_brier_score,
                           observations,
                           forecasts,
