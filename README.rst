@@ -31,6 +31,7 @@ Examples
    import xarray as xr
    import pandas as pd
    import numpy as np
+   from scipy.stats import norm
    import xskillscore as xs
 
 
@@ -76,6 +77,7 @@ Examples
    # You can also specify multiple axes for deterministic metrics
    r = xs.pearson_r(obs, fct, ["lat", "lon"])
 
+
    # probabilistic
    obs = xr.DataArray(
        np.random.rand(4, 5), coords=[np.arange(4), np.arange(5)], dims=["lat", "lon"]
@@ -88,8 +90,6 @@ Examples
    crps_ensemble = xs.crps_ensemble(obs, fct)
 
    crps_gaussian = xs.crps_gaussian(obs, fct.mean("time"), fct.std("time"))
-
-   from scipy.stats import norm
 
    crps_quadratic = xs.crps_quadratic(obs, norm)
 
