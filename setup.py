@@ -14,6 +14,7 @@ INSTALL_REQUIRES = [
     'dask',
     'scipy',
     'properscoring',
+    'numba'
 ]
 TESTS_REQUIRE = ['pytest']
 PYTHON_REQUIRE = '>=3.6'
