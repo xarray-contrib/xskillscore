@@ -89,7 +89,7 @@ Examples
    )
    crps_ensemble = xs.crps_ensemble(obs, fct)
 
-   crps_gaussian = xs.crps_gaussian(obs, fct.mean("time"), fct.std("time"))
+   crps_gaussian = xs.crps_gaussian(obs, fct.mean("member"), fct.std("member"))
 
    crps_quadratic = xs.crps_quadratic(obs, norm)
 
