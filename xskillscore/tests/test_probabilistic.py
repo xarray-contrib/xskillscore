@@ -1,22 +1,14 @@
 import numpy as np
 import pytest
 import xarray as xr
-from properscoring import (
-    brier_score,
-    crps_ensemble,
-    crps_gaussian,
-    crps_quadrature,
-    threshold_brier_score,
-)
+from properscoring import (brier_score, crps_ensemble, crps_gaussian,
+                           crps_quadrature, threshold_brier_score)
 from scipy.stats import norm
 from xarray.tests import assert_allclose, assert_identical
-from xskillscore.core.probabilistic import (
-    xr_brier_score,
-    xr_crps_ensemble,
-    xr_crps_gaussian,
-    xr_crps_quadrature,
-    xr_threshold_brier_score,
-)
+from xskillscore.core.probabilistic import (xr_brier_score, xr_crps_ensemble,
+                                            xr_crps_gaussian,
+                                            xr_crps_quadrature,
+                                            xr_threshold_brier_score)
 
 
 @pytest.fixture
