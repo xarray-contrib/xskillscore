@@ -74,19 +74,22 @@ Examples
 
    mae = xs.mae(obs, fct, "time")
 
-   # You can also specify multiple axes for deterministic metrics
+   # You can also specify multiple axes for deterministic metrics:
    r = xs.pearson_r(obs, fct, ["lat", "lon"])
 
 
    # probabilistic
    obs = xr.DataArray(
-       np.random.rand(4, 5), coords=[np.arange(4), np.arange(5)], dims=["lat", "lon"]
+       np.random.rand(4, 5),
+       coords=[np.arange(4), np.arange(5)],
+       dims=["lat", "lon"]
    )
    fct = xr.DataArray(
        np.random.rand(3, 4, 5),
        coords=[np.arange(3), np.arange(4), np.arange(5)],
        dims=["member", "lat", "lon"],
    )
+   
    crps_ensemble = xs.crps_ensemble(obs, fct)
 
    crps_gaussian = xs.crps_gaussian(obs, fct.mean("member"), fct.std("member"))
