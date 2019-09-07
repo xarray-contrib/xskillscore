@@ -68,7 +68,7 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
 
     See Also
     --------
-    properscoring.crps_quadratic
+    properscoring.crps_quadrature
     xarray.apply_ufunc
     """
     return xr.apply_ufunc(
