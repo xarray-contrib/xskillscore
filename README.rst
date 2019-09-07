@@ -97,7 +97,8 @@ Examples
 
    brier_score = xs.brier_score(obs > 0.5, (fct > 0.5).mean("member"))
 
-   # You can also use xskillscore as a method of your dataset.
+
+   # You can also use xskillscore as a method of your dataset:
    ds = xr.Dataset()
    ds["obs_var"] = obs
    ds["fct_var"] = fct
@@ -106,7 +107,7 @@ Examples
    r = ds.xs.pearson_r("obs_var", "fct_var", "time")
 
    # If fct is not a part of the dataset, inputting a separate
-   # DataArray as an argument works as well
+   # DataArray as an argument works as well:
    ds = ds.drop("fct_var")
    r = ds.xs.pearson_r("obs_var", fct, "time")
 
