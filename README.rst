@@ -94,7 +94,7 @@ Examples
 
    crps_gaussian = xs.crps_gaussian(obs, fct.mean("member"), fct.std("member"))
 
-   crps_quadratic = xs.crps_quadratic(obs, norm)
+   crps_quadrature = xs.crps_quadrature(obs, norm)
 
    threshold_brier_score = xs.threshold_brier_score(obs, fct, 0.7)
 
