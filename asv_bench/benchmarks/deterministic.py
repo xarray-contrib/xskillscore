@@ -11,6 +11,10 @@ from . import parameterized, randn, requires_dask
 
 DETERMINISTIC_METRICS = [rmse, pearson_r, mae, mse, pearson_r_p_value]
 
+large_lon_lat = 2000
+large_lon_lat_chunksize = large_lon_lat // 4
+nmember = 4
+
 
 class Generate:
     """
@@ -58,8 +62,14 @@ class Generate:
             encoding=None,
             attrs={'units': 'foo units', 'description': 'a description'},
         )
-
         self.ds.attrs = {'history': 'created for xarray benchmarking'}
+
+        # set nans for land sea mask
+        self.ds = self.ds.where(
+            (abs(self.ds.lat) > 20)
+            | (self.ds.lat < 100)
+            | (self.ds.lat > 160)
+        )
 
 
 class Compute_small(Generate):
@@ -67,7 +77,7 @@ class Compute_small(Generate):
     A benchmark xskillscore.metric for small xr.DataArrays"""
 
     def setup(self, *args, **kwargs):
-        self.make_ds(3, 90, 45)  # 4 degree grid
+        self.make_ds(nmember, 90, 45)  # 4 degree grid
 
     @parameterized('metric', DETERMINISTIC_METRICS)
     def time_xskillscore_metric_small(self, metric):
@@ -84,32 +94,41 @@ class Compute_small(Generate):
 
 class Compute_large(Generate):
     """
-    A benchmark xskillscore.metric for small xr.DataArrays"""
+    A benchmark xskillscore.metric for large xr.DataArrays"""
+
+    def setup_cache(self, *args, **kwargs):
+        self.make_ds(nmember, large_lon_lat, large_lon_lat)
+        self.ds.to_netcdf('large.nc')
 
     def setup(self, *args, **kwargs):
-        self.make_ds(5, 1000, 1000)
+        self.ds = xr.open_dataset('large.nc')
 
     @parameterized('metric', DETERMINISTIC_METRICS)
     def time_xskillscore_metric_large(self, metric):
         """Take time for xskillscore.metric."""
         dim = 'member'
-        metric(self.ds['tos'], self.ds['sos'], dim=dim).compute()
+        metric(self.ds['tos'], self.ds['sos'], dim=dim)
 
     @parameterized('metric', DETERMINISTIC_METRICS)
     def peakmem_xskillscore_metric_large(self, metric):
         dim = 'member'
         """Take memory peak for xskillscore.metric."""
-        metric(self.ds['tos'], self.ds['sos'], dim=dim).compute()
+        metric(self.ds['tos'], self.ds['sos'], dim=dim)
 
 
 class Compute_large_dask(Generate):
     """
     A benchmark xskillscore.metric for large xr.DataArrays with dask."""
 
-    def setup(self, *args, **kwargs):
+    def setup_cache(self, *args, **kwargs):
         requires_dask()
-        self.make_ds(5, 1000, 1000)
-        self.ds = self.ds.chunk({'lon': 500, 'lat': 500})
+        self.make_ds(nmember, large_lon_lat, large_lon_lat)
+        self.ds.to_netcdf('large.nc')
+
+    def setup(self, *args, **kwargs):
+        self.ds = xr.open_dataset(
+            'large.nc', chunks={'lon': large_lon_lat_chunksize}
+        )
 
     @parameterized('metric', DETERMINISTIC_METRICS)
     def time_xskillscore_metric_large_dask(self, metric):

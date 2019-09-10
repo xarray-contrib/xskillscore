@@ -26,10 +26,14 @@ PROBABILISTIC_METRICS = [
 
 including_crps_quadrature = False
 
+large_lon_lat = 2000
+large_lon_lat_chunksize = large_lon_lat // 2
+nmember = 4
+
 
 class Generate:
     """
-    Generate random ds, control to be benckmarked.
+    Generate random fct and obs to be benckmarked.
     """
 
     timeout = 600
@@ -78,13 +82,25 @@ class Generate:
         self.fct.attrs = {'history': 'created for xarray benchmarking'}
         self.obs.attrs = {'history': 'created for xarray benchmarking'}
 
+        # set nans for land sea mask
+        self.fct = self.fct.where(
+            (abs(self.fct.lat) > 20)
+            | (self.fct.lat < 100)
+            | (self.fct.lat > 160)
+        )
+        self.obs = self.obs.where(
+            (abs(self.obs.lat) > 20)
+            | (self.obs.lat < 100)
+            | (self.obs.lat > 160)
+        )
+
 
 class Compute_small(Generate):
     """
     A  benchmark xskillscore.metric for small xr.DataArrays"""
 
     def setup(self, *args, **kwargs):
-        self.make_ds(3, 90, 45)  # 4 degree grid
+        self.make_ds(nmember, 90, 45)  # 4 degree grid
 
     @parameterized('metric', PROBABILISTIC_METRICS)
     def time_xskillscore_probabilistic_small(self, metric):
@@ -137,10 +153,10 @@ class Compute_small(Generate):
 
 class Compute_large(Generate):
     """
-    A  benchmark xskillscore.metric for large xr.DataArrays."""
+    A benchmark xskillscore.metric for large xr.DataArrays."""
 
     def setup(self, *args, **kwargs):
-        self.make_ds(5, 1000, 1000)
+        self.make_ds(nmember, large_lon_lat, large_lon_lat)
 
     @parameterized('metric', PROBABILISTIC_METRICS)
     def time_xskillscore_probabilistic_large(self, metric):
@@ -197,9 +213,13 @@ class Compute_large_dask(Generate):
 
     def setup(self, *args, **kwargs):
         requires_dask()
-        self.make_ds(5, 1000, 1000)
-        self.obs = self.obs.chunk({'lon': 500, 'lat': 500})
-        self.fct = self.fct.chunk({'lon': 500, 'lat': 500})
+        self.make_ds(nmember, large_lon_lat, large_lon_lat)
+        self.obs = self.obs.chunk(
+            {'lon': large_lon_lat_chunksize, 'lat': large_lon_lat_chunksize}
+        )
+        self.fct = self.fct.chunk(
+            {'lon': large_lon_lat_chunksize, 'lat': large_lon_lat_chunksize}
+        )
 
     @parameterized('metric', PROBABILISTIC_METRICS)
     def time_xskillscore_probabilistic_large_dask(self, metric):
