@@ -1,2 +1,9 @@
 __pycache__
 xskillscore.egg-info/
+.pytest_cache
+dask-worker-space/
+dist
+build
+
+# asv environments
+.asv
