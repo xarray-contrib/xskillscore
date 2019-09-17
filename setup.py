@@ -14,7 +14,7 @@ INSTALL_REQUIRES = [
     'dask',
     'scipy',
     'properscoring',
-    'numba'
+    'numba',
     'bottleneck'
 ]
 TESTS_REQUIRE = ['pytest']
