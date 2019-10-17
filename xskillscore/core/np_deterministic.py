@@ -5,7 +5,7 @@ from scipy import special
 __all__ = ['_pearson_r', '_pearson_r_p_value', '_rmse', '_mse', '_mae']
 
 
-def _pearson_r(a, b, axis):
+def _pearson_r(a, b, weights, axis):
     """
     ndarray implementation of scipy.stats.pearsonr.
 
@@ -17,6 +17,8 @@ def _pearson_r(a, b, axis):
         Input array.
     axis : int
         The axis to apply the correlation along.
+    weights : ndarray
+        Input array.
 
     Returns
     -------
@@ -30,17 +32,18 @@ def _pearson_r(a, b, axis):
     """
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
-    ma = np.mean(a, axis=0)
-    mb = np.mean(b, axis=0)
+    weights = np.rollaxis(weights, axis)
+    ma = np.sum(a * weights, axis=0) / np.sum(weights, axis=0)
+    mb = np.sum(b * weights, axis=0) / np.sum(weights, axis=0)
     am, bm = a - ma, b - mb
-    r_num = np.sum(am * bm, axis=0)
-    r_den = np.sqrt(np.sum(am*am, axis=0) * np.sum(bm*bm, axis=0))
+    r_num = np.sum(weights * am * bm, axis=0)
+    r_den = np.sqrt(np.sum(weights * am * am, axis=0) * np.sum(weights * bm * bm, axis=0))
     r = r_num / r_den
     res = np.clip(r, -1.0, 1.0)
     return res
 
 
-def _pearson_r_p_value(a, b, axis):
+def _pearson_r_p_value(a, b, weights, axis):
     """
     ndarray implementation of scipy.stats.pearsonr.
 
@@ -52,6 +55,8 @@ def _pearson_r_p_value(a, b, axis):
         Input array.
     axis : int
         The axis to apply the correlation along.
+    weights : ndarray
+        Input array.
 
     Returns
     -------
@@ -63,7 +68,7 @@ def _pearson_r_p_value(a, b, axis):
     scipy.stats.pearsonr
 
     """
-    r = _pearson_r(a, b, axis)
+    r = _pearson_r(a, b, weights, axis)
     a = np.rollaxis(a, axis)
     df = a.shape[0] - 2
     t_squared = r**2 * (df / ((1.0 - r) * (1.0 + r)))
@@ -76,7 +81,7 @@ def _pearson_r_p_value(a, b, axis):
     return res
 
 
-def _rmse(a, b, axis):
+def _rmse(a, b, weights, axis):
     """
     Root Mean Squared Error.
 
@@ -88,6 +93,8 @@ def _rmse(a, b, axis):
         Input array.
     axis : int
         The axis to apply the rmse along.
+    weights : ndarray
+        Input array.
 
     Returns
     -------
@@ -99,11 +106,13 @@ def _rmse(a, b, axis):
     sklearn.metrics.mean_squared_error
 
     """
-    res = np.sqrt(((a - b) ** 2).mean(axis=axis))
+    squared_error = (a - b) ** 2
+    mean_squared_error = np.sum(squared_error * weights, axis=axis) / np.sum(weights, axis=axis)
+    res = np.sqrt(mean_squared_error)
     return res
 
 
-def _mse(a, b, axis):
+def _mse(a, b, weights, axis):
     """
     Mean Squared Error.
 
@@ -115,6 +124,8 @@ def _mse(a, b, axis):
         Input array.
     axis : int
         The axis to apply the mse along.
+    weights : ndarray
+        Input array.
 
     Returns
     -------
@@ -126,11 +137,12 @@ def _mse(a, b, axis):
     sklearn.metrics.mean_squared_error
 
     """
-    res = ((a - b) ** 2).mean(axis=axis)
+    squared_error = (a - b) **2
+    res = np.sum(squared_error * weights, axis=axis) / np.sum(weights, axis=axis)
     return res
 
 
-def _mae(a, b, axis):
+def _mae(a, b, weights, axis):
     """
     Mean Absolute Error.
 
@@ -142,6 +154,8 @@ def _mae(a, b, axis):
         Input array.
     axis : int
         The axis to apply the mae along.
+    weights : ndarray
+        Input array.
 
     Returns
     -------
@@ -153,5 +167,6 @@ def _mae(a, b, axis):
     sklearn.metrics.mean_absolute_error
 
     """
-    res = (np.absolute(a - b)).mean(axis=axis)
+    absolute_error = np.absolute(a - b)
+    res = np.sum(absolute_error * weights, axis=axis) / np.sum(weights, axis=axis)
     return res
