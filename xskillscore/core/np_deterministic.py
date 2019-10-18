@@ -15,6 +15,7 @@ def _check_weights(weights):
     else:
         return weights
 
+
 def _get_numpy_funcs(skipna):
     """
     Returns nansum and nanmean if skipna is True;
@@ -124,7 +125,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
     scipy.stats.pearsonr
 
     """
-    r = _pearson_r(a, b, weights, axis)
+    r = _pearson_r(a, b, weights, axis, skipna)
     a = np.rollaxis(a, axis)
     df = a.shape[0] - 2
     t_squared = r ** 2 * (df / ((1.0 - r) * (1.0 + r)))

@@ -165,7 +165,7 @@ def test_pearson_r_xr(a, b, dim, weight, weights):
     _weights = _preprocess_weights(_a, dim, new_dim, _weights)
 
     axis = _a.dims.index(new_dim)
-    res = _pearson_r(_a.values, _b.values, _weights.values, axis)
+    res = _pearson_r(_a.values, _b.values, _weights.values, axis, skipna=False)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -194,7 +194,7 @@ def test_pearson_r_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
     _weights = _preprocess_weights(_a_dask, dim, new_dim, _weights)
 
     axis = _a_dask.dims.index(new_dim)
-    res = _pearson_r(_a_dask.values, _b_dask.values, _weights.values, axis)
+    res = _pearson_r(_a_dask.values, _b_dask.values, _weights.values, axis, skipna=False)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -223,7 +223,7 @@ def test_pearson_r_p_value_xr(a, b, dim, weight, weights):
     _weights = _preprocess_weights(_a, dim, new_dim, _weights)
 
     axis = _a.dims.index(new_dim)
-    res = _pearson_r_p_value(_a.values, _b.values, _weights.values, axis)
+    res = _pearson_r_p_value(_a.values, _b.values, _weights.values, axis, skipna=False)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -252,7 +252,7 @@ def test_pearson_r_p_value_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
     _weights = _preprocess_weights(_a_dask, dim, new_dim, _weights)
 
     axis = _a_dask.dims.index(new_dim)
-    res = _pearson_r_p_value(_a_dask.values, _b_dask.values, _weights.values, axis)
+    res = _pearson_r_p_value(_a_dask.values, _b_dask.values, _weights.values, axis, skipna=False)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
