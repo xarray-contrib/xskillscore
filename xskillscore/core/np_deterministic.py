@@ -16,6 +16,17 @@ def _check_weights(weights):
         return weights
 
 
+def _check_weights(weights):
+    """
+    Quick check if weights are all NaN. If so,
+    return None to guide weighting scheme.
+    """
+    if np.all(np.isnan(weights)):
+        return None
+    else:
+        return weights
+
+
 def _pearson_r(a, b, weights, axis):
     """
     ndarray implementation of scipy.stats.pearsonr.

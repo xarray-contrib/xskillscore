@@ -24,7 +24,6 @@ from xskillscore.core.np_deterministic import (
 
 AXES = ("time", "lat", "lon", ("lat", "lon"), ("time", "lat", "lon"))
 
-
 @pytest.fixture
 def a():
     dates = pd.date_range("1/1/2000", "1/3/2000", freq="D")
@@ -75,15 +74,37 @@ def weights_dask():
     ).chunk()
 
 
+
 @pytest.fixture
-def weights_ones():
-    dates = pd.date_range('1/1/2000', '1/3/2000', freq='D')
+def weights():
+    """
+    Weighting array by cosine of the latitude.
+    """
+    dates = pd.date_range("1/1/2000", "1/3/2000", freq="D")
     lats = np.arange(4)
     lons = np.arange(5)
-    data = np.ones((len(dates), len(lats), len(lons)))
-    return xr.DataArray(data,
-                        coords=[dates, lats, lons],
-                        dims=['time', 'lat', 'lon'])
+    cos = np.abs(np.cos(lats))
+    data = np.tile(cos, (len(dates), len(lons), 1)).reshape(
+        len(dates), len(lats), len(lons)
+    )
+    return xr.DataArray(data, coords=[dates, lats, lons], dims=["time", "lat", "lon"])
+
+
+@pytest.fixture
+def weights_dask():
+    """
+    Weighting array by cosine of the latitude.
+    """
+    dates = pd.date_range("1/1/2000", "1/3/2000", freq="D")
+    lats = np.arange(4)
+    lons = np.arange(5)
+    cos = np.abs(np.cos(lats))
+    data = np.tile(cos, (len(dates), len(lons), 1)).reshape(
+        len(dates), len(lats), len(lons)
+    )
+    return xr.DataArray(
+        data, coords=[dates, lats, lons], dims=["time", "lat", "lon"]
+    ).chunk()
 
 
 @pytest.fixture
