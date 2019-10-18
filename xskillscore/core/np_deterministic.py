@@ -15,6 +15,16 @@ def _check_weights(weights):
     else:
         return weights
 
+def _get_numpy_funcs(skipna):
+    """
+    Returns nansum and nanmean if skipna is True;
+    Returns sum and mean if skipna is False.
+    """
+    if skipna:
+        return np.nansum, np.nanmean
+    else:
+        return np.sum, np.mean
+
 
 def _check_weights(weights):
     """
@@ -41,6 +51,8 @@ def _pearson_r(a, b, weights, axis):
         The axis to apply the correlation along.
     weights : ndarray
         Input array.
+    skipna : bool
+        Whether or not to skip NaNs.
 
     Returns
     -------
@@ -52,6 +64,7 @@ def _pearson_r(a, b, weights, axis):
     scipy.stats.pearsonr
 
     """
+    sumfunc, meanfunc = _get_numpy_funcs(skipna)
     weights = _check_weights(weights)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
@@ -61,30 +74,30 @@ def _pearson_r(a, b, weights, axis):
     # the denominator gets inflated when there are masked regions.
     if weights is not None:
         weights = np.rollaxis(weights, axis)
-        ma = np.sum(a * weights, axis=0) / np.sum(weights, axis=0)
-        mb = np.sum(b * weights, axis=0) / np.sum(weights, axis=0)
+        ma = sumfunc(a * weights, axis=0) / sumfunc(weights, axis=0)
+        mb = sumfunc(b * weights, axis=0) / sumfunc(weights, axis=0)
     else:
-        ma = np.mean(a, axis=0)
-        mb = np.mean(b, axis=0)
+        ma = meanfunc(a, axis=0)
+        mb = meanfunc(b, axis=0)
 
     am, bm = a - ma, b - mb
 
     if weights is not None:
-        r_num = np.sum(weights * am * bm, axis=0)
+        r_num = sumfunc(weights * am * bm, axis=0)
         r_den = np.sqrt(
             np.sum(weights * am * am, axis=0)
             * np.sum(weights * bm * bm, axis=0)
         )
     else:
-        r_num = np.sum(am * bm, axis=0)
-        r_den = np.sqrt(np.sum(am * am, axis=0) * np.sum(bm * bm, axis=0))
+        r_num = sumfunc(am * bm, axis=0)
+        r_den = np.sqrt(sumfunc(am * am, axis=0) * sumfunc(bm * bm, axis=0))
 
     r = r_num / r_den
     res = np.clip(r, -1.0, 1.0)
     return res
 
 
-def _pearson_r_p_value(a, b, weights, axis):
+def _pearson_r_p_value(a, b, weights, axis, skipna):
     """
     ndarray implementation of scipy.stats.pearsonr.
 
@@ -98,6 +111,8 @@ def _pearson_r_p_value(a, b, weights, axis):
         The axis to apply the correlation along.
     weights : ndarray
         Input array.
+    skipna : bool
+        Whether or not to skip NaNs.
 
     Returns
     -------
@@ -122,7 +137,7 @@ def _pearson_r_p_value(a, b, weights, axis):
     return res
 
 
-def _rmse(a, b, weights, axis):
+def _rmse(a, b, weights, axis, skipna):
     """
     Root Mean Squared Error.
 
@@ -136,6 +151,8 @@ def _rmse(a, b, weights, axis):
         The axis to apply the rmse along.
     weights : ndarray
         Input array.
+    skipna : bool
+        Whether or not to skip NaNs.
 
     Returns
     -------
@@ -147,6 +164,7 @@ def _rmse(a, b, weights, axis):
     sklearn.metrics.mean_squared_error
 
     """
+    sumfunc, meanfunc = _get_numpy_funcs(skipna)
     weights = _check_weights(weights)
 
     squared_error = (a - b) ** 2
@@ -155,12 +173,12 @@ def _rmse(a, b, weights, axis):
             squared_error * weights, axis=axis
         ) / np.sum(weights, axis=axis)
     else:
-        mean_squared_error = ((a - b) ** 2).mean(axis=axis)
+        mean_squared_error = meanfunc(((a - b) ** 2), axis=axis)
     res = np.sqrt(mean_squared_error)
     return res
 
 
-def _mse(a, b, weights, axis):
+def _mse(a, b, weights, axis, skipna):
     """
     Mean Squared Error.
 
@@ -174,6 +192,8 @@ def _mse(a, b, weights, axis):
         The axis to apply the mse along.
     weights : ndarray
         Input array.
+    skipna : bool
+        Whether or not to skip NaNs.
 
     Returns
     -------
@@ -185,6 +205,7 @@ def _mse(a, b, weights, axis):
     sklearn.metrics.mean_squared_error
 
     """
+    sumfunc, meanfunc = _get_numpy_funcs(skipna)
     weights = _check_weights(weights)
 
     squared_error = (a - b) ** 2
@@ -193,10 +214,10 @@ def _mse(a, b, weights, axis):
             weights, axis=axis
         )
     else:
-        return squared_error.mean(axis=axis)
+        return meanfunc(squared_error, axis=axis)
 
 
-def _mae(a, b, weights, axis):
+def _mae(a, b, weights, axis, skipna):
     """
     Mean Absolute Error.
 
@@ -210,6 +231,8 @@ def _mae(a, b, weights, axis):
         The axis to apply the mae along.
     weights : ndarray
         Input array.
+    skipna : bool
+        Whether or not to skip NaNs.
 
     Returns
     -------
@@ -221,6 +244,7 @@ def _mae(a, b, weights, axis):
     sklearn.metrics.mean_absolute_error
 
     """
+    sumfunc, meanfunc = _get_numpy_funcs(skipna)
     weights = _check_weights(weights)
 
     absolute_error = np.absolute(a - b)
@@ -229,4 +253,4 @@ def _mae(a, b, weights, axis):
             weights, axis=axis
         )
     else:
-        return absolute_error.mean(axis=axis)
+        return meanfunc(absolute_error, axis=axis)
