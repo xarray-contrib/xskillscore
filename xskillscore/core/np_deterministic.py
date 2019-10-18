@@ -5,17 +5,6 @@ from scipy import special
 __all__ = ["_pearson_r", "_pearson_r_p_value", "_rmse", "_mse", "_mae"]
 
 
-def _check_weights(weights):
-    """
-    Quick check if weights are all NaN. If so,
-    return None to guide weighting scheme.
-    """
-    if np.all(np.isnan(weights)):
-        return None
-    else:
-        return weights
-
-
 def _get_numpy_funcs(skipna):
     """
     Returns nansum and nanmean if skipna is True;
@@ -38,7 +27,7 @@ def _check_weights(weights):
         return weights
 
 
-def _pearson_r(a, b, weights, axis):
+def _pearson_r(a, b, weights, axis, skipna):
     """
     ndarray implementation of scipy.stats.pearsonr.
 
@@ -51,9 +40,9 @@ def _pearson_r(a, b, weights, axis):
     axis : int
         The axis to apply the correlation along.
     weights : ndarray
-        Input array.
+        Input array of weights for a and b.
     skipna : bool
-        Whether or not to skip NaNs.
+        If True, skip NaNs when computing function.
 
     Returns
     -------
@@ -86,8 +75,8 @@ def _pearson_r(a, b, weights, axis):
     if weights is not None:
         r_num = sumfunc(weights * am * bm, axis=0)
         r_den = np.sqrt(
-            np.sum(weights * am * am, axis=0)
-            * np.sum(weights * bm * bm, axis=0)
+            sumfunc(weights * am * am, axis=0)
+            * sumfunc(weights * bm * bm, axis=0)
         )
     else:
         r_num = sumfunc(am * bm, axis=0)
@@ -111,9 +100,9 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
     axis : int
         The axis to apply the correlation along.
     weights : ndarray
-        Input array.
+        Input array of weights for a and b.
     skipna : bool
-        Whether or not to skip NaNs.
+        If True, skip NaNs when computing function.
 
     Returns
     -------
@@ -151,9 +140,9 @@ def _rmse(a, b, weights, axis, skipna):
     axis : int
         The axis to apply the rmse along.
     weights : ndarray
-        Input array.
+        Input array of weights for a and b.
     skipna : bool
-        Whether or not to skip NaNs.
+        If True, skip NaNs when computing function.
 
     Returns
     -------
@@ -170,9 +159,9 @@ def _rmse(a, b, weights, axis, skipna):
 
     squared_error = (a - b) ** 2
     if weights is not None:
-        mean_squared_error = np.sum(
+        mean_squared_error = sumfunc(
             squared_error * weights, axis=axis
-        ) / np.sum(weights, axis=axis)
+        ) / sumfunc(weights, axis=axis)
     else:
         mean_squared_error = meanfunc(((a - b) ** 2), axis=axis)
     res = np.sqrt(mean_squared_error)
@@ -192,9 +181,9 @@ def _mse(a, b, weights, axis, skipna):
     axis : int
         The axis to apply the mse along.
     weights : ndarray
-        Input array.
+        Input array of weights for a and b.
     skipna : bool
-        Whether or not to skip NaNs.
+        If True, skip NaNs when computing function.
 
     Returns
     -------
@@ -211,7 +200,7 @@ def _mse(a, b, weights, axis, skipna):
 
     squared_error = (a - b) ** 2
     if weights is not None:
-        return np.sum(squared_error * weights, axis=axis) / np.sum(
+        return sumfunc(squared_error * weights, axis=axis) / sumfunc(
             weights, axis=axis
         )
     else:
@@ -231,9 +220,9 @@ def _mae(a, b, weights, axis, skipna):
     axis : int
         The axis to apply the mae along.
     weights : ndarray
-        Input array.
+        Input array of weights for a and b.
     skipna : bool
-        Whether or not to skip NaNs.
+        If True, skip NaNs when computing function.
 
     Returns
     -------
@@ -250,7 +239,7 @@ def _mae(a, b, weights, axis, skipna):
 
     absolute_error = np.absolute(a - b)
     if weights is not None:
-        return np.sum(absolute_error * weights, axis=axis) / np.sum(
+        return sumfunc(absolute_error * weights, axis=axis) / sumfunc(
             weights, axis=axis
         )
     else:
