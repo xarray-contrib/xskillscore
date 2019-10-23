@@ -25,14 +25,13 @@ def _preprocess_weights(a, dim, new_dim, weights):
 
     Parameters
     ----------
-    a : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
+    a : xarray.Dataset or xarray.DataArray
         One of the arrays over which the function will be applied.
     dim : str, list
         The original dimension(s) to apply the function along.
     new_dim : str
         The newly named dimension after running ``_preprocess_dims``
-    weights : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-              scalars
+    weights : xarray.Dataset or xarray.DataArray
         Weights to apply to function, matching the dimension size of
         ``new_dim``.
     """
@@ -69,21 +68,19 @@ def pearson_r(a, b, dim, weights=None):
 
     Parameters
     ----------
-    a : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
-        Mix of labeled and/or unlabeled arrays to which to apply the function.
-    b : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
-        Mix of labeled and/or unlabeled arrays to which to apply the function.
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along.
-    weights : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-              scalars
+    weights : xarray.Dataset or xarray.DataArray
         Weights matching dimensions of ``dim`` to apply during the function.
         If None, an array of ones will be applied (i.e., no weighting).
 
     Returns
     -------
-    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
-    numpy.ndarray, the first type on that list to appear on an input.
+    xr.DataArray or xr.Dataset
         Pearson's correlation coefficient.
 
     See Also
@@ -121,21 +118,19 @@ def pearson_r_p_value(a, b, dim, weights=None):
 
     Parameters
     ----------
-    a : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
-        Mix of labeled and/or unlabeled arrays to which to apply the function.
-    b : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
-        Mix of labeled and/or unlabeled arrays to which to apply the function.
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along.
-    weights : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-              scalars
+    weights : xarray.Dataset or xarray.DataArray
         Weights matching dimensions of ``dim`` to apply during the function.
         If None, an array of ones will be applied (i.e., no weighting).
 
     Returns
     -------
-    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
-    numpy.ndarray, the first type on that list to appear on an input.
+    xarray.Dataset or xarray.DataArray
         2-tailed p-value.
 
     See Also
@@ -173,21 +168,19 @@ def rmse(a, b, dim, weights=None):
 
     Parameters
     ----------
-    a : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
-        Mix of labeled and/or unlabeled arrays to which to apply the function.
-    b : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
-        Mix of labeled and/or unlabeled arrays to which to apply the function.
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the rmse along.
-    weights : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-              scalars
+    weights : xarray.Dataset or xarray.DataArray
         Weights matching dimensions of ``dim`` to apply during the function.
         If None, an array of ones will be applied (i.e., no weighting).
 
     Returns
     -------
-    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
-    numpy.ndarray, the first type on that list to appear on an input.
+    xarray.Dataset or xarray.DataArray
         Root Mean Squared Error.
 
     See Also
@@ -217,21 +210,19 @@ def mse(a, b, dim, weights=None):
 
     Parameters
     ----------
-    a : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
-        Mix of labeled and/or unlabeled arrays to which to apply the function.
-    b : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
-        Mix of labeled and/or unlabeled arrays to which to apply the function.
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the mse along.
-    weights : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-              scalars
+    weights : xarray.Dataset or xarray.DataArray
         Weights matching dimensions of ``dim`` to apply during the function.
         If None, an array of ones will be applied (i.e., no weighting).
 
     Returns
     -------
-    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
-    numpy.ndarray, the first type on that list to appear on an input.
+    xarray.Dataset or xarray.DataArray
         Mean Squared Error.
 
     See Also
@@ -261,21 +252,19 @@ def mae(a, b, dim, weights=None):
 
     Parameters
     ----------
-    a : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
-        Mix of labeled and/or unlabeled arrays to which to apply the function.
-    b : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or scalars
-        Mix of labeled and/or unlabeled arrays to which to apply the function.
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the mae along.
-    weights : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-              scalars
+    weights : xarray.Dataset or xarray.DataArray
         Weights matching dimensions of ``dim`` to apply during the function.
         If None, an array of ones will be applied (i.e., no weighting).
 
     Returns
     -------
-    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
-    numpy.ndarray, the first type on that list to appear on an input.
+    xarray.Dataset or xarray.DataArray
         Mean Absolute Error.
 
     See Also

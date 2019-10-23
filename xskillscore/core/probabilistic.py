@@ -15,17 +15,16 @@ def xr_crps_gaussian(observations, mu, sig):
 
     Parameters
     ----------
-    observations : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled observations arrays.
-    mu : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled forecasts mean arrays.
-    sig : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled forecasts mean arrays.
+    observations : xarray.Dataset or xarray.DataArray
+        The observations or set of observations.
+    mu : xarray.Dataset or xarray.DataArray
+        The mean of the forecast normal distribution.
+    sig : xarray.Dataset or xarray.DataArray
+        The standard deviation of the forecast distribution.
 
     Returns
     -------
-    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
-     numpy.ndarray, the first type on that list to appear on an input.
+    xarray.Dataset or xarray.DataArray
 
     See Also
     --------
@@ -58,13 +57,15 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
 
     Parameters
     ----------
-    x : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled x arrays.
+    x : xarray.Dataset or xarray.DataArray
+        Observations associated with the forecast distribution ``cdf_or_dist``.
+    cdf_or_dist : callable or scipy.stats.distribution
+        Function which returns the cumulative density of the forecast
+        distribution at value x.
 
     Returns
     -------
-    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
-     numpy.ndarray, the first type on that list to appear on an input.
+    xarray.Dataset or xarray.DataArray
 
     See Also
     --------
@@ -92,27 +93,24 @@ def xr_crps_ensemble(
 
     Parameters
     ----------
-    observations : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled observations arrays.
-    forecasts : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled forecasts arrays with required
-     member dimension `dim`.
-    weights : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled, optional
-     If provided, the CRPS is calculated exactly with the assigned
-     probability weights to each forecast. Weights should be positive, but
-     do not need to be normalized. By default, each forecast is weighted
-     equally.
+    observations : xarray.Dataset or xarray.DataArray
+        The observations or set of observations.
+    forecasts : xarray.Dataset or xarray.DataArray
+        Forecast with required member dimension ``dim``.
+    weights : xarray.Dataset or xarray.DataArray
+        If provided, the CRPS is calculated exactly with the assigned
+        probability weights to each forecast. Weights should be positive,
+        but do not need to be normalized. By default, each forecast is
+        weighted equally.
     issorted : bool, optional
-     Optimization flag to indicate that the elements of `ensemble` are
-     already sorted along `axis`.
+        Optimization flag to indicate that the elements of `ensemble` are
+        already sorted along `axis`.
     dim : str, optional
-     Name of ensemble member dimension. By default, 'member'.
+        Name of ensemble member dimension. By default, 'member'.
 
     Returns
     -------
-    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
-    numpy.ndarray, the first type on that list to appear on an input.
+    xarray.Dataset or xarray.DataArray
 
     See Also
     --------
@@ -133,20 +131,20 @@ def xr_crps_ensemble(
 def xr_brier_score(observations, forecasts):
     """
     xarray version of properscoring.brier_score: Calculate Brier score (BS).
+
     ..math:
         BS(p, k) = (p_1 - k)^2,
 
     Parameters
     ----------
-    observations : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled observations arrays.
-    forecasts : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled forecasts arrays.
+    observations : xarray.Dataset or xarray.DataArray
+        The observations or set of observations.
+    forecasts : xarray.Dataset or xarray.DataArray
+        The forecasts associated with the observations.
 
     Returns
     -------
-    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
-    numpy.ndarray, the first type on that list to appear on an input.
+    xarray.Dataset or xarray.DataArray
 
     References
     ----------
@@ -179,26 +177,24 @@ def xr_threshold_brier_score(
 
     Parameters
     ----------
-    observations : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled observations arrays.
-    forecasts : Dataset, DataArray, GroupBy, Variable, numpy/dask arrays or
-     scalars, Mix of labeled and/or unlabeled forecasts arrays with required
-     member dimension `dim`.
-    threshold : scalar or 1d scalar threshold values at
-     which to calculate exceedence Brier scores.
+    observations : xarray.Dataset or xarray.DataArray
+        The observations or set of observations.
+    forecasts : xarray.Dataset or xarray.DataArray
+        Forecast with required member dimension ``dim``.
+    threshold : scalar or 1d scalar
+        Threshold values at which to calculate exceedence Brier scores.
     issorted : bool, optional
         Optimization flag to indicate that the elements of `ensemble` are
         already sorted along `axis`.
     dim : str, optional
-     Name of ensemble member dimension. By default, 'member'.
+        Name of ensemble member dimension. By default, 'member'.
 
     Returns
     -------
-    Single value or tuple of Dataset, DataArray, Variable, dask.array.Array or
-    numpy.ndarray, the first type on that list to appear on an input. (If
-    ``threshold`` is a scalar, the result will have the same shape as
-    observations. Otherwise, it will have an additional final dimension
-    corresponding to the threshold levels. Not implemented yet.)
+    xarray.Dataset or xarray.DataArray
+        (If ``threshold`` is a scalar, the result will have the same shape as
+        observations. Otherwise, it will have an additional final dimension
+        corresponding to the threshold levels. Not implemented yet.)
 
     References
     ----------
