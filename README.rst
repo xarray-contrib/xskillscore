@@ -79,7 +79,21 @@ Examples
 
    # You can also specify multiple axes for deterministic metrics:
    r = xs.pearson_r(obs, fct, ["lat", "lon"])
-
+   
+   # You can weight over the dimensions the function is being applied
+   # to by passing the argument ``weights=weight`` with a xr.DataArray
+   # containing the dimension(s) being reduced.
+   cos = np.abs(np.cos(np.arange(4)))
+   wgts = np.tile(cos, (5, 1)).reshape(4, 5)
+   wgt = xr.DataArray(
+      wgts,
+      coords=[
+         np.arange(4),
+         np.arange(5),
+      ],
+      dims=["lat", "lon"],
+   )
+   rmse_wgt = xs.rmse(obs, fct, ['lat', 'lon'], weights=wgt) 
 
    # probabilistic
    obs = xr.DataArray(
