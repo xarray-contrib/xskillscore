@@ -111,6 +111,24 @@ Examples
    weighted = xs.pearson_r(a, b, dims, weights=weights)
    non_weighted = xs.pearson_r(a, b, dims, weights=None)
 
+   # You can also pass the optional keyword `skipna=True` to ignore any NaNs on the
+   # input data. This is useful in the case that you are computing these functions
+   # over space and have a mask applied to the grid or have NaNs over land.
+
+   skipna_res = xs.mae(obs.where(obs.lat > 1), fct.where(fct.lat > 1), ['lat', 'lon'], skipna=True)
+   # >>> skipna_res
+   # <xarray.DataArray (time: 3)>
+   # array([0.29007757, 0.29660133, 0.38978561])
+   # Coordinates:
+   # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
+
+   no_skipna_res = xs.mae(obs.where(obs.lat > 1), fct.where(fct.lat > 1), ['lat', 'lon'], skipna=False)
+   # >>> no_skipna_res
+   # <xarray.DataArray (time: 3)>
+   # array([nan, nan, nan])
+   # Coordinates:
+   # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
+
    # probabilistic
    obs = xr.DataArray(
        np.random.rand(4, 5),
