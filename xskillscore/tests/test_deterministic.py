@@ -1,26 +1,19 @@
+import bottleneck as bn
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from scipy.stats import distributions
 from xarray.tests import assert_allclose
 
-from xskillscore.core.deterministic import (
-    _preprocess_dims,
-    _preprocess_weights,
-    mae,
-    mse,
-    pearson_r,
-    pearson_r_p_value,
-    rmse,
-)
-from xskillscore.core.np_deterministic import (
-    _mae,
-    _mse,
-    _pearson_r,
-    _pearson_r_p_value,
-    _rmse,
-)
-
+from xskillscore.core.deterministic import (_preprocess_dims,
+                                            _preprocess_weights, mae, mse,
+                                            pearson_r, pearson_r_p_value, rmse,
+                                            smape, spearman_r,
+                                            spearman_r_p_value)
+from xskillscore.core.np_deterministic import (_mae, _mse, _pearson_r,
+                                               _pearson_r_p_value, _rmse,
+                                               _spearman_r)
 
 AXES = ("time", "lat", "lon", ("lat", "lon"), ("time", "lat", "lon"))
 
@@ -220,7 +213,8 @@ def test_pearson_r_p_value_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
     _weights = _preprocess_weights(_a_dask, dim, new_dim, _weights)
 
     axis = _a_dask.dims.index(new_dim)
-    res = _pearson_r_p_value(_a_dask.values, _b_dask.values, _weights.values, axis)
+    res = _pearson_r_p_value(
+        _a_dask.values, _b_dask.values, _weights.values, axis)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -343,3 +337,42 @@ def test_mae_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
+
+
+@pytest.mark.parametrize("dim", AXES)
+def test_spearman_r(a, b, dim):
+    """Test spearman_r with bottleneck.rankdata and pearson_r."""
+    actual = spearman_r(a, b, dim)
+    # dirty fix, this only tests whether spearman_r is equal to pearson_r rankdata
+    # but this tests spearman_r doesnt crash on all AXES
+    if len(dim) == 1:
+        axis = list(a, dim).index(dim) - 1
+        a2 = bn.rankdata(a, axis)
+        b2 = bn.rankdata(b, axis)
+        expected = pearson_r(a2, b2, dim)
+        assert_allclose(actual, expected)
+
+
+@pytest.mark.parametrize("dim", AXES)
+def test_spearman_r_p_value(a, b, dim):
+    """Test spearman_r with bottleneck.rankdata and pearson_r."""
+    actual = spearman_r_p_value(a, b, dim)
+    # dirty fix, this only tests whether spearman_r is equal to pearson_r rankdata
+    # but this tests spearman_r doesnt crash on all AXES
+    if len(dim) == 1:
+        dof = a[dim].size - 2  # degrees of freedom
+        rs = _spearman_r(a, b, dim)
+        t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
+        expected = 2 * distributions.t.sf(np.abs(t), dof)
+        assert_allclose(actual, expected)
+
+
+@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize("metric", [smape])
+def test_percentage_metric_in_interval_0_1(a, b, dim, metric):
+    """Test smape to be within bounds."""
+    res = metric(a, b, dim)
+    print(res.mean())
+    assert not (res < 0).any()
+    assert not (res > 1).any()
+    assert not res.isnull().any()
