@@ -91,9 +91,15 @@ Examples
    # complicated model grids tend to be accompanied by a cell area coordinate,
    # which could also be passed into this function.
    dims = ('lat', 'lon')
-   base_data = np.ones((30,180,360))
-   a = xr.DataArray(base_data + np.random.rand(30,180,360), dims=['time','lat', 'lon'])
-   b = xr.DataArray(base_data + np.random.rand(30,180,360), dims=['time','lat', 'lon'])
+   base_data = np.ones((30, 180, 360))
+   a = xr.DataArray(
+       base_data + np.random.rand(30, 180, 360),
+       dims=['time', 'lat', 'lon']
+   )
+   b = xr.DataArray(
+       base_data + np.random.rand(30, 180, 360),
+       dims=['time', 'lat', 'lon']
+   )
    x = np.linspace(-179.5, 179.5, 360)
    y = np.linspace(-89.5, 89.5, 180)
    lon, lat = np.meshgrid(x, y)
