@@ -24,7 +24,9 @@ def a():
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(dates), len(lats), len(lons))
-    return xr.DataArray(data, coords=[dates, lats, lons], dims=["time", "lat", "lon"])
+    return xr.DataArray(
+        data, coords=[dates, lats, lons], dims=["time", "lat", "lon"]
+    )
 
 
 @pytest.fixture
@@ -33,7 +35,9 @@ def b():
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(dates), len(lats), len(lons))
-    return xr.DataArray(data, coords=[dates, lats, lons], dims=["time", "lat", "lon"])
+    return xr.DataArray(
+        data, coords=[dates, lats, lons], dims=["time", "lat", "lon"]
+    )
 
 
 @pytest.fixture
@@ -48,7 +52,9 @@ def weights():
     data = np.tile(cos, (len(dates), len(lons), 1)).reshape(
         len(dates), len(lats), len(lons)
     )
-    return xr.DataArray(data, coords=[dates, lats, lons], dims=["time", "lat", "lon"])
+    return xr.DataArray(
+        data, coords=[dates, lats, lons], dims=["time", "lat", "lon"]
+    )
 
 
 @pytest.fixture
@@ -106,7 +112,8 @@ def adjust_weights(dim, weight, weights):
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight", [True, False])
 def test_pearson_r_xr(a, b, dim, weight, weights):
-    # Generates subsetted weights to pass in as arg to main function and for the numpy testing.
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
     _weights = adjust_weights(dim, weight, weights)
 
     actual = pearson_r(a, b, dim, weights=_weights)
@@ -126,7 +133,7 @@ def test_pearson_r_xr(a, b, dim, weight, weights):
     _weights = _preprocess_weights(_a, dim, new_dim, _weights)
 
     axis = _a.dims.index(new_dim)
-    res = _pearson_r(_a.values, _b.values, _weights.values, axis)
+    res = _pearson_r(_a.values, _b.values, _weights.values, axis, skipna=False)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -135,7 +142,8 @@ def test_pearson_r_xr(a, b, dim, weight, weights):
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight", [True, False])
 def test_pearson_r_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
-    # Generates subsetted weights to pass in as arg to main function and for the numpy testing.
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
     _weights = adjust_weights(dim, weight, weights_dask)
 
     actual = pearson_r(a_dask, b_dask, dim, weights=_weights)
@@ -155,7 +163,9 @@ def test_pearson_r_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
     _weights = _preprocess_weights(_a_dask, dim, new_dim, _weights)
 
     axis = _a_dask.dims.index(new_dim)
-    res = _pearson_r(_a_dask.values, _b_dask.values, _weights.values, axis)
+    res = _pearson_r(
+        _a_dask.values, _b_dask.values, _weights.values, axis, skipna=False
+    )
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -164,7 +174,8 @@ def test_pearson_r_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight", [True, False])
 def test_pearson_r_p_value_xr(a, b, dim, weight, weights):
-    # Generates subsetted weights to pass in as arg to main function and for the numpy testing.
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
     _weights = adjust_weights(dim, weight, weights)
 
     actual = pearson_r_p_value(a, b, dim, weights=_weights)
@@ -184,7 +195,9 @@ def test_pearson_r_p_value_xr(a, b, dim, weight, weights):
     _weights = _preprocess_weights(_a, dim, new_dim, _weights)
 
     axis = _a.dims.index(new_dim)
-    res = _pearson_r_p_value(_a.values, _b.values, _weights.values, axis)
+    res = _pearson_r_p_value(
+        _a.values, _b.values, _weights.values, axis, skipna=False
+    )
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -193,7 +206,8 @@ def test_pearson_r_p_value_xr(a, b, dim, weight, weights):
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight", [True, False])
 def test_pearson_r_p_value_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
-    # Generates subsetted weights to pass in as arg to main function and for the numpy testing.
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
     _weights = adjust_weights(dim, weight, weights_dask)
 
     actual = pearson_r_p_value(a_dask, b_dask, dim, weights=_weights)
@@ -214,7 +228,8 @@ def test_pearson_r_p_value_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
 
     axis = _a_dask.dims.index(new_dim)
     res = _pearson_r_p_value(
-        _a_dask.values, _b_dask.values, _weights.values, axis)
+        _a_dask.values, _b_dask.values, _weights.values, axis, skipna=False
+    )
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -223,7 +238,8 @@ def test_pearson_r_p_value_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight", [True, False])
 def test_rmse_xr(a, b, dim, weight, weights):
-    # Generates subsetted weights to pass in as arg to main function and for the numpy testing.
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
     weights = adjust_weights(dim, weight, weights)
 
     actual = rmse(a, b, dim, weights=weights)
@@ -234,7 +250,7 @@ def test_rmse_xr(a, b, dim, weight, weights):
     _b = b
     _weights = _preprocess_weights(_a, dim, dim, weights)
     axis = tuple(a.dims.index(d) for d in dim)
-    res = _rmse(_a.values, _b.values, _weights.values, axis)
+    res = _rmse(_a.values, _b.values, _weights.values, axis, skipna=False)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -243,7 +259,8 @@ def test_rmse_xr(a, b, dim, weight, weights):
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight", [True, False])
 def test_rmse_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
-    # Generates subsetted weights to pass in as arg to main function and for the numpy testing.
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
     _weights = adjust_weights(dim, weight, weights_dask)
 
     actual = rmse(a_dask, b_dask, dim, weights=_weights)
@@ -254,7 +271,9 @@ def test_rmse_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
     _b_dask = b_dask
     _weights = _preprocess_weights(_a_dask, dim, dim, _weights)
     axis = tuple(a_dask.dims.index(d) for d in dim)
-    res = _rmse(_a_dask.values, _b_dask.values, _weights.values, axis)
+    res = _rmse(
+        _a_dask.values, _b_dask.values, _weights.values, axis, skipna=False
+    )
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -263,7 +282,8 @@ def test_rmse_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight", [True, False])
 def test_mse_xr(a, b, dim, weight, weights):
-    # Generates subsetted weights to pass in as arg to main function and for the numpy testing.
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
     weights = adjust_weights(dim, weight, weights)
 
     actual = mse(a, b, dim, weights=weights)
@@ -274,7 +294,7 @@ def test_mse_xr(a, b, dim, weight, weights):
     _b = b
     _weights = _preprocess_weights(_a, dim, dim, weights)
     axis = tuple(a.dims.index(d) for d in dim)
-    res = _mse(_a.values, _b.values, _weights.values, axis)
+    res = _mse(_a.values, _b.values, _weights.values, axis, skipna=False)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -283,7 +303,8 @@ def test_mse_xr(a, b, dim, weight, weights):
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight", [True, False])
 def test_mse_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
-    # Generates subsetted weights to pass in as arg to main function and for the numpy testing.
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
     _weights = adjust_weights(dim, weight, weights_dask)
 
     actual = mse(a_dask, b_dask, dim, weights=_weights)
@@ -294,7 +315,9 @@ def test_mse_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
     _b_dask = b_dask
     _weights = _preprocess_weights(_a_dask, dim, dim, _weights)
     axis = tuple(a_dask.dims.index(d) for d in dim)
-    res = _mse(_a_dask.values, _b_dask.values, _weights.values, axis)
+    res = _mse(
+        _a_dask.values, _b_dask.values, _weights.values, axis, skipna=False
+    )
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -303,7 +326,8 @@ def test_mse_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight", [True, False])
 def test_mae_xr(a, b, dim, weight, weights):
-    # Generates subsetted weights to pass in as arg to main function and for the numpy testing.
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
     weights = adjust_weights(dim, weight, weights)
 
     actual = mae(a, b, dim, weights=weights)
@@ -314,7 +338,7 @@ def test_mae_xr(a, b, dim, weight, weights):
     _b = b
     _weights = _preprocess_weights(_a, dim, dim, weights)
     axis = tuple(a.dims.index(d) for d in dim)
-    res = _mae(_a.values, _b.values, _weights.values, axis)
+    res = _mae(_a.values, _b.values, _weights.values, axis, skipna=False)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -323,7 +347,8 @@ def test_mae_xr(a, b, dim, weight, weights):
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight", [True, False])
 def test_mae_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
-    # Generates subsetted weights to pass in as arg to main function and for the numpy testing.
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
     _weights = adjust_weights(dim, weight, weights_dask)
     actual = mae(a_dask, b_dask, dim, weights=_weights)
     assert actual.chunks is not None
@@ -333,7 +358,9 @@ def test_mae_xr_dask(a_dask, b_dask, dim, weight, weights_dask):
     _b_dask = b_dask
     _weights = _preprocess_weights(_a_dask, dim, dim, _weights)
     axis = tuple(a_dask.dims.index(d) for d in dim)
-    res = _mae(_a_dask.values, _b_dask.values, _weights.values, axis)
+    res = _mae(
+        _a_dask.values, _b_dask.values, _weights.values, axis, skipna=False
+    )
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
