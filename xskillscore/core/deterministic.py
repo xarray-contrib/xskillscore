@@ -38,18 +38,17 @@ def _preprocess_weights(a, dim, new_dim, weights):
     if weights is None:
         return xr.full_like(a, None)  # Return nan weighting array.
     else:
-        # Scale weights to vary from 0 to 1.
-        weights = weights / weights.max()
         # Throw error if there are negative weights.
         if weights.min() < 0:
             raise ValueError(
                 "Weights has a minimum below 0. Please submit a weights array "
                 "of positive numbers."
             )
+        # Scale weights to vary from 0 to 1.
+        weights = weights / weights.max()
         # Check that the weights array has the same size
         # dimension(s) as those being applied over.
-        drop_dims = [i for i in a.dims if i not in new_dim]
-        drop_dims = {k: 0 for k in drop_dims}
+        drop_dims = {k: 0 for k in a.dims if k not in new_dim}
         if dict(weights.sizes) != dict(a.isel(drop_dims).sizes):
             raise ValueError(
                 f"weights dimension(s) {dim} of size {dict(weights.sizes)} "
@@ -62,7 +61,7 @@ def _preprocess_weights(a, dim, new_dim, weights):
         return weights
 
 
-def pearson_r(a, b, dim, weights=None):
+def pearson_r(a, b, dim, weights=None, skipna=False):
     """
     Pearson's correlation coefficient.
 
@@ -77,10 +76,12 @@ def pearson_r(a, b, dim, weights=None):
     weights : xarray.Dataset or xarray.DataArray
         Weights matching dimensions of ``dim`` to apply during the function.
         If None, an array of ones will be applied (i.e., no weighting).
+    skipna : bool
+        If True, skip NaNs when computing function.
 
     Returns
     -------
-    xr.DataArray or xr.Dataset
+    xarray.DataArray or xarray.Dataset
         Pearson's correlation coefficient.
 
     See Also
@@ -106,13 +107,13 @@ def pearson_r(a, b, dim, weights=None):
         b,
         weights,
         input_core_dims=[[new_dim], [new_dim], [new_dim]],
-        kwargs={"axis": -1},
+        kwargs={"axis": -1, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
     )
 
 
-def pearson_r_p_value(a, b, dim, weights=None):
+def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
     """
     2-tailed p-value associated with pearson's correlation coefficient.
 
@@ -127,6 +128,8 @@ def pearson_r_p_value(a, b, dim, weights=None):
     weights : xarray.Dataset or xarray.DataArray
         Weights matching dimensions of ``dim`` to apply during the function.
         If None, an array of ones will be applied (i.e., no weighting).
+    skipna : bool
+        If True, skip NaNs when computing function.
 
     Returns
     -------
@@ -156,13 +159,13 @@ def pearson_r_p_value(a, b, dim, weights=None):
         b,
         weights,
         input_core_dims=[[new_dim], [new_dim], [new_dim]],
-        kwargs={"axis": -1},
+        kwargs={"axis": -1, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
     )
 
 
-def rmse(a, b, dim, weights=None):
+def rmse(a, b, dim, weights=None, skipna=False):
     """
     Root Mean Squared Error.
 
@@ -177,6 +180,8 @@ def rmse(a, b, dim, weights=None):
     weights : xarray.Dataset or xarray.DataArray
         Weights matching dimensions of ``dim`` to apply during the function.
         If None, an array of ones will be applied (i.e., no weighting).
+    skipna : bool
+        If True, skip NaNs when computing function.
 
     Returns
     -------
@@ -198,13 +203,13 @@ def rmse(a, b, dim, weights=None):
         b,
         weights,
         input_core_dims=[dim, dim, dim],
-        kwargs={"axis": axis},
+        kwargs={"axis": axis, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
     )
 
 
-def mse(a, b, dim, weights=None):
+def mse(a, b, dim, weights=None, skipna=False):
     """
     Mean Squared Error.
 
@@ -219,6 +224,8 @@ def mse(a, b, dim, weights=None):
     weights : xarray.Dataset or xarray.DataArray
         Weights matching dimensions of ``dim`` to apply during the function.
         If None, an array of ones will be applied (i.e., no weighting).
+    skipna : bool
+        If True, skip NaNs when computing function.
 
     Returns
     -------
@@ -240,13 +247,13 @@ def mse(a, b, dim, weights=None):
         b,
         weights,
         input_core_dims=[dim, dim, dim],
-        kwargs={"axis": axis},
+        kwargs={"axis": axis, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
     )
 
 
-def mae(a, b, dim, weights=None):
+def mae(a, b, dim, weights=None, skipna=False):
     """
     Mean Absolute Error.
 
@@ -261,6 +268,8 @@ def mae(a, b, dim, weights=None):
     weights : xarray.Dataset or xarray.DataArray
         Weights matching dimensions of ``dim`` to apply during the function.
         If None, an array of ones will be applied (i.e., no weighting).
+    skipna : bool
+        If True, skip NaNs when computing function.
 
     Returns
     -------
@@ -282,7 +291,7 @@ def mae(a, b, dim, weights=None):
         b,
         weights,
         input_core_dims=[dim, dim, dim],
-        kwargs={"axis": axis},
+        kwargs={"axis": axis, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
     )
