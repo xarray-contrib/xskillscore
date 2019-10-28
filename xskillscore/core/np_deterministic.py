@@ -129,9 +129,9 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
 
     """
     r = _pearson_r(a, b, weights, axis, skipna)
+    nnans = np.sum(np.isnan(a * b), axis)
     a = np.rollaxis(a, axis)
-    # TODO:  should dof be reduced by number of nans in a or b?
-    dof = a.shape[0] - 2
+    dof = a.shape[0] - 2 - nnans
     t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
     _x = dof / (dof + t_squared)
     _x = np.asarray(_x)
@@ -210,9 +210,9 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
 
     """
     rs = _spearman_r(a, b, weights, axis, skipna)
+    nnans = np.sum(np.isnan(a * b), axis)
     a = np.rollaxis(a, axis)
-    # TODO:  should dof be reduced by number of nans in a or b?
-    dof = a.shape[0] - 2
+    dof = a.shape[0] - 2 - nnans
     t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
     return p
