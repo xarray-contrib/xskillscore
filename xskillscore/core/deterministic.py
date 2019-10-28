@@ -436,7 +436,7 @@ def mad(a, b, dim, skipna=False):
         _mad,
         a,
         b,
-        input_core_dims=[dim, dim, dim],
+        input_core_dims=[dim, dim],
         kwargs={"axis": axis, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],

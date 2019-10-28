@@ -118,6 +118,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
     """
     r = _pearson_r(a, b, weights, axis, skipna)
     a = np.rollaxis(a, axis)
+    # TODO:  should dof be reduced by number of nans in a or b?
     dof = a.shape[0] - 2
     t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
     _x = dof / (dof + t_squared)
@@ -157,12 +158,12 @@ def _spearman_r(a, b, weights, axis, skipna):
 
     """
     if skipna:
-        rankfunc = bn.nanrankdata
-    else:
         rankfunc = bn.rankdata
-    a = rankfunc(a, axis=axis)
-    b = rankfunc(b, axis=axis)
-    return _pearson_r(a, b, weights, axis, skipna)
+    else:
+        rankfunc = bn.nanrankdata
+    _a = rankfunc(a, axis=axis)
+    _b = rankfunc(b, axis=axis)
+    return _pearson_r(_a, _b, weights, axis, skipna)
 
 
 def _spearman_r_p_value(a, b, weights, axis, skipna):
@@ -195,6 +196,7 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
     # https://github.com/scipy/scipy/blob/v1.3.1/scipy/stats/stats.py#L3613-L3764
     rs = _spearman_r(a, b, weights, axis, skipna)
     a = np.rollaxis(a, axis)
+    # TODO:  should dof be reduced by number of nans in a or b?
     dof = a.shape[0] - 2
     t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
@@ -350,7 +352,7 @@ def _mad(a, b, axis, skipna):
     else:
         medianfunc = np.median
     absolute_error = np.absolute(a - b)
-    return medianfunc(absolute_error(axis=axis))
+    return medianfunc(absolute_error, axis=axis)
 
 
 def _mape(a, b, weights, axis, skipna):
