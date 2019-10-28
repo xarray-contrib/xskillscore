@@ -23,7 +23,9 @@ def _check_weights(weights):
     Quick check if weights are all NaN. If so,
     return None to guide weighting scheme.
     """
-    if np.all(np.isnan(weights)):
+    if weights is None:
+        return weights
+    elif np.all(np.isnan(weights)):
         return None
     else:
         return weights
