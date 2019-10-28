@@ -3,38 +3,46 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from xskillscore.core.deterministic import (mad, mae, mape, mse, pearson_r,
-                                            pearson_r_p_value, rmse, smape,
-                                            spearman_r, spearman_r_p_value)
+from xskillscore.core.deterministic import (
+    mad,
+    mae,
+    mape,
+    mse,
+    pearson_r,
+    pearson_r_p_value,
+    rmse,
+    smape,
+    spearman_r,
+    spearman_r_p_value,
+)
 
 # Should only have masking issues when pulling in masked
 # grid cells over space.
-AXES = [["time"], ["lat"], ["lon"], ("lat", "lon"), ("time", "lat", "lon")]
+AXES = [['time'], ['lat'], ['lon'], ('lat', 'lon'), ('time', 'lat', 'lon')]
 
-distance_metrics = [mae, mse, mad, mape, smape,
-                    rmse]
+distance_metrics = [mae, mse, mad, mape, smape, rmse]
 
 
 @pytest.fixture
 def a():
-    time = pd.date_range("1/1/2000", "1/3/2000", freq="D")
+    time = pd.date_range('1/1/2000', '1/3/2000', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(time), len(lats), len(lons))
     da = xr.DataArray(
-        data, coords=[time, lats, lons], dims=["time", "lat", "lon"]
+        data, coords=[time, lats, lons], dims=['time', 'lat', 'lon']
     )
     return da
 
 
 @pytest.fixture
 def b():
-    time = pd.date_range("1/1/2000", "1/3/2000", freq="D")
+    time = pd.date_range('1/1/2000', '1/3/2000', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(time), len(lats), len(lons))
     da = xr.DataArray(
-        data, coords=[time, lats, lons], dims=["time", "lat", "lon"]
+        data, coords=[time, lats, lons], dims=['time', 'lat', 'lon']
     )
     return da
 
@@ -47,23 +55,24 @@ def mask_data(da, dim):
     return da.where(da[dim] > da[dim].isel({dim: 0}))
 
 
-@pytest.mark.parametrize("metric", distance_metrics)
-@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize('metric', distance_metrics)
+@pytest.mark.parametrize('dim', AXES)
 def test_distance_metrics_masked(a, b, dim, metric):
-    """Test for all distance-based metrics whether result if skipna dont contain any nans and whether result if not skipna is all nan."""
+    """Test for all distance-based metrics whether result if skipna do not
+     contain any nans and whether result if not skipna is all nan."""
     a_masked = mask_data(a, dim[0])
     b_masked = mask_data(b, dim[0])
 
     res_skipna = metric(a_masked, b_masked, dim, skipna=True)
     res_no_skipna = metric(a_masked, b_masked, dim, skipna=False)
-    print(res_no_skipna, res_skipna)
     assert np.isnan(res_no_skipna).all()
     assert not np.isnan(res_skipna).any()
 
 
-@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize('dim', AXES)
 def test_pearson_r_masked(a, b, dim):
-    """Test pearson_r whether result if skipna dont contain any nans and whether result if not skipna is all nan."""
+    """Test pearson_r whether result if skipna do not contain any nans and
+     whether result if not skipna is all nan."""
     a_masked = mask_data(a, dim[0])
     b_masked = mask_data(b, dim[0])
 
@@ -73,7 +82,7 @@ def test_pearson_r_masked(a, b, dim):
     assert not np.isnan(res_skipna).any()
 
 
-@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize('dim', AXES)
 def test_pearson_r_p_value_masked(a, b, dim):
     a_masked = mask_data(a, dim[0])
     b_masked = mask_data(b, dim[0])
@@ -85,7 +94,7 @@ def test_pearson_r_p_value_masked(a, b, dim):
     assert not np.isnan(res_skipna).any()
 
 
-@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize('dim', AXES)
 def test_spearman_r_masked(a, b, dim):
     a_masked = mask_data(a, dim[0])
     b_masked = mask_data(b, dim[0])
@@ -96,7 +105,7 @@ def test_spearman_r_masked(a, b, dim):
     assert not np.isnan(res_skipna).any()
 
 
-@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize('dim', AXES)
 def test_spearman_r_p_value_masked(a, b, dim):
     a_masked = mask_data(a, dim[0])
     b_masked = mask_data(b, dim[0])

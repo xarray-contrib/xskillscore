@@ -1,11 +1,30 @@
 import xarray as xr
 
-from .np_deterministic import (_mad, _mae, _mape, _mse, _pearson_r,
-                               _pearson_r_p_value, _rmse, _smape, _spearman_r,
-                               _spearman_r_p_value)
+from .np_deterministic import (
+    _mad,
+    _mae,
+    _mape,
+    _mse,
+    _pearson_r,
+    _pearson_r_p_value,
+    _rmse,
+    _smape,
+    _spearman_r,
+    _spearman_r_p_value,
+)
 
-__all__ = ["pearson_r", "pearson_r_p_value", "rmse", "mse", "mae",
-           "mad", "smape", "mape", "spearman_r", "spearman_r_p_value"]
+__all__ = [
+    'pearson_r',
+    'pearson_r_p_value',
+    'rmse',
+    'mse',
+    'mae',
+    'mad',
+    'smape',
+    'mape',
+    'spearman_r',
+    'spearman_r_p_value',
+]
 
 
 def _preprocess_dims(dim):
@@ -43,8 +62,8 @@ def _preprocess_weights(a, dim, new_dim, weights):
         # Throw error if there are negative weights.
         if weights.min() < 0:
             raise ValueError(
-                "Weights has a minimum below 0. Please submit a weights array "
-                "of positive numbers."
+                'Weights has a minimum below 0. Please submit a weights array '
+                'of positive numbers.'
             )
         # Scale weights to vary from 0 to 1.
         weights = weights / weights.max()
@@ -53,9 +72,9 @@ def _preprocess_weights(a, dim, new_dim, weights):
         drop_dims = {k: 0 for k in a.dims if k not in new_dim}
         if dict(weights.sizes) != dict(a.isel(drop_dims).sizes):
             raise ValueError(
-                f"weights dimension(s) {dim} of size {dict(weights.sizes)} "
+                f'weights dimension(s) {dim} of size {dict(weights.sizes)} '
                 f"does not match DataArray's size "
-                f"{dict(a.isel(drop_dims).sizes)}"
+                f'{dict(a.isel(drop_dims).sizes)}'
             )
         if dict(weights.sizes) != dict(a.sizes):
             # Broadcast weights to full size of main object.
@@ -94,7 +113,7 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
     """
     dim, _ = _preprocess_dims(dim)
     if len(dim) > 1:
-        new_dim = "_".join(dim)
+        new_dim = '_'.join(dim)
         a = a.stack(**{new_dim: dim})
         b = b.stack(**{new_dim: dim})
         if weights is not None:
@@ -109,8 +128,8 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=[[new_dim], [new_dim], [new_dim]],
-        kwargs={"axis": -1, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': -1, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -146,7 +165,7 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
     """
     dim, _ = _preprocess_dims(dim)
     if len(dim) > 1:
-        new_dim = "_".join(dim)
+        new_dim = '_'.join(dim)
         a = a.stack(**{new_dim: dim})
         b = b.stack(**{new_dim: dim})
         if weights is not None:
@@ -161,8 +180,8 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=[[new_dim], [new_dim], [new_dim]],
-        kwargs={"axis": -1, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': -1, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -197,7 +216,7 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
     """
     dim, _ = _preprocess_dims(dim)
     if len(dim) > 1:
-        new_dim = "_".join(dim)
+        new_dim = '_'.join(dim)
         a = a.stack(**{new_dim: dim})
         b = b.stack(**{new_dim: dim})
         if weights is not None:
@@ -212,8 +231,8 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=[[new_dim], [new_dim], [new_dim]],
-        kwargs={"axis": -1, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': -1, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -248,7 +267,7 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
     """
     dim, _ = _preprocess_dims(dim)
     if len(dim) > 1:
-        new_dim = "_".join(dim)
+        new_dim = '_'.join(dim)
         a = a.stack(**{new_dim: dim})
         b = b.stack(**{new_dim: dim})
         if weights is not None:
@@ -263,8 +282,8 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=[[new_dim], [new_dim], [new_dim]],
-        kwargs={"axis": -1, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': -1, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -307,8 +326,8 @@ def rmse(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=[dim, dim, dim],
-        kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': axis, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -351,8 +370,8 @@ def mse(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=[dim, dim, dim],
-        kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': axis, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -395,8 +414,8 @@ def mae(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=[dim, dim, dim],
-        kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': axis, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -437,8 +456,8 @@ def mad(a, b, dim, skipna=False):
         a,
         b,
         input_core_dims=[dim, dim],
-        kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': axis, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -469,7 +488,6 @@ def mape(a, b, dim, weights=None, skipna=False):
 
     See Also
     --------
-    sklearn.metrics.mean_absolute_error / a * 100
     xarray.apply_ufunc
 
     """
@@ -482,8 +500,8 @@ def mape(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=[dim, dim, dim],
-        kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': axis, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -514,7 +532,6 @@ def smape(a, b, dim, weights=None, skipna=False):
 
     See Also
     --------
-    sklearn.metrics.mean_absolute_error / (np.abs(a) + np.abs(b)) * 100
     xarray.apply_ufunc
 
     """
@@ -527,7 +544,7 @@ def smape(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=[dim, dim, dim],
-        kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': axis, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )

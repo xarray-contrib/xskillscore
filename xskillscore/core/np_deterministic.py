@@ -3,8 +3,18 @@ import numpy as np
 from scipy import special
 from scipy.stats import distributions
 
-__all__ = ["_pearson_r", "_pearson_r_p_value", "_rmse", "_mse", "_mae",
-           "_mad", "_smape", "_mape", "_spearman_r", "_spearman_r_p_value"]
+__all__ = [
+    '_pearson_r',
+    '_pearson_r_p_value',
+    '_rmse',
+    '_mse',
+    '_mae',
+    '_mad',
+    '_smape',
+    '_mape',
+    '_spearman_r',
+    '_spearman_r_p_value',
+]
 
 
 def _get_numpy_funcs(skipna):
@@ -194,8 +204,11 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
     --------
     scipy.stats.spearmanr
 
+    Reference
+    ---------
+    https://github.com/scipy/scipy/blob/v1.3.1/scipy/stats/stats.py#L3613-L3764
+
     """
-    # https://github.com/scipy/scipy/blob/v1.3.1/scipy/stats/stats.py#L3613-L3764
     rs = _spearman_r(a, b, weights, axis, skipna)
     a = np.rollaxis(a, axis)
     # TODO:  should dof be reduced by number of nans in a or b?
@@ -390,9 +403,7 @@ def _mape(a, b, weights, axis, skipna):
     # check whether a as zeros ?
     mape = np.absolute(a - b) / np.absolute(a)
     if weights is not None:
-        return sumfunc(mape * weights, axis=axis) / sumfunc(
-            weights, axis=axis
-        )
+        return sumfunc(mape * weights, axis=axis) / sumfunc(weights, axis=axis)
     else:
         return meanfunc(mape, axis=axis)
 
