@@ -129,8 +129,10 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
 
     """
     r = _pearson_r(a, b, weights, axis, skipna)
-    nnans = np.sum(np.isnan(a * b), axis)
     a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    # dirty fix: want to check the number of nans in union(a,b) on axis 0
+    nnans = np.sum(np.isnan(a[0] * b[0]))
     dof = a.shape[0] - 2 - nnans
     t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
     _x = dof / (dof + t_squared)
@@ -169,6 +171,7 @@ def _spearman_r(a, b, weights, axis, skipna):
     scipy.stats.spearmanr
 
     """
+    # TODO: returns 1 if all nan
     if skipna:
         rankfunc = bn.rankdata
     else:
@@ -210,8 +213,10 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
 
     """
     rs = _spearman_r(a, b, weights, axis, skipna)
-    nnans = np.sum(np.isnan(a * b), axis)
     a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    # dirty fix: want to check the number of nans in union(a,b) on axis 0
+    nnans = np.sum(np.isnan(a[0] * b[0]))
     dof = a.shape[0] - 2 - nnans
     t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
@@ -400,8 +405,8 @@ def _mape(a, b, weights, axis, skipna):
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
     weights = _check_weights(weights)
-    # check whether a as zeros ?
-    mape = np.absolute(a - b) / np.absolute(a)
+    # replace divided by 0 with nan
+    mape = np.absolute(a - b) / np.absolute(np.where(a != 0, a, np.nan))
     if weights is not None:
         return sumfunc(mape * weights, axis=axis) / sumfunc(weights, axis=axis)
     else:
