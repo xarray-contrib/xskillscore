@@ -41,6 +41,11 @@ def _check_weights(weights):
         return weights
 
 
+def _check_for_all_nans_on_axis(a, axis):
+    """Check if all entries along axis are NaN."""
+    return True if np.isnan(a[axis]).all() else False
+
+
 def _pearson_r(a, b, weights, axis, skipna):
     """
     ndarray implementation of scipy.stats.pearsonr.
@@ -68,6 +73,9 @@ def _pearson_r(a, b, weights, axis, skipna):
     scipy.stats.pearsonr
 
     """
+    # returns nan if all nan
+    if _check_for_all_nans_on_axis(a, axis):
+        return np.isnan(a[axis])
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
     weights = _check_weights(weights)
     a = np.rollaxis(a, axis)
@@ -128,10 +136,12 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
     scipy.stats.pearsonr
 
     """
+    # returns nan if all nan
+    if _check_for_all_nans_on_axis(a, axis):
+        return np.isnan(a[axis])
     r = _pearson_r(a, b, weights, axis, skipna)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
-    # dirty fix: want to check the number of nans in union(a,b) on axis 0
     nnans = np.sum(np.isnan(a[0] * b[0]))
     dof = a.shape[0] - 2 - nnans
     t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
@@ -171,7 +181,9 @@ def _spearman_r(a, b, weights, axis, skipna):
     scipy.stats.spearmanr
 
     """
-    # TODO: returns 1 if all nan
+    # returns nan if all nan
+    if _check_for_all_nans_on_axis(a, axis):
+        return np.isnan(a[axis])
     if skipna:
         rankfunc = bn.rankdata
     else:
@@ -212,10 +224,12 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
     https://github.com/scipy/scipy/blob/v1.3.1/scipy/stats/stats.py#L3613-L3764
 
     """
+    # returns nan if all nan
+    if _check_for_all_nans_on_axis(a, axis):
+        return np.isnan(a[axis])
     rs = _spearman_r(a, b, weights, axis, skipna)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
-    # dirty fix: want to check the number of nans in union(a,b) on axis 0
     nnans = np.sum(np.isnan(a[0] * b[0]))
     dof = a.shape[0] - 2 - nnans
     t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))

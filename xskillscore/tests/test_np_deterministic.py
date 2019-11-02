@@ -9,6 +9,7 @@ from sklearn.metrics import (
 )
 
 from xskillscore.core.np_deterministic import (
+    _check_for_all_nans_on_axis,
     _mad,
     _mae,
     _mape,
@@ -35,6 +36,15 @@ def b():
 # standard params in this testing file
 skipna = False
 weights = None
+
+
+@pytest.mark.parametrize('axis', [0, 1, 2])
+def test_check_all_nans(a, axis):
+    a_axis_nan = a.copy()
+    a_axis_nan[axis] = np.nan
+    expected = True
+    actual = _check_for_all_nans_on_axis(a_axis_nan, axis)
+    assert expected == actual
 
 
 def test_pearson_r_nd(a, b):
@@ -110,7 +120,7 @@ def test_spearman_r_nd(a, b):
             _b = b[:, i, j]
             expected[i, j], p = stats.spearmanr(_a, _b)
     actual = _spearman_r(a, b, weights, axis, skipna)
-    assert_allclose(actual, expected)
+    assert_allclose(actual, expected, atol=1e-5)
 
     axis = 1
     expected = np.squeeze(a[:, 0, :]).copy()
@@ -120,7 +130,7 @@ def test_spearman_r_nd(a, b):
             _b = b[i, :, j]
             expected[i, j], p = stats.spearmanr(_a, _b)
     actual = _spearman_r(a, b, weights, axis, skipna)
-    assert_allclose(actual, expected)
+    assert_allclose(actual, expected, atol=1e-5)
 
     axis = 2
     expected = np.squeeze(a[:, :, 0]).copy()
@@ -130,7 +140,7 @@ def test_spearman_r_nd(a, b):
             _b = b[i, j, :]
             expected[i, j], p = stats.spearmanr(_a, _b)
     actual = _spearman_r(a, b, weights, axis, skipna)
-    assert_allclose(actual, expected)
+    assert_allclose(actual, expected, atol=1e-5)
 
 
 def test_spearman_r_p_value_nd(a, b):
@@ -143,7 +153,7 @@ def test_spearman_r_p_value_nd(a, b):
             _b = b[:, i, j]
             r, expected[i, j] = stats.spearmanr(_a, _b, nan_policy=nan_policy)
     actual = _spearman_r_p_value(a, b, weights, axis, skipna)
-    assert_allclose(actual, expected, rtol=0.1)
+    assert_allclose(actual, expected, atol=1e-5)
 
     axis = 1
     expected = np.squeeze(a[:, 0, :]).copy()
@@ -153,7 +163,7 @@ def test_spearman_r_p_value_nd(a, b):
             _b = b[i, :, j]
             p, expected[i, j] = stats.spearmanr(_a, _b, nan_policy=nan_policy)
     actual = _spearman_r_p_value(a, b, weights, axis, skipna)
-    assert_allclose(actual, expected, rtol=0.1)
+    assert_allclose(actual, expected, atol=1e-5)
 
     axis = 2
     expected = np.squeeze(a[:, :, 0]).copy()
@@ -163,7 +173,7 @@ def test_spearman_r_p_value_nd(a, b):
             _b = b[i, j, :]
             r, expected[i, j] = stats.spearmanr(_a, _b, nan_policy=nan_policy)
     actual = _spearman_r_p_value(a, b, weights, axis, skipna)
-    assert_allclose(actual, expected, rtol=0.1)
+    assert_allclose(actual, expected, atol=1e-5)
 
 
 def test_rmse_nd(a, b):
