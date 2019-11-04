@@ -12,6 +12,9 @@ dependencies:
   - pip
   - numba
   - bottleneck
+  - matplotlib
+  - cftime==1.0.3.4
+  - nc-time-axis
   - pip:
     - properscoring
     - asv
