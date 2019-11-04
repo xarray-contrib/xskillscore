@@ -7,9 +7,7 @@ from sklearn.metrics import (
     mean_squared_error,
     median_absolute_error,
 )
-
 from xskillscore.core.np_deterministic import (
-    _check_for_all_nans_on_axis,
     _mad,
     _mae,
     _mape,
@@ -36,15 +34,6 @@ def b():
 # standard params in this testing file
 skipna = False
 weights = None
-
-
-@pytest.mark.parametrize('axis', [0, 1, 2])
-def test_check_all_nans(a, axis):
-    a_axis_nan = a.copy()
-    a_axis_nan[axis] = np.nan
-    expected = True
-    actual = _check_for_all_nans_on_axis(a_axis_nan, axis)
-    assert expected == actual
 
 
 def test_pearson_r_nd(a, b):

@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-
 from xskillscore.core.deterministic import (
     mad,
     mae,
@@ -72,7 +71,6 @@ def test_metrics_masked(a, b, dim, metric):
     res_no_skipna = metric(a_masked, b_masked, dim, skipna=False)
 
     return_for_nan_pearson_r_p_value = 1.0
-    return_for_nan_spearman_r = 1.0
 
     if 'lon' in dim or 'lat' in dim:  # metric is applied along axis with nans
         # res_skipna shouldnt have nans
@@ -86,16 +84,17 @@ def test_metrics_masked(a, b, dim, metric):
         res_skipna_where_masked = res_skipna.isel(lon=[1, 2], lat=[1, 2])
         res_no_skipna_where_masked = res_no_skipna.isel(lon=[1, 2], lat=[1, 2])
 
-        # where masked should be all nan
-        if metric in [spearman_r]:
-            assert (res_skipna_where_masked == return_for_nan_spearman_r).all()
+        if metric is pearson_r_p_value:
+            assert (
+                res_skipna_where_masked == return_for_nan_pearson_r_p_value
+            ).all()
         else:
             assert np.isnan(res_skipna_where_masked).all()
-        assert np.isnan(res_no_skipna_where_masked).all()
-        # res_skipna should have a few nans
-        if metric in [spearman_r]:
-            assert (res_skipna == return_for_nan_spearman_r).any()
+            assert np.isnan(res_no_skipna_where_masked).all()
+        # res_skipna should have a few nans or 1.0 for pearson_r_p_value
+        if metric is pearson_r_p_value:
+            assert (res_skipna == return_for_nan_pearson_r_p_value).any()
         else:
             assert np.isnan(res_skipna).any()
-        # res_no_skipna should have a few nans
-        assert np.isnan(res_no_skipna).any()
+            # res_no_skipna should have a few nans
+            assert np.isnan(res_no_skipna).any()
