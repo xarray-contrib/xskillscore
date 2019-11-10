@@ -8,8 +8,8 @@ xskillscore: Metrics for verifying forecasts
 .. image:: https://anaconda.org/conda-forge/xskillscore/badges/version.svg
    :target: https://anaconda.org/conda-forge/xskillscore/
 .. image:: https://img.shields.io/badge/benchmarked%20by-asv-green.svg?style=flat
-  :target: https://raybellwaves.github.io/xskillscore/ 
-   
+  :target: https://raybellwaves.github.io/xskillscore/
+
 
 **xskillscore** is an open source project and Python package that provides verification metrics of deterministic (and probabilistic from `properscoring`) forecasts with `xarray`.
 
@@ -71,15 +71,25 @@ Examples
 
    r_p_value = xs.pearson_r_p_value(obs, fct, "time")
 
+   rs = xs.spearman_r(obs, fct, "time")
+
+   rs_p_value = xs.spearman_r_p_value(obs, fct, "time")
+
    rmse = xs.rmse(obs, fct, "time")
 
    mse = xs.mse(obs, fct, "time")
 
    mae = xs.mae(obs, fct, "time")
 
+   mad = xs.mad(obs, fct, "time")
+
+   mape = xs.mape(obs, fct, "time")
+
+   smape = xs.smape(obs, fct, "time")
+
    # You can also specify multiple axes for deterministic metrics:
    r = xs.pearson_r(obs, fct, ["lat", "lon"])
-   
+
    # You can weight over the dimensions the function is being applied
    # to by passing the argument ``weights=weight`` with a xr.DataArray
    # containing the dimension(s) being reduced.
@@ -146,7 +156,7 @@ Examples
        coords=[np.arange(3), np.arange(4), np.arange(5)],
        dims=["member", "lat", "lon"],
    )
-   
+
    crps_ensemble = xs.crps_ensemble(obs, fct)
 
    crps_gaussian = xs.crps_gaussian(obs, fct.mean("member"), fct.std("member"))

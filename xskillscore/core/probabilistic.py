@@ -8,6 +8,14 @@ from properscoring import (
     threshold_brier_score,
 )
 
+__all__ = [
+    'brier_score',
+    'crps_ensemble',
+    'crps_gaussian',
+    'crps_quadrature',
+    'threshold_brier_score',
+]
+
 
 def xr_crps_gaussian(observations, mu, sig):
     """

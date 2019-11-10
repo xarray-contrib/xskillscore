@@ -3,103 +3,80 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from xskillscore.core.deterministic import (
-    mae,
-    mse,
-    pearson_r,
-    pearson_r_p_value,
-    rmse,
-)
-
+from xskillscore.core.deterministic import (mad, mae, mape, mse, pearson_r,
+                                            pearson_r_p_value, rmse, smape,
+                                            spearman_r, spearman_r_p_value)
 
 # Should only have masking issues when pulling in masked
 # grid cells over space.
-AXES = [["time"], ["lat"], ["lon"], ("lat", "lon"), ("time", "lat", "lon")]
+AXES = [['time'], ['lat'], ['lon'], ('lat', 'lon'), ('time', 'lat', 'lon')]
+
+distance_metrics = [mae, mse, mad, mape, smape, rmse]
+correlation_metrics = [
+    pearson_r,
+    pearson_r_p_value,
+    spearman_r,
+    spearman_r_p_value,
+]
 
 
 @pytest.fixture
 def a():
-    time = pd.date_range("1/1/2000", "1/3/2000", freq="D")
+    time = pd.date_range('1/1/2000', '1/3/2000', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(time), len(lats), len(lons))
     da = xr.DataArray(
-        data, coords=[time, lats, lons], dims=["time", "lat", "lon"]
+        data, coords=[time, lats, lons], dims=['time', 'lat', 'lon']
     )
     return da
 
 
 @pytest.fixture
 def b():
-    time = pd.date_range("1/1/2000", "1/3/2000", freq="D")
+    time = pd.date_range('1/1/2000', '1/3/2000', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(time), len(lats), len(lons))
     da = xr.DataArray(
-        data, coords=[time, lats, lons], dims=["time", "lat", "lon"]
+        data, coords=[time, lats, lons], dims=['time', 'lat', 'lon']
     )
     return da
 
 
-def mask_data(da, dim):
+def mask_land_data(da):
     """
-    Masks sample data arbitrarily over specified dim.
+    Masks sample data arbitrarily like a block of land.
     """
-    # Mask an arbitrary region with NaNs (like a block of land).
-    return da.where(da[dim] > da[dim].isel({dim: 0}))
+    da.data[:, 1:3, 1:3] = np.nan
+    return da
 
 
-@pytest.mark.parametrize("dim", AXES)
-def test_pearson_r_masked(a, b, dim):
-    a_masked = mask_data(a, dim[0])
-    b_masked = mask_data(b, dim[0])
+@pytest.mark.parametrize('metric', correlation_metrics + distance_metrics)
+@pytest.mark.parametrize('dim', AXES)
+def test_metrics_masked(a, b, dim, metric):
+    """Test for all distance-based metrics whether result of skipna does not
+    contain any nans when applied along dim with nans."""
+    a_masked = mask_land_data(a)
+    b_masked = mask_land_data(b)
+    res_skipna = metric(a_masked, b_masked, dim, skipna=True)
+    res_no_skipna = metric(a_masked, b_masked, dim, skipna=False)
 
-    res_skipna = pearson_r(a_masked, b_masked, dim, skipna=True)
-    res_no_skipna = pearson_r(a_masked, b_masked, dim, skipna=False)
-    assert np.isnan(res_no_skipna).all()
-    assert not np.isnan(res_skipna).any()
+    if 'lon' in dim or 'lat' in dim:  # metric is applied along axis with nans
+        # res_skipna shouldnt have nans
+        if metric not in [spearman_r_p_value, pearson_r_p_value]:
+            assert not np.isnan(res_skipna).any()
+        # res_no_skipna should have different result then skipna
+        assert (res_no_skipna != res_skipna).any()
+    else:  # metric is applied along axis without nans
+        res_skipna_where_masked = res_skipna.isel(lon=[1, 2], lat=[1, 2])
+        res_no_skipna_where_masked = res_no_skipna.isel(lon=[1, 2], lat=[1, 2])
 
-
-@pytest.mark.parametrize("dim", AXES)
-def test_pearson_r_p_value_masked(a, b, dim):
-    a_masked = mask_data(a, dim[0])
-    b_masked = mask_data(b, dim[0])
-
-    res_skipna = pearson_r_p_value(a_masked, b_masked, dim, skipna=True)
-    res_no_skipna = pearson_r_p_value(a_masked, b_masked, dim, skipna=False)
-    # p-value defaults to exactly 1.0 instead of NaNs.
-    assert (res_no_skipna == 1.0).all()
-    assert not np.isnan(res_skipna).any()
-
-
-@pytest.mark.parametrize("dim", AXES)
-def test_rmse_masked(a, b, dim):
-    a_masked = mask_data(a, dim[0])
-    b_masked = mask_data(b, dim[0])
-
-    res_skipna = rmse(a_masked, b_masked, dim, skipna=True)
-    res_no_skipna = rmse(a_masked, b_masked, dim, skipna=False)
-    assert np.isnan(res_no_skipna).all()
-    assert not np.isnan(res_skipna).any()
-
-
-@pytest.mark.parametrize("dim", AXES)
-def test_mse_masked(a, b, dim):
-    a_masked = mask_data(a, dim[0])
-    b_masked = mask_data(b, dim[0])
-
-    res_skipna = mse(a_masked, b_masked, dim, skipna=True)
-    res_no_skipna = mse(a_masked, b_masked, dim, skipna=False)
-    assert np.isnan(res_no_skipna).all()
-    assert not np.isnan(res_skipna).any()
-
-
-@pytest.mark.parametrize("dim", AXES)
-def test_mae_masked(a, b, dim):
-    a_masked = mask_data(a, dim[0])
-    b_masked = mask_data(b, dim[0])
-
-    res_skipna = mae(a_masked, b_masked, dim, skipna=True)
-    res_no_skipna = mae(a_masked, b_masked, dim, skipna=False)
-    assert np.isnan(res_no_skipna).all()
-    assert not np.isnan(res_skipna).any()
+        assert np.isnan(res_skipna_where_masked).all()
+        assert np.isnan(res_no_skipna_where_masked).all()
+        # res_skipna should have a few nans
+        assert np.isnan(res_skipna).any()
+        # res_no_skipna should have a few nans
+        assert np.isnan(res_no_skipna).any()
+        # # res_no_skipna should have different result then skipna
+        assert (res_no_skipna != res_skipna).any()
