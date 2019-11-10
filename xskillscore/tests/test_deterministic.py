@@ -105,12 +105,12 @@ def weights_dask(weights):
     return weights.chunk()
 
 
-def adjust_weights(dim, weight, weights):
+def adjust_weights(dim, weight_bool, weights):
     """
     Adjust the weights test data to only span the core dimension
     that the function is being applied over.
     """
-    if weight:
+    if weight_bool:
         drop_dims = [i for i in weights.dims if i not in dim]
         drop_dims = {k: 0 for k in drop_dims}
         return weights.isel(drop_dims)
@@ -120,8 +120,8 @@ def adjust_weights(dim, weight, weights):
 
 @pytest.mark.parametrize('metrics', correlation_metrics)
 @pytest.mark.parametrize('dim', AXES)
-@pytest.mark.parametrize('weight', [True, False])
-def test_correlation_metrics_xr(a, b, dim, weight, weights, metrics):
+@pytest.mark.parametrize('weight_bool', [True, False])
+def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     """Test whether correlation metric for xarray functions (from
      deterministic.py) give save numerical results as for numpy functions from
      np_deterministic.py)."""
@@ -129,7 +129,7 @@ def test_correlation_metrics_xr(a, b, dim, weight, weights, metrics):
     metric, _metric = metrics
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
-    _weights = adjust_weights(dim, weight, weights)
+    _weights = adjust_weights(dim, weight_bool, weights)
 
     actual = metric(a, b, dim, weights=_weights)
     # check that no chunks for no chunk inputs
@@ -140,7 +140,7 @@ def test_correlation_metrics_xr(a, b, dim, weight, weights, metrics):
         new_dim = '_'.join(dim)
         _a = a.stack(**{new_dim: dim})
         _b = b.stack(**{new_dim: dim})
-        if weight:
+        if weight_bool:
             _weights = _weights.stack(**{new_dim: dim})
     else:
         new_dim = dim[0]
@@ -157,8 +157,8 @@ def test_correlation_metrics_xr(a, b, dim, weight, weights, metrics):
 
 @pytest.mark.parametrize('metrics', distance_metrics)
 @pytest.mark.parametrize('dim', AXES)
-@pytest.mark.parametrize('weight', [True, False])
-def test_distance_metrics_xr(a, b, dim, weight, weights, metrics):
+@pytest.mark.parametrize('weight_bool', [True, False])
+def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     """Test whether distance-based metric for xarray functions (from
      deterministic.py) give save numerical results as for numpy functions from
      np_deterministic.py)."""
@@ -166,7 +166,7 @@ def test_distance_metrics_xr(a, b, dim, weight, weights, metrics):
     metric, _metric = metrics
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
-    weights = adjust_weights(dim, weight, weights)
+    weights = adjust_weights(dim, weight_bool, weights)
     # mad has no weights argument
     if metric is mad:
         actual = metric(a, b, dim)
@@ -192,9 +192,9 @@ def test_distance_metrics_xr(a, b, dim, weight, weights, metrics):
 
 @pytest.mark.parametrize('metrics', correlation_metrics)
 @pytest.mark.parametrize('dim', AXES)
-@pytest.mark.parametrize('weight', [True, False])
+@pytest.mark.parametrize('weight_bool', [True, False])
 def test_correlation_metrics_xr_dask(
-    a_dask, b_dask, dim, weight, weights_dask, metrics
+    a_dask, b_dask, dim, weight_bool, weights_dask, metrics
 ):
     """Test whether correlation metric for xarray functions can be lazy when
      chunked by using dask and give same results."""
@@ -205,7 +205,7 @@ def test_correlation_metrics_xr_dask(
     metric, _metric = metrics
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
-    _weights = adjust_weights(dim, weight, weights)
+    _weights = adjust_weights(dim, weight_bool, weights)
 
     actual = metric(a, b, dim, weights=_weights)
     # check that chunks for chunk inputs
@@ -221,9 +221,9 @@ def test_correlation_metrics_xr_dask(
 
 @pytest.mark.parametrize('metrics', distance_metrics)
 @pytest.mark.parametrize('dim', AXES)
-@pytest.mark.parametrize('weight', [True, False])
+@pytest.mark.parametrize('weight_bool', [True, False])
 def test_distance_metrics_xr_dask(
-    a_dask, b_dask, dim, weight, weights_dask, metrics
+    a_dask, b_dask, dim, weight_bool, weights_dask, metrics
 ):
     """Test whether distance metrics for xarray functions can be lazy when
      chunked by using dask and give same results."""
@@ -234,7 +234,7 @@ def test_distance_metrics_xr_dask(
     metric, _metric = metrics
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
-    _weights = adjust_weights(dim, weight, weights)
+    _weights = adjust_weights(dim, weight_bool, weights)
     if _weights is not None:
         _weights = _weights.load()
     if metric is mad:
