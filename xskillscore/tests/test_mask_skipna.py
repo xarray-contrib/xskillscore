@@ -33,15 +33,10 @@ def a():
 
 
 @pytest.fixture
-def b():
-    time = pd.date_range('1/1/2000', '1/3/2000', freq='D')
-    lats = np.arange(4)
-    lons = np.arange(5)
-    data = np.random.rand(len(time), len(lats), len(lons))
-    da = xr.DataArray(
-        data, coords=[time, lats, lons], dims=['time', 'lat', 'lon']
-    )
-    return da
+def b(a):
+    b = a.copy()
+    b.values = np.random.rand(a.shape[0], a.shape[1], a.shape[2])
+    return b
 
 
 def mask_land_data(da):
