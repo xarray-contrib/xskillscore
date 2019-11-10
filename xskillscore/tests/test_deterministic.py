@@ -50,41 +50,34 @@ AXES = ('time', 'lat', 'lon', ('lat', 'lon'), ('time', 'lat', 'lon'))
 
 @pytest.fixture
 def a():
-    dates = pd.date_range('1/1/2000', '1/3/2000', freq='D')
+    times = pd.date_range('1/1/2000', '1/3/2000', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
-    data = np.random.rand(len(dates), len(lats), len(lons))
+    data = np.random.rand(len(times), len(lats), len(lons))
     return xr.DataArray(
-        data, coords=[dates, lats, lons], dims=['time', 'lat', 'lon']
+        data, coords=[times, lats, lons], dims=['time', 'lat', 'lon']
     )
 
 
 @pytest.fixture
-def b():
-    dates = pd.date_range('1/1/2000', '1/3/2000', freq='D')
-    lats = np.arange(4)
-    lons = np.arange(5)
-    data = np.random.rand(len(dates), len(lats), len(lons))
-    return xr.DataArray(
-        data, coords=[dates, lats, lons], dims=['time', 'lat', 'lon']
-    )
+def b(a):
+    b = a.copy()
+    b.values = np.random.rand(a.shape[0], a.shape[1], a.shape[2])
+    return b
 
 
 @pytest.fixture
-def weights():
+def weights(a):
     """
     Weighting array by cosine of the latitude.
     """
-    dates = pd.date_range('1/1/2000', '1/3/2000', freq='D')
-    lats = np.arange(4)
-    lons = np.arange(5)
-    cos = np.abs(np.cos(lats))
-    data = np.tile(cos, (len(dates), len(lons), 1)).reshape(
-        len(dates), len(lats), len(lons)
+    a_weighted = a.copy()
+    cos = np.abs(np.cos(a.lat))
+    data = np.tile(cos, (a.shape[0], a.shape[2], 1)).reshape(
+        a.shape[0], a.shape[1], a.shape[2]
     )
-    return xr.DataArray(
-        data, coords=[dates, lats, lons], dims=['time', 'lat', 'lon']
-    )
+    a_weighted.values = data
+    return a_weighted
 
 
 @pytest.fixture

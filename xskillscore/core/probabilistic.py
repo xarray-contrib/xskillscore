@@ -19,7 +19,8 @@ __all__ = [
 
 def xr_crps_gaussian(observations, mu, sig):
     """
-    xarray version of properscoring.crps_gaussian.
+    xarray version of properscoring.crps_gaussian: Continuous Ranked
+     Probability Score with a Gaussian distribution.
 
     Parameters
     ----------
@@ -61,7 +62,8 @@ def xr_crps_gaussian(observations, mu, sig):
 
 def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
     """
-    xarray version of properscoring.crps_quadrature.
+    xarray version of properscoring.crps_quadrature: Continuous Ranked
+     Probability Score with numerical integration of the normal distribution
 
     Parameters
     ----------
@@ -97,7 +99,8 @@ def xr_crps_ensemble(
     observations, forecasts, weights=None, issorted=False, dim='member'
 ):
     """
-    xarray version of properscoring.crps_ensemble.
+    xarray version of properscoring.crps_ensemble: Continuous Ranked
+     Probability Score with the ensemble distribution
 
     Parameters
     ----------

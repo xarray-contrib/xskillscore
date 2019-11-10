@@ -47,17 +47,11 @@ Examples
        ],
        dims=["time", "lat", "lon"],
    )
-   fct = xr.DataArray(
-       np.random.rand(3, 4, 5),
-       coords=[
-           pd.date_range("1/1/2000", "1/3/2000", freq="D"),
-           np.arange(4),
-           np.arange(5),
-       ],
-       dims=["time", "lat", "lon"],
-   )
+   fct = obs.copy()
+   fct.values = np.random.rand(3, 4, 5)
 
-   # deterministic
+   ### Deterministic metrics
+   # Pearson's correlation coefficient
    r = xs.pearson_r(obs, fct, "time")
    # >>> r
    # <xarray.DataArray (lat: 4, lon: 5)>
@@ -69,25 +63,35 @@ Examples
    #  * lat      (lat) int64 0 1 2 3
    #  * lon      (lon) int64 0 1 2 3 4
 
+   # 2-tailed p-value of Pearson's correlation coefficient
    r_p_value = xs.pearson_r_p_value(obs, fct, "time")
 
+   # Spearman's correlation coefficient
    rs = xs.spearman_r(obs, fct, "time")
 
+   # 2-tailed p-value associated with Spearman's correlation coefficient
    rs_p_value = xs.spearman_r_p_value(obs, fct, "time")
 
+   # Root Mean Squared Error
    rmse = xs.rmse(obs, fct, "time")
 
+   # Mean Squared Error
    mse = xs.mse(obs, fct, "time")
 
+   # Mean Absolute Error
    mae = xs.mae(obs, fct, "time")
 
+   # Median Absolute Deviation
    mad = xs.mad(obs, fct, "time")
 
+   # Mean Absolute Percentage Error
    mape = xs.mape(obs, fct, "time")
 
+   # Symmetric Mean Absolute Percentage Error
    smape = xs.smape(obs, fct, "time")
 
-   # You can also specify multiple axes for deterministic metrics:
+   # You can also specify multiple axes for deterministic metrics.
+   # Apply Pearson's correlation coefficient over the latitude and longitude dimension
    r = xs.pearson_r(obs, fct, ["lat", "lon"])
 
    # You can weight over the dimensions the function is being applied
@@ -100,52 +104,57 @@ Examples
    # at the equator and minimum at the poles (as in the below example). More
    # complicated model grids tend to be accompanied by a cell area coordinate,
    # which could also be passed into this function.
-   dims = ('lat', 'lon')
-   base_data = np.ones((30, 180, 360))
-   a = xr.DataArray(
-       base_data + np.random.rand(30, 180, 360),
-       dims=['time', 'lat', 'lon']
-   )
-   b = xr.DataArray(
-       base_data + np.random.rand(30, 180, 360),
-       dims=['time', 'lat', 'lon']
-   )
-   x = np.linspace(-179.5, 179.5, 360)
-   y = np.linspace(-89.5, 89.5, 180)
-   lon, lat = np.meshgrid(x, y)
-   a['latitude'] = (dims, lat)
-   a['longitude'] = (dims, lon)
-   b['latitude'] = (dims, lat)
-   b['longitude'] = (dims, lon)
+   obs2 = xr.DataArray(
+       np.random.rand(3, 180, 360),
+       coords=[
+           pd.date_range("1/1/2000", "1/3/2000", freq="D"),
+           np.linspace(-89.5, 89.5, 180),
+           np.linspace(-179.5, 179.5, 360),
+       ],
+       dims=["time", "lat", "lon"],
+    )
+   fct2 = obs2.copy()
+   fct2.values = np.random.rand(3, 180, 360)
 
-   # make weights
-   weights = np.cos(np.deg2rad(a.latitude))
-   a, weights = xr.broadcast(a, weights)
-   weights = weights.isel(time=0) # remove time from weights
+   # make weights as cosine of the latitude and broadcast
+   weights = np.cos(np.deg2rad(obs2.lat))
+   _, weights = xr.broadcast(obs2, weights)
+   # Remove the time dimension from weights
+   weights = weights.isel(time=0)
 
-   # example
-   weighted = xs.pearson_r(a, b, dims, weights=weights)
-   non_weighted = xs.pearson_r(a, b, dims, weights=None)
-
+   # Pearson's correlation coefficient with weights
+   r_weighted = xs.pearson_r(obs2, fct2, ["lat", "lon"], weights=weights)
+   # >>> r_weighted
+   # <xarray.DataArray (time: 3)>
+   # array([0.00601718, 0.00364946, 0.00213547])
+   # Coordinates:
+   # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
+   r = xs.pearson_r(obs2, fct2, ["lat", "lon"])
+   # >>> r
+   # <xarray.DataArray (time: 3)>
+   # array([ 5.02325347e-03, -6.75266864e-05, -3.00668282e-03])
+   # Coordinates:
+   # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
+   
    # You can also pass the optional keyword `skipna=True` to ignore any NaNs on the
    # input data. This is useful in the case that you are computing these functions
    # over space and have a mask applied to the grid or have NaNs over land.
 
-   skipna_res = xs.mae(obs.where(obs.lat > 1), fct.where(fct.lat > 1), ['lat', 'lon'], skipna=True)
-   # >>> skipna_res
+   mae_with_skipna = xs.mae(obs.where(obs.lat > 1), fct.where(fct.lat > 1), ['lat', 'lon'], skipna=True)
+   # >>> mae_with_skipna
    # <xarray.DataArray (time: 3)>
    # array([0.29007757, 0.29660133, 0.38978561])
    # Coordinates:
    # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
 
-   no_skipna_res = xs.mae(obs.where(obs.lat > 1), fct.where(fct.lat > 1), ['lat', 'lon'], skipna=False)
-   # >>> no_skipna_res
+   mae_with_no_skipna = xs.mae(obs.where(obs.lat > 1), fct.where(fct.lat > 1), ['lat', 'lon'], skipna=False)
+   # >>> mae_with_no_skipna
    # <xarray.DataArray (time: 3)>
    # array([nan, nan, nan])
    # Coordinates:
    # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
 
-   # probabilistic
+   ### Probabilistic
    obs = xr.DataArray(
        np.random.rand(4, 5),
        coords=[np.arange(4), np.arange(5)],
@@ -157,14 +166,19 @@ Examples
        dims=["member", "lat", "lon"],
    )
 
+   # Continuous Ranked Probability Score with the ensemble distribution
    crps_ensemble = xs.crps_ensemble(obs, fct)
 
+   # Continuous Ranked Probability Score with a Gaussian distribution
    crps_gaussian = xs.crps_gaussian(obs, fct.mean("member"), fct.std("member"))
 
+   # Continuous Ranked Probability Score with numerical integration of the normal distribution
    crps_quadrature = xs.crps_quadrature(obs, norm)
 
+   # Brier scores of an ensemble for exceeding given thresholds
    threshold_brier_score = xs.threshold_brier_score(obs, fct, 0.7)
 
+   # Brier score
    brier_score = xs.brier_score(obs > 0.5, (fct > 0.5).mean("member"))
 
 
