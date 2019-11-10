@@ -2,18 +2,10 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-from xskillscore.core.deterministic import (
-    mad,
-    mae,
-    mape,
-    mse,
-    pearson_r,
-    pearson_r_p_value,
-    rmse,
-    smape,
-    spearman_r,
-    spearman_r_p_value,
-)
+
+from xskillscore.core.deterministic import (mad, mae, mape, mse, pearson_r,
+                                            pearson_r_p_value, rmse, smape,
+                                            spearman_r, spearman_r_p_value)
 
 # Should only have masking issues when pulling in masked
 # grid cells over space.
@@ -63,8 +55,8 @@ def mask_land_data(da):
 @pytest.mark.parametrize('metric', correlation_metrics + distance_metrics)
 @pytest.mark.parametrize('dim', AXES)
 def test_metrics_masked(a, b, dim, metric):
-    """Test for all distance-based metrics whether result if skipna do not
-     contain any nans when applied along dim with nans."""
+    """Test for all distance-based metrics whether result of skipna does not
+    contain any nans when applied along dim with nans."""
     a_masked = mask_land_data(a)
     b_masked = mask_land_data(b)
     res_skipna = metric(a_masked, b_masked, dim, skipna=True)

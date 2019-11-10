@@ -1,17 +1,8 @@
 import xarray as xr
 
-from .np_deterministic import (
-    _mad,
-    _mae,
-    _mape,
-    _mse,
-    _pearson_r,
-    _pearson_r_p_value,
-    _rmse,
-    _smape,
-    _spearman_r,
-    _spearman_r_p_value,
-)
+from .np_deterministic import (_mad, _mae, _mape, _mse, _pearson_r,
+                               _pearson_r_p_value, _rmse, _smape, _spearman_r,
+                               _spearman_r_p_value)
 
 __all__ = [
     'pearson_r',
@@ -107,8 +98,13 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
 
     See Also
     --------
-    scipy.stats.pearsonr
     xarray.apply_ufunc
+    scipy.stats.pearsonr
+    xskillscore.core.np_deterministic._pearson_r
+
+    Reference
+    ---------
+    https://en.wikipedia.org/wiki/Pearson_correlation_coefficient
 
     """
     dim, _ = _preprocess_dims(dim)
@@ -159,8 +155,9 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
 
     See Also
     --------
-    scipy.stats.pearsonr
     xarray.apply_ufunc
+    scipy.stats.pearsonr
+    xskillscore.core.np_deterministic._pearson_r_p_value
 
     """
     dim, _ = _preprocess_dims(dim)
@@ -211,8 +208,15 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
 
     See Also
     --------
-    scipy.stats.spearman_r
     xarray.apply_ufunc
+    scipy.stats.spearman_r
+    xskillscore.core.np_deterministic._spearman_r
+
+    Reference
+    ---------
+    https://github.com/scipy/scipy/blob/v1.3.1/scipy/stats/stats.py#L3613-L3764
+    https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
+
     """
     dim, _ = _preprocess_dims(dim)
     if len(dim) > 1:
@@ -262,8 +266,10 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
 
     See Also
     --------
-    scipy.stats.spearman_r
     xarray.apply_ufunc
+    scipy.stats.spearman_r
+    xskillscore.core.np_deterministic._spearman_r_p_value
+
     """
     dim, _ = _preprocess_dims(dim)
     if len(dim) > 1:
@@ -313,8 +319,13 @@ def rmse(a, b, dim, weights=None, skipna=False):
 
     See Also
     --------
-    sklearn.metrics.mean_squared_error
     xarray.apply_ufunc
+    sklearn.metrics.mean_squared_error
+    xskillscore.core.np_deterministic._rmse
+
+    Reference
+    ---------
+    https://en.wikipedia.org/wiki/Root-mean-square_deviation
 
     """
     dim, axis = _preprocess_dims(dim)
@@ -357,8 +368,13 @@ def mse(a, b, dim, weights=None, skipna=False):
 
     See Also
     --------
-    sklearn.metrics.mean_squared_error
     xarray.apply_ufunc
+    sklearn.metrics.mean_squared_error
+    xskillscore.core.np_deterministic._mse
+
+    Reference
+    ---------
+    https://en.wikipedia.org/wiki/Mean_squared_error
 
     """
     dim, axis = _preprocess_dims(dim)
@@ -401,8 +417,13 @@ def mae(a, b, dim, weights=None, skipna=False):
 
     See Also
     --------
-    sklearn.metrics.mean_absolute_error
     xarray.apply_ufunc
+    sklearn.metrics.mean_absolute_error
+    xskillscore.core.np_deterministic._mae
+
+    Reference
+    ---------
+    https://en.wikipedia.org/wiki/Mean_absolute_error
 
     """
     dim, axis = _preprocess_dims(dim)
@@ -444,10 +465,12 @@ def mad(a, b, dim, skipna=False):
     --------
     sklearn.metrics.median_absolute_error
     xarray.apply_ufunc
+    xskillscore.core.np_deterministic._mad
 
     Reference
     ---------
     https://en.wikipedia.org/wiki/Median_absolute_deviation
+
     """
     dim, axis = _preprocess_dims(dim)
 
@@ -489,6 +512,11 @@ def mape(a, b, dim, weights=None, skipna=False):
     See Also
     --------
     xarray.apply_ufunc
+    xskillscore.core.np_deterministic._mape
+
+    Reference
+    ---------
+    https://en.wikipedia.org/wiki/Mean_absolute_percentage_error
 
     """
     dim, axis = _preprocess_dims(dim)
@@ -533,6 +561,11 @@ def smape(a, b, dim, weights=None, skipna=False):
     See Also
     --------
     xarray.apply_ufunc
+    xskillscore.core.np_deterministic._smape
+
+    Reference
+    ---------
+    https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
 
     """
     dim, axis = _preprocess_dims(dim)
