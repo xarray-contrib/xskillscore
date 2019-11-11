@@ -147,7 +147,7 @@ Examples
    # Coordinates:
    # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
 
-   mae_with_no_skipna = xs.mae(obs.where(obs.lat > 1), fct.where(fct.lat > 1), ['lat', 'lon'], skipna=False)
+   mae_with_no_skipna = xs.mae(obs.where(obs.lat > 1), fct.where(fct.lat > 1), ['lat', 'lon'])
    # >>> mae_with_no_skipna
    # <xarray.DataArray (time: 3)>
    # array([nan, nan, nan])
