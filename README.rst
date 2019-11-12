@@ -139,14 +139,12 @@ Examples
    # You can also pass the optional keyword `skipna=True` to ignore any NaNs on the
    # input data. This is useful in the case that you are computing these functions
    # over space and have a mask applied to the grid or have NaNs over land.
-
    mae_with_skipna = xs.mae(obs.where(obs.lat > 1), fct.where(fct.lat > 1), ['lat', 'lon'], skipna=True)
    # >>> mae_with_skipna
    # <xarray.DataArray (time: 3)>
    # array([0.29007757, 0.29660133, 0.38978561])
    # Coordinates:
    # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
-
    mae_with_no_skipna = xs.mae(obs.where(obs.lat > 1), fct.where(fct.lat > 1), ['lat', 'lon'])
    # >>> mae_with_no_skipna
    # <xarray.DataArray (time: 3)>
