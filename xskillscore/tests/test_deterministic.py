@@ -67,6 +67,11 @@ def b(a):
 
 
 @pytest.fixture
+def b_nan(b):
+    return b.where(b < 0.5)
+
+
+@pytest.fixture
 def weights(a):
     """
     Weighting array by cosine of the latitude.
@@ -252,3 +257,8 @@ def test_percentage_metric_in_interval_0_1(a, b, dim, metric):
     assert not (res < 0).any()
     assert not (res > 1).any()
     assert not res.isnull().any()
+
+
+def test_pearson_r_p_value_skipna(a, b_nan):
+    res = pearson_r_p_value(a, b_nan, ['lat', 'lon'])
+    assert not np.isnan(res).all()

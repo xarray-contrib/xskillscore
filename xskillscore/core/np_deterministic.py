@@ -141,8 +141,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
     _b = 0.5
     res = special.betainc(_a, _b, _x)
     # reset masked values to nan
-    all_nan = np.isnan(a.mean(axis=0) * b.mean(axis=0))
-    res = np.where(all_nan, np.nan, res)
+    res[np.where(np.isnan(r))] = np.nan
     return res
 
 
