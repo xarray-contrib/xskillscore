@@ -252,3 +252,9 @@ def test_percentage_metric_in_interval_0_1(a, b, dim, metric):
     assert not (res < 0).any()
     assert not (res > 1).any()
     assert not res.isnull().any()
+
+
+def test_pearson_r_integer():
+    """Test whether arrays as integers work."""
+    da = xr.DataArray([0, 1, 2], dims=['time'])
+    assert pearson_r(da, da, dim='time') == 1
