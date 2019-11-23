@@ -260,5 +260,5 @@ def test_percentage_metric_in_interval_0_1(a, b, dim, metric):
 
 
 def test_pearson_r_p_value_skipna(a, b_nan):
-    res = pearson_r_p_value(a, b_nan, ['lat', 'lon'])
+    res = pearson_r_p_value(a, b_nan, ['lat', 'lon'], skipna=True)
     assert not np.isnan(res).all()
