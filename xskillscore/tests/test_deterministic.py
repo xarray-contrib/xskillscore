@@ -260,5 +260,6 @@ def test_percentage_metric_in_interval_0_1(a, b, dim, metric):
 
 
 def test_pearson_r_p_value_skipna(a, b_nan):
+    """Test whether NaNs sprinkled in array will NOT yield all NaNs."""
     res = pearson_r_p_value(a, b_nan, ['lat', 'lon'], skipna=True)
     assert not np.isnan(res).all()
