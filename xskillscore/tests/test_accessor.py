@@ -61,7 +61,7 @@ def test_rmse_accessor_dask(ds_dask):
 def test_mae_accessor_outer_array(ds_dask):
     ds = ds_dask.load()
     b = ds['b']
-    ds = ds.drop('b')
+    ds = ds.drop_vars('b')
     dim = 'lat'
 
     actual = mae(ds['a'], b, dim)
