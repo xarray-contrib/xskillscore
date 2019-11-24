@@ -48,7 +48,11 @@ def _preprocess_weights(a, dim, new_dim, weights):
         ``new_dim``.
     """
     if weights is None:
-        return xr.full_like(a, None)  # Return nan weighting array.
+        try:
+            return xr.full_like(a, None)  # Return nan weighting array.
+        except TypeError:
+            # integers can't be NaN
+            return xr.full_like(a.astype(float), None)
     else:
         # Throw error if there are negative weights.
         if weights.min() < 0:
