@@ -263,3 +263,9 @@ def test_pearson_r_p_value_skipna(a, b_nan):
     """Test whether NaNs sprinkled in array will NOT yield all NaNs."""
     res = pearson_r_p_value(a, b_nan, ['lat', 'lon'], skipna=True)
     assert not np.isnan(res).all()
+
+
+def test_pearson_r_integer():
+    """Test whether arrays as integers work."""
+    da = xr.DataArray([0, 1, 2], dims=['time'])
+    assert pearson_r(da, da, dim='time') == 1
