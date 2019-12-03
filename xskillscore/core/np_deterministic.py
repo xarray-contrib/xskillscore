@@ -142,7 +142,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
     res = special.betainc(_a, _b, _x)
     # reset masked values to nan
     nan_locs = np.where(np.isnan(r))
-    if len(nan_locs) > 0:
+    if len(nan_locs[0].ravel()) > 0:
         res[nan_locs] = np.nan
     return res
 
