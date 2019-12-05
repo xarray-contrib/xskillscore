@@ -9,7 +9,7 @@ from xskillscore.core.deterministic import (mad, mae, mape, mse, pearson_r,
 
 # Should only have masking issues when pulling in masked
 # grid cells over space.
-AXES = [['time'], ['lat'], ['lon'], ('lat', 'lon'), ('time', 'lat', 'lon')]
+AXES = ('time', 'lat', 'lon', ('lat', 'lon'), ('time', 'lat', 'lon'))
 
 distance_metrics = [mae, mse, mad, mape, smape, rmse]
 correlation_metrics = [
