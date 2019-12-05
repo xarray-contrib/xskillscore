@@ -135,8 +135,6 @@ def test_spearman_r_nd(a, b):
 def test_spearman_r_p_value_nd(a, b):
     nan_policy = 'propagate'  # default
     axis = 0
-    print(a)
-    print(b)
     expected = np.squeeze(a[0, :, :]).copy()
     for i in range(np.shape(a)[1]):
         for j in range(np.shape(a)[2]):

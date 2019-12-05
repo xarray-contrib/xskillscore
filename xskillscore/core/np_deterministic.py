@@ -129,23 +129,28 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
 
     """
     r = _pearson_r(a, b, weights, axis, skipna)
-    a = np.rollaxis(a, axis)
-    b = np.rollaxis(b, axis)
-    dof = np.apply_over_axes(np.sum, np.isnan(a * b), 0).squeeze() - 2
-    dof = np.where(dof > 1.0, dof, a.shape[0] - 2)
-    t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
-    _x = dof / (dof + t_squared)
-    _x = np.asarray(_x)
-    _x = np.where(_x < 1.0, _x, 1.0)
-    _a = 0.5 * dof
-    _b = 0.5
-    res = special.betainc(_a, _b, _x)
-    # reset masked values to nan
-    all_nan = np.isnan(a.mean(axis=0) * b.mean(axis=0))
-    res = np.where(all_nan, np.nan, res)
-    return res
+    if np.isnan(r).all():
+        return r
+    else:
+        # no nans or some nans
+        a = np.rollaxis(a, axis)
+        b = np.rollaxis(b, axis)
+        dof = np.apply_over_axes(np.sum, np.isnan(a * b), 0).squeeze() - 2
+        dof = np.where(dof > 1.0, dof, a.shape[0] - 2)
+        t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
+        _x = dof / (dof + t_squared)
+        _x = np.asarray(_x)
+        _x = np.where(_x < 1.0, _x, 1.0)
+        _a = 0.5 * dof
+        _b = 0.5
+        res = special.betainc(_a, _b, _x)
+        # reset masked values to nan
+        nan_locs = np.where(np.isnan(r))
+        if len(nan_locs[0]) > 0:
+            res[nan_locs] = np.nan
+        return res
 
-
+    
 def _spearman_r(a, b, weights, axis, skipna):
     """
     ndarray implementation of scipy.stats.spearmanr.
