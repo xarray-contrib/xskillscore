@@ -12,6 +12,7 @@ dependencies:
   - pip
   - numba
   - bottleneck
+  - black
   - pip:
     - properscoring
     - asv
