@@ -9,11 +9,11 @@ from properscoring import (
 )
 
 __all__ = [
-    'brier_score',
-    'crps_ensemble',
-    'crps_gaussian',
-    'crps_quadrature',
-    'threshold_brier_score',
+    "brier_score",
+    "crps_ensemble",
+    "crps_gaussian",
+    "crps_quadrature",
+    "threshold_brier_score",
 ]
 
 
@@ -55,7 +55,7 @@ def xr_crps_gaussian(observations, mu, sig):
         mu,
         sig,
         input_core_dims=[[], [], []],
-        dask='parallelized',
+        dask="parallelized",
         output_dtypes=[float],
     )
 
@@ -90,13 +90,13 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
         xmax,
         tol,
         input_core_dims=[[], [], [], [], []],
-        dask='parallelized',
+        dask="parallelized",
         output_dtypes=[float],
     )
 
 
 def xr_crps_ensemble(
-    observations, forecasts, weights=None, issorted=False, dim='member'
+    observations, forecasts, weights=None, issorted=False, dim="member"
 ):
     """
     xarray version of properscoring.crps_ensemble: Continuous Ranked
@@ -133,8 +133,8 @@ def xr_crps_ensemble(
         observations,
         forecasts,
         input_core_dims=[[], [dim]],
-        kwargs={'axis': -1, 'issorted': issorted, 'weights': weights},
-        dask='parallelized',
+        kwargs={"axis": -1, "issorted": issorted, "weights": weights},
+        dask="parallelized",
         output_dtypes=[float],
     )
 
@@ -174,13 +174,13 @@ def xr_brier_score(observations, forecasts):
         observations,
         forecasts,
         input_core_dims=[[], []],
-        dask='parallelized',
+        dask="parallelized",
         output_dtypes=[float],
     )
 
 
 def xr_threshold_brier_score(
-    observations, forecasts, threshold, issorted=False, dim='member'
+    observations, forecasts, threshold, issorted=False, dim="member"
 ):
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
@@ -220,24 +220,23 @@ def xr_threshold_brier_score(
     """
     if isinstance(threshold, list):
         threshold.sort()
-        threshold = xr.DataArray(threshold, dims='threshold')
-        threshold['threshold'] = np.arange(1, 1 + threshold.threshold.size)
+        threshold = xr.DataArray(threshold, dims="threshold")
+        threshold["threshold"] = np.arange(1, 1 + threshold.threshold.size)
 
     if isinstance(threshold, (xr.DataArray, xr.Dataset)):
-        if 'threshold' not in threshold.dims:
+        if "threshold" not in threshold.dims:
             raise ValueError(
-                'please provide threshold with threshold dim, found',
-                threshold.dims,
+                "please provide threshold with threshold dim, found", threshold.dims,
             )
-        input_core_dims = [[], [dim], ['threshold']]
-        output_core_dims = [['threshold']]
+        input_core_dims = [[], [dim], ["threshold"]]
+        output_core_dims = [["threshold"]]
     elif isinstance(threshold, (int, float)):
         input_core_dims = [[], [dim], []]
         output_core_dims = [[]]
     else:
         raise ValueError(
-            'Please provide threshold as list, int, float \
-            or xr.object with threshold dimension; found',
+            "Please provide threshold as list, int, float \
+            or xr.object with threshold dimension; found",
             type(threshold),
         )
     return xr.apply_ufunc(
@@ -246,8 +245,8 @@ def xr_threshold_brier_score(
         forecasts,
         threshold,
         input_core_dims=input_core_dims,
-        kwargs={'axis': -1, 'issorted': issorted},
+        kwargs={"axis": -1, "issorted": issorted},
         output_core_dims=output_core_dims,
-        dask='parallelized',
+        dask="parallelized",
         output_dtypes=[float],
     )

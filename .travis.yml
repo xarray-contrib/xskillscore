@@ -17,7 +17,7 @@ before_install:
   - conda info -a
 
 install:
-  - conda env create -n xskillscore-dev --file ci/requirements-py36.yml
+  - conda env create --file ci/requirements-py36.yml
   - source activate xskillscore-dev 
   - conda list
   - pip install --no-deps -e .

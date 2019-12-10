@@ -4,16 +4,16 @@ from scipy import special
 from scipy.stats import distributions
 
 __all__ = [
-    '_pearson_r',
-    '_pearson_r_p_value',
-    '_rmse',
-    '_mse',
-    '_mae',
-    '_mad',
-    '_smape',
-    '_mape',
-    '_spearman_r',
-    '_spearman_r_p_value',
+    "_pearson_r",
+    "_pearson_r_p_value",
+    "_rmse",
+    "_mse",
+    "_mae",
+    "_mad",
+    "_smape",
+    "_mape",
+    "_spearman_r",
+    "_spearman_r_p_value",
 ]
 
 
@@ -89,8 +89,7 @@ def _pearson_r(a, b, weights, axis, skipna):
     if weights is not None:
         r_num = sumfunc(weights * am * bm, axis=0)
         r_den = np.sqrt(
-            sumfunc(weights * am * am, axis=0)
-            * sumfunc(weights * bm * bm, axis=0)
+            sumfunc(weights * am * am, axis=0) * sumfunc(weights * bm * bm, axis=0)
         )
     else:
         r_num = sumfunc(am * bm, axis=0)
@@ -150,7 +149,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
             res[nan_locs] = np.nan
         return res
 
-    
+
 def _spearman_r(a, b, weights, axis, skipna):
     """
     ndarray implementation of scipy.stats.spearmanr.
@@ -257,9 +256,9 @@ def _rmse(a, b, weights, axis, skipna):
 
     squared_error = (a - b) ** 2
     if weights is not None:
-        mean_squared_error = sumfunc(
-            squared_error * weights, axis=axis
-        ) / sumfunc(weights, axis=axis)
+        mean_squared_error = sumfunc(squared_error * weights, axis=axis) / sumfunc(
+            weights, axis=axis
+        )
     else:
         mean_squared_error = meanfunc(((a - b) ** 2), axis=axis)
     res = np.sqrt(mean_squared_error)
@@ -298,9 +297,7 @@ def _mse(a, b, weights, axis, skipna):
 
     squared_error = (a - b) ** 2
     if weights is not None:
-        return sumfunc(squared_error * weights, axis=axis) / sumfunc(
-            weights, axis=axis
-        )
+        return sumfunc(squared_error * weights, axis=axis) / sumfunc(weights, axis=axis)
     else:
         return meanfunc(squared_error, axis=axis)
 
@@ -448,8 +445,6 @@ def _smape(a, b, weights, axis, skipna):
     weights = _check_weights(weights)
     smape = np.absolute(a - b) / (np.absolute(a) + np.absolute(b))
     if weights is not None:
-        return sumfunc(smape * weights, axis=axis) / sumfunc(
-            weights, axis=axis
-        )
+        return sumfunc(smape * weights, axis=axis) / sumfunc(weights, axis=axis)
     else:
         return meanfunc(smape, axis=axis)

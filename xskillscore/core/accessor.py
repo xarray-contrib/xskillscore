@@ -1,11 +1,10 @@
 import xarray as xr
 
-from.deterministic import pearson_r, pearson_r_p_value, rmse, mse, mae
-from.probabilistic import (xr_crps_gaussian, xr_crps_ensemble,
-                           xr_threshold_brier_score)
+from .deterministic import pearson_r, pearson_r_p_value, rmse, mse, mae
+from .probabilistic import xr_crps_gaussian, xr_crps_ensemble, xr_threshold_brier_score
 
 
-@xr.register_dataset_accessor('xs')
+@xr.register_dataset_accessor("xs")
 class XSkillScoreAccessor(object):
     def __init__(self, xarray_obj):
         self._obj = xarray_obj
@@ -56,10 +55,12 @@ class XSkillScoreAccessor(object):
         forecasts = self._in_ds(forecasts)
         return xr_crps_ensemble(observations, forecasts)
 
-    def threshold_brier_score(self, observations, forecasts, threshold,
-                              issorted=False, axis=-1):
+    def threshold_brier_score(
+        self, observations, forecasts, threshold, issorted=False, axis=-1
+    ):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
         threshold = self._in_ds(threshold)
-        return xr_threshold_brier_score(observations, forecasts, threshold,
-                                        issorted=issorted, axis=axis)
+        return xr_threshold_brier_score(
+            observations, forecasts, threshold, issorted=issorted, axis=axis
+        )
