@@ -1,14 +1,22 @@
 import numpy as np
 import pytest
 import xarray as xr
-from properscoring import (brier_score, crps_ensemble, crps_gaussian,
-                           crps_quadrature, threshold_brier_score)
+from properscoring import (
+    brier_score,
+    crps_ensemble,
+    crps_gaussian,
+    crps_quadrature,
+    threshold_brier_score,
+)
 from scipy.stats import norm
 from xarray.tests import assert_allclose, assert_identical
-from xskillscore.core.probabilistic import (xr_brier_score, xr_crps_ensemble,
-                                            xr_crps_gaussian,
-                                            xr_crps_quadrature,
-                                            xr_threshold_brier_score)
+from xskillscore.core.probabilistic import (
+    xr_brier_score,
+    xr_crps_ensemble,
+    xr_crps_gaussian,
+    xr_crps_quadrature,
+    xr_threshold_brier_score,
+)
 
 
 @pytest.fixture
@@ -16,9 +24,7 @@ def o_dask():
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(lats), len(lons))
-    return xr.DataArray(
-        data, coords=[lats, lons], dims=['lat', 'lon']
-    ).chunk()
+    return xr.DataArray(data, coords=[lats, lons], dims=["lat", "lon"]).chunk()
 
 
 @pytest.fixture
@@ -28,7 +34,7 @@ def f_dask():
     lons = np.arange(5)
     data = np.random.rand(len(members), len(lats), len(lons))
     return xr.DataArray(
-        data, coords=[members, lats, lons], dims=['member', 'lat', 'lon']
+        data, coords=[members, lats, lons], dims=["member", "lat", "lon"]
     ).chunk()
 
 
@@ -45,8 +51,8 @@ def test_xr_crps_ensemble_dask(o_dask, f_dask):
 
 
 def test_xr_crps_gaussian_dask(o_dask, f_dask):
-    mu = f_dask.mean('member')
-    sig = f_dask.std('member')
+    mu = f_dask.mean("member")
+    sig = f_dask.std("member")
     actual = xr_crps_gaussian(o_dask, mu, sig)
     expected = crps_gaussian(o_dask, mu, sig)
     expected = xr.DataArray(expected, coords=o_dask.coords)
@@ -119,37 +125,33 @@ def test_xr_threshold_brier_score_dask_b_int(o_dask, f_dask):
 
 def test_xr_threshold_brier_score_multiple_thresholds_list(o_dask, f_dask):
     threshold = [0.1, 0.3, 0.5]
-    actual = xr_threshold_brier_score(
-        o_dask.compute(), f_dask.compute(), threshold
-    )
+    actual = xr_threshold_brier_score(o_dask.compute(), f_dask.compute(), threshold)
     assert actual.chunks is None
 
 
 def test_xr_threshold_brier_score_multiple_thresholds_xr(o_dask, f_dask):
-    threshold = xr.DataArray([0.1, 0.3, 0.5], dims='threshold')
-    actual = xr_threshold_brier_score(
-        o_dask.compute(), f_dask.compute(), threshold
-    )
+    threshold = xr.DataArray([0.1, 0.3, 0.5], dims="threshold")
+    actual = xr_threshold_brier_score(o_dask.compute(), f_dask.compute(), threshold)
     assert actual.chunks is None
 
 
 def test_xr_threshold_brier_score_multiple_thresholds_dask(o_dask, f_dask):
-    threshold = xr.DataArray([0.1, 0.3, 0.5, 0.7], dims='threshold').chunk()
+    threshold = xr.DataArray([0.1, 0.3, 0.5, 0.7], dims="threshold").chunk()
     actual = xr_threshold_brier_score(o_dask, f_dask, threshold)
     assert actual.chunks is not None
 
 
 def test_xr_brier_score(o_dask, f_dask):
     actual = xr_brier_score(
-        (o_dask > 0.5).compute(), (f_dask > 0.5).mean('member').compute()
+        (o_dask > 0.5).compute(), (f_dask > 0.5).mean("member").compute()
     )
     assert actual.chunks is None
 
 
 def test_xr_brier_score_dask(o_dask, f_dask):
-    actual = xr_brier_score((o_dask > 0.5), (f_dask > 0.5).mean('member'))
+    actual = xr_brier_score((o_dask > 0.5), (f_dask > 0.5).mean("member"))
     assert actual.chunks is not None
-    expected = brier_score((o_dask > 0.5), (f_dask > 0.5).mean('member'))
+    expected = brier_score((o_dask > 0.5), (f_dask > 0.5).mean("member"))
     expected = xr.DataArray(expected, coords=o_dask.coords)
     # test for numerical identity of xr_brier_score and brier_score
     assert_allclose(actual, expected)

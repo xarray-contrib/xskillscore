@@ -17,11 +17,12 @@ before_install:
   - conda info -a
 
 install:
-  - conda env create -n test_env --file ci/requirements-py36.yml
-  - source activate test_env
+  - conda env create --file ci/requirements-py36.yml
+  - source activate xskillscore-dev 
   - conda list
   - pip install --no-deps -e .
   - python setup.py install
 
 script:
   - py.test xskillscore
+  - ./ci/run-linter.sh
