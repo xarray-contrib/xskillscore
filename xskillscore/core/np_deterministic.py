@@ -17,15 +17,33 @@ __all__ = [
 ]
 
 
-def _get_numpy_funcs(skipna):
+def _trim_nans(a, b, weights):
     """
-    Returns nansum and nanmean if skipna is True;
-    Returns sum and mean if skipna is False.
+    Considers missing values pairwise. If a value is missing
+    in a, the corresponding value in b is also dropped, and
+    vice versa.
+
+    Returns
+    -------
+    a_trimmed, b_trimmed, weights_trimmed : ndarray
+        a, b, and weights (if not None) with values removed
+        if there is a nan at the given index in a or b.
+    all_nan : bool
+        True if either a or b are all nans.
     """
-    if skipna:
-        return np.nansum, np.nanmean
+    if np.isnan(a).all() or np.isnan(b).all():
+        all_nan = True
+        a_trimmed, b_trimmed, weights_trimmed = np.nan, np.nan, np.nan
     else:
-        return np.sum, np.mean
+        all_nan = False
+        # Find pairwise indices in a and b that do not have nans.
+        idx = np.logical_and(~np.isnan(a), ~np.isnan(b))
+        a_trimmed, b_trimmed = a[idx], b[idx]
+        if weights is None:
+            weights_trimmed = None
+        else:
+            weights_trimmed = weights[idx]
+    return a_trimmed, b_trimmed, weights_trimmed, all_nan
 
 
 def _check_weights(weights):
@@ -68,7 +86,10 @@ def _pearson_r(a, b, weights, axis, skipna):
     scipy.stats.pearsonr
 
     """
-    sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights, all_nan = _trim_nans(a, b, weights)
+        if all_nan:
+            return np.nan
     weights = _check_weights(weights)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
@@ -78,22 +99,22 @@ def _pearson_r(a, b, weights, axis, skipna):
     # the denominator gets inflated when there are masked regions.
     if weights is not None:
         weights = np.rollaxis(weights, axis)
-        ma = sumfunc(a * weights, axis=0) / sumfunc(weights, axis=0)
-        mb = sumfunc(b * weights, axis=0) / sumfunc(weights, axis=0)
+        ma = np.sum(a * weights, axis=0) / np.sum(weights, axis=0)
+        mb = np.sum(b * weights, axis=0) / np.sum(weights, axis=0)
     else:
-        ma = meanfunc(a, axis=0)
-        mb = meanfunc(b, axis=0)
+        ma = np.mean(a, axis=0)
+        mb = np.mean(b, axis=0)
 
     am, bm = a - ma, b - mb
 
     if weights is not None:
-        r_num = sumfunc(weights * am * bm, axis=0)
+        r_num = np.sum(weights * am * bm, axis=0)
         r_den = np.sqrt(
-            sumfunc(weights * am * am, axis=0) * sumfunc(weights * bm * bm, axis=0)
+            np.sum(weights * am * am, axis=0) * np.sum(weights * bm * bm, axis=0)
         )
     else:
-        r_num = sumfunc(am * bm, axis=0)
-        r_den = np.sqrt(sumfunc(am * am, axis=0) * sumfunc(bm * bm, axis=0))
+        r_num = np.sum(am * bm, axis=0)
+        r_den = np.sqrt(np.sum(am * am, axis=0) * np.sum(bm * bm, axis=0))
 
     r = r_num / r_den
     res = np.clip(r, -1.0, 1.0)
@@ -251,16 +272,19 @@ def _rmse(a, b, weights, axis, skipna):
     sklearn.metrics.mean_squared_error
 
     """
-    sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights, all_nan = _trim_nans(a, b, weights)
+        if all_nan:
+            return np.nan
     weights = _check_weights(weights)
 
     squared_error = (a - b) ** 2
     if weights is not None:
-        mean_squared_error = sumfunc(squared_error * weights, axis=axis) / sumfunc(
+        mean_squared_error = np.sum(squared_error * weights, axis=axis) / np.sum(
             weights, axis=axis
         )
     else:
-        mean_squared_error = meanfunc(((a - b) ** 2), axis=axis)
+        mean_squared_error = np.mean(((a - b) ** 2), axis=axis)
     res = np.sqrt(mean_squared_error)
     return res
 
@@ -292,14 +316,17 @@ def _mse(a, b, weights, axis, skipna):
     sklearn.metrics.mean_squared_error
 
     """
-    sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights, all_nan = _trim_nans(a, b, weights)
+        if all_nan:
+            return np.nan
     weights = _check_weights(weights)
 
     squared_error = (a - b) ** 2
     if weights is not None:
-        return sumfunc(squared_error * weights, axis=axis) / sumfunc(weights, axis=axis)
+        return np.sum(squared_error * weights, axis=axis) / np.sum(weights, axis=axis)
     else:
-        return meanfunc(squared_error, axis=axis)
+        return np.mean(squared_error, axis=axis)
 
 
 def _mae(a, b, weights, axis, skipna):
@@ -329,16 +356,19 @@ def _mae(a, b, weights, axis, skipna):
     sklearn.metrics.mean_absolute_error
 
     """
-    sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights, all_nan = _trim_nans(a, b, weights)
+        if all_nan:
+            return np.nan
     weights = _check_weights(weights)
 
     absolute_error = np.absolute(a - b)
     if weights is not None:
-        return sumfunc(absolute_error * weights, axis=axis) / sumfunc(
+        return np.sum(absolute_error * weights, axis=axis) / np.sum(
             weights, axis=axis
         )
     else:
-        return meanfunc(absolute_error, axis=axis)
+        return np.mean(absolute_error, axis=axis)
 
 
 def _mad(a, b, axis, skipna):
@@ -367,11 +397,11 @@ def _mad(a, b, axis, skipna):
 
     """
     if skipna:
-        medianfunc = np.nanmedian
-    else:
-        medianfunc = np.median
+        a, b, _, all_nan = _trim_nans(a, b, None)
+        if all_nan:
+            return np.nan
     absolute_error = np.absolute(a - b)
-    return medianfunc(absolute_error, axis=axis)
+    return np.median(absolute_error, axis=axis)
 
 
 def _mape(a, b, weights, axis, skipna):
@@ -402,14 +432,17 @@ def _mape(a, b, weights, axis, skipna):
     ---------
     https://en.wikipedia.org/wiki/Mean_absolute_percentage_error
     """
-    sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights, all_nan = _trim_nans(a, b, weights)
+        if all_nan:
+            return np.nan
     weights = _check_weights(weights)
     # replace divided by 0 with nan
     mape = np.absolute(a - b) / np.absolute(np.where(a != 0, a, np.nan))
     if weights is not None:
-        return sumfunc(mape * weights, axis=axis) / sumfunc(weights, axis=axis)
+        return np.sum(mape * weights, axis=axis) / np.sum(weights, axis=axis)
     else:
-        return meanfunc(mape, axis=axis)
+        return np.mean(mape, axis=axis)
 
 
 def _smape(a, b, weights, axis, skipna):
@@ -441,10 +474,13 @@ def _smape(a, b, weights, axis, skipna):
     https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
 
     """
-    sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights, all_nan = _trim_nans(a, b, weights)
+        if all_nan:
+            return np.nan
     weights = _check_weights(weights)
     smape = np.absolute(a - b) / (np.absolute(a) + np.absolute(b))
     if weights is not None:
-        return sumfunc(smape * weights, axis=axis) / sumfunc(weights, axis=axis)
+        return np.sum(smape * weights, axis=axis) / np.sum(weights, axis=axis)
     else:
-        return meanfunc(smape, axis=axis)
+        return np.mean(smape, axis=axis)
