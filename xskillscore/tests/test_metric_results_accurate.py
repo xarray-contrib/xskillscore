@@ -93,3 +93,11 @@ def test_mape_same_as_numpy(a, b):
     xs_mape = mape(a, b, "time")
     np_mape = np.mean(np.abs((a - b) / a))
     assert np.allclose(xs_mape, np_mape)
+
+
+def test_smape_same_as_numpy(a, b):
+    """Tests that symmetric mean absolute percent error is same as computed
+    from numpy."""
+    xs_smape = smape(a, b, "time")
+    np_smape = 1 / len(a) * np.sum(np.abs(b - a) / (np.abs(a) + np.abs(b)))
+    assert np.allclose(xs_smape, np_smape)

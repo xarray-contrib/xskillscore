@@ -54,6 +54,7 @@ def drop_nans(a, b, dim="time"):
     b = b.where(a.notnull())
     return a.dropna(dim), b.dropna(dim)
 
+
 # ADD WEIGHTS
 @pytest.mark.parametrize("metric", METRICS)
 def test_skipna_returns_same_value_as_dropped_pairwise_nans(a, b, metric):
