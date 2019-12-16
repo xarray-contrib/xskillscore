@@ -18,18 +18,19 @@ from xskillscore.core.deterministic import (
     spearman_r_p_value,
 )
 
-METRICS = [
+WEIGHTED_METRICS = [
     pearson_r,
     pearson_r_p_value,
     spearman_r,
     spearman_r_p_value,
     mae,
     mse,
-    mad,
     mape,
     smape,
     rmse,
 ]
+
+NON_WEIGHTED_METRICS = [mad]
 
 
 @pytest.fixture
@@ -46,27 +47,48 @@ def b():
     return da
 
 
-def drop_nans(a, b, dim="time"):
+@pytest.fixture
+def weights():
+    time = pd.date_range("1/1/2000", "1/5/2000", freq="D")
+    da = xr.DataArray([1, 2, 3, 4, 5], dims=["time"], coords=[time])
+    return da
+
+
+def drop_nans(a, b, weights=None, dim="time"):
     """
     Masks a and b where they have pairwise nans.
     """
     a = a.where(b.notnull())
     b = b.where(a.notnull())
-    return a.dropna(dim), b.dropna(dim)
+    if weights is not None:
+        weights = weights.where(a.notnull())
+        weights = weights.dropna(dim)
+    return a.dropna(dim), b.dropna(dim), weights
 
 
-# ADD WEIGHTS
-@pytest.mark.parametrize("metric", METRICS)
+@pytest.mark.parametrize("metric", WEIGHTED_METRICS + NON_WEIGHTED_METRICS)
 def test_skipna_returns_same_value_as_dropped_pairwise_nans(a, b, metric):
     """Tests that DataArrays with pairwise nans return the same result
     as the same two with those nans dropped."""
-    a_dropped, b_dropped = drop_nans(a, b)
+    a_dropped, b_dropped, _ = drop_nans(a, b)
     res_with_nans = metric(a, b, "time", skipna=True)
     res_dropped_nans = metric(a_dropped, b_dropped, "time")
     assert_allclose(res_with_nans, res_dropped_nans)
 
 
-@pytest.mark.parametrize("metric", METRICS)
+@pytest.mark.parametrize("metric", WEIGHTED_METRICS)
+def test_skipna_returns_same_value_as_dropped_pairwise_nans_with_weights(
+    a, b, weights, metric
+):
+    """Tests that DataArrays with pairwise nans return the same result
+    as the same two with those nans dropped."""
+    a_dropped, b_dropped, weights_dropped = drop_nans(a, b, weights)
+    res_with_nans = metric(a, b, "time", skipna=True, weights=weights)
+    res_dropped_nans = metric(a_dropped, b_dropped, "time", weights=weights_dropped)
+    assert_allclose(res_with_nans, res_dropped_nans)
+
+
+@pytest.mark.parametrize("metric", WEIGHTED_METRICS + NON_WEIGHTED_METRICS)
 def test_skipna_returns_nan_when_false(a, b, metric):
     """Tests that nan is returned if there's any nans in the time series
     and skipna is False."""
