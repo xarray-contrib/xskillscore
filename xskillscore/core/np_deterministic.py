@@ -246,7 +246,7 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
     rs = _spearman_r(a, b, weights, axis, skipna)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
-    dof = np.apply_over_axes(np.sum, ~np.isnan(a * b), 0).squeeze() - 2
+    dof = np.apply_over_axes(np.sum, np.isnan(a * b), 0).squeeze() - 2
     dof = np.where(dof > 1.0, dof, a.shape[0] - 2)
     t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
