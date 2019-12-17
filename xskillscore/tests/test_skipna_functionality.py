@@ -6,7 +6,7 @@ from xarray.tests import assert_allclose
 
 
 from xskillscore.core.deterministic import (
-    mad,
+    median_absolute_error,
     mae,
     mape,
     mse,
@@ -30,7 +30,7 @@ WEIGHTED_METRICS = [
     rmse,
 ]
 
-NON_WEIGHTED_METRICS = [mad]
+NON_WEIGHTED_METRICS = [median_absolute_error]
 
 
 @pytest.fixture

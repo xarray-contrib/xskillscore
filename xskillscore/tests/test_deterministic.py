@@ -7,7 +7,7 @@ from xarray.tests import assert_allclose
 from xskillscore.core.deterministic import (
     _preprocess_dims,
     _preprocess_weights,
-    mad,
+    median_absolute_error,
     mae,
     mape,
     mse,
@@ -19,7 +19,7 @@ from xskillscore.core.deterministic import (
     spearman_r_p_value,
 )
 from xskillscore.core.np_deterministic import (
-    _mad,
+    _median_absolute_error,
     _mae,
     _mape,
     _mse,
@@ -41,7 +41,7 @@ distance_metrics = [
     (mse, _mse),
     (rmse, _rmse),
     (mae, _mae),
-    (mad, _mad),
+    (median_absolute_error, _median_absolute_error),
     (mape, _mape),
     (smape, _smape),
 ]
@@ -163,8 +163,8 @@ def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     weights = adjust_weights(dim, weight_bool, weights)
-    # mad has no weights argument
-    if metric is mad:
+    # median absolute error has no weights argument
+    if metric is median_absolute_error:
         actual = metric(a, b, dim)
     else:
         actual = metric(a, b, dim, weights=weights)
@@ -175,7 +175,7 @@ def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     _b = b
     _weights = _preprocess_weights(_a, dim, dim, weights)
     axis = tuple(a.dims.index(d) for d in dim)
-    if metric is mad:
+    if metric is median_absolute_error:
         res = _metric(_a.values, _b.values, axis, skipna=False)
     else:
         res = _metric(_a.values, _b.values, _weights.values, axis, skipna=False)
@@ -231,13 +231,13 @@ def test_distance_metrics_xr_dask(
     _weights = adjust_weights(dim, weight_bool, weights)
     if _weights is not None:
         _weights = _weights.load()
-    if metric is mad:
+    if metric is median_absolute_error:
         actual = metric(a, b, dim)
     else:
         actual = metric(a, b, dim, weights=_weights)
     # check that chunks for chunk inputs
     assert actual.chunks is not None
-    if metric is mad:
+    if metric is median_absolute_error:
         expected = metric(a.load(), b.load(), dim)
     else:
         expected = metric(a.load(), b.load(), dim, weights=_weights)

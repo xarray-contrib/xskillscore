@@ -9,7 +9,7 @@ __all__ = [
     "_rmse",
     "_mse",
     "_mae",
-    "_mad",
+    "_median_absolute_error",
     "_smape",
     "_mape",
     "_spearman_r",
@@ -378,9 +378,9 @@ def _mae(a, b, weights, axis, skipna):
         return meanfunc(absolute_error, axis=axis)
 
 
-def _mad(a, b, axis, skipna):
+def _median_absolute_error(a, b, axis, skipna):
     """
-    Median Absolute Deviation.
+    Median Absolute Error.
 
     Parameters
     ----------
@@ -389,18 +389,18 @@ def _mad(a, b, axis, skipna):
     b : ndarray
         Input array.
     axis : int
-        The axis to apply the mad along.
+        The axis to apply the median absolute error along.
     skipna : bool
         If True, skip NaNs when computing function.
 
     Returns
     -------
     res : ndarray
-        Median Absolute Deviation.
+        Median Absolute Error.
 
     See Also
     --------
-    scipy.stats.median_absolute_deviation
+    sklearn.metrics.median_absolute_error
 
     """
     medianfunc = np.nanmedian if skipna else np.median
