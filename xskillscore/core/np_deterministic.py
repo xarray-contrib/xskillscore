@@ -159,8 +159,9 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         # no nans or some nans
         a = np.rollaxis(a, axis)
         b = np.rollaxis(b, axis)
-        dof = np.apply_over_axes(np.sum, np.isnan(a * b), 0).squeeze() - 2
-        dof = np.where(dof > 1.0, dof, a.shape[0] - 2)
+        # can just count non-nans on `a` since we matched
+        # nans above.
+        dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
         t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
         _x = dof / (dof + t_squared)
         _x = np.asarray(_x)
@@ -246,8 +247,9 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
     rs = _spearman_r(a, b, weights, axis, skipna)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
-    dof = np.apply_over_axes(np.sum, np.isnan(a * b), 0).squeeze() - 2
-    dof = np.where(dof > 1.0, dof, a.shape[0] - 2)
+    # can just count non-nans on `a` since we matched
+    # nans above.
+    dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
     t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
     return p
