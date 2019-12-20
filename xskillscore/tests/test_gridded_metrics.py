@@ -42,9 +42,7 @@ def gridded_a():
 @pytest.fixture
 def gridded_b(gridded_a):
     b = gridded_a.copy()
-    b.values = np.random.rand(
-        gridded_b.shape[0], gridded_b.shape[1], gridded_b.shape[2]
-    )
+    b.values = np.random.rand(b.shape[0], b.shape[1], b.shape[2])
     return b
 
 
