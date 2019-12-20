@@ -35,22 +35,22 @@ NON_WEIGHTED_METRICS = [median_absolute_error]
 
 @pytest.fixture
 def a():
-    time = pd.date_range("1/1/2000", "1/5/2000", freq="D")
-    da = xr.DataArray([3, np.nan, 5, 7, 9], dims=["time"], coords=[time])
+    time = pd.date_range("1/1/2000", "1/3/2000", freq="D")
+    da = xr.DataArray([3, np.nan, 5], dims=["time"], coords=[time])
     return da
 
 
 @pytest.fixture
-def b():
-    time = pd.date_range("1/1/2000", "1/5/2000", freq="D")
-    da = xr.DataArray([7, 2, np.nan, 2, 4], dims=["time"], coords=[time])
-    return da
+def b(a):
+    b = a.copy()
+    b.values = [7, 2, np.nan]
+    return b
 
 
 @pytest.fixture
 def weights():
-    time = pd.date_range("1/1/2000", "1/5/2000", freq="D")
-    da = xr.DataArray([1, 2, 3, 4, 5], dims=["time"], coords=[time])
+    time = pd.date_range("1/1/2000", "1/3/2000", freq="D")
+    da = xr.DataArray([1, 2, 3], dims=["time"], coords=[time])
     return da
 
 
