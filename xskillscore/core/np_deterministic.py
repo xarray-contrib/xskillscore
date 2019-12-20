@@ -246,8 +246,7 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
     rs = _spearman_r(a, b, weights, axis, skipna)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
-    # can just count non-nans on `a` since we matched
-    # nans above.
+    # count non-nans
     dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
     t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
