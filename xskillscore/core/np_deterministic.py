@@ -159,8 +159,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         # no nans or some nans
         a = np.rollaxis(a, axis)
         b = np.rollaxis(b, axis)
-        # can just count non-nans on `a` since we matched
-        # nans above.
+        # count non-nans
         dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
         t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
         _x = dof / (dof + t_squared)
