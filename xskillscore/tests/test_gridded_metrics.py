@@ -32,20 +32,17 @@ METRICS = [
 
 @pytest.fixture
 def gridded_a():
-    time = pd.date_range("1/1/2000", "1/5/2000", freq="D")
-    lats = np.arange(3)
-    lons = np.arange(3)
-    data = np.random.rand(len(time), len(lats), len(lons))
-    da = xr.DataArray(data, coords=[time, lats, lons], dims=["time", "lat", "lon"])
-    return da
+    times = pd.date_range("1/1/2000", "1/3/2000", freq="D")
+    lats = np.arange(4)
+    lons = np.arange(5)
+    data = np.random.rand(len(times), len(lats), len(lons))
+    return xr.DataArray(data, coords=[times, lats, lons], dims=["time", "lat", "lon"])
 
 
 @pytest.fixture
 def gridded_b(gridded_a):
     b = gridded_a.copy()
-    b.values = np.random.rand(
-        gridded_a.shape[0], gridded_a.shape[1], gridded_a.shape[2]
-    )
+    b.values = np.random.rand(b.shape[0], b.shape[1], b.shape[2])
     return b
 
 

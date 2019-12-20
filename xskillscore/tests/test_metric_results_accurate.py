@@ -26,16 +26,16 @@ from xskillscore.core.deterministic import (
 
 @pytest.fixture
 def a():
-    time = pd.date_range("1/1/2000", "1/5/2000", freq="D")
+    time = pd.date_range("1/1/2000", "1/3/2000", freq="D")
     da = xr.DataArray(np.random.rand(len(time)), dims=["time"], coords=[time])
     return da
 
 
 @pytest.fixture
-def b():
-    time = pd.date_range("1/1/2000", "1/5/2000", freq="D")
-    da = xr.DataArray(np.random.rand(len(time)), dims=["time"], coords=[time])
-    return da
+def b(a):
+    b = a.copy()
+    b.values = np.random.rand(b.shape[0])
+    return b
 
 
 def test_pearsonr_same_as_scipy(a, b):
