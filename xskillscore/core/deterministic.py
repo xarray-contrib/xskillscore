@@ -1,17 +1,8 @@
 import xarray as xr
 
-from .np_deterministic import (
-    _median_absolute_error,
-    _mae,
-    _mape,
-    _mse,
-    _pearson_r,
-    _pearson_r_p_value,
-    _rmse,
-    _smape,
-    _spearman_r,
-    _spearman_r_p_value,
-)
+from .np_deterministic import (_mae, _mape, _median_absolute_error, _mse,
+                               _pearson_r, _pearson_r_p_value, _rmse, _smape,
+                               _spearman_r, _spearman_r_p_value)
 
 __all__ = [
     "pearson_r",
@@ -57,11 +48,7 @@ def _preprocess_weights(a, dim, new_dim, weights):
         ``new_dim``.
     """
     if weights is None:
-        try:
-            return xr.full_like(a, None)  # Return nan weighting array.
-        except TypeError:
-            # integers can't be NaN
-            return xr.full_like(a.astype(float), None)
+        return None
     else:
         # Throw error if there are negative weights.
         if weights.min() < 0:
@@ -84,6 +71,14 @@ def _preprocess_weights(a, dim, new_dim, weights):
             # Broadcast weights to full size of main object.
             _, weights = xr.broadcast(a, weights)
         return weights
+
+
+def _determine_input_core_dims_based_on_weights(weights, dim):
+    if weights is None:
+        input_core_dims = [[dim], [dim], [None]]
+    else:
+        input_core_dims = [[dim], [dim], [dim]]
+    return input_core_dims
 
 
 def pearson_r(a, b, dim, weights=None, skipna=False):
@@ -131,12 +126,15 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
         new_dim = dim[0]
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
+    input_core_dims = _determine_input_core_dims_based_on_weights(
+        weights, new_dim)
+
     return xr.apply_ufunc(
         _pearson_r,
         a,
         b,
         weights,
-        input_core_dims=[[new_dim], [new_dim], [new_dim]],
+        input_core_dims=input_core_dims,
         kwargs={"axis": -1, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
@@ -184,12 +182,15 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
         new_dim = dim[0]
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
+    input_core_dims = _determine_input_core_dims_based_on_weights(
+        weights, new_dim)
+
     return xr.apply_ufunc(
         _pearson_r_p_value,
         a,
         b,
         weights,
-        input_core_dims=[[new_dim], [new_dim], [new_dim]],
+        input_core_dims=input_core_dims,
         kwargs={"axis": -1, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
@@ -242,12 +243,15 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
         new_dim = dim[0]
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
+    input_core_dims = _determine_input_core_dims_based_on_weights(
+        weights, new_dim)
+
     return xr.apply_ufunc(
         _spearman_r,
         a,
         b,
         weights,
-        input_core_dims=[[new_dim], [new_dim], [new_dim]],
+        input_core_dims=input_core_dims,
         kwargs={"axis": -1, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
@@ -295,12 +299,15 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
         new_dim = dim[0]
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
+    input_core_dims = _determine_input_core_dims_based_on_weights(
+        weights, new_dim)
+
     return xr.apply_ufunc(
         _spearman_r_p_value,
         a,
         b,
         weights,
-        input_core_dims=[[new_dim], [new_dim], [new_dim]],
+        input_core_dims=input_core_dims,
         kwargs={"axis": -1, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
@@ -343,13 +350,15 @@ def rmse(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
+    input_core_dims = _determine_input_core_dims_based_on_weights(
+        weights, dim)
 
     return xr.apply_ufunc(
         _rmse,
         a,
         b,
         weights,
-        input_core_dims=[dim, dim, dim],
+        input_core_dims=input_core_dims,
         kwargs={"axis": axis, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
@@ -392,13 +401,15 @@ def mse(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
+    input_core_dims = _determine_input_core_dims_based_on_weights(
+        weights, dim)
 
     return xr.apply_ufunc(
         _mse,
         a,
         b,
         weights,
-        input_core_dims=[dim, dim, dim],
+        input_core_dims=input_core_dims,
         kwargs={"axis": axis, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
@@ -441,13 +452,15 @@ def mae(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
+    input_core_dims = _determine_input_core_dims_based_on_weights(
+        weights, dim)
 
     return xr.apply_ufunc(
         _mae,
         a,
         b,
         weights,
-        input_core_dims=[dim, dim, dim],
+        input_core_dims=input_core_dims,
         kwargs={"axis": axis, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
@@ -530,13 +543,15 @@ def mape(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
+    input_core_dims = _determine_input_core_dims_based_on_weights(
+        weights, dim)
 
     return xr.apply_ufunc(
         _mape,
         a,
         b,
         weights,
-        input_core_dims=[dim, dim, dim],
+        input_core_dims=input_core_dims,
         kwargs={"axis": axis, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
@@ -579,13 +594,15 @@ def smape(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
+    input_core_dims = _determine_input_core_dims_based_on_weights(
+        weights, dim)
 
     return xr.apply_ufunc(
         _smape,
         a,
         b,
         weights,
-        input_core_dims=[dim, dim, dim],
+        input_core_dims=input_core_dims,
         kwargs={"axis": axis, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
