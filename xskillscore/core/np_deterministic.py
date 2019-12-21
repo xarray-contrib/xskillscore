@@ -9,12 +9,33 @@ __all__ = [
     "_rmse",
     "_mse",
     "_mae",
-    "_mad",
+    "_median_absolute_error",
     "_smape",
     "_mape",
     "_spearman_r",
     "_spearman_r_p_value",
 ]
+
+
+def _match_nans(a, b, weights):
+    """
+    Considers missing values pairwise. If a value is missing
+    in a, the corresponding value in b is turned to nan, and
+    vice versa.
+
+    Returns
+    -------
+    a, b, weights : ndarray
+        a, b, and weights (if not None) with nans placed at
+        pairwise locations.
+    """
+    if np.isnan(a).any() or np.isnan(b).any():
+        # Find pairwise indices in a and b that have nans.
+        idx = np.logical_or(np.isnan(a), np.isnan(b))
+        a[idx], b[idx] = np.nan, np.nan
+        if weights is not None:
+            weights[idx] = np.nan
+    return a, b, weights
 
 
 def _get_numpy_funcs(skipna):
@@ -69,6 +90,8 @@ def _pearson_r(a, b, weights, axis, skipna):
 
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
     weights = _check_weights(weights)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
@@ -127,6 +150,8 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
     scipy.stats.pearsonr
 
     """
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
     r = _pearson_r(a, b, weights, axis, skipna)
     if np.isnan(r).all():
         return r
@@ -134,8 +159,8 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         # no nans or some nans
         a = np.rollaxis(a, axis)
         b = np.rollaxis(b, axis)
-        dof = np.apply_over_axes(np.sum, np.isnan(a * b), 0).squeeze() - 2
-        dof = np.where(dof > 1.0, dof, a.shape[0] - 2)
+        # count non-nans
+        dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
         t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
         _x = dof / (dof + t_squared)
         _x = np.asarray(_x)
@@ -177,6 +202,8 @@ def _spearman_r(a, b, weights, axis, skipna):
     scipy.stats.spearmanr
 
     """
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
     rankfunc = bn.nanrankdata
     _a = rankfunc(a, axis=axis)
     _b = rankfunc(b, axis=axis)
@@ -214,11 +241,13 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
     https://github.com/scipy/scipy/blob/v1.3.1/scipy/stats/stats.py#L3613-L3764
 
     """
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
     rs = _spearman_r(a, b, weights, axis, skipna)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
-    dof = np.apply_over_axes(np.sum, np.isnan(a * b), 0).squeeze() - 2
-    dof = np.where(dof > 1.0, dof, a.shape[0] - 2)
+    # count non-nans
+    dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
     t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
     return p
@@ -252,6 +281,8 @@ def _rmse(a, b, weights, axis, skipna):
 
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
     weights = _check_weights(weights)
 
     squared_error = (a - b) ** 2
@@ -293,6 +324,8 @@ def _mse(a, b, weights, axis, skipna):
 
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
     weights = _check_weights(weights)
 
     squared_error = (a - b) ** 2
@@ -330,6 +363,8 @@ def _mae(a, b, weights, axis, skipna):
 
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
     weights = _check_weights(weights)
 
     absolute_error = np.absolute(a - b)
@@ -341,7 +376,7 @@ def _mae(a, b, weights, axis, skipna):
         return meanfunc(absolute_error, axis=axis)
 
 
-def _mad(a, b, axis, skipna):
+def _median_absolute_error(a, b, axis, skipna):
     """
     Median Absolute Error.
 
@@ -352,7 +387,7 @@ def _mad(a, b, axis, skipna):
     b : ndarray
         Input array.
     axis : int
-        The axis to apply the mae along.
+        The axis to apply the median absolute error along.
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -366,10 +401,9 @@ def _mad(a, b, axis, skipna):
     sklearn.metrics.median_absolute_error
 
     """
+    medianfunc = np.nanmedian if skipna else np.median
     if skipna:
-        medianfunc = np.nanmedian
-    else:
-        medianfunc = np.median
+        a, b, _ = _match_nans(a, b, None)
     absolute_error = np.absolute(a - b)
     return medianfunc(absolute_error, axis=axis)
 
@@ -387,7 +421,7 @@ def _mape(a, b, weights, axis, skipna):
     b : ndarray
         Input array.
     axis : int
-        The axis to apply the mae along.
+        The axis to apply the mape along.
     weights : ndarray
         Input array.
     skipna : bool
@@ -401,8 +435,17 @@ def _mape(a, b, weights, axis, skipna):
     Reference
     ---------
     https://en.wikipedia.org/wiki/Mean_absolute_percentage_error
+
+    Notes
+    -----
+    The percent error is calculated in reference to ``a``.
+
+    Percent error is reported as decimal percent. I.e., a value of
+    1 is 100%.
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
     weights = _check_weights(weights)
     # replace divided by 0 with nan
     mape = np.absolute(a - b) / np.absolute(np.where(a != 0, a, np.nan))
@@ -440,8 +483,14 @@ def _smape(a, b, weights, axis, skipna):
     ---------
     https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
 
+    Notes
+    -----
+    Symmetric percent error is reported as decimal percent. I.e., a value of 1
+    is 100%.
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
     weights = _check_weights(weights)
     smape = np.absolute(a - b) / (np.absolute(a) + np.absolute(b))
     if weights is not None:

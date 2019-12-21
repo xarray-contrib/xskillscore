@@ -1,7 +1,7 @@
 # flake8: noqa
 from .core.accessor import XSkillScoreAccessor
 from .core.deterministic import (
-    mad,
+    median_absolute_error,
     mae,
     mape,
     mse,

@@ -4,7 +4,7 @@ import pytest
 import xarray as xr
 
 from xskillscore.core.deterministic import (
-    mad,
+    median_absolute_error,
     mae,
     mape,
     mse,
@@ -20,7 +20,7 @@ from xskillscore.core.deterministic import (
 # grid cells over space.
 AXES = ("time", "lat", "lon", ("lat", "lon"), ("time", "lat", "lon"))
 
-distance_metrics = [mae, mse, mad, mape, smape, rmse]
+distance_metrics = [mae, mse, median_absolute_error, mape, smape, rmse]
 correlation_metrics = [
     pearson_r,
     pearson_r_p_value,

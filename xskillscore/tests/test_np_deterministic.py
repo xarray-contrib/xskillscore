@@ -8,7 +8,7 @@ from sklearn.metrics import (
     median_absolute_error,
 )
 from xskillscore.core.np_deterministic import (
-    _mad,
+    _median_absolute_error,
     _mae,
     _mape,
     _mse,
@@ -261,7 +261,7 @@ def test_mae_nd(a, b):
     assert_allclose(actual, expected)
 
 
-def test_mad_nd(a, b):
+def test_median_absolute_error_nd(a, b):
     axis = 0
     expected = np.squeeze(a[0, :, :]).copy()
     for i in range(np.shape(a)[1]):
@@ -269,7 +269,7 @@ def test_mad_nd(a, b):
             _a = a[:, i, j]
             _b = b[:, i, j]
             expected[i, j] = median_absolute_error(_a, _b)
-    actual = _mad(a, b, axis, skipna)
+    actual = _median_absolute_error(a, b, axis, skipna)
     assert_allclose(actual, expected)
 
     axis = 1
@@ -279,7 +279,7 @@ def test_mad_nd(a, b):
             _a = a[i, :, j]
             _b = b[i, :, j]
             expected[i, j] = median_absolute_error(_a, _b)
-    actual = _mad(a, b, axis, skipna)
+    actual = _median_absolute_error(a, b, axis, skipna)
     assert_allclose(actual, expected)
 
     axis = 2
@@ -289,7 +289,7 @@ def test_mad_nd(a, b):
             _a = a[i, j, :]
             _b = b[i, j, :]
             expected[i, j] = median_absolute_error(_a, _b)
-    actual = _mad(a, b, axis, skipna)
+    actual = _median_absolute_error(a, b, axis, skipna)
     assert_allclose(actual, expected)
 
 

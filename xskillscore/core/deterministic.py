@@ -1,7 +1,7 @@
 import xarray as xr
 
 from .np_deterministic import (
-    _mad,
+    _median_absolute_error,
     _mae,
     _mape,
     _mse,
@@ -19,7 +19,7 @@ __all__ = [
     "rmse",
     "mse",
     "mae",
-    "mad",
+    "median_absolute_error",
     "smape",
     "mape",
     "spearman_r",
@@ -454,9 +454,9 @@ def mae(a, b, dim, weights=None, skipna=False):
     )
 
 
-def mad(a, b, dim, skipna=False):
+def median_absolute_error(a, b, dim, skipna=False):
     """
-    Median Absolute Deviation.
+    Median Absolute Error.
 
     Parameters
     ----------
@@ -465,30 +465,26 @@ def mad(a, b, dim, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the mae along.
+        The dimension(s) to apply the median absolute error along.
     skipna : bool
         If True, skip NaNs when computing function.
 
     Returns
     -------
     xarray.Dataset or xarray.DataArray
-        Median Absolute Deviation.
+        Median Absolute Error.
 
     See Also
     --------
     sklearn.metrics.median_absolute_error
     xarray.apply_ufunc
-    xskillscore.core.np_deterministic._mad
-
-    Reference
-    ---------
-    https://en.wikipedia.org/wiki/Median_absolute_deviation
+    xskillscore.core.np_deterministic._median_absolute_error
 
     """
     dim, axis = _preprocess_dims(dim)
 
     return xr.apply_ufunc(
-        _mad,
+        _median_absolute_error,
         a,
         b,
         input_core_dims=[dim, dim],
