@@ -56,6 +56,7 @@ def _check_weights(weights):
     """
     if weights is None:
         return None
+    # catch if np.ndarray None
     elif (weights == None).all():
         return None
     elif np.all(np.isnan(weights)):
