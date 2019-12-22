@@ -2,12 +2,12 @@
 Changelog History
 =================
 
-xskillscore v0.0.10 (2019-12-##)
+xskillscore v0.0.10 (2019-12-21)
 ================================
 
 Deprecations
 ------------
-- ``mad`` no longer works and is replaced by ``median_absolute_deviation``. `Riley X. Brady`_
+- ``mad`` no longer works and is replaced by ``median_absolute_error``. `Riley X. Brady`_
 
 Features
 --------
