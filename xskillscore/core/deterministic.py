@@ -33,6 +33,33 @@ def _preprocess_dims(dim):
 
 
 def _stack_input_if_needed(a, b, dim, weights):
+    """
+    Stack input arrays a, b if needed in correlation metrics.
+    Adapt dim and weights accordingly.
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : list
+        The dimension(s) to apply the correlation along.
+    weights : xarray.Dataset or xarray.DataArray or None
+        Weights matching dimensions of ``dim`` to apply during the function.
+
+    Returns
+    -------
+    a : xarray.Dataset or xarray.DataArray stacked with new_dim
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray stacked with new_dim
+        Labeled array(s) over which to apply the function.
+    new_dim : str
+        The dimension(s) to apply the correlation along.
+    weights : xarray.Dataset or xarray.DataArray stacked with new_dim or None
+        Weights matching dimensions of ``dim`` to apply during the function.
+
+    """
     if len(dim) > 1:
         new_dim = "_".join(dim)
         a = a.stack(**{new_dim: dim})
@@ -41,7 +68,7 @@ def _stack_input_if_needed(a, b, dim, weights):
             weights = weights.stack(**{new_dim: dim})
     else:
         new_dim = dim[0]
-    return a, b, new_dim
+    return a, b, new_dim, weights
 
 
 def _preprocess_weights(a, dim, new_dim, weights):
@@ -145,14 +172,7 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
 
     """
     dim, _ = _preprocess_dims(dim)
-    if len(dim) > 1:
-        new_dim = "_".join(dim)
-        a = a.stack(**{new_dim: dim})
-        b = b.stack(**{new_dim: dim})
-        if weights is not None:
-            weights = weights.stack(**{new_dim: dim})
-    else:
-        new_dim = dim[0]
+    a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
     input_core_dims = _determine_input_core_dims(
@@ -200,16 +220,8 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
 
     """
     dim, _ = _preprocess_dims(dim)
-    if len(dim) > 1:
-        new_dim = "_".join(dim)
-        a = a.stack(**{new_dim: dim})
-        b = b.stack(**{new_dim: dim})
-        if weights is not None:
-            weights = weights.stack(**{new_dim: dim})
-    else:
-        new_dim = dim[0]
+    a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
-
     input_core_dims = _determine_input_core_dims(
         new_dim, weights)
 
@@ -260,16 +272,8 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
 
     """
     dim, _ = _preprocess_dims(dim)
-    if len(dim) > 1:
-        new_dim = "_".join(dim)
-        a = a.stack(**{new_dim: dim})
-        b = b.stack(**{new_dim: dim})
-        if weights is not None:
-            weights = weights.stack(**{new_dim: dim})
-    else:
-        new_dim = dim[0]
+    a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
-
     input_core_dims = _determine_input_core_dims(
         new_dim, weights)
 
@@ -315,16 +319,8 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
 
     """
     dim, _ = _preprocess_dims(dim)
-    if len(dim) > 1:
-        new_dim = "_".join(dim)
-        a = a.stack(**{new_dim: dim})
-        b = b.stack(**{new_dim: dim})
-        if weights is not None:
-            weights = weights.stack(**{new_dim: dim})
-    else:
-        new_dim = dim[0]
+    a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
-
     input_core_dims = _determine_input_core_dims(
         new_dim, weights)
 
