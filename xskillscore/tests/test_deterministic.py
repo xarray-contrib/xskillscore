@@ -4,32 +4,17 @@ import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
 
-from xskillscore.core.deterministic import (
-    _preprocess_dims,
-    _preprocess_weights,
-    median_absolute_error,
-    mae,
-    mape,
-    mse,
-    pearson_r,
-    pearson_r_p_value,
-    rmse,
-    smape,
-    spearman_r,
-    spearman_r_p_value,
-)
-from xskillscore.core.np_deterministic import (
-    _median_absolute_error,
-    _mae,
-    _mape,
-    _mse,
-    _pearson_r,
-    _pearson_r_p_value,
-    _rmse,
-    _smape,
-    _spearman_r,
-    _spearman_r_p_value,
-)
+from xskillscore.core.deterministic import (_preprocess_dims,
+                                            _preprocess_weights, mae, mape,
+                                            median_absolute_error, mse,
+                                            pearson_r, pearson_r_p_value, rmse,
+                                            smape, spearman_r,
+                                            spearman_r_p_value)
+from xskillscore.core.np_deterministic import (_mae, _mape,
+                                               _median_absolute_error, _mse,
+                                               _pearson_r, _pearson_r_p_value,
+                                               _rmse, _smape, _spearman_r,
+                                               _spearman_r_p_value)
 
 correlation_metrics = [
     (pearson_r, _pearson_r),
@@ -45,7 +30,8 @@ distance_metrics = [
     (mape, _mape),
     (smape, _smape),
 ]
-AXES = ("time", "lat", "lon", ("lat", "lon"), ("time", "lat", "lon"))
+
+AXES = ("time", "lat", "lon", ["lat", "lon"], ["time", "lat", "lon"])
 
 
 @pytest.fixture
@@ -144,8 +130,11 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
         _b = b
     _weights = _preprocess_weights(_a, dim, new_dim, _weights)
 
+    # ensure _weights.values or None
+    _weights = None if _weights is None else _weights.values
+
     axis = _a.dims.index(new_dim)
-    res = _metric(_a.values, _b.values, _weights.values, axis, skipna=False)
+    res = _metric(_a.values, _b.values, _weights, axis, skipna=False)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -178,7 +167,10 @@ def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     if metric is median_absolute_error:
         res = _metric(_a.values, _b.values, axis, skipna=False)
     else:
-        res = _metric(_a.values, _b.values, _weights.values, axis, skipna=False)
+        # ensure _weights.values or None
+        _weights = None if _weights is None else _weights.values
+        res = _metric(_a.values, _b.values,
+                      _weights, axis, skipna=False)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -248,6 +240,7 @@ def test_distance_metrics_xr_dask(
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("metric", [smape])
 def test_percentage_metric_in_interval_0_1(a, b, dim, metric):
+    print(a, b)
     """Test smape to be within bounds."""
     res = metric(a, b, dim)
     assert not (res < 0).any()

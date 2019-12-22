@@ -55,7 +55,9 @@ def _check_weights(weights):
     return None to guide weighting scheme.
     """
     if weights is None:
-        return weights
+        return None
+    elif (weights == None).all():
+        return None
     elif np.all(np.isnan(weights)):
         return None
     else:
@@ -112,7 +114,8 @@ def _pearson_r(a, b, weights, axis, skipna):
     if weights is not None:
         r_num = sumfunc(weights * am * bm, axis=0)
         r_den = np.sqrt(
-            sumfunc(weights * am * am, axis=0) * sumfunc(weights * bm * bm, axis=0)
+            sumfunc(weights * am * am, axis=0) *
+            sumfunc(weights * bm * bm, axis=0)
         )
     else:
         r_num = sumfunc(am * bm, axis=0)

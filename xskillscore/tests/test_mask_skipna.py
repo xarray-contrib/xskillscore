@@ -3,22 +3,14 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from xskillscore.core.deterministic import (
-    median_absolute_error,
-    mae,
-    mape,
-    mse,
-    pearson_r,
-    pearson_r_p_value,
-    rmse,
-    smape,
-    spearman_r,
-    spearman_r_p_value,
-)
+from xskillscore.core.deterministic import (mae, mape, median_absolute_error,
+                                            mse, pearson_r, pearson_r_p_value,
+                                            rmse, smape, spearman_r,
+                                            spearman_r_p_value)
 
 # Should only have masking issues when pulling in masked
 # grid cells over space.
-AXES = ("time", "lat", "lon", ("lat", "lon"), ("time", "lat", "lon"))
+AXES = ("time", "lat", "lon", ["lat", "lon"], ["time", "lat", "lon"])
 
 distance_metrics = [mae, mse, median_absolute_error, mape, smape, rmse]
 correlation_metrics = [
@@ -35,7 +27,8 @@ def a():
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(time), len(lats), len(lons))
-    da = xr.DataArray(data, coords=[time, lats, lons], dims=["time", "lat", "lon"])
+    da = xr.DataArray(data, coords=[time, lats, lons], dims=[
+                      "time", "lat", "lon"])
     return da
 
 

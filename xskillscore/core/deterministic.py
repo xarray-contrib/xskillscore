@@ -32,6 +32,18 @@ def _preprocess_dims(dim):
     return dim, axis
 
 
+def _stack_input_if_needed(a, b, dim, weights):
+    if len(dim) > 1:
+        new_dim = "_".join(dim)
+        a = a.stack(**{new_dim: dim})
+        b = b.stack(**{new_dim: dim})
+        if weights is not None:
+            weights = weights.stack(**{new_dim: dim})
+    else:
+        new_dim = dim[0]
+    return a, b, new_dim
+
+
 def _preprocess_weights(a, dim, new_dim, weights):
     """Preprocesses weights array to prepare for numpy computation.
 
@@ -74,10 +86,13 @@ def _preprocess_weights(a, dim, new_dim, weights):
 
 
 def _determine_input_core_dims_based_on_weights(weights, dim):
+    if not isinstance(dim, list):
+        dim = [dim]
+    # build input_core_dims depending on weights
     if weights is None:
-        input_core_dims = [[dim], [dim], [None]]
+        input_core_dims = [dim, dim, [None]]
     else:
-        input_core_dims = [[dim], [dim], [dim]]
+        input_core_dims = [dim, dim, dim]
     return input_core_dims
 
 

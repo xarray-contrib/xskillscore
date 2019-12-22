@@ -80,8 +80,8 @@
       "numpy" : [""],
       "xarray": [""],
       "dask": [""],
-      "numba": [null, ""],
-      "bottleneck": [null, ""]
+      //"numba": [null, ""],
+      //"bottleneck": [null, ""]
     },
 
     // Combinations of libraries/python versions can be excluded/included
