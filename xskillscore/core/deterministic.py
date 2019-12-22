@@ -55,7 +55,7 @@ def _preprocess_weights(a, dim, new_dim, weights):
         The original dimension(s) to apply the function along.
     new_dim : str
         The newly named dimension after running ``_preprocess_dims``
-    weights : xarray.Dataset or xarray.DataArray
+    weights : xarray.Dataset or xarray.DataArray or None
         Weights to apply to function, matching the dimension size of
         ``new_dim``.
     """
@@ -85,7 +85,22 @@ def _preprocess_weights(a, dim, new_dim, weights):
         return weights
 
 
-def _determine_input_core_dims_based_on_weights(weights, dim):
+def _determine_input_core_dims(dim, weights):
+    """
+    Determine input_core_dims based on type of dim and weights.
+
+    Parameters
+    ----------
+    dim : str, list
+        The dimension(s) to apply the correlation along.
+    weights : xarray.Dataset or xarray.DataArray or None
+        Weights matching dimensions of ``dim`` to apply during the function.
+
+    Returns
+    -------
+    list of lists
+        input_core_dims used for xr.apply_ufunc.
+    """
     if not isinstance(dim, list):
         dim = [dim]
     # build input_core_dims depending on weights
@@ -108,9 +123,8 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along.
-    weights : xarray.Dataset or xarray.DataArray
+    weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
-        If None, an array of ones will be applied (i.e., no weighting).
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -141,8 +155,8 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
         new_dim = dim[0]
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
-    input_core_dims = _determine_input_core_dims_based_on_weights(
-        weights, new_dim)
+    input_core_dims = _determine_input_core_dims(
+        new_dim, weights)
 
     return xr.apply_ufunc(
         _pearson_r,
@@ -168,9 +182,8 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along.
-    weights : xarray.Dataset or xarray.DataArray
+    weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
-        If None, an array of ones will be applied (i.e., no weighting).
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -197,8 +210,8 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
         new_dim = dim[0]
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
-    input_core_dims = _determine_input_core_dims_based_on_weights(
-        weights, new_dim)
+    input_core_dims = _determine_input_core_dims(
+        new_dim, weights)
 
     return xr.apply_ufunc(
         _pearson_r_p_value,
@@ -224,9 +237,8 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along.
-    weights : xarray.Dataset or xarray.DataArray
+    weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
-        If None, an array of ones will be applied (i.e., no weighting).
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -258,8 +270,8 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
         new_dim = dim[0]
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
-    input_core_dims = _determine_input_core_dims_based_on_weights(
-        weights, new_dim)
+    input_core_dims = _determine_input_core_dims(
+        new_dim, weights)
 
     return xr.apply_ufunc(
         _spearman_r,
@@ -285,9 +297,8 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along.
-    weights : xarray.Dataset or xarray.DataArray
+    weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
-        If None, an array of ones will be applied (i.e., no weighting).
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -314,8 +325,8 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
         new_dim = dim[0]
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
-    input_core_dims = _determine_input_core_dims_based_on_weights(
-        weights, new_dim)
+    input_core_dims = _determine_input_core_dims(
+        new_dim, weights)
 
     return xr.apply_ufunc(
         _spearman_r_p_value,
@@ -341,9 +352,8 @@ def rmse(a, b, dim, weights=None, skipna=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the rmse along.
-    weights : xarray.Dataset or xarray.DataArray
+    weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
-        If None, an array of ones will be applied (i.e., no weighting).
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -365,8 +375,8 @@ def rmse(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
-    input_core_dims = _determine_input_core_dims_based_on_weights(
-        weights, dim)
+    input_core_dims = _determine_input_core_dims(
+        dim, weights)
 
     return xr.apply_ufunc(
         _rmse,
@@ -392,9 +402,8 @@ def mse(a, b, dim, weights=None, skipna=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the mse along.
-    weights : xarray.Dataset or xarray.DataArray
+    weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
-        If None, an array of ones will be applied (i.e., no weighting).
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -416,8 +425,8 @@ def mse(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
-    input_core_dims = _determine_input_core_dims_based_on_weights(
-        weights, dim)
+    input_core_dims = _determine_input_core_dims(
+        dim, weights)
 
     return xr.apply_ufunc(
         _mse,
@@ -443,9 +452,8 @@ def mae(a, b, dim, weights=None, skipna=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the mae along.
-    weights : xarray.Dataset or xarray.DataArray
+    weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
-        If None, an array of ones will be applied (i.e., no weighting).
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -467,8 +475,8 @@ def mae(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
-    input_core_dims = _determine_input_core_dims_based_on_weights(
-        weights, dim)
+    input_core_dims = _determine_input_core_dims(
+        dim, weights)
 
     return xr.apply_ufunc(
         _mae,
@@ -535,9 +543,8 @@ def mape(a, b, dim, weights=None, skipna=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the mae along.
-    weights : xarray.Dataset or xarray.DataArray
+    weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
-        If None, an array of ones will be applied (i.e., no weighting).
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -558,8 +565,8 @@ def mape(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
-    input_core_dims = _determine_input_core_dims_based_on_weights(
-        weights, dim)
+    input_core_dims = _determine_input_core_dims(
+        dim, weights)
 
     return xr.apply_ufunc(
         _mape,
@@ -586,9 +593,8 @@ def smape(a, b, dim, weights=None, skipna=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the mae along.
-    weights : xarray.Dataset or xarray.DataArray
+    weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
-        If None, an array of ones will be applied (i.e., no weighting).
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -609,8 +615,8 @@ def smape(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
-    input_core_dims = _determine_input_core_dims_based_on_weights(
-        weights, dim)
+    input_core_dims = _determine_input_core_dims(
+        dim, weights)
 
     return xr.apply_ufunc(
         _smape,
