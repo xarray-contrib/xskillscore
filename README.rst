@@ -83,8 +83,8 @@ Examples
    # Mean Absolute Error
    mae = xs.mae(obs, fct, "time")
 
-   # Median Absolute Deviation
-   median_absolute_deviation = xs.median_absolute_deviation(obs, fct, "time")
+   # Median Absolute Error
+   median_absolute_error = xs.median_absolute_error(obs, fct, "time")
 
    # Mean Absolute Percentage Error
    mape = xs.mape(obs, fct, "time")
