@@ -115,8 +115,7 @@ def _pearson_r(a, b, weights, axis, skipna):
     if weights is not None:
         r_num = sumfunc(weights * am * bm, axis=0)
         r_den = np.sqrt(
-            sumfunc(weights * am * am, axis=0) *
-            sumfunc(weights * bm * bm, axis=0)
+            sumfunc(weights * am * am, axis=0) * sumfunc(weights * bm * bm, axis=0)
         )
     else:
         r_num = sumfunc(am * bm, axis=0)
