@@ -92,10 +92,11 @@ Examples
    # Symmetric Mean Absolute Percentage Error
    smape = xs.smape(obs, fct, "time")
 
-   # You can also specify multiple axes for deterministic metrics.
-   # Apply Pearson's correlation coefficient over the latitude and longitude dimension
+   # You can also specify multiple axes for deterministic metrics:
+   # Apply Pearson's correlation coefficient
+   # over the latitude and longitude dimension
    r = xs.pearson_r(obs, fct, ["lat", "lon"])
-
+   
    # You can weight over the dimensions the function is being applied
    # to by passing the argument ``weights=weight`` with a xr.DataArray
    # containing the dimension(s) being reduced.
@@ -138,16 +139,17 @@ Examples
    # Coordinates:
    # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
    
-   # You can also pass the optional keyword `skipna=True` to ignore any NaNs on the
-   # input data. This is useful in the case that you are computing these functions
-   # over space and have a mask applied to the grid or have NaNs over land.
-   mae_with_skipna = xs.mae(obs.where(obs.lat > 1), fct.where(fct.lat > 1), ['lat', 'lon'], skipna=True)
+   # You can also pass the optional keyword `skipna=True`
+   # to ignore any NaNs on the input data:
+   obs_with_nans = obs.where(obs.lat > 1)
+   fct_with_nans = fct.where(fct.lat > 1)
+   mae_with_skipna = xs.mae(obs_with_nans, fct_with_nans, ['lat', 'lon'], skipna=True)
    # >>> mae_with_skipna
    # <xarray.DataArray (time: 3)>
    # array([0.29007757, 0.29660133, 0.38978561])
    # Coordinates:
    # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
-   mae_with_no_skipna = xs.mae(obs.where(obs.lat > 1), fct.where(fct.lat > 1), ['lat', 'lon'])
+   mae_with_no_skipna = xs.mae(obs_with_nans, fct_with_nans, ['lat', 'lon'])
    # >>> mae_with_no_skipna
    # <xarray.DataArray (time: 3)>
    # array([nan, nan, nan])
@@ -155,31 +157,32 @@ Examples
    # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
 
    ### Probabilistic
-   obs = xr.DataArray(
+   obs3 = xr.DataArray(
        np.random.rand(4, 5),
        coords=[np.arange(4), np.arange(5)],
        dims=["lat", "lon"]
    )
-   fct = xr.DataArray(
+   fct3 = xr.DataArray(
        np.random.rand(3, 4, 5),
        coords=[np.arange(3), np.arange(4), np.arange(5)],
        dims=["member", "lat", "lon"],
    )
 
    # Continuous Ranked Probability Score with the ensemble distribution
-   crps_ensemble = xs.crps_ensemble(obs, fct)
+   crps_ensemble = xs.crps_ensemble(obs3, fct3)
 
    # Continuous Ranked Probability Score with a Gaussian distribution
-   crps_gaussian = xs.crps_gaussian(obs, fct.mean("member"), fct.std("member"))
+   crps_gaussian = xs.crps_gaussian(obs3, fct3.mean("member"), fct3.std("member"))
 
-   # Continuous Ranked Probability Score with numerical integration of the normal distribution
-   crps_quadrature = xs.crps_quadrature(obs, norm)
+   # Continuous Ranked Probability Score with numerical integration
+   # of the normal distribution
+   crps_quadrature = xs.crps_quadrature(obs3, norm)
 
    # Brier scores of an ensemble for exceeding given thresholds
-   threshold_brier_score = xs.threshold_brier_score(obs, fct, 0.7)
+   threshold_brier_score = xs.threshold_brier_score(obs3, fct3, 0.7)
 
    # Brier score
-   brier_score = xs.brier_score(obs > 0.5, (fct > 0.5).mean("member"))
+   brier_score = xs.brier_score(obs3 > 0.5, (fct3 > 0.5).mean("member"))
 
 
    # You can also use xskillscore as a method of your dataset:
