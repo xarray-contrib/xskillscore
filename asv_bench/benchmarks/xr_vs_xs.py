@@ -7,15 +7,35 @@ import pandas as pd
 import xarray as xr
 
 from xskillscore import mse as xs_mse
+from xskillscore import pearson_r as xs_pearson_r
 
 from . import parameterized, randn, requires_dask
 
 
 def xr_mse(a, b, dim):
+    """mse implementation using xarray only."""
     return ((a-b)**2).mean(dim)
 
 
-METRICS = [xs_mse, xr_mse]
+def covariance_gufunc(x, y):
+    return ((x - x.mean(axis=-1, keepdims=True))
+            * (y - y.mean(axis=-1, keepdims=True))).mean(axis=-1)
+
+
+def pearson_correlation_gufunc(x, y):
+    return covariance_gufunc(x, y) / (x.std(axis=-1) * y.std(axis=-1))
+
+
+def xr_pearson_r(x, y, dim):
+    """pearson_r implementation using xarray and minimal numpy only."""
+    return xr.apply_ufunc(
+        pearson_correlation_gufunc, x, y,
+        input_core_dims=[[dim], [dim]],
+        dask='parallelized',
+        output_dtypes=[float])
+
+
+METRICS = [xs_mse, xr_mse, xs_pearson_r, xr_pearson_r]
 
 large_lon_lat = 2000
 large_lon_lat_chunksize = large_lon_lat // 4
