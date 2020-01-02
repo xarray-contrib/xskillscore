@@ -7,15 +7,18 @@ from .np_deterministic import (
     _mse,
     _pearson_r,
     _pearson_r_p_value,
+    _pearson_r_eff_p_value,
     _rmse,
     _smape,
     _spearman_r,
     _spearman_r_p_value,
+    _spearman_r_eff_p_value,
 )
 
 __all__ = [
     "pearson_r",
     "pearson_r_p_value",
+    "pearson_r_eff_p_value",
     "rmse",
     "mse",
     "mae",
@@ -24,6 +27,7 @@ __all__ = [
     "mape",
     "spearman_r",
     "spearman_r_p_value",
+    "spearman_r_eff_p_value",
 ]
 
 
@@ -196,6 +200,59 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
     )
 
 
+def pearson_r_eff_p_value(a, b, dim, skipna=False):
+    """
+    2-tailed p-value associated with Pearson's correlation coefficient,
+    accounting for autocorrelation.
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to compute the p value over.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray
+        2-tailed p-value of Pearson's correlation coefficient, accounting
+        for autocorrelation.
+
+    See Also
+    --------
+    xarray.apply_ufunc
+    scipy.stats.pearsonr
+    xskillscore.core.np_deterministic._pearson_r_eff_p_value
+
+    Reference
+    ---------
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+      freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
+
+    """
+    dim, _ = _preprocess_dims(dim)
+    if len(dim) > 1:
+        new_dim = "_".join(dim)
+        a = a.stack(**{new_dim: dim})
+        b = b.stack(**{new_dim: dim})
+    else:
+        new_dim = dim[0]
+
+    return xr.apply_ufunc(
+        _pearson_r_eff_p_value,
+        a,
+        b,
+        input_core_dims=[[new_dim], [new_dim]],
+        kwargs={"axis": -1, "skipna": skipna},
+        dask="parallelized",
+        output_dtypes=[float],
+    )
+
+
 def spearman_r(a, b, dim, weights=None, skipna=False):
     """
     Spearman's correlation coefficient.
@@ -301,6 +358,53 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=[[new_dim], [new_dim], [new_dim]],
+        kwargs={"axis": -1, "skipna": skipna},
+        dask="parallelized",
+        output_dtypes=[float],
+    )
+
+
+def spearman_r_eff_p_value(a, b, dim, skipna=False):
+    """
+    2-tailed p-value associated with Spearman rank correlation coefficient,
+    accounting for autocorrelation.
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to compute the p value over.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray
+        2-tailed p-value of Spearman's correlation coefficient.
+
+    See Also
+    --------
+    xarray.apply_ufunc
+    scipy.stats.spearman_r
+    xskillscore.core.np_deterministic._spearman_r_eff_p_value
+
+    """
+    dim, _ = _preprocess_dims(dim)
+    if len(dim) > 1:
+        new_dim = "_".join(dim)
+        a = a.stack(**{new_dim: dim})
+        b = b.stack(**{new_dim: dim})
+    else:
+        new_dim = dim[0]
+
+    return xr.apply_ufunc(
+        _spearman_r_eff_p_value,
+        a,
+        b,
+        input_core_dims=[[new_dim], [new_dim]],
         kwargs={"axis": -1, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
