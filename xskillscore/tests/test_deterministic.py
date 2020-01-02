@@ -13,10 +13,12 @@ from xskillscore.core.deterministic import (
     mse,
     pearson_r,
     pearson_r_p_value,
+    pearson_r_eff_p_value,
     rmse,
     smape,
     spearman_r,
     spearman_r_p_value,
+    spearman_r_eff_p_value,
 )
 from xskillscore.core.np_deterministic import (
     _median_absolute_error,
@@ -25,17 +27,21 @@ from xskillscore.core.np_deterministic import (
     _mse,
     _pearson_r,
     _pearson_r_p_value,
+    _pearson_r_eff_p_value,
     _rmse,
     _smape,
     _spearman_r,
     _spearman_r_p_value,
+    _spearman_r_eff_p_value,
 )
 
 correlation_metrics = [
     (pearson_r, _pearson_r),
     (pearson_r_p_value, _pearson_r_p_value),
+    (pearson_r_eff_p_value, _pearson_r_eff_p_value),
     (spearman_r, _spearman_r),
     (spearman_r_p_value, _spearman_r_p_value),
+    (spearman_r_eff_p_value, _spearman_r_eff_p_value),
 ]
 distance_metrics = [
     (mse, _mse),
@@ -126,8 +132,10 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
-
-    actual = metric(a, b, dim, weights=_weights)
+    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value]:
+        actual = metric(a, b, dim)
+    else:
+        actual = metric(a, b, dim, weights=_weights)
     # check that no chunks for no chunk inputs
     assert actual.chunks is None
 
@@ -145,7 +153,10 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     _weights = _preprocess_weights(_a, dim, new_dim, _weights)
 
     axis = _a.dims.index(new_dim)
-    res = _metric(_a.values, _b.values, _weights.values, axis, skipna=False)
+    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value]:
+        res = _metric(_a.values, _b.values, axis, skipna=False)
+    else:
+        res = _metric(_a.values, _b.values, _weights.values, axis, skipna=False)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -200,15 +211,21 @@ def test_correlation_metrics_xr_dask(
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
-
-    actual = metric(a, b, dim, weights=_weights)
+    
+    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value]:
+        actual = metric(a, b, dim)
+    else:
+        actual = metric(a, b, dim, weights=_weights)
     # check that chunks for chunk inputs
     assert actual.chunks is not None
 
     if _weights is not None:
         _weights = _weights.load()
-
-    expected = metric(a.load(), b.load(), dim, _weights)
+    
+    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value]:
+        expected = metric(a.load(), b.load(), dim)
+    else:
+        expected = metric(a.load(), b.load(), dim, _weights)
     assert expected.chunks is None
     assert_allclose(actual.compute(), expected)
 
@@ -259,6 +276,12 @@ def test_pearson_r_p_value_skipna(a, b_nan):
     """Test whether NaNs sprinkled in array will NOT yield all NaNs."""
     res = pearson_r_p_value(a, b_nan, ["lat", "lon"], skipna=True)
     assert not np.isnan(res).all()
+
+
+# def test_pearson_r_eff_p_value_skipna(a, b_nan):
+#     """Test whether NaNs sprinkled in array will NOT yield all NaNs."""
+#     res = pearson_r_eff_p_value(a, b_nan, ["lat", "lon"], skipna=True)
+#     assert not np.isnan(res).all()
 
 
 def test_pearson_r_integer():
