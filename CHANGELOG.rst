@@ -2,6 +2,13 @@
 Changelog History
 =================
 
+xskillscore v0.0.11 (2020-01-##)
+================================
+
+Features
+--------
+- Add ``effective_sample_size``, ``pearson_r_eff_p_value``, and ``spearman_r_eff_p_value`` for computing statistical significance for temporally correlated data with autocorrelation. `Riley X. Brady`_
+
 xskillscore v0.0.10 (2019-12-21)
 ================================
 

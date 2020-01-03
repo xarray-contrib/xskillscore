@@ -54,6 +54,11 @@ distance_metrics = [
     (mape, _mape),
     (smape, _smape),
 ]
+temporal_only_metrics = [
+    pearson_r_eff_p_value,
+    spearman_r_eff_p_value,
+    effective_sample_size,
+]
 AXES = ("time", "lat", "lon", ("lat", "lon"), ("time", "lat", "lon"))
 
 
@@ -132,10 +137,13 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
      np_deterministic.py)."""
     # unpack metrics
     metric, _metric = metrics
+    # Only apply over time dimension for effective p value.
+    if (dim != "time") and (metric in temporal_only_metrics):
+        dim = "time"
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
-    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value, effective_sample_size]:
+    if metric in temporal_only_metrics:
         actual = metric(a, b, dim)
     else:
         actual = metric(a, b, dim, weights=_weights)
@@ -156,7 +164,7 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     _weights = _preprocess_weights(_a, dim, new_dim, _weights)
 
     axis = _a.dims.index(new_dim)
-    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value, effective_sample_size]:
+    if metric in temporal_only_metrics:
         res = _metric(_a.values, _b.values, axis, skipna=False)
     else:
         res = _metric(_a.values, _b.values, _weights.values, axis, skipna=False)
@@ -211,11 +219,14 @@ def test_correlation_metrics_xr_dask(
     weights = weights_dask
     # unpack metrics
     metric, _metric = metrics
+    # Only apply over time dimension for effective p value.
+    if (dim != "time") and (metric in temporal_only_metrics):
+        dim = "time"
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
-    
-    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value, effective_sample_size]:
+
+    if metric in temporal_only_metrics:
         actual = metric(a, b, dim)
     else:
         actual = metric(a, b, dim, weights=_weights)
@@ -224,8 +235,8 @@ def test_correlation_metrics_xr_dask(
 
     if _weights is not None:
         _weights = _weights.load()
-    
-    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value, effective_sample_size]:
+
+    if metric in temporal_only_metrics:
         expected = metric(a.load(), b.load(), dim)
     else:
         expected = metric(a.load(), b.load(), dim, _weights)

@@ -2,7 +2,6 @@ import bottleneck as bn
 import numpy as np
 from scipy import special
 from scipy.stats import distributions
-import scipy
 
 
 __all__ = [
@@ -85,8 +84,10 @@ def _effective_sample_size(a, b, axis, skipna):
 
     .. note::
         This metric should only be applied over the time dimension,
-        since it is designed for temporal autocorrelation.
-    
+        since it is designed for temporal autocorrelation. Weights
+        are not included due to the reliance on temporal
+        autocorrelation.
+
     Parameters
     ----------
     a : ndarray
@@ -102,6 +103,13 @@ def _effective_sample_size(a, b, axis, skipna):
     -------
     n_eff : ndarray
         Effective sample size.
+
+    Reference
+    ---------
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+      freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+      Academic press, 2011.
 
     """
     if skipna:
@@ -233,7 +241,9 @@ def _pearson_r_eff_p_value(a, b, axis, skipna):
 
     .. note::
         This metric should only be applied over the time dimension,
-        since it is designed for temporal autocorrelation.
+        since it is designed for temporal autocorrelation. Weights
+        are not included due to the reliance on temporal
+        autocorrelation.
 
     Parameters
     ----------
@@ -250,11 +260,13 @@ def _pearson_r_eff_p_value(a, b, axis, skipna):
     -------
     res : ndarray
         2-tailed p-value.
-    
+
     Reference
     ---------
     * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+      Academic press, 2011.
 
     """
     if skipna:
@@ -361,7 +373,9 @@ def _spearman_r_eff_p_value(a, b, axis, skipna):
 
     .. note::
         This metric should only be applied over the time dimension,
-        since it is designed for temporal autocorrelation.
+        since it is designed for temporal autocorrelation. Weights
+        are not included due to the reliance on temporal
+        autocorrelation.
 
     Parameters
     ----------
@@ -387,6 +401,8 @@ def _spearman_r_eff_p_value(a, b, axis, skipna):
     ---------
     * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+      Academic press, 2011.
 
     """
     if skipna:
