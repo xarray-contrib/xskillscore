@@ -19,6 +19,7 @@ from xskillscore.core.deterministic import (
     spearman_r,
     spearman_r_p_value,
     spearman_r_eff_p_value,
+    effective_sample_size,
 )
 from xskillscore.core.np_deterministic import (
     _median_absolute_error,
@@ -33,6 +34,7 @@ from xskillscore.core.np_deterministic import (
     _spearman_r,
     _spearman_r_p_value,
     _spearman_r_eff_p_value,
+    _effective_sample_size,
 )
 
 correlation_metrics = [
@@ -42,6 +44,7 @@ correlation_metrics = [
     (spearman_r, _spearman_r),
     (spearman_r_p_value, _spearman_r_p_value),
     (spearman_r_eff_p_value, _spearman_r_eff_p_value),
+    (effective_sample_size, _effective_sample_size),
 ]
 distance_metrics = [
     (mse, _mse),
@@ -132,7 +135,7 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
-    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value]:
+    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value, effective_sample_size]:
         actual = metric(a, b, dim)
     else:
         actual = metric(a, b, dim, weights=_weights)
@@ -153,7 +156,7 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     _weights = _preprocess_weights(_a, dim, new_dim, _weights)
 
     axis = _a.dims.index(new_dim)
-    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value]:
+    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value, effective_sample_size]:
         res = _metric(_a.values, _b.values, axis, skipna=False)
     else:
         res = _metric(_a.values, _b.values, _weights.values, axis, skipna=False)
@@ -212,7 +215,7 @@ def test_correlation_metrics_xr_dask(
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
     
-    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value]:
+    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value, effective_sample_size]:
         actual = metric(a, b, dim)
     else:
         actual = metric(a, b, dim, weights=_weights)
@@ -222,7 +225,7 @@ def test_correlation_metrics_xr_dask(
     if _weights is not None:
         _weights = _weights.load()
     
-    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value]:
+    if metric in [pearson_r_eff_p_value, spearman_r_eff_p_value, effective_sample_size]:
         expected = metric(a.load(), b.load(), dim)
     else:
         expected = metric(a.load(), b.load(), dim, _weights)

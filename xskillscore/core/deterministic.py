@@ -13,6 +13,7 @@ from .np_deterministic import (
     _spearman_r,
     _spearman_r_p_value,
     _spearman_r_eff_p_value,
+    _effective_sample_size,
 )
 
 __all__ = [
@@ -28,6 +29,7 @@ __all__ = [
     "spearman_r",
     "spearman_r_p_value",
     "spearman_r_eff_p_value",
+    "effective_sample_size",
 ]
 
 
@@ -194,6 +196,49 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=[[new_dim], [new_dim], [new_dim]],
+        kwargs={"axis": -1, "skipna": skipna},
+        dask="parallelized",
+        output_dtypes=[float],
+    )
+
+
+def effective_sample_size(a, b, dim, skipna=False):
+    """Effective sample size for temporally correlated data.
+
+    .. note::
+        This metric should only be applied over the time dimension,
+        since it is designed for temporal autocorrelation.
+    
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int
+        The axis to compute the effective sample size over.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    n_eff : ndarray
+        Effective sample size.
+
+    """
+    dim, _ = _preprocess_dims(dim)
+    if len(dim) > 1:
+        new_dim = "_".join(dim)
+        a = a.stack(**{new_dim: dim})
+        b = b.stack(**{new_dim: dim})
+    else:
+        new_dim = dim[0]
+
+    return xr.apply_ufunc(
+        _effective_sample_size,
+        a,
+        b,
+        input_core_dims=[[new_dim], [new_dim]],
         kwargs={"axis": -1, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],

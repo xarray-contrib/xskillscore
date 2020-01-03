@@ -16,6 +16,7 @@ __all__ = [
     "_mape",
     "_spearman_r",
     "_spearman_r_p_value",
+    "_effective_sample_size",
 ]
 
 
@@ -79,7 +80,7 @@ def __compute_anomalies(a, b, weights, axis, skipna):
     return am, bm
 
 
-def __effective_sample_size(a, b, axis, skipna):
+def _effective_sample_size(a, b, axis, skipna):
     """Effective sample size for temporally correlated data.
 
     .. note::
@@ -262,7 +263,7 @@ def _pearson_r_eff_p_value(a, b, axis, skipna):
     if np.isnan(r).all():
         return r
     else:
-        dof = __effective_sample_size(a, b, axis, skipna) - 2
+        dof = _effective_sample_size(a, b, axis, skipna) - 2
         t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
         _x = dof / (dof + t_squared)
         _x = np.asarray(_x)
@@ -391,7 +392,7 @@ def _spearman_r_eff_p_value(a, b, axis, skipna):
     if skipna:
         a, b, _ = _match_nans(a, b, None)
     rs = _spearman_r(a, b, None, axis, skipna)
-    dof = __effective_sample_size(a, b, axis, skipna) - 2
+    dof = _effective_sample_size(a, b, axis, skipna) - 2
     t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
     return p
