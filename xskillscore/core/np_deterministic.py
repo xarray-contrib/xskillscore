@@ -4,16 +4,16 @@ from scipy import special
 from scipy.stats import distributions
 
 __all__ = [
-    "_pearson_r",
-    "_pearson_r_p_value",
-    "_rmse",
-    "_mse",
-    "_mae",
-    "_median_absolute_error",
-    "_smape",
-    "_mape",
-    "_spearman_r",
-    "_spearman_r_p_value",
+    '_pearson_r',
+    '_pearson_r_p_value',
+    '_rmse',
+    '_mse',
+    '_mae',
+    '_median_absolute_error',
+    '_smape',
+    '_mape',
+    '_spearman_r',
+    '_spearman_r_p_value',
 ]
 
 
@@ -56,7 +56,7 @@ def _check_weights(weights):
     """
     if weights is None:
         return None
-    # catch if np.ndarray None
+    # catch if np.ndarray values are None
     elif (weights == None).all():
         return None
     elif np.all(np.isnan(weights)):

@@ -3,32 +3,25 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from xskillscore.core.deterministic import (mae, mape, median_absolute_error,
-                                            mse, pearson_r, pearson_r_p_value,
-                                            rmse, smape, spearman_r,
-                                            spearman_r_p_value)
+from xskillscore.core.deterministic import (mae, mape, median_absolute_error, mse,
+                                            pearson_r, pearson_r_p_value, rmse, smape,
+                                            spearman_r, spearman_r_p_value)
 
 # Should only have masking issues when pulling in masked
 # grid cells over space.
-AXES = ("time", "lat", "lon", ["lat", "lon"], ["time", "lat", "lon"])
+AXES = ('time', 'lat', 'lon', ['lat', 'lon'], ['time', 'lat', 'lon'])
 
 distance_metrics = [mae, mse, median_absolute_error, mape, smape, rmse]
-correlation_metrics = [
-    pearson_r,
-    pearson_r_p_value,
-    spearman_r,
-    spearman_r_p_value,
-]
+correlation_metrics = [pearson_r, pearson_r_p_value, spearman_r, spearman_r_p_value]
 
 
 @pytest.fixture
 def a():
-    time = pd.date_range("1/1/2000", "1/3/2000", freq="D")
+    time = pd.date_range('1/1/2000', '1/3/2000', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(time), len(lats), len(lons))
-    da = xr.DataArray(data, coords=[time, lats, lons], dims=[
-                      "time", "lat", "lon"])
+    da = xr.DataArray(data, coords=[time, lats, lons], dims=['time', 'lat', 'lon'])
     return da
 
 
@@ -40,15 +33,13 @@ def b(a):
 
 
 def mask_land_data(da):
-    """
-    Masks sample data arbitrarily like a block of land.
-    """
+    """Masks sample data arbitrarily like a block of land."""
     da.data[:, 1:3, 1:3] = np.nan
     return da
 
 
-@pytest.mark.parametrize("metric", correlation_metrics + distance_metrics)
-@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize('metric', correlation_metrics + distance_metrics)
+@pytest.mark.parametrize('dim', AXES)
 def test_metrics_masked(a, b, dim, metric):
     """Test for all distance-based metrics whether result of skipna does not
     contain any nans when applied along dim with nans."""
@@ -57,7 +48,7 @@ def test_metrics_masked(a, b, dim, metric):
     res_skipna = metric(a_masked, b_masked, dim, skipna=True)
     res_no_skipna = metric(a_masked, b_masked, dim, skipna=False)
 
-    if "lon" in dim or "lat" in dim:  # metric is applied along axis with nans
+    if 'lon' in dim or 'lat' in dim:  # metric is applied along axis with nans
         # res_skipna shouldnt have nans
         if metric not in [spearman_r_p_value, pearson_r_p_value]:
             assert not np.isnan(res_skipna).any()
