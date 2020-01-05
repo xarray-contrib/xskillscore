@@ -415,7 +415,7 @@ def _mape(a, b, weights, axis, skipna):
     """
     Mean Absolute Percentage Error.
 
-    :: math MAPE = 1/n \sum \frac{|F_t-A_t|}{|A_t|}
+    :: math MAPE = 1/n \\sum \\frac{|F_t-A_t|}{|A_t|}
 
     Parameters
     ----------
@@ -462,7 +462,7 @@ def _smape(a, b, weights, axis, skipna):
     """
     Symmetric Mean Absolute Percentage Error.
 
-    :: math SMAPE = 1/n \sum \frac{|F_t-A_t|}{(|A_t|+|F_t|)}
+    :: math SMAPE = 1/n \\sum \\frac{|F_t-A_t|}{(|A_t|+|F_t|)}
 
     Parameters
     ----------
