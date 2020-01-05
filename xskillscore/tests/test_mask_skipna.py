@@ -3,9 +3,18 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from xskillscore.core.deterministic import (mae, mape, median_absolute_error, mse,
-                                            pearson_r, pearson_r_p_value, rmse, smape,
-                                            spearman_r, spearman_r_p_value)
+from xskillscore.core.deterministic import (
+    mae,
+    mape,
+    median_absolute_error,
+    mse,
+    pearson_r,
+    pearson_r_p_value,
+    rmse,
+    smape,
+    spearman_r,
+    spearman_r_p_value,
+)
 
 # Should only have masking issues when pulling in masked
 # grid cells over space.

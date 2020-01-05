@@ -1,8 +1,17 @@
 import xarray as xr
 
-from .np_deterministic import (_mae, _mape, _median_absolute_error, _mse,
-                               _pearson_r, _pearson_r_p_value, _rmse, _smape,
-                               _spearman_r, _spearman_r_p_value)
+from .np_deterministic import (
+    _mae,
+    _mape,
+    _median_absolute_error,
+    _mse,
+    _pearson_r,
+    _pearson_r_p_value,
+    _rmse,
+    _smape,
+    _spearman_r,
+    _spearman_r_p_value,
+)
 
 __all__ = [
     "pearson_r",
@@ -175,8 +184,7 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
-    input_core_dims = _determine_input_core_dims(
-        new_dim, weights)
+    input_core_dims = _determine_input_core_dims(new_dim, weights)
 
     return xr.apply_ufunc(
         _pearson_r,
@@ -222,8 +230,7 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
     dim, _ = _preprocess_dims(dim)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
-    input_core_dims = _determine_input_core_dims(
-        new_dim, weights)
+    input_core_dims = _determine_input_core_dims(new_dim, weights)
 
     return xr.apply_ufunc(
         _pearson_r_p_value,
@@ -274,8 +281,7 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
     dim, _ = _preprocess_dims(dim)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
-    input_core_dims = _determine_input_core_dims(
-        new_dim, weights)
+    input_core_dims = _determine_input_core_dims(new_dim, weights)
 
     return xr.apply_ufunc(
         _spearman_r,
@@ -321,8 +327,7 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
     dim, _ = _preprocess_dims(dim)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
-    input_core_dims = _determine_input_core_dims(
-        new_dim, weights)
+    input_core_dims = _determine_input_core_dims(new_dim, weights)
 
     return xr.apply_ufunc(
         _spearman_r_p_value,
@@ -371,8 +376,7 @@ def rmse(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
-    input_core_dims = _determine_input_core_dims(
-        dim, weights)
+    input_core_dims = _determine_input_core_dims(dim, weights)
 
     return xr.apply_ufunc(
         _rmse,
@@ -421,8 +425,7 @@ def mse(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
-    input_core_dims = _determine_input_core_dims(
-        dim, weights)
+    input_core_dims = _determine_input_core_dims(dim, weights)
 
     return xr.apply_ufunc(
         _mse,
@@ -471,8 +474,7 @@ def mae(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
-    input_core_dims = _determine_input_core_dims(
-        dim, weights)
+    input_core_dims = _determine_input_core_dims(dim, weights)
 
     return xr.apply_ufunc(
         _mae,
@@ -561,8 +563,7 @@ def mape(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
-    input_core_dims = _determine_input_core_dims(
-        dim, weights)
+    input_core_dims = _determine_input_core_dims(dim, weights)
 
     return xr.apply_ufunc(
         _mape,
@@ -611,8 +612,7 @@ def smape(a, b, dim, weights=None, skipna=False):
     """
     dim, axis = _preprocess_dims(dim)
     weights = _preprocess_weights(a, dim, dim, weights)
-    input_core_dims = _determine_input_core_dims(
-        dim, weights)
+    input_core_dims = _determine_input_core_dims(dim, weights)
 
     return xr.apply_ufunc(
         _smape,
