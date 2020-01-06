@@ -3,22 +3,38 @@ import pandas as pd
 import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
-from xskillscore.core.deterministic import (_preprocess_dims,
-                                            _preprocess_weights,
-                                            effective_sample_size, mae, mape,
-                                            median_absolute_error, mse,
-                                            pearson_r, pearson_r_eff_p_value,
-                                            pearson_r_p_value, rmse, smape,
-                                            spearman_r, spearman_r_eff_p_value,
-                                            spearman_r_p_value)
-from xskillscore.core.np_deterministic import (_effective_sample_size, _mae,
-                                               _mape, _median_absolute_error,
-                                               _mse, _pearson_r,
-                                               _pearson_r_eff_p_value,
-                                               _pearson_r_p_value, _rmse,
-                                               _smape, _spearman_r,
-                                               _spearman_r_eff_p_value,
-                                               _spearman_r_p_value)
+from xskillscore.core.deterministic import (
+    _preprocess_dims,
+    _preprocess_weights,
+    effective_sample_size,
+    mae,
+    mape,
+    median_absolute_error,
+    mse,
+    pearson_r,
+    pearson_r_eff_p_value,
+    pearson_r_p_value,
+    rmse,
+    smape,
+    spearman_r,
+    spearman_r_eff_p_value,
+    spearman_r_p_value,
+)
+from xskillscore.core.np_deterministic import (
+    _effective_sample_size,
+    _mae,
+    _mape,
+    _median_absolute_error,
+    _mse,
+    _pearson_r,
+    _pearson_r_eff_p_value,
+    _pearson_r_p_value,
+    _rmse,
+    _smape,
+    _spearman_r,
+    _spearman_r_eff_p_value,
+    _spearman_r_p_value,
+)
 
 correlation_metrics = [
     (pearson_r, _pearson_r),
