@@ -7,10 +7,13 @@ from .core.deterministic import (
     mse,
     pearson_r,
     pearson_r_p_value,
+    pearson_r_eff_p_value,
     rmse,
     smape,
     spearman_r,
     spearman_r_p_value,
+    spearman_r_eff_p_value,
+    effective_sample_size,
 )
 from .core.probabilistic import xr_brier_score as brier_score
 from .core.probabilistic import xr_crps_ensemble as crps_ensemble

@@ -3,6 +3,7 @@ import numpy as np
 from scipy import special
 from scipy.stats import distributions
 
+
 __all__ = [
     "_pearson_r",
     "_pearson_r_p_value",
@@ -14,6 +15,7 @@ __all__ = [
     "_mape",
     "_spearman_r",
     "_spearman_r_p_value",
+    "_effective_sample_size",
 ]
 
 
@@ -62,6 +64,74 @@ def _check_weights(weights):
         return weights
 
 
+def __compute_anomalies(a, b, weights, axis, skipna):
+    sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    # Only do weighted sums if there are weights. Cannot have a
+    # single generic function with weights of all ones, because
+    # the denominator gets inflated when there are masked regions.
+    if weights is not None:
+        ma = sumfunc(a * weights, axis=axis) / sumfunc(weights, axis=axis)
+        mb = sumfunc(b * weights, axis=axis) / sumfunc(weights, axis=axis)
+    else:
+        ma = meanfunc(a, axis=axis)
+        mb = meanfunc(b, axis=axis)
+    am, bm = a - ma, b - mb
+    return am, bm
+
+
+def _effective_sample_size(a, b, axis, skipna):
+    """Effective sample size for temporally correlated data.
+
+    .. note::
+        This metric should only be applied over the time dimension,
+        since it is designed for temporal autocorrelation. Weights
+        are not included due to the reliance on temporal
+        autocorrelation.
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int
+        The axis to compute the effective sample size over.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    n_eff : ndarray
+        Effective sample size.
+
+    Reference
+    ---------
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+      freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+      Academic press, 2011.
+
+    """
+    if skipna:
+        a, b, _ = _match_nans(a, b, None)
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+
+    # count total number of samples that are non-nan.
+    n = np.count_nonzero(~np.isnan(a), axis=0)
+
+    # compute lag-1 autocorrelation.
+    am, bm = __compute_anomalies(a, b, weights=None, axis=0, skipna=skipna)
+    a_auto = _pearson_r(am[0:-1], am[1::], weights=None, axis=0, skipna=skipna)
+    b_auto = _pearson_r(bm[0:-1], bm[1::], weights=None, axis=0, skipna=skipna)
+
+    # compute effective sample size per Bretherton et al. 1999
+    n_eff = n * (1 - a_auto * b_auto) / (1 + a_auto * b_auto)
+    n_eff = np.floor(n_eff)
+    n_eff = np.clip(n_eff, 0, n)
+    return n_eff
+
+
 def _pearson_r(a, b, weights, axis, skipna):
     """
     ndarray implementation of scipy.stats.pearsonr.
@@ -95,19 +165,10 @@ def _pearson_r(a, b, weights, axis, skipna):
     weights = _check_weights(weights)
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
-
-    # Only do weighted sums if there are weights. Cannot have a
-    # single generic function with weights of all ones, because
-    # the denominator gets inflated when there are masked regions.
     if weights is not None:
         weights = np.rollaxis(weights, axis)
-        ma = sumfunc(a * weights, axis=0) / sumfunc(weights, axis=0)
-        mb = sumfunc(b * weights, axis=0) / sumfunc(weights, axis=0)
-    else:
-        ma = meanfunc(a, axis=0)
-        mb = meanfunc(b, axis=0)
 
-    am, bm = a - ma, b - mb
+    am, bm = __compute_anomalies(a, b, weights=weights, axis=0, skipna=skipna)
 
     if weights is not None:
         r_num = sumfunc(weights * am * bm, axis=0)
@@ -134,7 +195,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
     b : ndarray
         Input array.
     axis : int
-        The axis to apply the correlation along.
+        The axis to apply the compute the p value over.
     weights : ndarray
         Input array of weights for a and b.
     skipna : bool
@@ -161,6 +222,60 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         b = np.rollaxis(b, axis)
         # count non-nans
         dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
+        t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
+        _x = dof / (dof + t_squared)
+        _x = np.asarray(_x)
+        _x = np.where(_x < 1.0, _x, 1.0)
+        _a = 0.5 * dof
+        _b = 0.5
+        res = special.betainc(_a, _b, _x)
+        # reset masked values to nan
+        nan_locs = np.where(np.isnan(r))
+        if len(nan_locs[0]) > 0:
+            res[nan_locs] = np.nan
+        return res
+
+
+def _pearson_r_eff_p_value(a, b, axis, skipna):
+    """Pearson r p value accounting for autocorrelation.
+
+    .. note::
+        This metric should only be applied over the time dimension,
+        since it is designed for temporal autocorrelation. Weights
+        are not included due to the reliance on temporal
+        autocorrelation.
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int
+        The axis to compute the p value over.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    res : ndarray
+        2-tailed p-value.
+
+    Reference
+    ---------
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+      freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+      Academic press, 2011.
+
+    """
+    if skipna:
+        a, b, _ = _match_nans(a, b, None)
+    r = _pearson_r(a, b, None, axis, skipna)
+    if np.isnan(r).all():
+        return r
+    else:
+        dof = _effective_sample_size(a, b, axis, skipna) - 2
         t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
         _x = dof / (dof + t_squared)
         _x = np.asarray(_x)
@@ -248,6 +363,52 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
     b = np.rollaxis(b, axis)
     # count non-nans
     dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
+    t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
+    p = 2 * distributions.t.sf(np.abs(t), dof)
+    return p
+
+
+def _spearman_r_eff_p_value(a, b, axis, skipna):
+    """Spearman rank correlation p value, accounting for autocorrelation.
+
+    .. note::
+        This metric should only be applied over the time dimension,
+        since it is designed for temporal autocorrelation. Weights
+        are not included due to the reliance on temporal
+        autocorrelation.
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    weights : ndarray
+        Input array.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    res : ndarray
+        2-tailed p-value.
+
+    See Also
+    --------
+    scipy.stats.spearmanr
+
+    Reference
+    ---------
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+      freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+      Academic press, 2011.
+
+    """
+    if skipna:
+        a, b, _ = _match_nans(a, b, None)
+    rs = _spearman_r(a, b, None, axis, skipna)
+    dof = _effective_sample_size(a, b, axis, skipna) - 2
     t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
     return p

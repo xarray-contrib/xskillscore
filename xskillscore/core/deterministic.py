@@ -1,4 +1,5 @@
 import xarray as xr
+import warnings
 
 from .np_deterministic import (
     _median_absolute_error,
@@ -7,15 +8,19 @@ from .np_deterministic import (
     _mse,
     _pearson_r,
     _pearson_r_p_value,
+    _pearson_r_eff_p_value,
     _rmse,
     _smape,
     _spearman_r,
     _spearman_r_p_value,
+    _spearman_r_eff_p_value,
+    _effective_sample_size,
 )
 
 __all__ = [
     "pearson_r",
     "pearson_r_p_value",
+    "pearson_r_eff_p_value",
     "rmse",
     "mse",
     "mae",
@@ -24,6 +29,8 @@ __all__ = [
     "mape",
     "spearman_r",
     "spearman_r_p_value",
+    "spearman_r_eff_p_value",
+    "effective_sample_size",
 ]
 
 
@@ -196,6 +203,160 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
     )
 
 
+def effective_sample_size(a, b, dim, skipna=False):
+    """Effective sample size for temporally correlated data.
+
+    .. note::
+        This metric should only be applied over the time dimension,
+        since it is designed for temporal autocorrelation. Weights
+        are not included due to the reliance on temporal
+        autocorrelation.
+
+    The effective sample size extracts the number of independent samples
+    between two time series being correlated. This is derived by assessing
+    the magnitude of the lag-1 autocorrelation coefficient in each of the time series
+    being correlated. A higher autocorrelation induces a lower effective sample
+    size which raises the correlation coefficient for a given p value.
+
+     .. math::
+        N_{eff} = N\\left( \\frac{1 -
+                   \\rho_{f}\\rho_{o}}{1 + \\rho_{f}\\rho_{o}} \\right),
+
+    where :math:`\\rho_{f}` and :math:`\\rho_{o}` are the lag-1 autocorrelation
+    coefficients for the forecast and observations.
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to apply the function along.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray
+        Effective sample size.
+
+    Reference
+    ---------
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+      freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+      Academic press, 2011.
+
+    """
+    dim, _ = _preprocess_dims(dim)
+    if len(dim) > 1:
+        raise ValueError(
+            "Effective sample size should only be applied to a singular time dimension."
+        )
+    else:
+        new_dim = dim[0]
+    if new_dim != "time":
+        warnings.warn(
+            f"{dim} is not 'time'. Make sure that you are applying this over a "
+            f"temporal dimension."
+        )
+
+    return xr.apply_ufunc(
+        _effective_sample_size,
+        a,
+        b,
+        input_core_dims=[[new_dim], [new_dim]],
+        kwargs={"axis": -1, "skipna": skipna},
+        dask="parallelized",
+        output_dtypes=[float],
+    )
+
+
+def pearson_r_eff_p_value(a, b, dim, skipna=False):
+    """
+    2-tailed p-value associated with Pearson's correlation coefficient,
+    accounting for autocorrelation.
+
+    .. note::
+        This metric should only be applied over the time dimension,
+        since it is designed for temporal autocorrelation. Weights
+        are not included due to the reliance on temporal
+        autocorrelation.
+
+    The effective p value is computed by replacing the sample size :math:`N` in the
+    t-statistic with the effective sample size, :math:`N_{eff}`. The same Pearson
+    product-moment correlation coefficient :math:`r` is used as when computing the
+    standard p value.
+
+    .. math::
+        t = r\\sqrt{ \\frac{N_{eff} - 2}{1 - r^{2}} },
+
+    where :math:`N_{eff}` is computed via the autocorrelation in the forecast and
+    observations.
+
+    .. math::
+        N_{eff} = N\\left( \\frac{1 -
+                   \\rho_{f}\\rho_{o}}{1 + \\rho_{f}\\rho_{o}} \\right),
+
+    where :math:`\\rho_{f}` and :math:`\\rho_{o}` are the lag-1 autocorrelation
+    coefficients for the forecast and observations.
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to compute the p value over.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray
+        2-tailed p-value of Pearson's correlation coefficient, accounting
+        for autocorrelation.
+
+    See Also
+    --------
+    xarray.apply_ufunc
+    scipy.stats.pearsonr
+    xskillscore.core.np_deterministic._pearson_r_eff_p_value
+
+    Reference
+    ---------
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+      freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+      Academic press, 2011.
+
+    """
+    dim, _ = _preprocess_dims(dim)
+    if len(dim) > 1:
+        raise ValueError(
+            "Effective sample size should only be applied to a singular time dimension."
+        )
+    else:
+        new_dim = dim[0]
+    if new_dim != "time":
+        warnings.warn(
+            f"{dim} is not 'time'. Make sure that you are applying this over a "
+            f"temporal dimension."
+        )
+
+    return xr.apply_ufunc(
+        _pearson_r_eff_p_value,
+        a,
+        b,
+        input_core_dims=[[new_dim], [new_dim]],
+        kwargs={"axis": -1, "skipna": skipna},
+        dask="parallelized",
+        output_dtypes=[float],
+    )
+
+
 def spearman_r(a, b, dim, weights=None, skipna=False):
     """
     Spearman's correlation coefficient.
@@ -301,6 +462,90 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=[[new_dim], [new_dim], [new_dim]],
+        kwargs={"axis": -1, "skipna": skipna},
+        dask="parallelized",
+        output_dtypes=[float],
+    )
+
+
+def spearman_r_eff_p_value(a, b, dim, skipna=False):
+    """
+    2-tailed p-value associated with Spearman rank correlation coefficient,
+    accounting for autocorrelation.
+
+    .. note::
+        This metric should only be applied over the time dimension,
+        since it is designed for temporal autocorrelation. Weights
+        are not included due to the reliance on temporal
+        autocorrelation.
+
+    The effective p value is computed by replacing the sample size :math:`N` in the
+    t-statistic with the effective sample size, :math:`N_{eff}`. The same Spearman's
+    rank correlation coefficient :math:`r` is used as when computing the standard p
+    value.
+
+    .. math::
+        t = r\\sqrt{ \\frac{N_{eff} - 2}{1 - r^{2}} },
+
+    where :math:`N_{eff}` is computed via the autocorrelation in the forecast and
+    observations.
+
+    .. math::
+        N_{eff} = N\\left( \\frac{1 -
+                   \\rho_{f}\\rho_{o}}{1 + \\rho_{f}\\rho_{o}} \\right),
+
+    where :math:`\\rho_{f}` and :math:`\\rho_{o}` are the lag-1 autocorrelation
+    coefficients for the forecast and observations.
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to compute the p value over.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray
+        2-tailed p-value of Spearman's correlation coefficient, accounting for
+        autocorrelation.
+
+    Reference
+    ---------
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+      freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+      Academic press, 2011.
+
+    See Also
+    --------
+    xarray.apply_ufunc
+    scipy.stats.spearman_r
+    xskillscore.core.np_deterministic._spearman_r_eff_p_value
+
+    """
+    dim, _ = _preprocess_dims(dim)
+    if len(dim) > 1:
+        raise ValueError(
+            "Effective sample size should only be applied to a singular time dimension."
+        )
+    else:
+        new_dim = dim[0]
+    if new_dim != "time":
+        warnings.warn(
+            f"{dim} is not 'time'. Make sure that you are applying this over a "
+            f"temporal dimension."
+        )
+
+    return xr.apply_ufunc(
+        _spearman_r_eff_p_value,
+        a,
+        b,
+        input_core_dims=[[new_dim], [new_dim]],
         kwargs={"axis": -1, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
