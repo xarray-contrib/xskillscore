@@ -12,10 +12,13 @@ from xskillscore.core.deterministic import (
     mse,
     pearson_r,
     pearson_r_p_value,
+    pearson_r_eff_p_value,
     rmse,
     smape,
     spearman_r,
     spearman_r_p_value,
+    spearman_r_eff_p_value,
+    effective_sample_size,
 )
 from xskillscore.core.np_deterministic import (
     _mae,
@@ -24,17 +27,23 @@ from xskillscore.core.np_deterministic import (
     _mse,
     _pearson_r,
     _pearson_r_p_value,
+    _pearson_r_eff_p_value,
     _rmse,
     _smape,
     _spearman_r,
     _spearman_r_p_value,
+    _spearman_r_eff_p_value,
+    _effective_sample_size,
 )
 
 correlation_metrics = [
     (pearson_r, _pearson_r),
     (pearson_r_p_value, _pearson_r_p_value),
+    (pearson_r_eff_p_value, _pearson_r_eff_p_value),
     (spearman_r, _spearman_r),
     (spearman_r_p_value, _spearman_r_p_value),
+    (spearman_r_eff_p_value, _spearman_r_eff_p_value),
+    (effective_sample_size, _effective_sample_size),
 ]
 distance_metrics = [
     (mse, _mse),
@@ -47,6 +56,11 @@ distance_metrics = [
 
 AXES = ('time', 'lat', 'lon', ['lat', 'lon'], ['time', 'lat', 'lon'])
 
+temporal_only_metrics = [
+    pearson_r_eff_p_value,
+    spearman_r_eff_p_value,
+    effective_sample_size,
+]
 
 @pytest.fixture
 def a():
@@ -121,11 +135,16 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
      np_deterministic.py)."""
     # unpack metrics
     metric, _metric = metrics
+    # Only apply over time dimension for effective p value.
+    if (dim != "time") and (metric in temporal_only_metrics):
+        dim = "time"
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
-
-    actual = metric(a, b, dim, weights=_weights)
+    if metric in temporal_only_metrics:
+        actual = metric(a, b, dim)
+    else:
+        actual = metric(a, b, dim, weights=_weights)
     # check that no chunks for no chunk inputs
     assert actual.chunks is None
 
@@ -146,7 +165,10 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     _weights = None if _weights is None else _weights.values
 
     axis = _a.dims.index(new_dim)
-    res = _metric(_a.values, _b.values, _weights, axis, skipna=False)
+    if metric in temporal_only_metrics:
+        res = _metric(_a.values, _b.values, axis, skipna=False)
+    else:
+        res = _metric(_a.values, _b.values, _weights, axis, skipna=False)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -200,18 +222,27 @@ def test_correlation_metrics_xr_dask(
     weights = weights_dask
     # unpack metrics
     metric, _metric = metrics
+    # Only apply over time dimension for effective p value.
+    if (dim != "time") and (metric in temporal_only_metrics):
+        dim = "time"
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
 
-    actual = metric(a, b, dim, weights=_weights)
+    if metric in temporal_only_metrics:
+        actual = metric(a, b, dim)
+    else:
+        actual = metric(a, b, dim, weights=_weights)
     # check that chunks for chunk inputs
     assert actual.chunks is not None
 
     if _weights is not None:
         _weights = _weights.load()
 
-    expected = metric(a.load(), b.load(), dim, _weights)
+    if metric in temporal_only_metrics:
+        expected = metric(a.load(), b.load(), dim)
+    else:
+        expected = metric(a.load(), b.load(), dim, _weights)
     assert expected.chunks is None
     assert_allclose(actual.compute(), expected)
 
@@ -263,6 +294,12 @@ def test_pearson_r_p_value_skipna(a, b_nan):
     """Test whether NaNs sprinkled in array will NOT yield all NaNs."""
     res = pearson_r_p_value(a, b_nan, ['lat', 'lon'], skipna=True)
     assert not np.isnan(res).all()
+
+
+# def test_pearson_r_eff_p_value_skipna(a, b_nan):
+#     """Test whether NaNs sprinkled in array will NOT yield all NaNs."""
+#     res = pearson_r_eff_p_value(a, b_nan, ["lat", "lon"], skipna=True)
+#     assert not np.isnan(res).all()
 
 
 def test_pearson_r_integer():
