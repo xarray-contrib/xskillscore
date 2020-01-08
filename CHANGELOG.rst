@@ -2,6 +2,13 @@
 Changelog History
 =================
 
+xskillscore v0.0.12 (2020-01-08)
+================================
+
+Features
+--------
+- ~30-50% speedup for deterministic metrics when `weights=None`. `Aaron Spring`_
+
 xskillscore v0.0.11 (2020-01-06)
 ================================
 
