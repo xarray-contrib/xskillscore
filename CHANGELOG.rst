@@ -7,7 +7,7 @@ xskillscore v0.0.12 (2020-01-xx)
 
 Internal Changes
 ----------------
-- ~30-50% speedup for deterministic metrics when `weights=None`. `Aaron Spring`_
+- ~30-50% speedup for deterministic metrics when ``weights=None``. `Aaron Spring`_
 
 xskillscore v0.0.11 (2020-01-06)
 ================================
