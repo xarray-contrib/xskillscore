@@ -57,7 +57,10 @@ def _check_weights(weights):
     return None to guide weighting scheme.
     """
     if weights is None:
-        return weights
+        return None
+    # catch if np.ndarray values are None
+    elif (weights == None).all():
+        return None
     elif np.all(np.isnan(weights)):
         return None
     else:
@@ -573,7 +576,7 @@ def _mape(a, b, weights, axis, skipna):
     """
     Mean Absolute Percentage Error.
 
-    :: math MAPE = 1/n \sum \frac{|F_t-A_t|}{|A_t|}
+    :: math MAPE = 1/n \\sum \\frac{|F_t-A_t|}{|A_t|}
 
     Parameters
     ----------
@@ -620,7 +623,7 @@ def _smape(a, b, weights, axis, skipna):
     """
     Symmetric Mean Absolute Percentage Error.
 
-    :: math SMAPE = 1/n \sum \frac{|F_t-A_t|}{(|A_t|+|F_t|)}
+    :: math SMAPE = 1/n \\sum \\frac{|F_t-A_t|}{(|A_t|+|F_t|)}
 
     Parameters
     ----------
