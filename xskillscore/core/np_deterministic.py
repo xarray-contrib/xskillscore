@@ -36,8 +36,8 @@ def _match_nans(a, b, weights):
         idx = np.logical_or(np.isnan(a), np.isnan(b))
         a[idx], b[idx] = np.nan, np.nan
         if weights is not None:
-           weights = weights.copy()
-           weights[idx] = np.nan
+            weights = weights.copy()
+            weights[idx] = np.nan
     return a, b, weights
 
 
