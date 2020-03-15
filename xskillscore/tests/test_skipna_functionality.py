@@ -58,7 +58,7 @@ def weights():
 def a_3d():
     da = xr.DataArray(
         np.repeat(
-            np.array([[0, 1, 2],[4, 5, 6], [7, 8, 9]]), 3
+            np.array([[0, 1, 2], [4, 5, 6], [7, 8, 9]]), 3
         ).reshape(3, 3, 3),
         coords=[
             pd.date_range("1/1/2000", "1/3/2000", freq="D"),
