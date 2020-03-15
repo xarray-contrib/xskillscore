@@ -130,8 +130,8 @@ def test_skipna_broadcast_weights_assignment_destination(
         a_3d, b_3d, weights_3d, metric):
     """Tests that 'assignment destination is read-only' is not raised
     https://github.com/raybellwaves/xskillscore/issues/79"""
-    a_3d_nan = a_3d.where(a_3d > 8)
-    b_3d_nan = b_3d.where(b_3d < 2)
+    a_3d_nan = a_3d.where(a_3d > 0)
+    b_3d_nan = b_3d.where(b_3d > 0)
     res = metric(a_3d_nan, b_3d_nan, ['lat', 'lon'],
                  weights=weights_3d, skipna=True)
-    print(res)
+    assert all([not np.isnan(r) for r in res])
