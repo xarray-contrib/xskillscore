@@ -57,9 +57,7 @@ def weights():
 @pytest.fixture
 def a_3d():
     da = xr.DataArray(
-        np.repeat(
-            np.array([[0, 1, 2], [4, 5, 6], [7, 8, 9]]), 3
-        ).reshape(3, 3, 3),
+        np.repeat(np.array([[0, 1, 2], [4, 5, 6], [7, 8, 9]]), 3).reshape(3, 3, 3),
         coords=[
             pd.date_range("1/1/2000", "1/3/2000", freq="D"),
             np.linspace(-89.5, 89.5, 3),
@@ -127,11 +125,11 @@ def test_skipna_returns_nan_when_false(a, b, metric):
 
 @pytest.mark.parametrize("metric", WEIGHTED_METRICS)
 def test_skipna_broadcast_weights_assignment_destination(
-        a_3d, b_3d, weights_3d, metric):
+    a_3d, b_3d, weights_3d, metric
+):
     """Tests that 'assignment destination is read-only' is not raised
     https://github.com/raybellwaves/xskillscore/issues/79"""
     a_3d_nan = a_3d.where(a_3d > 0)
     b_3d_nan = b_3d.where(b_3d > 0)
-    res = metric(a_3d_nan, b_3d_nan, ['lat', 'lon'],
-                 weights=weights_3d, skipna=True)
+    res = metric(a_3d_nan, b_3d_nan, ["lat", "lon"], weights=weights_3d, skipna=True)
     assert all([not np.isnan(r) for r in res])
