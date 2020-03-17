@@ -2,12 +2,12 @@
 Changelog History
 =================
 
-xskillscore v0.0.13 (2020-XX-XX)
+xskillscore v0.0.13 (2020-03-17)
 ================================
 
 Bug Fixes
-----------------
-- Fixes https://github.com/raybellwaves/xskillscore/issues/79 `assignment destination is read-only` error when skipna=True and weights are passed. `Andrew Huang`_
+---------
+- Fixes https://github.com/raybellwaves/xskillscore/issues/79 `assignment destination is read-only` error when ``skipna=True`` and weights are passed. `Andrew Huang`_
 
 xskillscore v0.0.12 (2020-01-09)
 ================================
