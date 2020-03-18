@@ -13,6 +13,10 @@ dependencies:
   - numba
   - bottleneck
   - black
+  - flake8
+  - doc8
+  - isort
+  - pre-commit
   - pip:
     - properscoring
     - asv

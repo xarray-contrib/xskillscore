@@ -2,6 +2,15 @@
 Changelog History
 =================
 
+xskillscore v0.0.14 (2020-03-xx)
+================================
+
+Internal Changes
+----------------
+- Contribution guide adapted from ``climpred``. Encourages to use ``pre-commit``. (:pr:`79`) `Aaron Spring`_
+- Templates for issues and pull requests on github. (:pr:`79`) `Aaron Spring`_
+
+
 xskillscore v0.0.13 (2020-03-17)
 ================================
 
