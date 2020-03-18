@@ -3,18 +3,9 @@ import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
 
-from xskillscore.core.deterministic import (
-    mae,
-    mape,
-    median_absolute_error,
-    mse,
-    pearson_r,
-    pearson_r_p_value,
-    rmse,
-    smape,
-    spearman_r,
-    spearman_r_p_value,
-)
+from xskillscore.core.deterministic import (mae, mape, median_absolute_error, mse,
+                                            pearson_r, pearson_r_p_value, rmse, smape,
+                                            spearman_r, spearman_r_p_value)
 
 WEIGHTED_METRICS = [
     pearson_r,
