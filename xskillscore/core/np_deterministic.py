@@ -16,6 +16,7 @@ __all__ = [
     "_spearman_r",
     "_spearman_r_p_value",
     "_effective_sample_size",
+    "_r2",
 ]
 
 
@@ -186,6 +187,55 @@ def _pearson_r(a, b, weights, axis, skipna):
     r = r_num / r_den
     res = np.clip(r, -1.0, 1.0)
     return res
+
+
+def _r2(a, b, weights, axis, skipna):
+    """
+    ndarray implementation of sklearn.metrics.r2_score.
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int
+        The axis to apply the r2_score along.
+    weights : ndarray
+        Input array of weights for a and b.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    res : ndarray
+        R^2 (coefficient of determination) score.
+
+    See Also
+    --------
+    sklearn.metrics.r2_score
+    """
+    sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
+    weights = _check_weights(weights)
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    if weights is not None:
+        weights = np.rollaxis(weights, axis)
+
+    am, bm = __compute_anomalies(a, b, weights=weights, axis=0, skipna=skipna)
+
+    if weights is not None:
+        squared_error = weights * ((a - b) ** 2)
+        am_squared = weights * (am ** 2)
+    else:
+        squared_error = (a - b) ** 2
+        am_squared = am ** 2
+    num = sumfunc(squared_error, axis=0)
+    den = sumfunc(am_squared, axis=0)
+    r2 = 1 - (num / den)
+    return r2
 
 
 def _pearson_r_p_value(a, b, weights, axis, skipna):

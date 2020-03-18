@@ -2,6 +2,13 @@
 Changelog History
 =================
 
+xskillscore v0.0.14 (2020-XX-XX)
+================================
+
+Features
+--------
+- Add ``r2`` as an implementation of ``sklearn.metrics.r2_score``. `Ray Bell`_
+
 xskillscore v0.0.13 (2020-03-17)
 ================================
 
@@ -43,3 +50,4 @@ Testing
 .. _`Riley X. Brady`: https://github.com/bradyrx
 .. _`Aaron Spring`: https://github.com/aaronspring
 .. _`Andrew Huang`: https://github.com/ahuang11
+.. _`Ray Bell`: https://github.com/raybellwaves
