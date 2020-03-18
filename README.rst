@@ -68,6 +68,9 @@ Examples
    # 2-tailed p-value of Pearson's correlation coefficient
    r_p_value = xs.pearson_r_p_value(obs, fct, "time")
 
+   # R^2 (coefficient of determination) score
+   r2 = xr.r2(obs, fct, "time")
+
    # Spearman's correlation coefficient
    rs = xs.spearman_r(obs, fct, "time")
 
