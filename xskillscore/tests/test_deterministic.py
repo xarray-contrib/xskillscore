@@ -1,8 +1,8 @@
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
+
 from xskillscore.core.deterministic import (
     _preprocess_dims,
     _preprocess_weights,
@@ -65,7 +65,7 @@ temporal_only_metrics = [
 
 @pytest.fixture
 def a():
-    times = pd.date_range('1/1/2000', '1/3/2000', freq='D')
+    times = xr.cftime_range('1/1/2000', '1/3/2000', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(times), len(lats), len(lons))
@@ -137,8 +137,8 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     # unpack metrics
     metric, _metric = metrics
     # Only apply over time dimension for effective p value.
-    if (dim != "time") and (metric in temporal_only_metrics):
-        dim = "time"
+    if (dim != 'time') and (metric in temporal_only_metrics):
+        dim = 'time'
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
@@ -224,8 +224,8 @@ def test_correlation_metrics_xr_dask(
     # unpack metrics
     metric, _metric = metrics
     # Only apply over time dimension for effective p value.
-    if (dim != "time") and (metric in temporal_only_metrics):
-        dim = "time"
+    if (dim != 'time') and (metric in temporal_only_metrics):
+        dim = 'time'
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
