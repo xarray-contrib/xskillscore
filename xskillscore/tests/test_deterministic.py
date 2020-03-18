@@ -65,7 +65,7 @@ temporal_only_metrics = [
 
 @pytest.fixture
 def a():
-    times = xr.cftime_range('1/1/2000', '1/3/2000', freq='D')
+    times = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(times), len(lats), len(lons))

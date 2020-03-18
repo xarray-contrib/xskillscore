@@ -3,9 +3,18 @@ import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
 
-from xskillscore.core.deterministic import (mae, mape, median_absolute_error, mse,
-                                            pearson_r, pearson_r_p_value, rmse, smape,
-                                            spearman_r, spearman_r_p_value)
+from xskillscore.core.deterministic import (
+    mae,
+    mape,
+    median_absolute_error,
+    mse,
+    pearson_r,
+    pearson_r_p_value,
+    rmse,
+    smape,
+    spearman_r,
+    spearman_r_p_value,
+)
 
 WEIGHTED_METRICS = [
     pearson_r,
@@ -24,7 +33,7 @@ NON_WEIGHTED_METRICS = [median_absolute_error]
 
 @pytest.fixture
 def a():
-    time = xr.cftime_range('1/1/2000', '1/3/2000', freq='D')
+    time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
     da = xr.DataArray([3, np.nan, 5], dims=['time'], coords=[time])
     return da
 
@@ -38,7 +47,7 @@ def b(a):
 
 @pytest.fixture
 def weights():
-    time = xr.cftime_range('1/1/2000', '1/3/2000', freq='D')
+    time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
     da = xr.DataArray([1, 2, 3], dims=['time'], coords=[time])
     return da
 
@@ -48,7 +57,7 @@ def a_3d():
     da = xr.DataArray(
         np.repeat(np.array([[0, 1, 2], [4, 5, 6], [7, 8, 9]]), 3).reshape(3, 3, 3),
         coords=[
-            xr.cftime_range('1/1/2000', '1/3/2000', freq='D'),
+            xr.cftime_range('2000-01-01', '2000-01-03', freq='D'),
             np.linspace(-89.5, 89.5, 3),
             np.linspace(-179.5, 179.5, 3),
         ],

@@ -21,7 +21,7 @@ from xskillscore.core.deterministic import (
 
 @pytest.fixture
 def a():
-    time = xr.cftime_range('1/1/2000', '1/3/2000', freq='D')
+    time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
     da = xr.DataArray(np.random.rand(len(time)), dims=['time'], coords=[time])
     return da
 

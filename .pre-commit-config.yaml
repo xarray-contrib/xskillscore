@@ -24,11 +24,11 @@ repos:
       - id: flake8
         args: ["--max-line-length=88", "--exclude=__init__.py", "--ignore=C901,W605,W503,F722"]
 
-  -   repo: https://github.com/pre-commit/mirrors-isort
-      rev: v4.3.21
-      hooks:
-      -   id: isort
-          args: ["-w", "88"]
+#  -   repo: https://github.com/pre-commit/mirrors-isort
+#      rev: v4.3.21
+#      hooks:
+#      -   id: isort
+#          args: ["-w", "88"]
 
   -   repo: https://github.com/PyCQA/doc8
       rev: 0.8.1rc2

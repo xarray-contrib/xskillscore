@@ -25,7 +25,7 @@ correlation_metrics = [pearson_r, pearson_r_p_value, spearman_r, spearman_r_p_va
 
 @pytest.fixture
 def a():
-    time = xr.cftime_range('1/1/2000', '1/3/2000', freq='D')
+    time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(time), len(lats), len(lons))

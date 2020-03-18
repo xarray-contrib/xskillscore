@@ -44,7 +44,7 @@ Examples
    obs = xr.DataArray(
        np.random.rand(3, 4, 5),
        coords=[
-           xr.cftime_range("1/1/2000", "1/3/2000", freq="D"),
+           xr.cftime_range("2000-01-01", "2000-01-03", freq="D"),
            np.arange(4),
            np.arange(5),
        ],
@@ -111,7 +111,7 @@ Examples
    obs2 = xr.DataArray(
        np.random.rand(3, 180, 360),
        coords=[
-           xr.cftime_range("1/1/2000", "1/3/2000", freq="D"),
+           xr.cftime_range("2000-01-01", "2000-01-03", freq="D"),
            np.linspace(-89.5, 89.5, 180),
            np.linspace(-179.5, 179.5, 360),
        ],
