@@ -35,4 +35,11 @@ setup(
     install_requires=INSTALL_REQUIRES,
     tests_require=TESTS_REQUIRE,
     python_requires=PYTHON_REQUIRE,
+    use_scm_version={'version_scheme': 'post-release', 'local_scheme': 'dirty-tag'},
+    setup_requires=[
+        'setuptools_scm',
+        'setuptools>=30.3.0',
+        'setuptools_scm_git_archive',
+    ],
+    zip_safe=False,
 )
