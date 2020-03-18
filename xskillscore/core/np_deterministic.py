@@ -217,7 +217,7 @@ def _r2(a, b, weights, axis, skipna):
 
     Reference
     ---------
-    https://en.wikipedia.org/wiki/Coefficient_of_determination    
+    https://en.wikipedia.org/wiki/Coefficient_of_determination
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
     if skipna:
