@@ -15,6 +15,7 @@ from .np_deterministic import (
     _spearman_r_p_value,
     _spearman_r_eff_p_value,
     _effective_sample_size,
+    _r2,
 )
 
 __all__ = [
@@ -31,6 +32,7 @@ __all__ = [
     "spearman_r_p_value",
     "spearman_r_eff_p_value",
     "effective_sample_size",
+    "r2",
 ]
 
 
@@ -195,6 +197,55 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
 
     return xr.apply_ufunc(
         _pearson_r,
+        a,
+        b,
+        weights,
+        input_core_dims=input_core_dims,
+        kwargs={"axis": -1, "skipna": skipna},
+        dask="parallelized",
+        output_dtypes=[float],
+    )
+
+
+def r2(a, b, dim, weights=None, skipna=False):
+    """
+    R^2 (coefficient of determination) score.
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to apply the correlation along.
+    weights : xarray.Dataset or xarray.DataArray or None
+        Weights matching dimensions of ``dim`` to apply during the function.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    xarray.DataArray or xarray.Dataset
+        R^2 (coefficient of determination) score.
+
+    See Also
+    --------
+    xarray.apply_ufunc
+    sklearn.metrics.r2_score
+
+    Reference
+    ---------
+    https://en.wikipedia.org/wiki/Coefficient_of_determination
+    """
+    dim, _ = _preprocess_dims(dim)
+    a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
+    weights = _preprocess_weights(a, dim, new_dim, weights)
+
+    input_core_dims = _determine_input_core_dims(new_dim, weights)
+
+    return xr.apply_ufunc(
+        _r2,
         a,
         b,
         weights,
