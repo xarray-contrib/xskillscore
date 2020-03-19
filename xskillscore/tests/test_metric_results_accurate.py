@@ -2,7 +2,11 @@ import numpy as np
 import pytest
 import xarray as xr
 from scipy.stats import pearsonr, spearmanr
-from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.metrics import (
+    mean_squared_error,
+    mean_absolute_error,
+    r2_score,
+)
 from sklearn.metrics import median_absolute_error as sklearn_med_abs
 
 from xskillscore.core.deterministic import (
@@ -16,6 +20,7 @@ from xskillscore.core.deterministic import (
     smape,
     spearman_r,
     spearman_r_p_value,
+    r2,
 )
 
 
@@ -41,6 +46,13 @@ def test_pearsonr_same_as_scipy(a, b):
     scipy_corr, scipy_p = pearsonr(a, b)
     assert np.allclose(xs_corr, scipy_corr)
     assert np.allclose(xs_p, scipy_p)
+
+
+def test_r2_same_as_sklearn(a, b):
+    """Tests that r2 is same as computed from sklearn."""
+    xs_r2 = r2(a, b, "time")
+    sklearn_r2 = r2_score(a, b)
+    assert np.allclose(xs_r2, sklearn_r2)
 
 
 def test_spearmanr_same_as_scipy(a, b):
@@ -69,9 +81,9 @@ def test_mse_same_as_sklearn(a, b):
 
 def test_mae_same_as_sklearn(a, b):
     """Tests that mean absolute error is same as computed from sklearn."""
-    xs_mse = mae(a, b, 'time')
-    sklearn_mse = mean_absolute_error(a, b)
-    assert np.allclose(xs_mse, sklearn_mse)
+    xs_mae = mae(a, b, "time")
+    sklearn_mae = mean_absolute_error(a, b)
+    assert np.allclose(xs_mae, sklearn_mae)
 
 
 def test_median_absolute_error_same_as_sklearn(a, b):

@@ -13,6 +13,7 @@ from xskillscore.core.deterministic import (
     smape,
     spearman_r,
     spearman_r_p_value,
+    r2,
 )
 
 METRICS = [
@@ -26,6 +27,7 @@ METRICS = [
     pearson_r_p_value,
     spearman_r,
     spearman_r_p_value,
+    r2,
 ]
 
 

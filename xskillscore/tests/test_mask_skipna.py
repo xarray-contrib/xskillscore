@@ -13,6 +13,7 @@ from xskillscore.core.deterministic import (
     smape,
     spearman_r,
     spearman_r_p_value,
+    r2,
 )
 
 # Should only have masking issues when pulling in masked
@@ -20,7 +21,13 @@ from xskillscore.core.deterministic import (
 AXES = ('time', 'lat', 'lon', ['lat', 'lon'], ['time', 'lat', 'lon'])
 
 distance_metrics = [mae, mse, median_absolute_error, mape, smape, rmse]
-correlation_metrics = [pearson_r, pearson_r_p_value, spearman_r, spearman_r_p_value]
+correlation_metrics = [
+    pearson_r,
+    r2,
+    pearson_r_p_value,
+    spearman_r,
+    spearman_r_p_value,
+]
 
 
 @pytest.fixture

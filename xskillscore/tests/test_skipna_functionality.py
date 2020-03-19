@@ -14,6 +14,7 @@ from xskillscore.core.deterministic import (
     smape,
     spearman_r,
     spearman_r_p_value,
+    r2,
 )
 
 WEIGHTED_METRICS = [
@@ -26,6 +27,7 @@ WEIGHTED_METRICS = [
     mape,
     smape,
     rmse,
+    r2,
 ]
 
 NON_WEIGHTED_METRICS = [median_absolute_error]

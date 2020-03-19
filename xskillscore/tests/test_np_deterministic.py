@@ -6,6 +6,7 @@ from sklearn.metrics import (
     mean_absolute_error,
     mean_squared_error,
     median_absolute_error,
+    r2_score,
 )
 from xskillscore.core.np_deterministic import (
     _median_absolute_error,
@@ -18,6 +19,7 @@ from xskillscore.core.np_deterministic import (
     _smape,
     _spearman_r,
     _spearman_r_p_value,
+    _r2,
 )
 
 
@@ -65,6 +67,38 @@ def test_pearson_r_nd(a, b):
             _b = b[i, j, :]
             expected[i, j], p = stats.pearsonr(_a, _b)
     actual = _pearson_r(a, b, weights, axis, skipna)
+    assert_allclose(actual, expected)
+
+
+def test_r2_nd(a, b):
+    axis = 0
+    expected = np.squeeze(a[0, :, :]).copy()
+    for i in range(np.shape(a)[1]):
+        for j in range(np.shape(a)[2]):
+            _a = a[:, i, j]
+            _b = b[:, i, j]
+            expected[i, j] = r2_score(_a, _b)
+    actual = _r2(a, b, weights, axis, skipna)
+    assert_allclose(actual, expected)
+
+    axis = 1
+    expected = np.squeeze(a[:, 0, :]).copy()
+    for i in range(np.shape(a)[0]):
+        for j in range(np.shape(a)[2]):
+            _a = a[i, :, j]
+            _b = b[i, :, j]
+            expected[i, j] = r2_score(_a, _b)
+    actual = _r2(a, b, weights, axis, skipna)
+    assert_allclose(actual, expected)
+
+    axis = 2
+    expected = np.squeeze(a[:, :, 0]).copy()
+    for i in range(np.shape(a)[0]):
+        for j in range(np.shape(a)[1]):
+            _a = a[i, j, :]
+            _b = b[i, j, :]
+            expected[i, j] = r2_score(_a, _b)
+    actual = _r2(a, b, weights, axis, skipna)
     assert_allclose(actual, expected)
 
 
