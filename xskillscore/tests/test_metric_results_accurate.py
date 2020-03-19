@@ -83,9 +83,9 @@ def test_mse_same_as_sklearn(a, b):
 
 def test_mae_same_as_sklearn(a, b):
     """Tests that mean absolute error is same as computed from sklearn."""
-    xs_mse = mae(a, b, "time")
-    sklearn_mse = mean_absolute_error(a, b)
-    assert np.allclose(xs_mse, sklearn_mse)
+    xs_mae = mae(a, b, "time")
+    sklearn_mae = mean_absolute_error(a, b)
+    assert np.allclose(xs_mae, sklearn_mae)
 
 
 def test_median_absolute_error_same_as_sklearn(a, b):
