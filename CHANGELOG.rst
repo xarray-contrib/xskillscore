@@ -2,6 +2,7 @@
 Changelog History
 =================
 
+
 xskillscore v0.0.15 (2020-03-23)
 ================================
 
@@ -12,7 +13,7 @@ Internal Changes
 - Templates for issues and pull requests on github. (:pr:`79`) `Aaron Spring`_
 - Remove `pandas` from code base. (:pr:`79`) `Aaron Spring`_
 
-xskillscore v0.0.14 (2020-03-21)
+xskillscore v0.0.14 (2020-03-20)
 ================================
 
 Features
