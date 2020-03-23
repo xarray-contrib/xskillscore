@@ -1,7 +1,7 @@
 Release Procedure
 -----------------
 
-We follow semantic versioning, e.g., v0.0.x. 
+We follow semantic versioning, e.g., v0.0.x.
 
 #. Create a new branch ``release-v0.0.x`` with the version for the release.
 
@@ -22,16 +22,6 @@ We follow semantic versioning, e.g., v0.0.x.
     $ git clean -xfd  # remove any files not checked into git
     $ python setup.py sdist bdist_wheel --universal  # build package
     $ twine upload dist/*  # register and push to pypi
-
-#. Update the stable branch (used by ReadTheDocs)::
-
-    $ git checkout stable
-    $ git rebase master
-    $ git push -f origin stable
-    $ git checkout master
-
-#. Go to https://readthedocs.org and add the new version to "Active Versions"
-   under the version tab. Force-build "stable" if it isn't already building.
 
 #. Update xskillscore conda-forge feedstock
 
