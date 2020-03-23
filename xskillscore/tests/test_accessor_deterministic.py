@@ -104,37 +104,6 @@ def adjust_weights(dim, weight_bool, weights):
         return None
 
 
-def get_func(ds, metric):
-    if metric == pearson_r:
-        return ds.xs.pearson_r
-    if metric == r2:
-        return ds.xs.r2
-    if metric == pearson_r_p_value:
-        return ds.xs.pearson_r_p_value
-    if metric == spearman_r:
-        return ds.xs.spearman_r
-    if metric == spearman_r_p_value:
-        return ds.xs.spearman_r_p_value
-    if metric == effective_sample_size:
-        return ds.xs.effective_sample_size
-    if metric == pearson_r_eff_p_value:
-        return ds.xs.pearson_r_eff_p_value
-    if metric == spearman_r_eff_p_value:
-        return ds.xs.spearman_r_eff_p_value
-    if metric == mse:
-        return ds.xs.mse
-    if metric == rmse:
-        return ds.xs.rmse
-    if metric == mae:
-        return ds.xs.mae
-    if metric == median_absolute_error:
-        return ds.xs.median_absolute_error
-    if metric == mape:
-        return ds.xs.mape
-    if metric == smape:
-        return ds.xs.smape
-
-
 @pytest.mark.parametrize("outer", [False, True])
 @pytest.mark.parametrize("metric", correlation_metrics + distance_metrics)
 @pytest.mark.parametrize("dim", AXES)
@@ -155,7 +124,7 @@ def test_deterministic_metrics_accessor(
     if outer:
         ds = ds.drop_vars("b")
 
-    accessor_func = get_func(ds, metric)
+    accessor_func = getattr(ds.xs, metric.__name__)
     if metric in temporal_only_metrics or metric == median_absolute_error:
         actual = metric(a, b, dim, skipna=skipna_bool)
         if outer:
