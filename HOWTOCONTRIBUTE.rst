@@ -214,9 +214,6 @@ defined in ``deterministic.py``.
    - Add yourself to list of authors at the end of ``CHANGELOG.rst`` file if not there yet, in
      alphabetical order.
 
- #. Add yourself to the
-    `contributors <https://xskillscore.readthedocs.io/en/latest/contributors.html>`_
-    list via ``docs/source/contributors.rst``.
 
 #. Finally, submit a pull request through the GitHub website using this data::
 
