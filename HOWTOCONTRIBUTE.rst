@@ -68,32 +68,6 @@ Write documentation
 
 ``xskillscore`` could always use more documentation. We have an open issue to build the documentation on a website: https://github.com/raybellwaves/xskillscore/issues/36
 
-* More complementary documentation.  Have you perhaps found something unclear?
-* Docstrings.  There can never be too many of them.
-* Example notebooks with different Earth System Models, lead times, etc. -- they're all very
-  appreciated.
-
-You can also edit documentation files directly in the GitHub web interface,
-without using a local copy.  This can be convenient for small fixes.
-
-Our documentation is written in reStructuredText. You can follow our conventions in already written
-documents. Some helpful guides are located
-`here <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`__ and
-`here <https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst>`__.
-
-.. note::
-    Build the documentation locally with the following command:
-
-    .. code:: bash
-
-        $ conda env update -f ci/requirements-py36.yml
-        $ cd docs
-        $ make html
-
-    The built documentation should be available in the ``docs/build/``.
-
-If you need to add new functions to the API, run ``sphinx-autogen -o api api.rst`` from the
-``docs/source`` directory and add the functions to ``api.rst``.
 
  .. _`pull requests`:
  .. _pull-requests:
