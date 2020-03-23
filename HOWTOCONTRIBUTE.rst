@@ -47,7 +47,7 @@ If you are reporting a bug, please include:
 * Any details about your local setup that might be helpful in troubleshooting,
   specifically the Python interpreter version, installed libraries, and ``xskillscore``
   version.
-* Detailed steps to reproduce the bug.
+* Detailed steps to reproduce the bug, ideally a Minimal, Complete and Verifiable Example (http://matthewrocklin.com/blog/work/2018/02/28/minimal-bug-reports)
 
 If you can write a demonstration test that currently fails but should passm
 that is a very useful commit to make as well, even if you cannot fix the bug itself.
@@ -66,34 +66,8 @@ Talk to developers to find out how you can fix specific bugs.
 Write documentation
 -------------------
 
-``xskillscore`` could always use more documentation.  What exactly is needed?
+``xskillscore`` could always use more documentation. We have an open issue to build the documentation on a website: https://github.com/raybellwaves/xskillscore/issues/36
 
-* More complementary documentation.  Have you perhaps found something unclear?
-* Docstrings.  There can never be too many of them.
-* Example notebooks with different Earth System Models, lead times, etc. -- they're all very
-  appreciated.
-
-You can also edit documentation files directly in the GitHub web interface,
-without using a local copy.  This can be convenient for small fixes.
-
-Our documentation is written in reStructuredText. You can follow our conventions in already written
-documents. Some helpful guides are located
-`here <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`__ and
-`here <https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst>`__.
-
-.. note::
-    Build the documentation locally with the following command:
-
-    .. code:: bash
-
-        $ conda env update -f ci/requirements-py36.yml
-        $ cd docs
-        $ make html
-
-    The built documentation should be available in the ``docs/build/``.
-
-If you need to add new functions to the API, run ``sphinx-autogen -o api api.rst`` from the
-``docs/source`` directory and add the functions to ``api.rst``.
 
  .. _`pull requests`:
  .. _pull-requests:
@@ -203,9 +177,6 @@ defined in ``deterministic.py``.
    - Add yourself to list of authors at the end of ``CHANGELOG.rst`` file if not there yet, in
      alphabetical order.
 
- #. Add yourself to the
-    `contributors <https://xskillscore.readthedocs.io/en/latest/contributors.html>`_
-    list via ``docs/source/contributors.rst``.
 
 #. Finally, submit a pull request through the GitHub website using this data::
 

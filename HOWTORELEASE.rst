@@ -3,7 +3,7 @@ Release Procedure
 
 We follow semantic versioning, e.g., v0.0.x. 
 
-#. Create a new branch ``release-vX.x.x`` with the version for the release.
+#. Create a new branch ``release-v0.0.x`` with the version for the release.
 
  * Update `CHANGELOG.rst`
  * Make sure all new changes, features are reflected in the documentation.
