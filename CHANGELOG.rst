@@ -12,6 +12,9 @@ Internal Changes
 - Templates for issues and pull requests on github. (:pr:`79`) `Aaron Spring`_
 - Remove `pandas` from code base. (:pr:`79`) `Aaron Spring`_
 
+xskillscore v0.0.14 (2020-03-21)
+================================
+
 Features
 --------
 - Add ``r2`` as an implementation of ``sklearn.metrics.r2_score``. `Ray Bell`_
