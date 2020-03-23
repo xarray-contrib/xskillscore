@@ -66,7 +66,7 @@ Talk to developers to find out how you can fix specific bugs.
 Write documentation
 -------------------
 
-``xskillscore`` could always use more documentation.  What exactly is needed?
+``xskillscore`` could always use more documentation. We have an open issue to build the documentation on a website: https://github.com/raybellwaves/xskillscore/issues/36
 
 * More complementary documentation.  Have you perhaps found something unclear?
 * Docstrings.  There can never be too many of them.
