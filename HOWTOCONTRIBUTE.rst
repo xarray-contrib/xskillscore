@@ -47,7 +47,7 @@ If you are reporting a bug, please include:
 * Any details about your local setup that might be helpful in troubleshooting,
   specifically the Python interpreter version, installed libraries, and ``xskillscore``
   version.
-* Detailed steps to reproduce the bug.
+* Detailed steps to reproduce the bug, ideally a Minimal, Complete and Verifiable Example (http://matthewrocklin.com/blog/work/2018/02/28/minimal-bug-reports)
 
 If you can write a demonstration test that currently fails but should passm
 that is a very useful commit to make as well, even if you cannot fix the bug itself.
