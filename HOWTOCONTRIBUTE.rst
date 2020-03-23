@@ -43,7 +43,7 @@ with the label "bug".
 
 If you are reporting a bug, please include:
 
-* Your operating system name and version.
+* Your operating system name and version: ``xs.show_versions()``
 * Any details about your local setup that might be helpful in troubleshooting,
   specifically the Python interpreter version, installed libraries, and ``xskillscore``
   version.
@@ -130,23 +130,12 @@ Preparing Pull Requests
 
     $ pip install -e .
 
-#. Install `pre-commit <https://pre-commit.com>`_ and its hook on the ``xskillscore`` repo::
+#. Run `pre-commit <https://pre-commit.com>`_::
 
-     $ pip install --user pre-commit
-     $ pre-commit install
-
-   Afterwards ``pre-commit`` will run whenever you commit.
+     $ pre-commit
 
    https://pre-commit.com/ is a framework for managing and maintaining multi-language pre-commit
    hooks to ensure code-style and code formatting is consistent.
-
-    Now you have an environment called ``xskillscore-dev`` that you can work in.
-    You’ll need to make sure to activate that environment next time you want
-    to use it after closing the terminal or your system.
-
-    You can now edit your local working copy and run/add tests as necessary. Please follow
-    PEP-8 for naming. When committing, ``pre-commit`` will modify the files as needed, or
-    will generally be quite clear about what you need to do to pass the commit test.
 
 #. Break your edits up into reasonably sized commits::
 
