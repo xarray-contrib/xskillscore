@@ -133,7 +133,6 @@ class XSkillScoreAccessor(object):
     ):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
-        threshold = self._in_ds(threshold)
         return threshold_brier_score(
             observations, forecasts, threshold, issorted=issorted, dim="member"
         )
