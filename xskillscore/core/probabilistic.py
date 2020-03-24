@@ -21,7 +21,6 @@ def xr_crps_gaussian(observations, mu, sig):
     """
     xarray version of properscoring.crps_gaussian: Continuous Ranked
      Probability Score with a Gaussian distribution.
-
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -30,11 +29,9 @@ def xr_crps_gaussian(observations, mu, sig):
         The mean of the forecast normal distribution.
     sig : xarray.Dataset or xarray.DataArray
         The standard deviation of the forecast distribution.
-
     Returns
     -------
     xarray.Dataset or xarray.DataArray
-
     See Also
     --------
     properscoring.crps_gaussian
@@ -64,7 +61,6 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
     """
     xarray version of properscoring.crps_quadrature: Continuous Ranked
      Probability Score with numerical integration of the normal distribution
-
     Parameters
     ----------
     x : xarray.Dataset or xarray.DataArray
@@ -72,11 +68,9 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
     cdf_or_dist : callable or scipy.stats.distribution
         Function which returns the cumulative density of the forecast
         distribution at value x.
-
     Returns
     -------
     xarray.Dataset or xarray.DataArray
-
     See Also
     --------
     properscoring.crps_quadrature
@@ -101,7 +95,6 @@ def xr_crps_ensemble(
     """
     xarray version of properscoring.crps_ensemble: Continuous Ranked
      Probability Score with the ensemble distribution
-
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -118,11 +111,9 @@ def xr_crps_ensemble(
         already sorted along `axis`.
     dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
-
     Returns
     -------
     xarray.Dataset or xarray.DataArray
-
     See Also
     --------
     properscoring.crps_ensemble
@@ -142,28 +133,23 @@ def xr_crps_ensemble(
 def xr_brier_score(observations, forecasts):
     """
     xarray version of properscoring.brier_score: Calculate Brier score (BS).
-
     ..math:
         BS(p, k) = (p_1 - k)^2,
-
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
         The observations or set of observations.
     forecasts : xarray.Dataset or xarray.DataArray
         The forecasts associated with the observations.
-
     Returns
     -------
     xarray.Dataset or xarray.DataArray
-
     References
     ----------
     Gneiting, Tilmann, and Adrian E Raftery. “Strictly Proper Scoring Rules,
       Prediction, and Estimation.” Journal of the American Statistical
       Association 102, no. 477 (March 1, 2007): 359–78.
       https://doi.org/10/c6758w.
-
     See Also
     --------
     properscoring.brier_score
@@ -185,7 +171,6 @@ def xr_threshold_brier_score(
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
      scores of an ensemble for exceeding given thresholds.
-
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -199,20 +184,17 @@ def xr_threshold_brier_score(
         already sorted along `axis`.
     dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
-
     Returns
     -------
     xarray.Dataset or xarray.DataArray
         (If ``threshold`` is a scalar, the result will have the same shape as
         observations. Otherwise, it will have an additional final dimension
         corresponding to the threshold levels. Not implemented yet.)
-
     References
     ----------
     Gneiting, T. and Ranjan, R. Comparing density forecasts using threshold-
        and quantile-weighted scoring rules. J. Bus. Econ. Stat. 29, 411-422
        (2011). http://www.stat.washington.edu/research/reports/2008/tr533.pdf
-
     See Also
     --------
     properscoring.threshold_brier_score

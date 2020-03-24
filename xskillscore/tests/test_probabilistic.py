@@ -64,7 +64,7 @@ def test_xr_crps_gaussian_dask(o_dask, f_dask):
     assert expected.chunks is None
 
 
-def test_xr_crps_quadrature_dask(o_dask, f_dask):
+def test_xr_crps_quadrature_dask(o_dask):
     cdf_or_dist = norm
     actual = xr_crps_quadrature(o_dask, cdf_or_dist)
     expected = crps_quadrature(o_dask, cdf_or_dist)
