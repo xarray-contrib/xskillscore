@@ -2,6 +2,13 @@
 Changelog History
 =================
 
+xskillscore v0.0.15 (2020-XX-XX)
+================================
+
+Features
+--------
+- Update the ``XSkillScoreAccessor`` with all metrics. `Ray Bell`_
+
 xskillscore v0.0.14 (2020-03-20)
 ================================
 
