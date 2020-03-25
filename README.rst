@@ -172,7 +172,7 @@ Examples
    )
 
    # Continuous Ranked Probability Score with the ensemble distribution
-   crps_ensemble = xs.crps_ensemble(obs3, fct3)
+   crps_ensemble = xs.crps_ensemble(obs3, fct3, dim='member')
 
    # Continuous Ranked Probability Score with a Gaussian distribution
    crps_gaussian = xs.crps_gaussian(obs3, fct3.mean("member"), fct3.std("member"))
