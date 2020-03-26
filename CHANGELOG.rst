@@ -2,17 +2,13 @@
 Changelog History
 =================
 
-<<<<<<< HEAD
-xskillscore v0.0.15 (2020-03-24)
+
+xskillscore v0.0.15 (2020-03-26)
 ================================
 
 Features
 --------
 - Update the ``XSkillScoreAccessor`` with all metrics. `Ray Bell`_
-=======
-
-xskillscore v0.0.15 (2020-03-26)
-================================
 
 Internal Changes
 ----------------
@@ -20,7 +16,7 @@ Internal Changes
   (:pr:`79`) `Aaron Spring`_
 - Templates for issues and pull requests on github. (:pr:`79`) `Aaron Spring`_
 - Remove `pandas` from code base. (:pr:`79`) `Aaron Spring`_
->>>>>>> 0069cd827d4d31d08ade34e333387edad682aeb2
+
 
 xskillscore v0.0.14 (2020-03-20)
 ================================
