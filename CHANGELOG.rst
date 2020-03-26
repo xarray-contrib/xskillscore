@@ -3,7 +3,7 @@ Changelog History
 =================
 
 
-xskillscore v0.0.15 (2020-03-23)
+xskillscore v0.0.15 (2020-03-26)
 ================================
 
 Internal Changes
@@ -66,7 +66,7 @@ Testing
   package (e.g. ``numpy``, ``scipy``, ``sklearn``). `Riley X. Brady`_
 - Test that ``skipna=True`` works properly with pairwise nans. `Riley X. Brady`_
 
+.. _`Ray Bell`: https://github.com/raybellwaves
 .. _`Riley X. Brady`: https://github.com/bradyrx
 .. _`Aaron Spring`: https://github.com/aaronspring
 .. _`Andrew Huang`: https://github.com/ahuang11
-.. _`Ray Bell`: https://github.com/raybellwaves

@@ -9,11 +9,11 @@ from xskillscore.core.deterministic import (
     mse,
     pearson_r,
     pearson_r_p_value,
+    r2,
     rmse,
     smape,
     spearman_r,
     spearman_r_p_value,
-    r2,
 )
 
 # Should only have masking issues when pulling in masked

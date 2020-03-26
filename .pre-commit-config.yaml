@@ -22,7 +22,7 @@ repos:
       rev: v2.4.0
       hooks:
       - id: flake8
-        args: ["--max-line-length=88", "--exclude=__init__.py", "--ignore=C901,W605,W503,F722"]
+        args: ["--max-line-length=88", "--exclude=__init__.py", "--ignore=C901,W605,W503,F722,E711"]
 
   -   repo: https://github.com/pre-commit/mirrors-isort
       rev: v4.3.21
