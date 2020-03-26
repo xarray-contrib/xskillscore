@@ -1,36 +1,39 @@
-import xarray as xr
 import warnings
 
+import xarray as xr
+
 from .np_deterministic import (
+    _effective_sample_size,
     _mae,
     _mape,
     _median_absolute_error,
     _mse,
     _pearson_r,
-    _pearson_r_p_value,
     _pearson_r_eff_p_value,
+    _pearson_r_p_value,
+    _r2,
     _rmse,
     _smape,
     _spearman_r,
-    _spearman_r_p_value,
     _spearman_r_eff_p_value,
-    _effective_sample_size,
+    _spearman_r_p_value,
 )
 
 __all__ = [
-    "pearson_r",
-    "pearson_r_p_value",
-    "pearson_r_eff_p_value",
-    "rmse",
-    "mse",
-    "mae",
-    "median_absolute_error",
-    "smape",
-    "mape",
-    "spearman_r",
-    "spearman_r_p_value",
-    "spearman_r_eff_p_value",
-    "effective_sample_size",
+    'pearson_r',
+    'pearson_r_p_value',
+    'pearson_r_eff_p_value',
+    'rmse',
+    'mse',
+    'mae',
+    'median_absolute_error',
+    'smape',
+    'mape',
+    'spearman_r',
+    'spearman_r_p_value',
+    'spearman_r_eff_p_value',
+    'effective_sample_size',
+    'r2',
 ]
 
 
@@ -77,7 +80,7 @@ def _stack_input_if_needed(a, b, dim, weights):
 
     """
     if len(dim) > 1:
-        new_dim = "_".join(dim)
+        new_dim = '_'.join(dim)
         a = a.stack(**{new_dim: dim})
         b = b.stack(**{new_dim: dim})
         if weights is not None:
@@ -108,8 +111,8 @@ def _preprocess_weights(a, dim, new_dim, weights):
         # Throw error if there are negative weights.
         if weights.min() < 0:
             raise ValueError(
-                "Weights has a minimum below 0. Please submit a weights array "
-                "of positive numbers."
+                'Weights has a minimum below 0. Please submit a weights array '
+                'of positive numbers.'
             )
         # Scale weights to vary from 0 to 1.
         weights = weights / weights.max()
@@ -118,9 +121,9 @@ def _preprocess_weights(a, dim, new_dim, weights):
         drop_dims = {k: 0 for k in a.dims if k not in new_dim}
         if dict(weights.sizes) != dict(a.isel(drop_dims).sizes):
             raise ValueError(
-                f"weights dimension(s) {dim} of size {dict(weights.sizes)} "
+                f'weights dimension(s) {dim} of size {dict(weights.sizes)} '
                 f"does not match DataArray's size "
-                f"{dict(a.isel(drop_dims).sizes)}"
+                f'{dict(a.isel(drop_dims).sizes)}'
             )
         if dict(weights.sizes) != dict(a.sizes):
             # Broadcast weights to full size of main object.
@@ -199,8 +202,57 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=input_core_dims,
-        kwargs={"axis": -1, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': -1, 'skipna': skipna},
+        dask='parallelized',
+        output_dtypes=[float],
+    )
+
+
+def r2(a, b, dim, weights=None, skipna=False):
+    """
+    R^2 (coefficient of determination) score.
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to apply the correlation along.
+    weights : xarray.Dataset or xarray.DataArray or None
+        Weights matching dimensions of ``dim`` to apply during the function.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    xarray.DataArray or xarray.Dataset
+        R^2 (coefficient of determination) score.
+
+    See Also
+    --------
+    xarray.apply_ufunc
+    sklearn.metrics.r2_score
+
+    Reference
+    ---------
+    https://en.wikipedia.org/wiki/Coefficient_of_determination
+    """
+    dim, _ = _preprocess_dims(dim)
+    a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
+    weights = _preprocess_weights(a, dim, new_dim, weights)
+
+    input_core_dims = _determine_input_core_dims(new_dim, weights)
+
+    return xr.apply_ufunc(
+        _r2,
+        a,
+        b,
+        weights,
+        input_core_dims=input_core_dims,
+        kwargs={'axis': -1, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -245,8 +297,8 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=input_core_dims,
-        kwargs={"axis": -1, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': -1, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -300,14 +352,14 @@ def effective_sample_size(a, b, dim, skipna=False):
     dim, _ = _preprocess_dims(dim)
     if len(dim) > 1:
         raise ValueError(
-            "Effective sample size should only be applied to a singular time dimension."
+            'Effective sample size should only be applied to a singular time dimension.'
         )
     else:
         new_dim = dim[0]
-    if new_dim != "time":
+    if new_dim != 'time':
         warnings.warn(
             f"{dim} is not 'time'. Make sure that you are applying this over a "
-            f"temporal dimension."
+            f'temporal dimension.'
         )
 
     return xr.apply_ufunc(
@@ -315,8 +367,8 @@ def effective_sample_size(a, b, dim, skipna=False):
         a,
         b,
         input_core_dims=[[new_dim], [new_dim]],
-        kwargs={"axis": -1, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': -1, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -384,14 +436,14 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False):
     dim, _ = _preprocess_dims(dim)
     if len(dim) > 1:
         raise ValueError(
-            "Effective sample size should only be applied to a singular time dimension."
+            'Effective sample size should only be applied to a singular time dimension.'
         )
     else:
         new_dim = dim[0]
-    if new_dim != "time":
+    if new_dim != 'time':
         warnings.warn(
             f"{dim} is not 'time'. Make sure that you are applying this over a "
-            f"temporal dimension."
+            f'temporal dimension.'
         )
 
     return xr.apply_ufunc(
@@ -399,8 +451,8 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False):
         a,
         b,
         input_core_dims=[[new_dim], [new_dim]],
-        kwargs={"axis": -1, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': -1, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -450,8 +502,8 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=input_core_dims,
-        kwargs={"axis": -1, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': -1, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -496,8 +548,8 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=input_core_dims,
-        kwargs={"axis": -1, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': -1, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -565,14 +617,14 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False):
     dim, _ = _preprocess_dims(dim)
     if len(dim) > 1:
         raise ValueError(
-            "Effective sample size should only be applied to a singular time dimension."
+            'Effective sample size should only be applied to a singular time dimension.'
         )
     else:
         new_dim = dim[0]
-    if new_dim != "time":
+    if new_dim != 'time':
         warnings.warn(
             f"{dim} is not 'time'. Make sure that you are applying this over a "
-            f"temporal dimension."
+            f'temporal dimension.'
         )
 
     return xr.apply_ufunc(
@@ -580,8 +632,8 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False):
         a,
         b,
         input_core_dims=[[new_dim], [new_dim]],
-        kwargs={"axis": -1, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': -1, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -629,8 +681,8 @@ def rmse(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=input_core_dims,
-        kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': axis, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -678,8 +730,8 @@ def mse(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=input_core_dims,
-        kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': axis, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -727,8 +779,8 @@ def mae(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=input_core_dims,
-        kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': axis, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -767,8 +819,8 @@ def median_absolute_error(a, b, dim, skipna=False):
         a,
         b,
         input_core_dims=[dim, dim],
-        kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': axis, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -816,8 +868,8 @@ def mape(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=input_core_dims,
-        kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': axis, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )
 
@@ -865,7 +917,7 @@ def smape(a, b, dim, weights=None, skipna=False):
         b,
         weights,
         input_core_dims=input_core_dims,
-        kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        kwargs={'axis': axis, 'skipna': skipna},
+        dask='parallelized',
         output_dtypes=[float],
     )

@@ -5,5 +5,7 @@ dask-worker-space/
 dist
 build
 
+.ipynb_checkpoints/
+
 # asv environments
 .asv

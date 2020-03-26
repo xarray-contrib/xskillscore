@@ -1,29 +1,20 @@
 from setuptools import find_packages, setup
 
 DISTNAME = 'xskillscore'
-VERSION = '0.0.12'
 LICENSE = 'Apache'
 AUTHOR = 'Ray Bell'
 AUTHOR_EMAIL = 'rayjohnbell0@gmail.com'
 DESCRIPTION = 'xskillscore'
 LONG_DESCRIPTION = """Metrics for verifying forecasts"""
 URL = 'https://github.com/raybellwaves/xskillscore'
-INSTALL_REQUIRES = [
-    'scikit-learn',
-    'xarray',
-    'dask',
-    'scipy',
-    'properscoring',
-    'numba',
-    'bottleneck'
-]
+with open('requirements.txt') as f:
+    INSTALL_REQUIRES = f.read().strip().split('\n')
 TESTS_REQUIRE = ['pytest']
 PYTHON_REQUIRE = '>=3.6'
 
 
 setup(
     name=DISTNAME,
-    version=VERSION,
     license=LICENSE,
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
@@ -34,4 +25,11 @@ setup(
     install_requires=INSTALL_REQUIRES,
     tests_require=TESTS_REQUIRE,
     python_requires=PYTHON_REQUIRE,
+    use_scm_version={'version_scheme': 'post-release', 'local_scheme': 'dirty-tag'},
+    setup_requires=[
+        'setuptools_scm',
+        'setuptools>=30.3.0',
+        'setuptools_scm_git_archive',
+    ],
+    zip_safe=False,
 )
