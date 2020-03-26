@@ -1,8 +1,8 @@
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
+
 from xskillscore.core.deterministic import (
     _preprocess_dims,
     _preprocess_weights,
@@ -14,6 +14,7 @@ from xskillscore.core.deterministic import (
     pearson_r,
     pearson_r_eff_p_value,
     pearson_r_p_value,
+    r2,
     rmse,
     smape,
     spearman_r,
@@ -29,6 +30,7 @@ from xskillscore.core.np_deterministic import (
     _pearson_r,
     _pearson_r_eff_p_value,
     _pearson_r_p_value,
+    _r2,
     _rmse,
     _smape,
     _spearman_r,
@@ -38,6 +40,7 @@ from xskillscore.core.np_deterministic import (
 
 correlation_metrics = [
     (pearson_r, _pearson_r),
+    (r2, _r2),
     (pearson_r_p_value, _pearson_r_p_value),
     (pearson_r_eff_p_value, _pearson_r_eff_p_value),
     (spearman_r, _spearman_r),
@@ -54,6 +57,7 @@ distance_metrics = [
     (smape, _smape),
 ]
 
+
 AXES = ('time', 'lat', 'lon', ['lat', 'lon'], ['time', 'lat', 'lon'])
 
 temporal_only_metrics = [
@@ -65,7 +69,7 @@ temporal_only_metrics = [
 
 @pytest.fixture
 def a():
-    times = pd.date_range('1/1/2000', '1/3/2000', freq='D')
+    times = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(times), len(lats), len(lons))
@@ -137,8 +141,8 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     # unpack metrics
     metric, _metric = metrics
     # Only apply over time dimension for effective p value.
-    if (dim != "time") and (metric in temporal_only_metrics):
-        dim = "time"
+    if (dim != 'time') and (metric in temporal_only_metrics):
+        dim = 'time'
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
@@ -224,8 +228,8 @@ def test_correlation_metrics_xr_dask(
     # unpack metrics
     metric, _metric = metrics
     # Only apply over time dimension for effective p value.
-    if (dim != "time") and (metric in temporal_only_metrics):
-        dim = "time"
+    if (dim != 'time') and (metric in temporal_only_metrics):
+        dim = 'time'
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)

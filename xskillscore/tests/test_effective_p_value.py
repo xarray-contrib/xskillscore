@@ -1,26 +1,25 @@
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 
 from xskillscore.core.deterministic import (
-    pearson_r_p_value,
-    pearson_r_eff_p_value,
-    spearman_r_p_value,
-    spearman_r_eff_p_value,
     effective_sample_size,
+    pearson_r_eff_p_value,
+    pearson_r_p_value,
+    spearman_r_eff_p_value,
+    spearman_r_p_value,
 )
 
-DIM = "time"
+DIM = 'time'
 
 
 @pytest.fixture
 def a():
-    times = pd.date_range("1/1/2000", "2/3/2000", freq="D")
+    times = xr.cftime_range('2000-01-01', '2000-01-23', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(times), len(lats), len(lons))
-    return xr.DataArray(data, coords=[times, lats, lons], dims=["time", "lat", "lon"])
+    return xr.DataArray(data, coords=[times, lats, lons], dims=['time', 'lat', 'lon'])
 
 
 @pytest.fixture
@@ -43,14 +42,14 @@ def test_eff_sample_size_smaller_than_n(a, b):
 def test_eff_pearson_p_greater_or_equal_to_normal_p(a, b):
     """Tests that the effective Pearson p value is greater than or equal to the
     normal Pearson p value."""
-    normal_p = pearson_r_p_value(a, b, "time")
-    eff_p = pearson_r_eff_p_value(a, b, "time")
+    normal_p = pearson_r_p_value(a, b, 'time')
+    eff_p = pearson_r_eff_p_value(a, b, 'time')
     assert (eff_p >= normal_p).all()
 
 
 def test_eff_spearman_p_greater_or_equal_to_normal_p(a, b):
     """Tests that the effective Spearman p value is greater than or equal to the
     normal Spearman p value."""
-    normal_p = spearman_r_p_value(a, b, "time")
-    eff_p = spearman_r_eff_p_value(a, b, "time")
+    normal_p = spearman_r_p_value(a, b, 'time')
+    eff_p = spearman_r_eff_p_value(a, b, 'time')
     assert (eff_p >= normal_p).all()

@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 
@@ -10,6 +9,7 @@ from xskillscore.core.deterministic import (
     mse,
     pearson_r,
     pearson_r_p_value,
+    r2,
     rmse,
     smape,
     spearman_r,
@@ -21,12 +21,18 @@ from xskillscore.core.deterministic import (
 AXES = ('time', 'lat', 'lon', ['lat', 'lon'], ['time', 'lat', 'lon'])
 
 distance_metrics = [mae, mse, median_absolute_error, mape, smape, rmse]
-correlation_metrics = [pearson_r, pearson_r_p_value, spearman_r, spearman_r_p_value]
+correlation_metrics = [
+    pearson_r,
+    r2,
+    pearson_r_p_value,
+    spearman_r,
+    spearman_r_p_value,
+]
 
 
 @pytest.fixture
 def a():
-    time = pd.date_range('1/1/2000', '1/3/2000', freq='D')
+    time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(time), len(lats), len(lons))
