@@ -1,10 +1,6 @@
 from setuptools import find_packages, setup
 
 DISTNAME = 'xskillscore'
-<<<<<<< HEAD
-VERSION = '0.0.15'
-=======
->>>>>>> 0069cd827d4d31d08ade34e333387edad682aeb2
 LICENSE = 'Apache'
 AUTHOR = 'Ray Bell'
 AUTHOR_EMAIL = 'rayjohnbell0@gmail.com'
