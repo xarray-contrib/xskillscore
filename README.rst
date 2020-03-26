@@ -13,7 +13,9 @@ xskillscore: Metrics for verifying forecasts
    :target: https://anaconda.org/conda-forge/xskillscore
 
 
-**xskillscore** is an open source project and Python package that provides verification metrics of deterministic (and probabilistic from `properscoring`) forecasts with `xarray`.
+**xskillscore** is an open source project and Python package that provides verification
+ metrics of deterministic (and probabilistic from `properscoring`) forecasts with
+ `xarray`.
 
 Installing
 ----------
@@ -34,7 +36,6 @@ Examples
 .. code-block:: python
 
    import xarray as xr
-   import pandas as pd
    import numpy as np
    from scipy.stats import norm
    import xskillscore as xs
@@ -43,7 +44,7 @@ Examples
    obs = xr.DataArray(
        np.random.rand(3, 4, 5),
        coords=[
-           pd.date_range("1/1/2000", "1/3/2000", freq="D"),
+           xr.cftime_range("2000-01-01", "2000-01-03", freq="D"),
            np.arange(4),
            np.arange(5),
        ],
@@ -99,7 +100,7 @@ Examples
    # Apply Pearson's correlation coefficient
    # over the latitude and longitude dimension
    r = xs.pearson_r(obs, fct, ["lat", "lon"])
-   
+
    # You can weight over the dimensions the function is being applied
    # to by passing the argument ``weights=weight`` with a xr.DataArray
    # containing the dimension(s) being reduced.
@@ -113,7 +114,7 @@ Examples
    obs2 = xr.DataArray(
        np.random.rand(3, 180, 360),
        coords=[
-           pd.date_range("1/1/2000", "1/3/2000", freq="D"),
+           xr.cftime_range("2000-01-01", "2000-01-03", freq="D"),
            np.linspace(-89.5, 89.5, 180),
            np.linspace(-179.5, 179.5, 360),
        ],
@@ -141,7 +142,7 @@ Examples
    # array([ 5.02325347e-03, -6.75266864e-05, -3.00668282e-03])
    # Coordinates:
    # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
-   
+
    # You can also pass the optional keyword `skipna=True`
    # to ignore any NaNs on the input data:
    obs_with_nans = obs.where(obs.lat > 1)

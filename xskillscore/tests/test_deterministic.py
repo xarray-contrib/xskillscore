@@ -1,8 +1,8 @@
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
+
 from xskillscore.core.deterministic import (
     _preprocess_dims,
     _preprocess_weights,
@@ -14,12 +14,12 @@ from xskillscore.core.deterministic import (
     pearson_r,
     pearson_r_eff_p_value,
     pearson_r_p_value,
+    r2,
     rmse,
     smape,
     spearman_r,
     spearman_r_eff_p_value,
     spearman_r_p_value,
-    r2,
 )
 from xskillscore.core.np_deterministic import (
     _effective_sample_size,
@@ -30,12 +30,12 @@ from xskillscore.core.np_deterministic import (
     _pearson_r,
     _pearson_r_eff_p_value,
     _pearson_r_p_value,
+    _r2,
     _rmse,
     _smape,
     _spearman_r,
     _spearman_r_eff_p_value,
     _spearman_r_p_value,
-    _r2,
 )
 
 correlation_metrics = [
@@ -57,7 +57,8 @@ distance_metrics = [
     (smape, _smape),
 ]
 
-AXES = ("time", "lat", "lon", ["lat", "lon"], ["time", "lat", "lon"])
+
+AXES = ('time', 'lat', 'lon', ['lat', 'lon'], ['time', 'lat', 'lon'])
 
 temporal_only_metrics = [
     pearson_r_eff_p_value,
@@ -68,11 +69,11 @@ temporal_only_metrics = [
 
 @pytest.fixture
 def a():
-    times = pd.date_range("1/1/2000", "1/3/2000", freq="D")
+    times = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(times), len(lats), len(lons))
-    return xr.DataArray(data, coords=[times, lats, lons], dims=["time", "lat", "lon"])
+    return xr.DataArray(data, coords=[times, lats, lons], dims=['time', 'lat', 'lon'])
 
 
 @pytest.fixture
@@ -130,9 +131,9 @@ def adjust_weights(dim, weight_bool, weights):
         return None
 
 
-@pytest.mark.parametrize("metrics", correlation_metrics)
-@pytest.mark.parametrize("dim", AXES)
-@pytest.mark.parametrize("weight_bool", [True, False])
+@pytest.mark.parametrize('metrics', correlation_metrics)
+@pytest.mark.parametrize('dim', AXES)
+@pytest.mark.parametrize('weight_bool', [True, False])
 def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     """Test whether correlation metric for xarray functions (from
      deterministic.py) give save numerical results as for numpy functions from
@@ -140,8 +141,8 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     # unpack metrics
     metric, _metric = metrics
     # Only apply over time dimension for effective p value.
-    if (dim != "time") and (metric in temporal_only_metrics):
-        dim = "time"
+    if (dim != 'time') and (metric in temporal_only_metrics):
+        dim = 'time'
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
@@ -154,7 +155,7 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
 
     dim, _ = _preprocess_dims(dim)
     if len(dim) > 1:
-        new_dim = "_".join(dim)
+        new_dim = '_'.join(dim)
         _a = a.stack(**{new_dim: dim})
         _b = b.stack(**{new_dim: dim})
         if weight_bool:
@@ -178,9 +179,9 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     assert_allclose(actual, expected)
 
 
-@pytest.mark.parametrize("metrics", distance_metrics)
-@pytest.mark.parametrize("dim", AXES)
-@pytest.mark.parametrize("weight_bool", [True, False])
+@pytest.mark.parametrize('metrics', distance_metrics)
+@pytest.mark.parametrize('dim', AXES)
+@pytest.mark.parametrize('weight_bool', [True, False])
 def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     """Test whether distance-based metric for xarray functions (from
      deterministic.py) give save numerical results as for numpy functions from
@@ -213,9 +214,9 @@ def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     assert_allclose(actual, expected)
 
 
-@pytest.mark.parametrize("metrics", correlation_metrics)
-@pytest.mark.parametrize("dim", AXES)
-@pytest.mark.parametrize("weight_bool", [True, False])
+@pytest.mark.parametrize('metrics', correlation_metrics)
+@pytest.mark.parametrize('dim', AXES)
+@pytest.mark.parametrize('weight_bool', [True, False])
 def test_correlation_metrics_xr_dask(
     a_dask, b_dask, dim, weight_bool, weights_dask, metrics
 ):
@@ -227,8 +228,8 @@ def test_correlation_metrics_xr_dask(
     # unpack metrics
     metric, _metric = metrics
     # Only apply over time dimension for effective p value.
-    if (dim != "time") and (metric in temporal_only_metrics):
-        dim = "time"
+    if (dim != 'time') and (metric in temporal_only_metrics):
+        dim = 'time'
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
@@ -251,9 +252,9 @@ def test_correlation_metrics_xr_dask(
     assert_allclose(actual.compute(), expected)
 
 
-@pytest.mark.parametrize("metrics", distance_metrics)
-@pytest.mark.parametrize("dim", AXES)
-@pytest.mark.parametrize("weight_bool", [True, False])
+@pytest.mark.parametrize('metrics', distance_metrics)
+@pytest.mark.parametrize('dim', AXES)
+@pytest.mark.parametrize('weight_bool', [True, False])
 def test_distance_metrics_xr_dask(
     a_dask, b_dask, dim, weight_bool, weights_dask, metrics
 ):
@@ -283,8 +284,8 @@ def test_distance_metrics_xr_dask(
     assert_allclose(actual.compute(), expected)
 
 
-@pytest.mark.parametrize("dim", AXES)
-@pytest.mark.parametrize("metric", [smape])
+@pytest.mark.parametrize('dim', AXES)
+@pytest.mark.parametrize('metric', [smape])
 def test_percentage_metric_in_interval_0_1(a, b, dim, metric):
     print(a, b)
     """Test smape to be within bounds."""
@@ -296,7 +297,7 @@ def test_percentage_metric_in_interval_0_1(a, b, dim, metric):
 
 def test_pearson_r_p_value_skipna(a, b_nan):
     """Test whether NaNs sprinkled in array will NOT yield all NaNs."""
-    res = pearson_r_p_value(a, b_nan, ["lat", "lon"], skipna=True)
+    res = pearson_r_p_value(a, b_nan, ['lat', 'lon'], skipna=True)
     assert not np.isnan(res).all()
 
 
@@ -308,5 +309,5 @@ def test_pearson_r_p_value_skipna(a, b_nan):
 
 def test_pearson_r_integer():
     """Test whether arrays as integers work."""
-    da = xr.DataArray([0, 1, 2], dims=["time"])
-    assert pearson_r(da, da, dim="time") == 1
+    da = xr.DataArray([0, 1, 2], dims=['time'])
+    assert pearson_r(da, da, dim='time') == 1
