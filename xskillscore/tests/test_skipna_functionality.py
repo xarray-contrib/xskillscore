@@ -60,7 +60,7 @@ def a_3d():
     da = xr.DataArray(
         np.repeat(np.array([[0, 1, 2], [4, 5, 6], [7, 8, 9]]), 3).reshape(3, 3, 3),
         coords=[
-            pd.date_range("1/1/2000", "1/3/2000", freq="D"),
+            xr.cftime_range("2000-01-01", "2000-01-03", freq="D"),
             np.linspace(-89.5, 89.5, 3),
             np.linspace(-179.5, 179.5, 3),
         ],
