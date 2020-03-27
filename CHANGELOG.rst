@@ -5,8 +5,8 @@ Changelog History
 xskillscore v0.0.16 (2020-XX-XX)
 ================================
 
-Documentation
--------------
+Internal Changes
+----------------
 
 - Add community support documents: ``HOWTOCONTRIBUTE.rst``, issue template and pull request template. `Aaron Spring`_
 
