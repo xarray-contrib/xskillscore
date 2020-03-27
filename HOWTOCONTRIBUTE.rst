@@ -114,6 +114,12 @@ Preparing Pull Requests
 
     $ pytest xskillscore
 
+   Check that your contribution is covered by tests and therefore increases the overall test coverage::
+
+    $ coverage run --source xskillscore -m py.test
+    $ coverage report
+    $ coveralls
+
   Please stick to `xarray <http://xarray.pydata.org/en/stable/contributing.html>`_'s testing recommendations.
 
 #. Running the performance test suite
