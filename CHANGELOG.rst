@@ -8,7 +8,7 @@ xskillscore v0.0.16 (2020-XX-XX)
 Documentation
 -------------
 
-- Add community support documents: ``HOWTOCONTRIBUTE.rst`` `Aaron Spring`_
+- Add community support documents: ``HOWTOCONTRIBUTE.rst``, issue template and pull request template. `Aaron Spring`_
 
 
 xskillscore v0.0.15 (2020-03-24)
