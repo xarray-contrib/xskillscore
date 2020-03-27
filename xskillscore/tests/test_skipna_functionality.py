@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
@@ -37,7 +36,7 @@ NON_WEIGHTED_METRICS = [median_absolute_error]
 
 @pytest.fixture
 def a():
-    time = pd.date_range("1/1/2000", "1/3/2000", freq="D")
+    time = xr.cftime_range("2000-01-01", "2000-01-03", freq="D")
     da = xr.DataArray([3, np.nan, 5], dims=["time"], coords=[time])
     return da
 
@@ -51,7 +50,7 @@ def b(a):
 
 @pytest.fixture
 def weights():
-    time = pd.date_range("1/1/2000", "1/3/2000", freq="D")
+    time = xr.cftime_range("2000-01-01", "2000-01-03", freq="D")
     da = xr.DataArray([1, 2, 3], dims=["time"], coords=[time])
     return da
 

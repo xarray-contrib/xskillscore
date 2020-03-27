@@ -5,6 +5,7 @@ dependencies:
   - python=3.6
   - scikit-learn
   - xarray
+  - cftime
   - dask
   - scipy
   - pytest
@@ -14,5 +15,5 @@ dependencies:
   - bottleneck
   - black
   - pip:
-    - properscoring
-    - asv
+      - properscoring
+      - asv
