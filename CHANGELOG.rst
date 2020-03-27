@@ -11,7 +11,6 @@ Internal Changes
 - Add community support documents: ``HOWTOCONTRIBUTE.rst``, issue template and pull request template. `Aaron Spring`_
 - Replace pandas with cftime in examples and tests. `Aaron Spring`_ 
 
-
 xskillscore v0.0.15 (2020-03-24)
 ================================
 
