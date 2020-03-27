@@ -2,6 +2,15 @@
 Changelog History
 =================
 
+xskillscore v0.0.16 (2020-XX-XX)
+================================
+
+Internal Changes
+----------------
+
+- Add community support documents: ``HOWTOCONTRIBUTE.rst``, issue template and pull request template. `Aaron Spring`_
+- Replace pandas with cftime in examples and tests. `Aaron Spring`_ 
+
 xskillscore v0.0.15 (2020-03-24)
 ================================
 

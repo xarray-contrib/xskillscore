@@ -11,6 +11,7 @@ URL = 'https://github.com/raybellwaves/xskillscore'
 INSTALL_REQUIRES = [
     'scikit-learn',
     'xarray',
+    'cftime',
     'dask',
     'scipy',
     'properscoring',
