@@ -7,10 +7,10 @@ xskillscore v0.0.16 (2020-XX-XX)
 
 Internal Changes
 ----------------
-
 - Add community support documents: ``HOWTOCONTRIBUTE.rst``, issue template and pull request template. `Aaron Spring`_
-- Replace pandas with cftime in examples and tests. `Aaron Spring`_ 
-- Add coveralls. `Aaron Spring`_ 
+- Replace ``pandas`` with ``cftime`` in examples and tests. `Aaron Spring`_
+- Add coveralls for tests coverage. `Aaron Spring`_
+- Add ``pre-commit`` for formatting. `Aaron Spring`_
 
 xskillscore v0.0.15 (2020-03-24)
 ================================
@@ -64,7 +64,7 @@ Testing
 - Test that metric results from ``xskillscore`` are the same value as an external package (e.g. ``numpy``, ``scipy``, ``sklearn``). `Riley X. Brady`_
 - Test that ``skipna=True`` works properly with pairwise nans. `Riley X. Brady`_
 
-.. _`Riley X. Brady`: https://github.com/bradyrx
 .. _`Aaron Spring`: https://github.com/aaronspring
 .. _`Andrew Huang`: https://github.com/ahuang11
+.. _`Riley X. Brady`: https://github.com/bradyrx
 .. _`Ray Bell`: https://github.com/raybellwaves

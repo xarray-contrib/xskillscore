@@ -8,12 +8,15 @@ dependencies:
   - cftime
   - dask
   - scipy
-  - pytest
-  - flake8
-  - pip
   - numba
   - bottleneck
+  - pytest
+  - flake8
   - black
+  - doc8
+  - isort
+  - pre-commit
+  - pip
   - pip:
       - properscoring
       - asv
