@@ -2,7 +2,7 @@
 language: python
 sudo: false # use container based build
 notifications:
-    email: false
+  email: false
 
 python:
   - 3.6
@@ -18,11 +18,15 @@ before_install:
 
 install:
   - conda env create --file ci/requirements-py36.yml
-  - source activate xskillscore-dev 
+  - source activate xskillscore-dev
   - conda list
   - pip install --no-deps -e .
   - python setup.py install
 
 script:
-  - py.test xskillscore
+  - coverage run --source xskillscore -m py.test
+  - coverage report
   - ./ci/run-linter.sh
+
+after_success:
+  - coveralls
