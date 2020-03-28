@@ -7,6 +7,8 @@ xskillscore: Metrics for verifying forecasts
    :target: https://pypi.python.org/pypi/xskillscore/
 .. image:: https://anaconda.org/conda-forge/xskillscore/badges/version.svg
    :target: https://anaconda.org/conda-forge/xskillscore/
+.. image:: https://coveralls.io/repos/github/raybellwaves/xskillscore/badge.svg?branch=master
+   :target: https://coveralls.io/github/raybellwaves/xskillscore?branch=master   
 .. image:: https://img.shields.io/badge/benchmarked%20by-asv-green.svg?style=flat
    :target: https://raybellwaves.github.io/xskillscore/
 .. image:: https://img.shields.io/conda/dn/conda-forge/xskillscore.svg
