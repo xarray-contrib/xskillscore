@@ -103,6 +103,13 @@ Preparing Pull Requests
 
     $ pip install -e .
 
+#. Run `pre-commit <https://pre-commit.com>`_::
+
+     $ pre-commit run --all-files
+
+   https://pre-commit.com/ is a framework for managing and maintaining multi-language pre-commit
+   hooks to ensure code-style and code formatting is consistent.
+
 #. Break your edits up into reasonably sized commits::
 
     $ git commit -a -m "<commit message>"

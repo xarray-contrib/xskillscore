@@ -8,18 +8,19 @@ from sklearn.metrics import (
     median_absolute_error,
     r2_score,
 )
+
 from xskillscore.core.np_deterministic import (
-    _median_absolute_error,
     _mae,
     _mape,
+    _median_absolute_error,
     _mse,
     _pearson_r,
     _pearson_r_p_value,
+    _r2,
     _rmse,
     _smape,
     _spearman_r,
     _spearman_r_p_value,
-    _r2,
 )
 
 
@@ -167,7 +168,7 @@ def test_spearman_r_nd(a, b):
 
 
 def test_spearman_r_p_value_nd(a, b):
-    nan_policy = "propagate"  # default
+    nan_policy = 'propagate'  # default
     axis = 0
     expected = np.squeeze(a[0, :, :]).copy()
     for i in range(np.shape(a)[1]):

@@ -1,29 +1,31 @@
 import xarray as xr
 
 from .deterministic import (
-    median_absolute_error,
+    effective_sample_size,
     mae,
     mape,
+    median_absolute_error,
     mse,
     pearson_r,
-    pearson_r_p_value,
     pearson_r_eff_p_value,
+    pearson_r_p_value,
+    r2,
     rmse,
     smape,
     spearman_r,
-    spearman_r_p_value,
     spearman_r_eff_p_value,
-    effective_sample_size,
-    r2,
+    spearman_r_p_value,
 )
-from .probabilistic import xr_brier_score as brier_score
-from .probabilistic import xr_crps_ensemble as crps_ensemble
-from .probabilistic import xr_crps_gaussian as crps_gaussian
-from .probabilistic import xr_crps_quadrature as crps_quadrature
-from .probabilistic import xr_threshold_brier_score as threshold_brier_score
+from .probabilistic import (
+    xr_brier_score as brier_score,
+    xr_crps_ensemble as crps_ensemble,
+    xr_crps_gaussian as crps_gaussian,
+    xr_crps_quadrature as crps_quadrature,
+    xr_threshold_brier_score as threshold_brier_score,
+)
 
 
-@xr.register_dataset_accessor("xs")
+@xr.register_dataset_accessor('xs')
 class XSkillScoreAccessor(object):
     def __init__(self, xarray_obj):
         self._obj = xarray_obj
@@ -115,12 +117,12 @@ class XSkillScoreAccessor(object):
         return crps_gaussian(observations, mu, sig)
 
     def crps_ensemble(
-        self, observations, forecasts, weights=None, issorted=False, dim="member"
+        self, observations, forecasts, weights=None, issorted=False, dim='member'
     ):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
         return crps_ensemble(
-            observations, forecasts, weights=weights, issorted=issorted, dim="member"
+            observations, forecasts, weights=weights, issorted=issorted, dim='member'
         )
 
     def crps_quadrature(self, x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
@@ -129,12 +131,12 @@ class XSkillScoreAccessor(object):
         return crps_quadrature(x, cdf_or_dist, xmin=xmin, xmax=xmax, tol=1e-6)
 
     def threshold_brier_score(
-        self, observations, forecasts, threshold, issorted=False, dim="member"
+        self, observations, forecasts, threshold, issorted=False, dim='member'
     ):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
         return threshold_brier_score(
-            observations, forecasts, threshold, issorted=issorted, dim="member"
+            observations, forecasts, threshold, issorted=issorted, dim='member'
         )
 
     def brier_score(self, observations, forecasts):

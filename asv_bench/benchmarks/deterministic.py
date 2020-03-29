@@ -66,9 +66,7 @@ class Generate:
 
         # set nans for land sea mask
         self.ds = self.ds.where(
-            (abs(self.ds.lat) > 20)
-            | (self.ds.lat < 100)
-            | (self.ds.lat > 160)
+            (abs(self.ds.lat) > 20) | (self.ds.lat < 100) | (self.ds.lat > 160)
         )
 
 
@@ -126,9 +124,7 @@ class Compute_large_dask(Generate):
         self.ds.to_netcdf('large.nc')
 
     def setup(self, *args, **kwargs):
-        self.ds = xr.open_dataset(
-            'large.nc', chunks={'lon': large_lon_lat_chunksize}
-        )
+        self.ds = xr.open_dataset('large.nc', chunks={'lon': large_lon_lat_chunksize})
 
     @parameterized('metric', DETERMINISTIC_METRICS)
     def time_xskillscore_metric_large_dask(self, metric):

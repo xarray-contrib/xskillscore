@@ -3,17 +3,17 @@ import pytest
 import xarray as xr
 
 from xskillscore.core.deterministic import (
-    median_absolute_error,
     mae,
     mape,
+    median_absolute_error,
     mse,
     pearson_r,
     pearson_r_p_value,
+    r2,
     rmse,
     smape,
     spearman_r,
     spearman_r_p_value,
-    r2,
 )
 
 METRICS = [
@@ -33,11 +33,11 @@ METRICS = [
 
 @pytest.fixture
 def gridded_a():
-    times = xr.cftime_range("2000-01-01", "2000-01-03", freq="D")
+    times = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(times), len(lats), len(lons))
-    return xr.DataArray(data, coords=[times, lats, lons], dims=["time", "lat", "lon"])
+    return xr.DataArray(data, coords=[times, lats, lons], dims=['time', 'lat', 'lon'])
 
 
 @pytest.fixture
@@ -56,20 +56,20 @@ def mask_data(da):
     return da
 
 
-@pytest.mark.parametrize("metric", METRICS)
+@pytest.mark.parametrize('metric', METRICS)
 def test_single_grid_cell_matches_individual_time_series(gridded_a, gridded_b, metric):
     """Test that a single grid cell result from a gridded dataset matches the
     result for just passing through the individual time series"""
-    for x in range(gridded_a["lon"].size):
-        for y in range(gridded_a["lat"].size):
+    for x in range(gridded_a['lon'].size):
+        for y in range(gridded_a['lat'].size):
             ts_a = gridded_a.isel(lat=y, lon=x)
             ts_b = gridded_b.isel(lat=y, lon=x)
-            gridded_res = metric(gridded_a, gridded_b, "time").isel(lat=y, lon=x)
-            ts_res = metric(ts_a, ts_b, "time")
+            gridded_res = metric(gridded_a, gridded_b, 'time').isel(lat=y, lon=x)
+            ts_res = metric(ts_a, ts_b, 'time')
             assert np.allclose(gridded_res, ts_res)
 
 
-@pytest.mark.parametrize("metric", METRICS)
+@pytest.mark.parametrize('metric', METRICS)
 def test_single_grid_cell_matches_individual_time_series_nans(
     gridded_a, gridded_b, metric
 ):
@@ -77,12 +77,12 @@ def test_single_grid_cell_matches_individual_time_series_nans(
     result for just passing through the individual time series"""
     gridded_a_masked = mask_data(gridded_a)
     gridded_b_masked = mask_data(gridded_b)
-    for x in range(gridded_a_masked["lon"].size):
-        for y in range(gridded_a_masked["lat"].size):
+    for x in range(gridded_a_masked['lon'].size):
+        for y in range(gridded_a_masked['lat'].size):
             ts_a_masked = gridded_a_masked.isel(lat=y, lon=x)
             ts_b_masked = gridded_b_masked.isel(lat=y, lon=x)
             gridded_res = metric(
-                gridded_a_masked, gridded_b_masked, "time", skipna=True
+                gridded_a_masked, gridded_b_masked, 'time', skipna=True
             ).isel(lat=y, lon=x)
-            ts_res = metric(ts_a_masked, ts_b_masked, "time", skipna=True)
+            ts_res = metric(ts_a_masked, ts_b_masked, 'time', skipna=True)
             assert np.allclose(gridded_res, ts_res, equal_nan=True)
