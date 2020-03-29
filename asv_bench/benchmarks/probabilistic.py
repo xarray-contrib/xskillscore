@@ -84,14 +84,10 @@ class Generate:
 
         # set nans for land sea mask
         self.fct = self.fct.where(
-            (abs(self.fct.lat) > 20)
-            | (self.fct.lat < 100)
-            | (self.fct.lat > 160)
+            (abs(self.fct.lat) > 20) | (self.fct.lat < 100) | (self.fct.lat > 160)
         )
         self.obs = self.obs.where(
-            (abs(self.obs.lat) > 20)
-            | (self.obs.lat < 100)
-            | (self.obs.lat > 160)
+            (abs(self.obs.lat) > 20) | (self.obs.lat < 100) | (self.obs.lat > 160)
         )
 
 
@@ -122,9 +118,7 @@ class Compute_small(Generate):
             threshold = 0.5
             metric(self.obs['tos'], self.fct['tos'], threshold)
         elif metric is brier_score:
-            metric(
-                self.obs['tos'] > 0.5, (self.fct['tos'] > 0.5).mean('member')
-            )
+            metric(self.obs['tos'] > 0.5, (self.fct['tos'] > 0.5).mean('member'))
 
     @parameterized('metric', PROBABILISTIC_METRICS)
     def peakmem_xskillscore_probabilistic_small(self, metric):
@@ -146,9 +140,7 @@ class Compute_small(Generate):
             threshold = 0.5
             metric(self.obs['tos'], self.fct['tos'], threshold)
         elif metric is brier_score:
-            metric(
-                self.obs['tos'] > 0.5, (self.fct['tos'] > 0.5).mean('member')
-            )
+            metric(self.obs['tos'] > 0.5, (self.fct['tos'] > 0.5).mean('member'))
 
 
 class Compute_large(Generate):
@@ -178,9 +170,7 @@ class Compute_large(Generate):
             threshold = 0.5
             metric(self.obs['tos'], self.fct['tos'], threshold)
         elif metric is brier_score:
-            metric(
-                self.obs['tos'] > 0.5, (self.fct['tos'] > 0.5).mean('member')
-            )
+            metric(self.obs['tos'] > 0.5, (self.fct['tos'] > 0.5).mean('member'))
 
     @parameterized('metric', PROBABILISTIC_METRICS)
     def peakmem_xskillscore_probabilistic_large(self, metric):
@@ -202,9 +192,7 @@ class Compute_large(Generate):
             threshold = 0.5
             metric(self.obs['tos'], self.fct['tos'], threshold)
         elif metric is brier_score:
-            metric(
-                self.obs['tos'] > 0.5, (self.fct['tos'] > 0.5).mean('member')
-            )
+            metric(self.obs['tos'] > 0.5, (self.fct['tos'] > 0.5).mean('member'))
 
 
 class Compute_large_dask(Generate):
@@ -234,9 +222,7 @@ class Compute_large_dask(Generate):
             else:
                 xmin, xmax, tol = -10, 10, 1e-6
                 cdf_or_dist = norm
-                metric(
-                    self.obs['tos'], cdf_or_dist, xmin, xmax, tol
-                ).compute()
+                metric(self.obs['tos'], cdf_or_dist, xmin, xmax, tol).compute()
         elif metric is crps_ensemble:
             metric(self.obs['tos'], self.fct['tos']).compute()
         elif metric is threshold_brier_score:
@@ -260,9 +246,7 @@ class Compute_large_dask(Generate):
             else:
                 xmin, xmax, tol = -10, 10, 1e-6
                 cdf_or_dist = norm
-                metric(
-                    self.obs['tos'], cdf_or_dist, xmin, xmax, tol
-                ).compute()
+                metric(self.obs['tos'], cdf_or_dist, xmin, xmax, tol).compute()
         elif metric is crps_ensemble:
             metric(self.obs['tos'], self.fct['tos']).compute()
         elif metric is threshold_brier_score:

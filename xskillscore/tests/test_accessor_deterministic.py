@@ -1,25 +1,24 @@
-import pytest
 import numpy as np
+import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
 
 from xskillscore.core.deterministic import (
-    median_absolute_error,
+    effective_sample_size,
     mae,
     mape,
+    median_absolute_error,
     mse,
     pearson_r,
-    pearson_r_p_value,
     pearson_r_eff_p_value,
+    pearson_r_p_value,
+    r2,
     rmse,
     smape,
     spearman_r,
-    spearman_r_p_value,
     spearman_r_eff_p_value,
-    effective_sample_size,
-    r2,
+    spearman_r_p_value,
 )
-
 
 correlation_metrics = [
     pearson_r,
@@ -47,16 +46,16 @@ distance_metrics = [
     smape,
 ]
 
-AXES = ("time", "lat", "lon", ["lat", "lon"], ["time", "lat", "lon"])
+AXES = ('time', 'lat', 'lon', ['lat', 'lon'], ['time', 'lat', 'lon'])
 
 
 @pytest.fixture
 def a():
-    times = xr.cftime_range("2000-01-01", "2000-01-03", freq="D")
+    times = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(times), len(lats), len(lons))
-    return xr.DataArray(data, coords=[times, lats, lons], dims=["time", "lat", "lon"])
+    return xr.DataArray(data, coords=[times, lats, lons], dims=['time', 'lat', 'lon'])
 
 
 @pytest.fixture
@@ -80,13 +79,13 @@ def weights(a):
 
 def _ds(a, b, skipna_bool, dask_bool):
     ds = xr.Dataset()
-    ds["a"] = a
-    ds["b"] = b
+    ds['a'] = a
+    ds['b'] = b
     if skipna_bool is True:
-        ds["b"] = b.where(b < 0.5)
+        ds['b'] = b.where(b < 0.5)
     if dask_bool is True:
-        ds["a"] = a.chunk()
-        ds["b"] = b.chunk()
+        ds['a'] = a.chunk()
+        ds['b'] = b.chunk()
     return ds
 
 
@@ -103,39 +102,39 @@ def adjust_weights(dim, weight_bool, weights):
         return None
 
 
-@pytest.mark.parametrize("outer_bool", [False, True])
-@pytest.mark.parametrize("metric", correlation_metrics + distance_metrics)
-@pytest.mark.parametrize("dim", AXES)
-@pytest.mark.parametrize("weight_bool", [False, True])
-@pytest.mark.parametrize("dask_bool", [False, True])
-@pytest.mark.parametrize("skipna_bool", [False, True])
+@pytest.mark.parametrize('outer_bool', [False, True])
+@pytest.mark.parametrize('metric', correlation_metrics + distance_metrics)
+@pytest.mark.parametrize('dim', AXES)
+@pytest.mark.parametrize('weight_bool', [False, True])
+@pytest.mark.parametrize('dask_bool', [False, True])
+@pytest.mark.parametrize('skipna_bool', [False, True])
 def test_deterministic_metrics_accessor(
     a, b, dim, skipna_bool, dask_bool, weight_bool, weights, metric, outer_bool
 ):
 
     # Update dim to time if testing temporal only metrics
-    if (dim != "time") and (metric in temporal_only_metrics):
-        dim = "time"
+    if (dim != 'time') and (metric in temporal_only_metrics):
+        dim = 'time'
 
     _weights = adjust_weights(dim, weight_bool, weights)
     ds = _ds(a, b, skipna_bool, dask_bool)
-    b = ds["b"]  # Update if populated with nans
+    b = ds['b']  # Update if populated with nans
     if outer_bool:
-        ds = ds.drop_vars("b")
+        ds = ds.drop_vars('b')
 
     accessor_func = getattr(ds.xs, metric.__name__)
     if metric in temporal_only_metrics or metric == median_absolute_error:
         actual = metric(a, b, dim, skipna=skipna_bool)
         if outer_bool:
-            expected = accessor_func("a", b, dim, skipna=skipna_bool)
+            expected = accessor_func('a', b, dim, skipna=skipna_bool)
         else:
-            expected = accessor_func("a", "b", dim, skipna=skipna_bool)
+            expected = accessor_func('a', 'b', dim, skipna=skipna_bool)
     else:
         actual = metric(a, b, dim, weights=_weights, skipna=skipna_bool)
         if outer_bool:
-            expected = accessor_func("a", b, dim, weights=_weights, skipna=skipna_bool)
+            expected = accessor_func('a', b, dim, weights=_weights, skipna=skipna_bool)
         else:
             expected = accessor_func(
-                "a", "b", dim, weights=_weights, skipna=skipna_bool
+                'a', 'b', dim, weights=_weights, skipna=skipna_bool
             )
     assert_allclose(actual, expected)

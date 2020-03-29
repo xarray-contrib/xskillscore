@@ -16,7 +16,7 @@ INSTALL_REQUIRES = [
     'scipy',
     'properscoring',
     'numba',
-    'bottleneck'
+    'bottleneck',
 ]
 TESTS_REQUIRE = ['pytest']
 PYTHON_REQUIRE = '>=3.6'

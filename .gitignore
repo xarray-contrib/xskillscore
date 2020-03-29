@@ -7,5 +7,7 @@ build
 
 .ipynb_checkpoints/
 
+.vscode
+
 # asv environments
 .asv

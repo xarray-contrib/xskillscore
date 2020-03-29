@@ -105,7 +105,7 @@ Preparing Pull Requests
 
 #. Run `pre-commit <https://pre-commit.com>`_::
 
-     $ pre-commit
+     $ pre-commit run --all-files
 
    https://pre-commit.com/ is a framework for managing and maintaining multi-language pre-commit
    hooks to ensure code-style and code formatting is consistent.
