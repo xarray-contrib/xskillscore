@@ -10,7 +10,7 @@ Internal Changes
 - Add community support documents: ``HOWTOCONTRIBUTE.rst``, issue template and pull request template. `Aaron Spring`_ and `Ray Bell`_
 - Replace ``pandas`` with ``cftime`` in examples and tests. `Aaron Spring`_ and `Ray Bell`_
 - Add coveralls for tests coverage. `Aaron Spring`_ and `Ray Bell`_
-- Add ``pre-commit`` for formatting. `Aaron Spring`_ and `Ray Bell`_
+- Add ``isort``, ``doc8`` and ``pre-commit`` for formatting. `Aaron Spring`_ and `Ray Bell`_
 
 xskillscore v0.0.15 (2020-03-24)
 ================================
