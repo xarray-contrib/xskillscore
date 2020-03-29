@@ -25,7 +25,7 @@ repos:
           [
             "--max-line-length=88",
             "--exclude=__init__.py",
-            "--ignore=E203,E266,E501,W503,F401,W605,E402,C901",
+            "--ignore=C901,E203,E266,E402,E501,E711,F401,W503,W605",
           ]
 
   - repo: https://github.com/pre-commit/mirrors-isort
