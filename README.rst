@@ -16,8 +16,8 @@ xskillscore: Metrics for verifying forecasts
 
 
 **xskillscore** is an open source project and Python package that provides verification
- metrics of deterministic (and probabilistic from `properscoring`) forecasts with `xarray`.
- 
+metrics of deterministic (and probabilistic from `properscoring`) forecasts with `xarray`.
+
 Installing
 ----------
 
