@@ -34,9 +34,9 @@ or
 See also
 --------
 
-- If you are interested in using ``xskillscore`` for data science where you data is mostly in
+- If you are interested in using **xskillscore** for data science where you data is mostly in
   ``pandas.DataFrames``'s check out the `xskillscore-tutorial <https://github.com/raybellwaves/xskillscore-tutorial>`_
-- If you are interested in using ``xskillscore`` for climate prediction check out
+- If you are interested in using **xskillscore** for climate prediction check out
   `climpred <https://climpred.readthedocs.io/en/stable/>`_.
 
 Examples
