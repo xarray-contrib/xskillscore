@@ -16,7 +16,7 @@ xskillscore: Metrics for verifying forecasts
 
 
 **xskillscore** is an open source project and Python package that provides verification
- metrics of deterministic (and probabilistic from `properscoring`) forecasts with `xarray`.
+metrics of deterministic (and probabilistic from `properscoring`) forecasts with `xarray`.
 
 Installing
 ----------
@@ -30,6 +30,14 @@ or
 or
 
 ``$ pip install git+https://github.com/raybellwaves/xskillscore``
+
+See also
+--------
+
+- If you are interested in using ``xskillscore`` for data science where you data is mostly in
+  ``pandas.DataFrames``'s check out the `xskillscore-tutorial <https://github.com/raybellwaves/xskillscore-tutorial>`_
+- If you are interested in using ``xskillscore`` for climate prediction check out
+  `climpred <https://climpred.readthedocs.io/en/stable/>`_.
 
 Examples
 --------
@@ -174,7 +182,7 @@ Examples
    )
 
    # Continuous Ranked Probability Score with the ensemble distribution
-   crps_ensemble = xs.crps_ensemble(obs3, fct3, dim='member')
+   crps_ensemble = xs.crps_ensemble(obs3, fct3)
 
    # Continuous Ranked Probability Score with a Gaussian distribution
    crps_gaussian = xs.crps_gaussian(obs3, fct3.mean("member"), fct3.std("member"))
@@ -203,14 +211,19 @@ Examples
    ds = ds.drop("fct_var")
    r = ds.xs.pearson_r("obs_var", fct, "time")
 
-What projects leverage xskillscore?
------------------------------------
+What other projects leverage xskillscore?
+-----------------------------------------
 
-- `climpred <https://climpred.readthedocs.io>`_: An xarray wrapper for analysis of ensemble forecast models for climate prediction.
 - `esmlab <https://esmlab.readthedocs.io>`_: Tools for working with earth system multi-model analyses with xarray.
-- A `Google Colab notebook <https://colab.research.google.com/drive/1wWHz_SMCHNuos5fxWRUJTcB6wqkTJQCR>`_ by `Matteo De Felice <https://github.com/matteodefelice>`_.
+- A `Google Colab notebook <https://colab.research.google.com/drive/1wWHz_SMCHNuos5fxWRUJTcB6wqkTJQCR>`_
+  by `Matteo De Felice <https://github.com/matteodefelice>`_.
 
 History
 -------
 
-**xskillscore** was orginally developed to parallelize forecast metrics of the multi-model-multi-ensemble forecasts associated with the `SubX <https://journals.ametsoc.org/doi/pdf/10.1175/BAMS-D-18-0270.1>`_ project. We are indebted to the **xarray** community for their `advice <https://groups.google.com/forum/#!searchin/xarray/xskillscore%7Csort:date/xarray/z8ue0G-BLc8/Cau-dY_ACAAJ>`_ in getting this package started.
+**xskillscore** was orginally developed to parallelize forecast metrics of the multi-model-multi-ensemble
+forecasts associated with the `SubX <https://journals.ametsoc.org/doi/pdf/10.1175/BAMS-D-18-0270.1>`_ project.
+
+We are indebted to the **xarray** community for their
+`advice <https://groups.google.com/forum/#!searchin/xarray/xskillscore%7Csort:date/xarray/z8ue0G-BLc8/Cau-dY_ACAAJ>`_
+in getting this package started.
