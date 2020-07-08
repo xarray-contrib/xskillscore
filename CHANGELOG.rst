@@ -14,6 +14,12 @@ Internal Changes
 - Add ``black``, ``flake8``, ``isort``, ``doc8`` and ``pre-commit`` for formatting
   similar to ``climpred``. `Aaron Spring`_ and `Ray Bell`_
 
+Bug Fixes
+---------
+- Avoid mutating inputted arrays when `skipna=True`. (:pr:`111`) `Riley X. Brady`_.
+- Avoid read-only error that appeared due to not copying input arrays when dealing
+  with NaNs. (:pr:`111`) `Riley X. Brady`_.
+
 
 xskillscore v0.0.15 (2020-03-24)
 ================================
