@@ -8,6 +8,7 @@ dependencies:
   - cftime
   - dask
   - scipy
+  - xhistogram
   - numba
   - bottleneck
   - pytest

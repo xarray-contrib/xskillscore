@@ -198,6 +198,60 @@ Examples
    # Brier score
    brier_score = xs.brier_score(obs3 > 0.5, (fct3 > 0.5).mean("member"))
 
+   ### Contingency-based
+   dichotomous_category_edges = np.array([0, 0.5, 1]) # "dichotomous" mean two-category
+   dichotomous_contingency = xs.Contingency(obs, fct,
+                                            dichotomous_category_edges, 
+                                            dichotomous_category_edges,
+                                            dim=['lat','lon'])
+
+   # Contingency table
+   dichotomous_contingency_table = dichotomous_contingency.table
+
+   # Bias score
+   bias_score = dichotomous_contingency.bias_score()
+
+   # Hit rate
+   hit_rate = dichotomous_contingency.hit_rate()
+
+   # False alarm ratio
+   false_alarm_ratio = dichotomous_contingency.false_alarm_ratio()
+
+   # False alarm rate
+   false_alarm_rate = dichotomous_contingency.false_alarm_rate()
+
+   # Success ratio
+   success_ratio = dichotomous_contingency.success_ratio()
+
+   # Threat score
+   threat_score = dichotomous_contingency.threat_score()
+
+   # Equitable threat score
+   equit_threat_score = dichotomous_contingency.equit_threat_score()
+
+   # Odds ratio
+   odds_ratio = dichotomous_contingency.odds_ratio()
+
+   # Odds ratio skill score
+   odds_ratio_skill_score = dichotomous_contingency.odds_ratio_skill_score()
+
+   multi_category_edges = np.array([0, 0.25, 0.75, 1])
+   multicategory_contingency = xs.Contingency(obs, fct,
+                                              multi_category_edges, 
+                                              multi_category_edges,
+                                              dim=['lat','lon'])
+
+   # Accuracy
+   accuracy = multicategory_contingency.accuracy()
+
+   # Heidke score
+   heidke_score = multicategory_contingency.heidke_score()
+
+   # Peirce score
+   peirce_score = multicategory_contingency.peirce_score()
+
+   # Gerrity score
+   gerrity_score = multicategory_contingency.gerrity_score()
 
    # You can also use xskillscore as a method of your dataset:
    ds = xr.Dataset()
