@@ -4,7 +4,14 @@ from xhistogram.xarray import histogram as xhist
 __all__ = [
     'histogram'
     'contingency_table',
-    'hit_rate'
+    'bias_score',
+    'hit_rate',
+    'false_alarm_ratio',
+    'false_alarm_rate',
+    'success_ratio',
+    'threat_score',
+    'odds_ratio',
+    'odds_ratio_skill_score'
 ]
 
 def histogram(*args, bins=None, bin_names=None, **kwargs):
@@ -22,7 +29,7 @@ def histogram(*args, bins=None, bin_names=None, **kwargs):
                                    bins=bins, **kwargs).rename(var)
                              for var in overlapping_vars])
         else:
-            raise ValueError('No common variables exist between DataSets a and b')
+            raise ValueError('No common variables exist between Datasets a and b')
     else:
         return xhist(*args, bins=bins, **kwargs)
 
@@ -101,6 +108,62 @@ def contingency_table(a, b, a_category_edges, b_category_edges, dim,
     return contingency
 
 
+def bias_score(contingency, forecast_category_name, reference_category_name, yes_category=2):
+    """ 
+        Returns the bias score given dichotomous contingency data 
+        
+        Parameters
+        ----------
+        contingency : xarray.Dataset or xarray.DataArray
+            A 2 category contingency table of the form output from doppyo.skill.contingency_table
+        yes_category : value, optional
+            The coordinate value of the category corresponding to 'yes'
+            
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the bias scores
+            
+        Examples
+        --------
+        >>> a = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> b = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> a['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> b['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> category_edges_a = np.linspace(-2,2,3)
+        >>> category_edges_b = np.linspace(-2,2,3)
+        >>> contingency = contingency_table(a, b, category_edges_a, category_edges_b, dim=['x','y'])
+        >>> hit_rate(contingency, forecast_category_name='a_category', reference_category_name='b_category')
+        <xarray.Dataset>
+        Dimensions:  ()
+        Data variables:
+            test2    float64 3.0
+            test1    float64 0.6667
+        
+        Notes
+        -----
+        See http://www.cawcr.gov.au/projects/verification/
+    """
+    
+    no_category = abs(yes_category - 2) + 1
+    
+    if len(contingency[forecast_category_name]) > 2:
+        raise ValueError('Bias score is defined for dichotomous contingency data only')
+    
+    hits = contingency.sel({forecast_category_name: yes_category, 
+                            reference_category_name: yes_category}, drop=True)
+    false_alarms = contingency.sel({forecast_category_name: yes_category, 
+                                    reference_category_name: no_category}, drop=True)
+    misses = contingency.sel({forecast_category_name: no_category, 
+                              reference_category_name: yes_category}, drop=True)
+
+    return (hits + false_alarms) / (hits + misses)
+
+
 def hit_rate(contingency, forecast_category_name, reference_category_name, yes_category=2):
     """ 
         Returns the hit rate (probability of detection) given dichotomous contingency data 
@@ -153,3 +216,338 @@ def hit_rate(contingency, forecast_category_name, reference_category_name, yes_c
                               reference_category_name: yes_category}, drop=True)
     
     return hits / (hits + misses)
+
+
+def false_alarm_ratio(contingency, forecast_category_name, reference_category_name, yes_category=2):
+    """ 
+        Returns the false alarm ratio given dichotomous contingency data 
+        
+        Parameters
+        ----------
+        contingency : xarray.Dataset or xarray.DataArray
+            A 2 category contingency table of the form output from doppyo.skill.contingency_table
+        yes_category : value, optional
+            The coordinate value of the category corresponding to 'yes'
+            
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the false alarm ratios
+            
+        Examples
+        --------
+        >>> a = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> b = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> a['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> b['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> category_edges_a = np.linspace(-2,2,3)
+        >>> category_edges_b = np.linspace(-2,2,3)
+        >>> contingency = contingency_table(a, b, category_edges_a, category_edges_b, dim=['x','y'])
+        >>> hit_rate(contingency, forecast_category_name='a_category', reference_category_name='b_category')
+        <xarray.Dataset>
+        Dimensions:  ()
+        Data variables:
+            test2    float64 0.1667
+            test1    float64 0.5
+          
+        Notes
+        -----
+        See http://www.cawcr.gov.au/projects/verification/
+    """
+    
+    no_category = abs(yes_category - 2) + 1
+    
+    if len(contingency[forecast_category_name]) > 2:
+        raise ValueError('False alarm ratio is defined for dichotomous contingency data only')
+    
+    hits = contingency.sel({forecast_category_name: yes_category, 
+                            reference_category_name: yes_category}, drop=True)
+    false_alarms = contingency.sel({forecast_category_name: yes_category, 
+                                    reference_category_name: no_category}, drop=True)
+
+    return false_alarms / (hits + false_alarms)
+
+
+def false_alarm_rate(contingency, forecast_category_name, reference_category_name, yes_category=2):
+    """ 
+        Returns the false alarm rate given dichotomous contingency data 
+        
+        Parameters
+        ----------
+        contingency : xarray.Dataset or xarray.DataArray
+            A 2 category contingency table of the form output from doppyo.skill.contingency_table
+        yes_category : value, optional
+            The coordinate value of the category corresponding to 'yes'
+            
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the false alarm rates
+            
+        Examples
+        --------
+        >>> a = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> b = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> a['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> b['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> category_edges_a = np.linspace(-2,2,3)
+        >>> category_edges_b = np.linspace(-2,2,3)
+        >>> contingency = contingency_table(a, b, category_edges_a, category_edges_b, dim=['x','y'])
+        >>> hit_rate(contingency, forecast_category_name='a_category', reference_category_name='b_category')
+        <xarray.Dataset>
+        Dimensions:  ()
+        Data variables:
+            test2    float64 0.5
+            test1    float64 0.75
+          
+        Notes
+        -----
+        See http://www.cawcr.gov.au/projects/verification/
+    """
+    
+    no_category = abs(yes_category - 2) + 1
+    
+    if len(contingency[forecast_category_name]) > 2:
+        raise ValueError('False alarm rate is defined for dichotomous contingency data only')
+        
+    false_alarms = contingency.sel({forecast_category_name: yes_category, 
+                                    reference_category_name: no_category}, drop=True)
+    correct_negs = contingency.sel({forecast_category_name: no_category, 
+                                    reference_category_name: no_category}, drop=True)
+
+    return false_alarms / (correct_negs + false_alarms)
+
+
+def success_ratio(contingency, forecast_category_name, reference_category_name, yes_category=2):
+    """ 
+        Returns the success ratio given dichotomous contingency data 
+        
+        Parameters
+        ----------
+        contingency : xarray.Dataset or xarray.DataArray
+            A 2 category contingency table of the form output from doppyo.skill.contingency_table
+        success_ratio : value, optional
+            The coordinate value of the category corresponding to 'yes'
+            
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the success ratios
+            
+        Examples
+        --------
+        >>> a = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> b = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> a['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> b['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> category_edges_a = np.linspace(-2,2,3)
+        >>> category_edges_b = np.linspace(-2,2,3)
+        >>> contingency = contingency_table(a, b, category_edges_a, category_edges_b, dim=['x','y'])
+        >>> hit_rate(contingency, forecast_category_name='a_category', reference_category_name='b_category')
+        <xarray.Dataset>
+        Dimensions:  ()
+        Data variables:
+            test2    float64 0.0
+            test1    float64 0.4
+          
+        Notes
+        -----
+        See http://www.cawcr.gov.au/projects/verification/
+    """
+    
+    no_category = abs(yes_category - 2) + 1
+    
+    if len(contingency[forecast_category_name]) > 2:
+        raise ValueError('Success ratio is defined for dichotomous contingency data only')
+        
+    hits = contingency.sel({forecast_category_name: yes_category, 
+                            reference_category_name: yes_category}, drop=True)
+    false_alarms = contingency.sel({forecast_category_name: yes_category, 
+                                    reference_category_name: no_category}, drop=True)
+    
+    return hits / (hits + false_alarms)
+
+
+def threat_score(contingency, forecast_category_name, reference_category_name, yes_category=2):
+    """ 
+        Returns the threat score given dichotomous contingency data 
+        
+        Parameters
+        ----------
+        contingency : xarray.Dataset or xarray.DataArray
+            A 2 category contingency table of the form output from doppyo.skill.contingency_table
+        success_ratio : value, optional
+            The coordinate value of the category corresponding to 'yes'
+            
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the threat scores
+            
+        Examples
+        --------
+        >>> a = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> b = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> a['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> b['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> category_edges_a = np.linspace(-2,2,3)
+        >>> category_edges_b = np.linspace(-2,2,3)
+        >>> contingency = contingency_table(a, b, category_edges_a, category_edges_b, dim=['x','y'])
+        >>> hit_rate(contingency, forecast_category_name='a_category', reference_category_name='b_category')
+        <xarray.Dataset>
+        Dimensions:  ()
+        Data variables:
+            test2    float64 0.1429
+            test1    float64 0.2
+          
+        Notes
+        -----
+        See http://www.cawcr.gov.au/projects/verification/
+    """
+    
+    no_category = abs(yes_category - 2) + 1
+    
+    if len(contingency[forecast_category_name]) > 2:
+        raise ValueError('Threat score is defined for dichotomous contingency data only')
+        
+    hits = contingency.sel({forecast_category_name: yes_category, 
+                           reference_category_name: yes_category}, drop=True)
+    misses = contingency.sel({forecast_category_name: no_category, 
+                             reference_category_name: yes_category}, drop=True)
+    false_alarms = contingency.sel({forecast_category_name: yes_category, 
+                                   reference_category_name: no_category}, drop=True)
+    
+    return hits / (hits + misses + false_alarms)
+
+
+def odds_ratio(contingency, forecast_category_name, reference_category_name, yes_category=2):
+    """ 
+        Returns the odds ratio given dichotomous contingency data 
+        
+        Parameters
+        ----------
+        contingency : xarray.Dataset or xarray.DataArray
+            A 2 category contingency table of the form output from doppyo.skill.contingency_table
+        success_ratio : value, optional
+            The coordinate value of the category corresponding to 'yes'
+            
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the equitable odds ratios
+            
+        Examples
+        --------
+        >>> a = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> b = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> a['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> b['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> category_edges_a = np.linspace(-2,2,3)
+        >>> category_edges_b = np.linspace(-2,2,3)
+        >>> contingency = contingency_table(a, b, category_edges_a, category_edges_b, dim=['x','y'])
+        >>> hit_rate(contingency, forecast_category_name='a_category', reference_category_name='b_category')
+        <xarray.Dataset>
+        Dimensions:  ()
+        Data variables:
+            test2    float64 0.3333
+            test1    float64 0.1
+          
+        Notes
+        -----
+        See http://www.cawcr.gov.au/projects/verification/
+    """
+
+    no_category = abs(yes_category - 2) + 1
+    
+    if len(contingency[forecast_category_name]) > 2:
+        raise ValueError('Odds ratio is defined for dichotomous contingency data only')
+        
+    hits = contingency.sel({forecast_category_name: yes_category, 
+                           reference_category_name: yes_category}, drop=True)
+    correct_negs = contingency.sel({forecast_category_name: no_category, 
+                                   reference_category_name:no_category}, drop=True)
+    misses = contingency.sel({forecast_category_name: no_category, 
+                             reference_category_name: yes_category}, drop=True)
+    false_alarms = contingency.sel({forecast_category_name: yes_category, 
+                                   reference_category_name: no_category}, drop=True)
+    
+    return (hits * correct_negs) / (misses * false_alarms)
+
+
+def odds_ratio_skill_score(contingency, forecast_category_name, reference_category_name, yes_category=2):
+    """ 
+        Returns the odds ratio skill score given dichotomous contingency data 
+        
+        Parameters
+        ----------
+        contingency : xarray.Dataset or xarray.DataArray
+            A 2 category contingency table of the form output from doppyo.skill.contingency_table
+        success_ratio : value, optional
+            The coordinate value of the category corresponding to 'yes'
+            
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the equitable odds ratio skill scores
+            
+        Examples
+        --------
+        >>> a = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> b = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                  coords=[('x', np.arange(3)), ('y', np.arange(3))]).to_dataset(name='test1')
+        >>> a['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> b['test2'] = xr.DataArray(np.random.normal(size=(3,3)), 
+        ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
+        >>> category_edges_a = np.linspace(-2,2,3)
+        >>> category_edges_b = np.linspace(-2,2,3)
+        >>> contingency = contingency_table(a, b, category_edges_a, category_edges_b, dim=['x','y'])
+        >>> hit_rate(contingency, forecast_category_name='a_category', reference_category_name='b_category')
+        <xarray.Dataset>
+        Dimensions:  ()
+        Data variables:
+            test2    float64 1.0
+            test1    float64 -0.6
+
+        Notes
+        -----
+        See http://www.cawcr.gov.au/projects/verification/
+    """
+    
+    no_category = abs(yes_category - 2) + 1
+    
+    if len(contingency[forecast_category_name]) > 2:
+        raise ValueError('Odd ratio skill score is defined for dichotomous contingency data only')
+        
+    hits = contingency.sel({forecast_category_name: yes_category, 
+                           reference_category_name: yes_category}, drop=True)
+    correct_negs = contingency.sel({forecast_category_name: no_category, 
+                                   reference_category_name: no_category}, drop=True)
+    misses = contingency.sel({forecast_category_name: no_category, 
+                             reference_category_name: yes_category}, drop=True)
+    false_alarms = contingency.sel({forecast_category_name: yes_category, 
+                                   reference_category_name: no_category}, drop=True)
+    
+    return (hits * correct_negs - misses * false_alarms) / \
+           (hits * correct_negs + misses * false_alarms)
