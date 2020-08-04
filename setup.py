@@ -17,6 +17,7 @@ INSTALL_REQUIRES = [
     'properscoring',
     'numba',
     'bottleneck',
+    'xhistogram'
 ]
 TESTS_REQUIRE = ['pytest']
 PYTHON_REQUIRE = '>=3.6'

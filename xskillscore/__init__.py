@@ -23,3 +23,4 @@ from .core.probabilistic import (
     xr_crps_quadrature as crps_quadrature,
     xr_threshold_brier_score as threshold_brier_score,
 )
+from .core.contingency import Contingency
