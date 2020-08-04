@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 import xarray as xr
-
 from xskillscore import Contingency
 
 
@@ -23,12 +22,11 @@ def b(a):
 
 @pytest.fixture
 def category_edges_a():
-    return np.linspace(-2, 2, 5)
-
+    return np.linspace(-2,2,5)
 
 @pytest.fixture
 def category_edges_b():
-    return np.linspace(-3, 3, 5)
+    return np.linspace(-3,3,5)
 
 
 @pytest.fixture
@@ -40,10 +38,9 @@ def a_dask(a):
 def b_dask(b):
     return b.chunk()
 
-
-DIMS = [['time'], ['lon'], ['lat'], 'time', ['time', 'lon', 'lat']]
-
-
+DIMS = [['time'],['lon'],['lat'],'time',['time','lon','lat']]
 @pytest.mark.parametrize('dim', DIMS)
-def test_Contingency(a, b, category_edges_a, category_edges_b, dim):
-    Contingency(a, b, category_edges_a, category_edges_b, dim=dim)
+def test_Contingency(a,b,category_edges_a,category_edges_b, dim):
+    cont_table = Contingency(a,b,category_edges_a,category_edges_b, dim=dim)
+    assert cont_table
+    # test against sklearn.metrics.confusion_matrix

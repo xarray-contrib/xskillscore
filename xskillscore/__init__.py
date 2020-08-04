@@ -1,5 +1,6 @@
 # flake8: noqa
 from .core.accessor import XSkillScoreAccessor
+from .core.contingency import Contingency
 from .core.deterministic import (
     effective_sample_size,
     mae,
@@ -23,4 +24,3 @@ from .core.probabilistic import (
     xr_crps_quadrature as crps_quadrature,
     xr_threshold_brier_score as threshold_brier_score,
 )
-from .core.contingency import Contingency
