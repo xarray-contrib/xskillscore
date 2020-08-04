@@ -101,7 +101,7 @@ Preparing Pull Requests
 
 #. Make an editable install of xskillscore by running::
 
-    $ pip install -e .
+    $ pip install --no-deps -e .
 
 #. Run `pre-commit <https://pre-commit.com>`_::
 
