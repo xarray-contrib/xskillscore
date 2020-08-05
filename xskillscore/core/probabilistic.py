@@ -90,7 +90,7 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
 
 
 def xr_crps_ensemble(
-    observations, forecasts, weights=None, issorted=False, dim='member'
+    observations, forecasts, weights=None, issorted=False, member_dim='member', dim=None
 ):
     """
     xarray version of properscoring.crps_ensemble: Continuous Ranked
@@ -119,18 +119,22 @@ def xr_crps_ensemble(
     properscoring.crps_ensemble
     xarray.apply_ufunc
     """
-    return xr.apply_ufunc(
+    res = xr.apply_ufunc(
         crps_ensemble,
         observations,
         forecasts,
-        input_core_dims=[[], [dim]],
+        input_core_dims=[[], [member_dim]],
         kwargs={'axis': -1, 'issorted': issorted, 'weights': weights},
         dask='parallelized',
         output_dtypes=[float],
     )
+    if dim is None:
+        return res
+    else:
+        return res.mean(dim)
 
 
-def xr_brier_score(observations, forecasts):
+def xr_brier_score(observations, forecasts, dim=None):
     """
     xarray version of properscoring.brier_score: Calculate Brier score (BS).
     ..math:
@@ -155,7 +159,7 @@ def xr_brier_score(observations, forecasts):
     properscoring.brier_score
     xarray.apply_ufunc
     """
-    return xr.apply_ufunc(
+    res = xr.apply_ufunc(
         brier_score,
         observations,
         forecasts,
@@ -163,10 +167,14 @@ def xr_brier_score(observations, forecasts):
         dask='parallelized',
         output_dtypes=[float],
     )
+    if dim is None:
+        return res
+    else:
+        return res.mean(dim)
 
 
 def xr_threshold_brier_score(
-    observations, forecasts, threshold, issorted=False, dim='member'
+    observations, forecasts, threshold, issorted=False, member_dim='member', dim=None,
 ):
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
@@ -210,10 +218,10 @@ def xr_threshold_brier_score(
             raise ValueError(
                 'please provide threshold with threshold dim, found', threshold.dims,
             )
-        input_core_dims = [[], [dim], ['threshold']]
+        input_core_dims = [[], [member_dim], ['threshold']]
         output_core_dims = [['threshold']]
     elif isinstance(threshold, (int, float)):
-        input_core_dims = [[], [dim], []]
+        input_core_dims = [[], [member_dim], []]
         output_core_dims = [[]]
     else:
         raise ValueError(
@@ -221,7 +229,7 @@ def xr_threshold_brier_score(
             or xr.object with threshold dimension; found',
             type(threshold),
         )
-    return xr.apply_ufunc(
+    res = xr.apply_ufunc(
         threshold_brier_score,
         observations,
         forecasts,
@@ -232,3 +240,7 @@ def xr_threshold_brier_score(
         dask='parallelized',
         output_dtypes=[float],
     )
+    if dim is None:
+        return res
+    else:
+        return res.mean(dim)

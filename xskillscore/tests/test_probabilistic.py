@@ -51,6 +51,13 @@ def test_xr_crps_ensemble_dask(o_dask, f_dask):
     assert expected.chunks is None
 
 
+@pytest.mark.parametrize('dim', ['lon', 'lat', ['lon', 'lat']])
+def test_xr_crps_ensemble_dim(o_dask, f_dask, dim):
+    actual = xr_crps_ensemble(o_dask, f_dask, dim=dim)
+    for d in dim:
+        assert d not in actual.dims
+
+
 def test_xr_crps_gaussian_dask(o_dask, f_dask):
     mu = f_dask.mean('member')
     sig = f_dask.std('member')
