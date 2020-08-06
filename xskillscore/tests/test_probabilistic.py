@@ -36,6 +36,12 @@ def o_dask(o):
 
 
 @pytest.fixture
+def weights(o):
+    """Latitudinal weighting"""
+    return o.lat
+
+
+@pytest.fixture
 def f():
     """Forecast has same dimensions as observation and member dimension."""
     members = np.arange(3)
@@ -78,6 +84,12 @@ def test_xr_crps_ensemble_dask(o_dask, f_dask):
 @pytest.mark.parametrize('dim', DIMS)
 def test_xr_crps_ensemble_dim(o, f, dim):
     actual = xr_crps_ensemble(o, f, dim=dim)
+    assert_only_dim_reduced(dim, actual, o)
+
+
+def test_xr_crps_ensemble_weighted(o, f, weights):
+    dim = ['lon', 'lat']
+    actual = xr_crps_ensemble(o, f, dim=dim, weights=weights)
     assert_only_dim_reduced(dim, actual, o)
 
 
