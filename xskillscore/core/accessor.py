@@ -110,11 +110,11 @@ class XSkillScoreAccessor(object):
         b = self._in_ds(b)
         return smape(a, b, dim, weights=weights, skipna=skipna)
 
-    def crps_gaussian(self, observations, mu, sig):
+    def crps_gaussian(self, observations, mu, sig, dim=None, weights=None):
         observations = self._in_ds(observations)
         mu = self._in_ds(mu)
         sig = self._in_ds(sig)
-        return crps_gaussian(observations, mu, sig)
+        return crps_gaussian(observations, mu, sig, dim=dim, weights=weights)
 
     def crps_ensemble(
         self,
@@ -138,10 +138,14 @@ class XSkillScoreAccessor(object):
             weights=weights,
         )
 
-    def crps_quadrature(self, x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
+    def crps_quadrature(
+        self, x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, dim=None, weights=None
+    ):
         x = self._in_ds(x)
         cdf_or_dist = self._in_ds(cdf_or_dist)
-        return crps_quadrature(x, cdf_or_dist, xmin=xmin, xmax=xmax, tol=1e-6)
+        return crps_quadrature(
+            x, cdf_or_dist, xmin=xmin, xmax=xmax, tol=1e-6, dim=dim, weights=weights
+        )
 
     def threshold_brier_score(
         self,

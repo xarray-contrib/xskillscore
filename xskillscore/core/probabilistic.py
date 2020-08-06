@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-def xr_crps_gaussian(observations, mu, sig):
+def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None):
     """
     xarray version of properscoring.crps_gaussian: Continuous Ranked
      Probability Score with a Gaussian distribution.
@@ -46,7 +46,7 @@ def xr_crps_gaussian(observations, mu, sig):
         observations, mu = xr.broadcast(observations, mu)
     if sig.dims != observations.dims:
         observations, sig = xr.broadcast(observations, sig)
-    return xr.apply_ufunc(
+    res = xr.apply_ufunc(
         crps_gaussian,
         observations,
         mu,
@@ -55,9 +55,18 @@ def xr_crps_gaussian(observations, mu, sig):
         dask='parallelized',
         output_dtypes=[float],
     )
+    if dim is None:
+        return res
+    else:
+        if weights is not None:
+            return res.weighted(weights).mean(dim)
+        else:
+            return res.mean(dim)
 
 
-def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
+def xr_crps_quadrature(
+    x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, dim=None, weights=None
+):
     """
     xarray version of properscoring.crps_quadrature: Continuous Ranked
      Probability Score with numerical integration of the normal distribution
@@ -76,7 +85,7 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
     properscoring.crps_quadrature
     xarray.apply_ufunc
     """
-    return xr.apply_ufunc(
+    res = xr.apply_ufunc(
         crps_quadrature,
         x,
         cdf_or_dist,
@@ -87,6 +96,13 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
         dask='parallelized',
         output_dtypes=[float],
     )
+    if dim is None:
+        return res
+    else:
+        if weights is not None:
+            return res.weighted(weights).mean(dim)
+        else:
+            return res.mean(dim)
 
 
 def xr_crps_ensemble(
