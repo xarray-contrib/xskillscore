@@ -120,20 +120,22 @@ class XSkillScoreAccessor(object):
         self,
         observations,
         forecasts,
-        weights=None,
+        member_weights=None,
         issorted=False,
         dim=None,
         member_dim='member',
+        weights=None,
     ):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
         return crps_ensemble(
             observations,
             forecasts,
-            weights=weights,
+            member_weights=member_weights,
             issorted=issorted,
             member_dim=member_dim,
             dim=dim,
+            weights=weights,
         )
 
     def crps_quadrature(self, x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
@@ -149,6 +151,7 @@ class XSkillScoreAccessor(object):
         issorted=False,
         dim=None,
         member_dim='member',
+        weights=None,
     ):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
@@ -159,9 +162,10 @@ class XSkillScoreAccessor(object):
             issorted=issorted,
             dim=dim,
             member_dim=member_dim,
+            weights=weights,
         )
 
-    def brier_score(self, observations, forecasts, dim=None):
+    def brier_score(self, observations, forecasts, dim=None, weights=None):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
-        return brier_score(observations, forecasts, dim=dim)
+        return brier_score(observations, forecasts, dim=dim, weights=weights)

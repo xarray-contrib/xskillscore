@@ -90,7 +90,13 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
 
 
 def xr_crps_ensemble(
-    observations, forecasts, weights=None, issorted=False, member_dim='member', dim=None
+    observations,
+    forecasts,
+    member_weights=None,
+    issorted=False,
+    member_dim='member',
+    dim=None,
+    weights=None,
 ):
     """
     xarray version of properscoring.crps_ensemble: Continuous Ranked
@@ -101,7 +107,7 @@ def xr_crps_ensemble(
         The observations or set of observations.
     forecasts : xarray.Dataset or xarray.DataArray
         Forecast with required member dimension ``dim``.
-    weights : xarray.Dataset or xarray.DataArray
+    member_weights : xarray.Dataset or xarray.DataArray
         If provided, the CRPS is calculated exactly with the assigned
         probability weights to each forecast. Weights should be positive,
         but do not need to be normalized. By default, each forecast is
@@ -124,17 +130,20 @@ def xr_crps_ensemble(
         observations,
         forecasts,
         input_core_dims=[[], [member_dim]],
-        kwargs={'axis': -1, 'issorted': issorted, 'weights': weights},
+        kwargs={'axis': -1, 'issorted': issorted, 'weights': member_weights},
         dask='parallelized',
         output_dtypes=[float],
     )
     if dim is None:
         return res
     else:
-        return res.mean(dim)
+        if weights is not None:
+            return res.weighted(weights).mean(dim)
+        else:
+            return res.mean(dim)
 
 
-def xr_brier_score(observations, forecasts, dim=None):
+def xr_brier_score(observations, forecasts, dim=None, weights=None):
     """
     xarray version of properscoring.brier_score: Calculate Brier score (BS).
     ..math:
@@ -170,11 +179,20 @@ def xr_brier_score(observations, forecasts, dim=None):
     if dim is None:
         return res
     else:
-        return res.mean(dim)
+        if weights is not None:
+            return res.weighted(weights).mean(dim)
+        else:
+            return res.mean(dim)
 
 
 def xr_threshold_brier_score(
-    observations, forecasts, threshold, issorted=False, member_dim='member', dim=None,
+    observations,
+    forecasts,
+    threshold,
+    issorted=False,
+    member_dim='member',
+    dim=None,
+    weights=None,
 ):
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
@@ -243,4 +261,7 @@ def xr_threshold_brier_score(
     if dim is None:
         return res
     else:
-        return res.mean(dim)
+        if weights is not None:
+            return res.weighted(weights).mean(dim)
+        else:
+            return res.mean(dim)
