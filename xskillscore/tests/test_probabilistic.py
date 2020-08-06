@@ -56,6 +56,9 @@ def test_xr_crps_ensemble_dim(o_dask, f_dask, dim):
     actual = xr_crps_ensemble(o_dask, f_dask, dim=dim)
     for d in dim:
         assert d not in actual.dims
+    for d in o_dask.dims:
+        if d not in dim:
+            assert d in actual.dims
 
 
 def test_xr_crps_gaussian_dask(o_dask, f_dask):
@@ -112,6 +115,16 @@ def test_xr_threshold_brier_score_dask(o_dask, f_dask):
     assert expected.chunks is None
 
 
+@pytest.mark.parametrize('dim', ['lon', 'lat', ['lon', 'lat']])
+def test_xr_threshold_brier_score_dim(o_dask, f_dask, dim):
+    actual = xr_threshold_brier_score(o_dask, f_dask, threshold=0.5, dim=dim)
+    for d in dim:
+        assert d not in actual.dims
+    for d in o_dask.dims:
+        if d not in dim:
+            assert d in actual.dims
+
+
 def test_xr_crps_gaussian_dask_b_int(o_dask):
     mu = 0
     sig = 1
@@ -149,11 +162,16 @@ def test_xr_threshold_brier_score_multiple_thresholds_dask(o_dask, f_dask):
     assert actual.chunks is not None
 
 
-def test_xr_brier_score(o_dask, f_dask):
+@pytest.mark.parametrize('dim', ['lon', 'lat', ['lon', 'lat']])
+def test_xr_brier_score_dim(o_dask, f_dask, dim):
     actual = xr_brier_score(
-        (o_dask > 0.5).compute(), (f_dask > 0.5).mean('member').compute()
+        (o_dask > 0.5).compute(), (f_dask > 0.5).mean('member').compute(), dim=dim
     )
-    assert actual.chunks is None
+    for d in dim:
+        assert d not in actual.dims
+    for d in o_dask.dims:
+        if d not in dim:
+            assert d in actual.dims
 
 
 def test_xr_brier_score_dask(o_dask, f_dask):
