@@ -21,6 +21,7 @@ def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None):
     """
     xarray version of properscoring.crps_gaussian: Continuous Ranked
      Probability Score with a Gaussian distribution.
+
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -29,13 +30,21 @@ def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None):
         The mean of the forecast normal distribution.
     sig : xarray.Dataset or xarray.DataArray
         The standard deviation of the forecast distribution.
+    dim : str or list of str, optional
+        Dimension to mean over after calculating crps_gaussian.
+        Defaults to None implying averaging.
+    weights : xr.DataArray with dimensions from dim, optional
+        Weigths for `weighted.mean(dim)`. Defaults to None implying unweighted mean.
+
     Returns
     -------
-    xarray.Dataset or xarray.DataArray
+    xarray.Dataset or xarray.DataArray reduced by dimension dim
+
     See Also
     --------
     properscoring.crps_gaussian
     xarray.apply_ufunc
+
     """
     # check if same dimensions
     if isinstance(mu, (int, float)):
@@ -70,6 +79,7 @@ def xr_crps_quadrature(
     """
     xarray version of properscoring.crps_quadrature: Continuous Ranked
      Probability Score with numerical integration of the normal distribution
+
     Parameters
     ----------
     x : xarray.Dataset or xarray.DataArray
@@ -77,13 +87,22 @@ def xr_crps_quadrature(
     cdf_or_dist : callable or scipy.stats.distribution
         Function which returns the cumulative density of the forecast
         distribution at value x.
+    xmin, xmax, tol: see properscoring.crps_quadrature
+    dim : str or list of str, optional
+        Dimension to mean over after calculating crps_gaussian.
+        Defaults to None implying averaging.
+    weights : xr.DataArray with dimensions from dim, optional
+        Weigths for `weighted.mean(dim)`. Defaults to None implying unweighted mean.
+
     Returns
     -------
     xarray.Dataset or xarray.DataArray
+
     See Also
     --------
     properscoring.crps_quadrature
     xarray.apply_ufunc
+
     """
     res = xr.apply_ufunc(
         crps_quadrature,
@@ -117,6 +136,7 @@ def xr_crps_ensemble(
     """
     xarray version of properscoring.crps_ensemble: Continuous Ranked
      Probability Score with the ensemble distribution
+
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -131,15 +151,23 @@ def xr_crps_ensemble(
     issorted : bool, optional
         Optimization flag to indicate that the elements of `ensemble` are
         already sorted along `axis`.
-    dim : str, optional
+    member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
+    dim : str or list of str, optional
+        Dimension to mean over after calculating crps_gaussian.
+        Defaults to None implying averaging.
+    weights : xr.DataArray with dimensions from dim, optional
+        Weigths for `weighted.mean(dim)`. Defaults to None implying unweighted mean.
+
     Returns
     -------
     xarray.Dataset or xarray.DataArray
+
     See Also
     --------
     properscoring.crps_ensemble
     xarray.apply_ufunc
+
     """
     res = xr.apply_ufunc(
         crps_ensemble,
@@ -162,27 +190,38 @@ def xr_crps_ensemble(
 def xr_brier_score(observations, forecasts, dim=None, weights=None):
     """
     xarray version of properscoring.brier_score: Calculate Brier score (BS).
+
     ..math:
-        BS(p, k) = (p_1 - k)^2,
+        BS(p, k) = (p_1 - k)^2
+
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
         The observations or set of observations.
     forecasts : xarray.Dataset or xarray.DataArray
         The forecasts associated with the observations.
+    dim : str or list of str, optional
+        Dimension to mean over after calculating crps_gaussian.
+        Defaults to None implying averaging.
+    weights : xr.DataArray with dimensions from dim, optional
+        Weigths for `weighted.mean(dim)`. Defaults to None implying unweighted mean.
+
     Returns
     -------
     xarray.Dataset or xarray.DataArray
+
     References
     ----------
     Gneiting, Tilmann, and Adrian E Raftery. “Strictly Proper Scoring Rules,
       Prediction, and Estimation.” Journal of the American Statistical
       Association 102, no. 477 (March 1, 2007): 359–78.
       https://doi.org/10/c6758w.
+
     See Also
     --------
     properscoring.brier_score
     xarray.apply_ufunc
+
     """
     res = xr.apply_ufunc(
         brier_score,
@@ -213,6 +252,7 @@ def xr_threshold_brier_score(
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
      scores of an ensemble for exceeding given thresholds.
+
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -224,23 +264,32 @@ def xr_threshold_brier_score(
     issorted : bool, optional
         Optimization flag to indicate that the elements of `ensemble` are
         already sorted along `axis`.
-    dim : str, optional
+    member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
+    dim : str or list of str, optional
+        Dimension to mean over after calculating crps_gaussian.
+        Defaults to None implying averaging.
+    weights : xr.DataArray with dimensions from dim, optional
+        Weigths for `weighted.mean(dim)`. Defaults to None implying unweighted mean.
+
     Returns
     -------
     xarray.Dataset or xarray.DataArray
         (If ``threshold`` is a scalar, the result will have the same shape as
         observations. Otherwise, it will have an additional final dimension
         corresponding to the threshold levels. Not implemented yet.)
+
     References
     ----------
     Gneiting, T. and Ranjan, R. Comparing density forecasts using threshold-
        and quantile-weighted scoring rules. J. Bus. Econ. Stat. 29, 411-422
        (2011). http://www.stat.washington.edu/research/reports/2008/tr533.pdf
+
     See Also
     --------
     properscoring.threshold_brier_score
     xarray.apply_ufunc
+
     """
     if isinstance(threshold, list):
         threshold.sort()
