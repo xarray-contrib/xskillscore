@@ -41,6 +41,7 @@ def f_dask():
         data, coords=[members, lats, lons], dims=['member', 'lat', 'lon']
     ).chunk()
 
+
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_crps_ensemble_dask(o_dask, f_dask, keep_attrs):
     actual = xr_crps_ensemble(o_dask, f_dask, keep_attrs=keep_attrs)
@@ -56,6 +57,7 @@ def test_xr_crps_ensemble_dask(o_dask, f_dask, keep_attrs):
         assert actual.attrs == o_dask.attrs
     else:
         assert actual.attrs == {}
+
 
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_crps_gaussian_dask(o_dask, f_dask, keep_attrs):
@@ -75,6 +77,7 @@ def test_xr_crps_gaussian_dask(o_dask, f_dask, keep_attrs):
     else:
         assert actual.attrs == {}
 
+
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_crps_quadrature_dask(o_dask, f_dask, keep_attrs):
     cdf_or_dist = norm
@@ -91,6 +94,7 @@ def test_xr_crps_quadrature_dask(o_dask, f_dask, keep_attrs):
         assert actual.attrs == o_dask.attrs
     else:
         assert actual.attrs == {}
+
 
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_crps_quadrature_args(o_dask, f_dask, keep_attrs):
@@ -110,6 +114,7 @@ def test_xr_crps_quadrature_args(o_dask, f_dask, keep_attrs):
     else:
         assert actual.attrs == {}
 
+
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_threshold_brier_score_dask(o_dask, f_dask, keep_attrs):
     threshold = 0.5
@@ -127,6 +132,7 @@ def test_xr_threshold_brier_score_dask(o_dask, f_dask, keep_attrs):
     else:
         assert actual.attrs == {}
 
+
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_crps_gaussian_dask_b_int(o_dask, keep_attrs):
     mu = 0
@@ -138,6 +144,7 @@ def test_xr_crps_gaussian_dask_b_int(o_dask, keep_attrs):
     else:
         assert actual.attrs == {}
 
+
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_threshold_brier_score_dask_b_float(o_dask, f_dask, keep_attrs):
     threshold = 0.5
@@ -148,6 +155,7 @@ def test_xr_threshold_brier_score_dask_b_float(o_dask, f_dask, keep_attrs):
     else:
         assert actual.attrs == {}
 
+
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_threshold_brier_score_dask_b_int(o_dask, f_dask, keep_attrs):
     threshold = 0
@@ -157,6 +165,7 @@ def test_xr_threshold_brier_score_dask_b_int(o_dask, f_dask, keep_attrs):
         assert actual.attrs == o_dask.attrs
     else:
         assert actual.attrs == {}
+
 
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_threshold_brier_score_multiple_thresholds_list(
@@ -170,6 +179,7 @@ def test_xr_threshold_brier_score_multiple_thresholds_list(
     else:
         assert actual.attrs == {}
 
+
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_threshold_brier_score_multiple_thresholds_xr(
     o_dask, f_dask, keep_attrs
@@ -181,6 +191,7 @@ def test_xr_threshold_brier_score_multiple_thresholds_xr(
         assert actual.attrs == o_dask.attrs
     else:
         assert actual.attrs == {}
+
 
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_threshold_brier_score_multiple_thresholds_dask(
@@ -194,6 +205,7 @@ def test_xr_threshold_brier_score_multiple_thresholds_dask(
     else:
         assert actual.attrs == {}
 
+
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_brier_score(o_dask, f_dask, keep_attrs):
     actual = xr_brier_score(
@@ -205,6 +217,7 @@ def test_xr_brier_score(o_dask, f_dask, keep_attrs):
         assert actual.attrs == o_dask.attrs
     else:
         assert actual.attrs == {}
+
 
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_xr_brier_score_dask(o_dask, f_dask, keep_attrs):
