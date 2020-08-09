@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-def xr_crps_gaussian(observations, mu, sig):
+def xr_crps_gaussian(observations, mu, sig, keep_attrs=False):
     """
     xarray version of properscoring.crps_gaussian: Continuous Ranked
      Probability Score with a Gaussian distribution.
@@ -30,6 +30,11 @@ def xr_crps_gaussian(observations, mu, sig):
         The mean of the forecast normal distribution.
     sig : xarray.Dataset or xarray.DataArray
         The standard deviation of the forecast distribution.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the original object to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -57,10 +62,11 @@ def xr_crps_gaussian(observations, mu, sig):
         input_core_dims=[[], [], []],
         dask="parallelized",
         output_dtypes=[float],
+        keep_attrs=keep_attrs
     )
 
 
-def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
+def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, keep_attrs=False):
     """
     xarray version of properscoring.crps_quadrature: Continuous Ranked
      Probability Score with numerical integration of the normal distribution
@@ -72,6 +78,11 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
     cdf_or_dist : callable or scipy.stats.distribution
         Function which returns the cumulative density of the forecast
         distribution at value x.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the original object to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -92,11 +103,12 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6):
         input_core_dims=[[], [], [], [], []],
         dask="parallelized",
         output_dtypes=[float],
+        keep_attrs=keep_attrs
     )
 
 
 def xr_crps_ensemble(
-    observations, forecasts, weights=None, issorted=False, dim="member"
+    observations, forecasts, weights=None, issorted=False, dim="member", keep_attrs=False
 ):
     """
     xarray version of properscoring.crps_ensemble: Continuous Ranked
@@ -118,6 +130,11 @@ def xr_crps_ensemble(
         already sorted along `axis`.
     dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the original object to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -136,10 +153,11 @@ def xr_crps_ensemble(
         kwargs={"axis": -1, "issorted": issorted, "weights": weights},
         dask="parallelized",
         output_dtypes=[float],
+        keep_attrs=keep_attrs
     )
 
 
-def xr_brier_score(observations, forecasts):
+def xr_brier_score(observations, forecasts, keep_attrs=False):
     """
     xarray version of properscoring.brier_score: Calculate Brier score (BS).
 
@@ -152,6 +170,11 @@ def xr_brier_score(observations, forecasts):
         The observations or set of observations.
     forecasts : xarray.Dataset or xarray.DataArray
         The forecasts associated with the observations.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the original object to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -176,11 +199,12 @@ def xr_brier_score(observations, forecasts):
         input_core_dims=[[], []],
         dask="parallelized",
         output_dtypes=[float],
+        keep_attrs=keep_attrs
     )
 
 
 def xr_threshold_brier_score(
-    observations, forecasts, threshold, issorted=False, dim="member"
+    observations, forecasts, threshold, issorted=False, dim="member", keep_attrs=False
 ):
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
@@ -199,6 +223,11 @@ def xr_threshold_brier_score(
         already sorted along `axis`.
     dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the original object to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -249,4 +278,5 @@ def xr_threshold_brier_score(
         output_core_dims=output_core_dims,
         dask="parallelized",
         output_dtypes=[float],
+        keep_attrs=keep_attrs
     )
