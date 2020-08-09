@@ -165,7 +165,6 @@ def test_xr_threshold_brier_score_multiple_thresholds_list(
     threshold = [0.1, 0.3, 0.5]
     actual = xr_threshold_brier_score(o_dask.compute(), f_dask.compute(), threshold, keep_attrs=keep_attrs)
     assert actual.chunks is None
-<<<<<<< HEAD
     if keep_attrs:
         assert actual.attrs == o_dask.attrs
     else:
@@ -189,18 +188,6 @@ def test_xr_threshold_brier_score_multiple_thresholds_dask(
 ):
     threshold = xr.DataArray([0.1, 0.3, 0.5, 0.7], dims="threshold").chunk()
     actual = xr_threshold_brier_score(o_dask, f_dask, threshold, keep_attrs=keep_attrs)
-=======
-
-
-def test_xr_threshold_brier_score_multiple_thresholds_xr(o_dask, f_dask):
-    threshold = xr.DataArray([0.1, 0.3, 0.5], dims='threshold')
-    actual = xr_threshold_brier_score(o_dask.compute(), f_dask.compute(), threshold)
-    assert actual.chunks is None
-
-
-def test_xr_threshold_brier_score_multiple_thresholds_dask(o_dask, f_dask):
-    threshold = xr.DataArray([0.1, 0.3, 0.5, 0.7], dims='threshold').chunk()
-    actual = xr_threshold_brier_score(o_dask, f_dask, threshold)
     assert actual.chunks is not None
     if keep_attrs:
         assert actual.attrs == o_dask.attrs
