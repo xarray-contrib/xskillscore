@@ -9,11 +9,11 @@ from properscoring import (
 )
 
 __all__ = [
-    "brier_score",
-    "crps_ensemble",
-    "crps_gaussian",
-    "crps_quadrature",
-    "threshold_brier_score",
+    'brier_score',
+    'crps_ensemble',
+    'crps_gaussian',
+    'crps_quadrature',
+    'threshold_brier_score',
 ]
 
 
@@ -21,7 +21,6 @@ def xr_crps_gaussian(observations, mu, sig, keep_attrs=False):
     """
     xarray version of properscoring.crps_gaussian: Continuous Ranked
      Probability Score with a Gaussian distribution.
-
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -39,7 +38,6 @@ def xr_crps_gaussian(observations, mu, sig, keep_attrs=False):
     Returns
     -------
     xarray.Dataset or xarray.DataArray
-
     See Also
     --------
     properscoring.crps_gaussian
@@ -60,7 +58,7 @@ def xr_crps_gaussian(observations, mu, sig, keep_attrs=False):
         mu,
         sig,
         input_core_dims=[[], [], []],
-        dask="parallelized",
+        dask='parallelized',
         output_dtypes=[float],
         keep_attrs=keep_attrs
     )
@@ -70,7 +68,6 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, keep_attr
     """
     xarray version of properscoring.crps_quadrature: Continuous Ranked
      Probability Score with numerical integration of the normal distribution
-
     Parameters
     ----------
     x : xarray.Dataset or xarray.DataArray
@@ -87,7 +84,6 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, keep_attr
     Returns
     -------
     xarray.Dataset or xarray.DataArray
-
     See Also
     --------
     properscoring.crps_quadrature
@@ -101,7 +97,7 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, keep_attr
         xmax,
         tol,
         input_core_dims=[[], [], [], [], []],
-        dask="parallelized",
+        dask='parallelized',
         output_dtypes=[float],
         keep_attrs=keep_attrs
     )
@@ -113,7 +109,6 @@ def xr_crps_ensemble(
     """
     xarray version of properscoring.crps_ensemble: Continuous Ranked
      Probability Score with the ensemble distribution
-
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -139,7 +134,6 @@ def xr_crps_ensemble(
     Returns
     -------
     xarray.Dataset or xarray.DataArray
-
     See Also
     --------
     properscoring.crps_ensemble
@@ -150,8 +144,8 @@ def xr_crps_ensemble(
         observations,
         forecasts,
         input_core_dims=[[], [dim]],
-        kwargs={"axis": -1, "issorted": issorted, "weights": weights},
-        dask="parallelized",
+        kwargs={'axis': -1, 'issorted': issorted, 'weights': weights},
+        dask='parallelized',
         output_dtypes=[float],
         keep_attrs=keep_attrs
     )
@@ -160,10 +154,8 @@ def xr_crps_ensemble(
 def xr_brier_score(observations, forecasts, keep_attrs=False):
     """
     xarray version of properscoring.brier_score: Calculate Brier score (BS).
-
     ..math:
         BS(p, k) = (p_1 - k)^2,
-
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -179,14 +171,12 @@ def xr_brier_score(observations, forecasts, keep_attrs=False):
     Returns
     -------
     xarray.Dataset or xarray.DataArray
-
     References
     ----------
     Gneiting, Tilmann, and Adrian E Raftery. “Strictly Proper Scoring Rules,
       Prediction, and Estimation.” Journal of the American Statistical
       Association 102, no. 477 (March 1, 2007): 359–78.
       https://doi.org/10/c6758w.
-
     See Also
     --------
     properscoring.brier_score
@@ -197,7 +187,7 @@ def xr_brier_score(observations, forecasts, keep_attrs=False):
         observations,
         forecasts,
         input_core_dims=[[], []],
-        dask="parallelized",
+        dask='parallelized',
         output_dtypes=[float],
         keep_attrs=keep_attrs
     )
@@ -209,7 +199,6 @@ def xr_threshold_brier_score(
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
      scores of an ensemble for exceeding given thresholds.
-
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -235,13 +224,11 @@ def xr_threshold_brier_score(
         (If ``threshold`` is a scalar, the result will have the same shape as
         observations. Otherwise, it will have an additional final dimension
         corresponding to the threshold levels. Not implemented yet.)
-
     References
     ----------
     Gneiting, T. and Ranjan, R. Comparing density forecasts using threshold-
        and quantile-weighted scoring rules. J. Bus. Econ. Stat. 29, 411-422
        (2011). http://www.stat.washington.edu/research/reports/2008/tr533.pdf
-
     See Also
     --------
     properscoring.threshold_brier_score
@@ -249,23 +236,23 @@ def xr_threshold_brier_score(
     """
     if isinstance(threshold, list):
         threshold.sort()
-        threshold = xr.DataArray(threshold, dims="threshold")
-        threshold["threshold"] = np.arange(1, 1 + threshold.threshold.size)
+        threshold = xr.DataArray(threshold, dims='threshold')
+        threshold['threshold'] = np.arange(1, 1 + threshold.threshold.size)
 
     if isinstance(threshold, (xr.DataArray, xr.Dataset)):
-        if "threshold" not in threshold.dims:
+        if 'threshold' not in threshold.dims:
             raise ValueError(
-                "please provide threshold with threshold dim, found", threshold.dims,
+                'please provide threshold with threshold dim, found', threshold.dims,
             )
-        input_core_dims = [[], [dim], ["threshold"]]
-        output_core_dims = [["threshold"]]
+        input_core_dims = [[], [dim], ['threshold']]
+        output_core_dims = [['threshold']]
     elif isinstance(threshold, (int, float)):
         input_core_dims = [[], [dim], []]
         output_core_dims = [[]]
     else:
         raise ValueError(
-            "Please provide threshold as list, int, float \
-            or xr.object with threshold dimension; found",
+            'Please provide threshold as list, int, float \
+            or xr.object with threshold dimension; found',
             type(threshold),
         )
     return xr.apply_ufunc(
@@ -274,9 +261,9 @@ def xr_threshold_brier_score(
         forecasts,
         threshold,
         input_core_dims=input_core_dims,
-        kwargs={"axis": -1, "issorted": issorted},
+        kwargs={'axis': -1, 'issorted': issorted},
         output_core_dims=output_core_dims,
-        dask="parallelized",
+        dask='parallelized',
         output_dtypes=[float],
         keep_attrs=keep_attrs
     )

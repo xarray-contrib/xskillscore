@@ -6,20 +6,20 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from xskillscore import mse as xs_mse
-from xskillscore import pearson_r as xs_pearson_r
+from xskillscore import mse as xs_mse, pearson_r as xs_pearson_r
 
 from . import parameterized, randn, requires_dask
 
 
 def xr_mse(a, b, dim):
     """mse implementation using xarray only."""
-    return ((a-b)**2).mean(dim)
+    return ((a - b) ** 2).mean(dim)
 
 
 def covariance_gufunc(x, y):
-    return ((x - x.mean(axis=-1, keepdims=True))
-            * (y - y.mean(axis=-1, keepdims=True))).mean(axis=-1)
+    return (
+        (x - x.mean(axis=-1, keepdims=True)) * (y - y.mean(axis=-1, keepdims=True))
+    ).mean(axis=-1)
 
 
 def pearson_correlation_gufunc(x, y):
@@ -29,10 +29,13 @@ def pearson_correlation_gufunc(x, y):
 def xr_pearson_r(x, y, dim):
     """pearson_r implementation using xarray and minimal numpy only."""
     return xr.apply_ufunc(
-        pearson_correlation_gufunc, x, y,
+        pearson_correlation_gufunc,
+        x,
+        y,
         input_core_dims=[[dim], [dim]],
         dask='parallelized',
-        output_dtypes=[float])
+        output_dtypes=[float],
+    )
 
 
 METRICS = [xs_mse, xr_mse, xs_pearson_r, xr_pearson_r]
@@ -60,7 +63,7 @@ class Generate:
 
         frac_nan = 0.0
 
-        times = pd.date_range(start="1/1/2000", periods=ntime, freq="D", )
+        times = pd.date_range(start='1/1/2000', periods=ntime, freq='D',)
 
         lons = xr.DataArray(
             np.linspace(0, 360, self.nx),
@@ -92,9 +95,7 @@ class Generate:
 
         # set nans for land sea mask
         self.ds = self.ds.where(
-            (abs(self.ds.lat) > 20)
-            | (self.ds.lat < 100)
-            | (self.ds.lat > 160)
+            (abs(self.ds.lat) > 20) | (self.ds.lat < 100) | (self.ds.lat > 160)
         )
 
 
@@ -152,9 +153,7 @@ class Compute_large_dask(Generate):
         self.ds.to_netcdf('large.nc')
 
     def setup(self, *args, **kwargs):
-        self.ds = xr.open_dataset(
-            'large.nc', chunks={'lon': large_lon_lat_chunksize}
-        )
+        self.ds = xr.open_dataset('large.nc', chunks={'lon': large_lon_lat_chunksize})
 
     @parameterized('metric', METRICS)
     def time_xskillscore_metric_large_dask(self, metric):

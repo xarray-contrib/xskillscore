@@ -5,14 +5,20 @@ dependencies:
   - python=3.6
   - scikit-learn
   - xarray
+  - cftime
   - dask
   - scipy
-  - pytest
-  - flake8
-  - pip
   - numba
   - bottleneck
+  - pytest
+  - flake8
   - black
+  - doc8
+  - isort
+  - pre-commit
+  - pip
   - pip:
-    - properscoring
-    - asv
+      - properscoring
+      - asv
+      - coveralls
+      - pygments

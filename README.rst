@@ -7,13 +7,17 @@ xskillscore: Metrics for verifying forecasts
    :target: https://pypi.python.org/pypi/xskillscore/
 .. image:: https://anaconda.org/conda-forge/xskillscore/badges/version.svg
    :target: https://anaconda.org/conda-forge/xskillscore/
+.. image:: https://coveralls.io/repos/github/raybellwaves/xskillscore/badge.svg?branch=master
+   :target: https://coveralls.io/github/raybellwaves/xskillscore?branch=master
 .. image:: https://img.shields.io/badge/benchmarked%20by-asv-green.svg?style=flat
    :target: https://raybellwaves.github.io/xskillscore/
 .. image:: https://img.shields.io/conda/dn/conda-forge/xskillscore.svg
    :target: https://anaconda.org/conda-forge/xskillscore
+.. image:: https://mybinder.org/badge_logo.svg
+ :target: https://mybinder.org/v2/gh/raybellwaves/xskillscore-tutorial/master?urlpath=lab
 
-
-**xskillscore** is an open source project and Python package that provides verification metrics of deterministic (and probabilistic from `properscoring`) forecasts with `xarray`.
+**xskillscore** is an open source project and Python package that provides verification
+metrics of deterministic (and probabilistic from `properscoring`) forecasts with `xarray`.
 
 Installing
 ----------
@@ -28,13 +32,20 @@ or
 
 ``$ pip install git+https://github.com/raybellwaves/xskillscore``
 
+See also
+--------
+
+- If you are interested in using **xskillscore** for data science where you data is mostly in
+  ``pandas.DataFrames``'s check out the `xskillscore-tutorial <https://github.com/raybellwaves/xskillscore-tutorial>`_
+- If you are interested in using **xskillscore** for climate prediction check out
+  `climpred <https://climpred.readthedocs.io/en/stable/>`_.
+
 Examples
 --------
 
 .. code-block:: python
 
    import xarray as xr
-   import pandas as pd
    import numpy as np
    from scipy.stats import norm
    import xskillscore as xs
@@ -43,7 +54,7 @@ Examples
    obs = xr.DataArray(
        np.random.rand(3, 4, 5),
        coords=[
-           pd.date_range("1/1/2000", "1/3/2000", freq="D"),
+           xr.cftime_range("2000-01-01", "2000-01-03", freq="D"),
            np.arange(4),
            np.arange(5),
        ],
@@ -99,7 +110,7 @@ Examples
    # Apply Pearson's correlation coefficient
    # over the latitude and longitude dimension
    r = xs.pearson_r(obs, fct, ["lat", "lon"])
-   
+
    # You can weight over the dimensions the function is being applied
    # to by passing the argument ``weights=weight`` with a xr.DataArray
    # containing the dimension(s) being reduced.
@@ -113,7 +124,7 @@ Examples
    obs2 = xr.DataArray(
        np.random.rand(3, 180, 360),
        coords=[
-           pd.date_range("1/1/2000", "1/3/2000", freq="D"),
+           xr.cftime_range("2000-01-01", "2000-01-03", freq="D"),
            np.linspace(-89.5, 89.5, 180),
            np.linspace(-179.5, 179.5, 360),
        ],
@@ -141,7 +152,7 @@ Examples
    # array([ 5.02325347e-03, -6.75266864e-05, -3.00668282e-03])
    # Coordinates:
    # * time     (time) datetime64[ns] 2000-01-01 2000-01-02 2000-01-03
-   
+
    # You can also pass the optional keyword `skipna=True`
    # to ignore any NaNs on the input data:
    obs_with_nans = obs.where(obs.lat > 1)
@@ -201,14 +212,19 @@ Examples
    ds = ds.drop("fct_var")
    r = ds.xs.pearson_r("obs_var", fct, "time")
 
-What projects leverage xskillscore?
------------------------------------
+What other projects leverage xskillscore?
+-----------------------------------------
 
-- `climpred <https://climpred.readthedocs.io>`_: An xarray wrapper for analysis of ensemble forecast models for climate prediction.
 - `esmlab <https://esmlab.readthedocs.io>`_: Tools for working with earth system multi-model analyses with xarray.
-- A `Google Colab notebook <https://colab.research.google.com/drive/1wWHz_SMCHNuos5fxWRUJTcB6wqkTJQCR>`_ by `Matteo De Felice <https://github.com/matteodefelice>`_.
+- A `Google Colab notebook <https://colab.research.google.com/drive/1wWHz_SMCHNuos5fxWRUJTcB6wqkTJQCR>`_
+  by `Matteo De Felice <https://github.com/matteodefelice>`_.
 
 History
 -------
 
-**xskillscore** was orginally developed to parallelize forecast metrics of the multi-model-multi-ensemble forecasts associated with the `SubX <https://journals.ametsoc.org/doi/pdf/10.1175/BAMS-D-18-0270.1>`_ project. We are indebted to the **xarray** community for their `advice <https://groups.google.com/forum/#!searchin/xarray/xskillscore%7Csort:date/xarray/z8ue0G-BLc8/Cau-dY_ACAAJ>`_ in getting this package started.
+**xskillscore** was orginally developed to parallelize forecast metrics of the multi-model-multi-ensemble
+forecasts associated with the `SubX <https://journals.ametsoc.org/doi/pdf/10.1175/BAMS-D-18-0270.1>`_ project.
+
+We are indebted to the **xarray** community for their
+`advice <https://groups.google.com/forum/#!searchin/xarray/xskillscore%7Csort:date/xarray/z8ue0G-BLc8/Cau-dY_ACAAJ>`_
+in getting this package started.
