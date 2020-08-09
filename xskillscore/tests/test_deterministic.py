@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
-import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
 
+import pytest
 from xskillscore.core.deterministic import (
     _preprocess_dims,
     _preprocess_weights,
@@ -74,8 +74,10 @@ def a():
     lons = np.arange(5)
     data = np.random.rand(len(times), len(lats), len(lons))
     return xr.DataArray(
-        data, coords=[times, lats, lons], dims=["time", "lat", "lon"],
-        attrs={"source": "testing"}
+        data,
+        coords=[times, lats, lons],
+        dims=['time', 'lat', 'lon'],
+        attrs={'source': 'testing'},
     )
 
 
@@ -311,16 +313,16 @@ def test_pearson_r_p_value_skipna(a, b_nan):
 
 def test_pearson_r_integer():
     """Test whether arrays as integers work."""
-    da = xr.DataArray([0, 1, 2], dims=["time"])
-    assert pearson_r(da, da, dim="time") == 1
+    da = xr.DataArray([0, 1, 2], dims=['time'])
+    assert pearson_r(da, da, dim='time') == 1
 
 
-@pytest.mark.parametrize("metrics", correlation_metrics + distance_metrics)
-@pytest.mark.parametrize("keep_attrs", [True, False])
+@pytest.mark.parametrize('metrics', correlation_metrics + distance_metrics)
+@pytest.mark.parametrize('keep_attrs', [True, False])
 def test_keep_attrs(a, b, metrics, keep_attrs):
     """Test keep_attrs for all metrics."""
     metric, _metric = metrics
-    res = metric(a, b, "time", keep_attrs=keep_attrs)
+    res = metric(a, b, 'time', keep_attrs=keep_attrs)
     if keep_attrs:
         assert res.attrs == a.attrs
     else:

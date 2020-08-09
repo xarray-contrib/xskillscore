@@ -210,7 +210,7 @@ def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -265,7 +265,7 @@ def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -317,7 +317,7 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -393,7 +393,7 @@ def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -483,7 +483,7 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -540,7 +540,7 @@ def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -592,7 +592,7 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -682,7 +682,7 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -737,7 +737,7 @@ def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         kwargs={'axis': axis, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -792,7 +792,7 @@ def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         kwargs={'axis': axis, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -847,7 +847,7 @@ def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         kwargs={'axis': axis, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -893,7 +893,7 @@ def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
         kwargs={'axis': axis, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -948,7 +948,7 @@ def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         kwargs={'axis': axis, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -1003,5 +1003,5 @@ def smape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         kwargs={'axis': axis, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )

@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 import xarray as xr
 from scipy.stats import pearsonr, spearmanr
 from sklearn.metrics import (
@@ -9,6 +8,7 @@ from sklearn.metrics import (
     r2_score,
 )
 
+import pytest
 from xskillscore.core.deterministic import (
     mae,
     mape,

@@ -1,5 +1,6 @@
 import numpy as np
 import xarray as xr
+
 from properscoring import (
     brier_score,
     crps_ensemble,
@@ -60,11 +61,13 @@ def xr_crps_gaussian(observations, mu, sig, keep_attrs=False):
         input_core_dims=[[], [], []],
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
-def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, keep_attrs=False):
+def xr_crps_quadrature(
+    x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, keep_attrs=False
+):
     """
     xarray version of properscoring.crps_quadrature: Continuous Ranked
      Probability Score with numerical integration of the normal distribution
@@ -99,12 +102,17 @@ def xr_crps_quadrature(x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, keep_attr
         input_core_dims=[[], [], [], [], []],
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
 def xr_crps_ensemble(
-    observations, forecasts, weights=None, issorted=False, dim="member", keep_attrs=False
+    observations,
+    forecasts,
+    weights=None,
+    issorted=False,
+    dim='member',
+    keep_attrs=False,
 ):
     """
     xarray version of properscoring.crps_ensemble: Continuous Ranked
@@ -147,7 +155,7 @@ def xr_crps_ensemble(
         kwargs={'axis': -1, 'issorted': issorted, 'weights': weights},
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
@@ -189,12 +197,12 @@ def xr_brier_score(observations, forecasts, keep_attrs=False):
         input_core_dims=[[], []],
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )
 
 
 def xr_threshold_brier_score(
-    observations, forecasts, threshold, issorted=False, dim="member", keep_attrs=False
+    observations, forecasts, threshold, issorted=False, dim='member', keep_attrs=False
 ):
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
@@ -265,5 +273,5 @@ def xr_threshold_brier_score(
         output_core_dims=output_core_dims,
         dask='parallelized',
         output_dtypes=[float],
-        keep_attrs=keep_attrs
+        keep_attrs=keep_attrs,
     )

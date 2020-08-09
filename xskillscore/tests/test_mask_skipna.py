@@ -1,7 +1,7 @@
 import numpy as np
-import pytest
 import xarray as xr
 
+import pytest
 from xskillscore.core.deterministic import (
     mae,
     mape,
