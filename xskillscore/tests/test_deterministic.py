@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
-
 import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
+
 from xskillscore.core.deterministic import (
     _preprocess_dims,
     _preprocess_weights,

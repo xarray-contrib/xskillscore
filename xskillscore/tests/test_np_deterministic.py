@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from numpy.testing import assert_allclose
 from scipy import stats
 from sklearn.metrics import (
@@ -8,7 +9,6 @@ from sklearn.metrics import (
     r2_score,
 )
 
-import pytest
 from xskillscore.core.np_deterministic import (
     _mae,
     _mape,

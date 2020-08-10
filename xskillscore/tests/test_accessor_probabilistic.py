@@ -1,9 +1,9 @@
 import numpy as np
-from scipy.stats import norm
-
 import pytest
 import xarray as xr
+from scipy.stats import norm
 from xarray.tests import assert_allclose
+
 from xskillscore.core.probabilistic import (
     xr_brier_score as brier_score,
     xr_crps_ensemble as crps_ensemble,
