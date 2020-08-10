@@ -1,6 +1,6 @@
 import numpy as np
-import xarray as xr
 
+import xarray as xr
 from properscoring import (
     brier_score,
     crps_ensemble,

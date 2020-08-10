@@ -1,9 +1,8 @@
 import numpy as np
-import xarray as xr
 from scipy.stats import norm
-from xarray.tests import assert_allclose, assert_identical
 
 import pytest
+import xarray as xr
 from properscoring import (
     brier_score,
     crps_ensemble,
@@ -11,6 +10,7 @@ from properscoring import (
     crps_quadrature,
     threshold_brier_score,
 )
+from xarray.tests import assert_allclose, assert_identical
 from xskillscore.core.probabilistic import (
     xr_brier_score,
     xr_crps_ensemble,
