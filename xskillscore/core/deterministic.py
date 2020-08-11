@@ -175,7 +175,7 @@ def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -232,7 +232,7 @@ def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -287,7 +287,7 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -355,7 +355,7 @@ def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -438,7 +438,7 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -505,7 +505,7 @@ def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -562,7 +562,7 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -637,7 +637,7 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -704,7 +704,7 @@ def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -759,7 +759,7 @@ def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -814,7 +814,7 @@ def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -867,7 +867,7 @@ def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -916,7 +916,7 @@ def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -971,7 +971,7 @@ def smape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 

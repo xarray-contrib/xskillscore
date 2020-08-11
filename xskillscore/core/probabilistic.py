@@ -31,7 +31,7 @@ def xr_crps_gaussian(observations, mu, sig, keep_attrs=False):
         The standard deviation of the forecast distribution.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -79,7 +79,7 @@ def xr_crps_quadrature(
         distribution at value x.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -134,7 +134,7 @@ def xr_crps_ensemble(
         Name of ensemble member dimension. By default, 'member'.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -171,7 +171,7 @@ def xr_brier_score(observations, forecasts, keep_attrs=False):
         The forecasts associated with the observations.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 
@@ -221,7 +221,7 @@ def xr_threshold_brier_score(
         Name of ensemble member dimension. By default, 'member'.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
-        from the original object to the new one.
+        from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
 

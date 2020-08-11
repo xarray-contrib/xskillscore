@@ -1,4 +1,4 @@
-import numpy as np
+enabled_disabled_datesimport numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
@@ -322,6 +322,7 @@ def test_pearson_r_integer():
 def test_keep_attrs(a, b, metrics, keep_attrs):
     """Test keep_attrs for all metrics."""
     metric, _metric = metrics
+    # ths tests only copying attrs from a
     res = metric(a, b, 'time', keep_attrs=keep_attrs)
     if keep_attrs:
         assert res.attrs == a.attrs
