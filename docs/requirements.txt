@@ -1,0 +1,9 @@
+bottleneck
+importlib_metadata
+nbsphinx
+numpy
+sphinx
+sphinxcontrib-napoleon
+sphinx_rtd_theme
+toolz
+xarray
