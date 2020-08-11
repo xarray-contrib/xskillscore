@@ -45,6 +45,10 @@ Probabilistic Metrics
 
 .. currentmodule:: xskillscore.core.probabilistic
 
+Currently, our probabilistic metrics are ported over from
+`properscoring <https://github.com/TheClimateCorporation/properscoring>`__ to work with
+``xarray`` DataArrays and Datasets.
+
 .. autosummary::
     :toctree: api/
 

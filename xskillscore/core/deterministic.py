@@ -167,7 +167,8 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along.
+        The dimension(s) to apply the correlation along. Note that this dimension will
+        be reduced as a result.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -190,8 +191,8 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import pearson_r
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -228,7 +229,8 @@ def r2(a, b, dim, weights=None, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along.
+        The dimension(s) to apply the correlation along. Note that this dimension will
+        be reduced as a result.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -250,8 +252,8 @@ def r2(a, b, dim, weights=None, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import r2
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -288,7 +290,8 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along.
+        The dimension(s) to apply the correlation along. Note that this dimension will
+        be reduced as a result.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -307,8 +310,8 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import pearson_r_p_value
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -363,7 +366,8 @@ def effective_sample_size(a, b, dim, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the function along.
+        The dimension(s) to apply the function along. Note that this dimension will
+        be reduced as a result.
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -381,8 +385,8 @@ def effective_sample_size(a, b, dim, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import effective_sample_size
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -451,7 +455,8 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to compute the p value over.
+        The dimension(s) to compute the p value over. Note that this dimension will
+        be reduced as a result.
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -469,8 +474,8 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import pearson_r_eff_p_value
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -520,7 +525,8 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along.
+        The dimension(s) to apply the correlation along. Note that this dimension will
+        be reduced as a result.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -544,8 +550,8 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import spearman_r
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -581,7 +587,8 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along.
+        The dimension(s) to apply the correlation along. Note that this dimension will
+        be reduced as a result.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -600,8 +607,8 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import spearman_r_p_value
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -663,7 +670,8 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to compute the p value over.
+        The dimension(s) to compute the p value over. Note that this dimension will
+        be reduced as a result.
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -688,8 +696,8 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import spearman_r_eff_p_value
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -732,7 +740,8 @@ def rmse(a, b, dim, weights=None, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the rmse along.
+        The dimension(s) to apply the rmse along. Note that this dimension will
+        be reduced as a result.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -755,8 +764,8 @@ def rmse(a, b, dim, weights=None, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import rmse
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -791,7 +800,8 @@ def mse(a, b, dim, weights=None, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the mse along.
+        The dimension(s) to apply the mse along. Note that this dimension will
+        be reduced as a result.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -814,8 +824,8 @@ def mse(a, b, dim, weights=None, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import mse
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -850,7 +860,8 @@ def mae(a, b, dim, weights=None, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the mae along.
+        The dimension(s) to apply the mae along. Note that this dimension will
+        be reduced as a result.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -873,8 +884,8 @@ def mae(a, b, dim, weights=None, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import mae
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -911,6 +922,7 @@ def median_absolute_error(a, b, dim, skipna=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the median absolute error along.
+        Note that this dimension will be reduced as a result.
     skipna : bool
         If True, skip NaNs when computing function.
 
@@ -927,8 +939,8 @@ def median_absolute_error(a, b, dim, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import median_absolute_error
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -961,7 +973,8 @@ def mape(a, b, dim, weights=None, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the mae along.
+        The dimension(s) to apply the mae along. Note that this dimension will
+        be reduced as a result.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -983,8 +996,8 @@ def mape(a, b, dim, weights=None, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import mape
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])
@@ -1020,7 +1033,8 @@ def smape(a, b, dim, weights=None, skipna=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the mae along.
+        The dimension(s) to apply the mae along. Note that this dimension will
+        be reduced as a result.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -1042,8 +1056,8 @@ def smape(a, b, dim, weights=None, skipna=False):
 
     Examples
     --------
-    >>> import numpy
-    >>> import xarray
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> from xskillscore import smape
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
                         dims=['time', 'x', 'y'])

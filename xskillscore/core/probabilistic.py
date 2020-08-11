@@ -208,6 +208,7 @@ def brier_score(observations, forecasts, dim=None, weights=None):
       Prediction, and Estimation.” Journal of the American Statistical
       Association 102, no. 477 (March 1, 2007): 359–78.
       https://doi.org/10/c6758w.
+    .. [2] https://journals.ametsoc.org/doi/abs/10.1175/1520-0493%281950%29078%3C0001%3AVOFEIT%3E2.0.CO%3B2
 
     """
     res = xr.apply_ufunc(

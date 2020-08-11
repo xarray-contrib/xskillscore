@@ -26,6 +26,10 @@ install:
 script:
   - coverage run --source xskillscore -m py.test
   - coverage report
+  - pushd docs
+  - nbstripout source/*.ipynb
+  - make html
+  - popd
   - ./ci/run-linter.sh
 
 after_success:

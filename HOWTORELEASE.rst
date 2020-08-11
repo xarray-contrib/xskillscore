@@ -31,18 +31,21 @@ a minor version adds functionality, and a patch covers bug fixes.
     $ git push -f origin stable
     $ git checkout master
 
-#. Update esmtools conda-forge feedstock
+#. Go to https://readthedocs.org and add the new version to "Active Versions"
+   under the version tab. Force-build "stable" if it isn't already building.
 
- * Fork `esmtools-feedstock repository <https://github.com/conda-forge/esmtools-feedstock>`_
+#. Update ``xskillscore`` conda-forge feedstock
+
+ * Fork `xskillscore-feedstock repository <https://github.com/conda-forge/xskillscore-feedstock>`_
  * Clone this fork and edit recipe::
 
-        $ git clone git@github.com:username/esmtools-feedstock.git
-        $ cd esmtools-feedstock
+        $ git clone git@github.com:username/xskillscore-feedstock.git
+        $ cd xskillscore-feedstock
         $ cd recipe
         $ # edit meta.yaml
 
  - Update version
- - Get sha256 from pypi.org for `esmtools <https://pypi.org/project/esmtools/#files>`_
- - Fill in the rest of information as described `here <https://github.com/conda-forge/esmtools-feedstock#updating-esmtools-feedstock>`_
+ - Get sha256 from pypi.org for `xskillscore <https://pypi.org/project/xskillscore/#files>`_
+ - Fill in the rest of information as described `here <https://github.com/conda-forge/xskillscore-feedstock#updating-xskillscore-feedstock>`_
 
  * Commit and submit a PR

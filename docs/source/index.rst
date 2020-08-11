@@ -41,12 +41,24 @@ You can also install the bleeding edge (pre-release versions) by running:
 
     pip install git+https://github.com/raybellwaves/xskillscore@master --upgrade
 
+**Getting Started**
+
+* :doc:`quick-start`
+
+.. toctree::
+    :maxdepth: 1
+    :hidden:
+    :caption: Getting Started
+
+    quick-start.ipynb
+
 **Help & Reference**
 
 * :doc:`api`
 * :doc:`contributing`
 * :doc:`changelog`
 * :doc:`release_procedure`
+* :doc:`related-projects`
 * :doc:`contributors`
 
 .. toctree::
@@ -58,4 +70,5 @@ You can also install the bleeding edge (pre-release versions) by running:
    contributing
    changelog
    release_procedure
+   related-projects
    contributors

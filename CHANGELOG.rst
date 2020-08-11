@@ -7,11 +7,16 @@ xskillscore v0.0.17 (2020-08-xx)
 
 Breaking Changes
 ----------------
-- Rename `dim` to `member_dim` in probabilistic metrics. (:pr:121) `Aaron Spring`_
+- Rename ``dim`` to ``member_dim`` in probabilistic metrics. (:pr:`121`) `Aaron Spring`_
+
+Documentation
+-------------
+- Added ``sphinx`` documentation with full API and a quick start notebook.
+  (:pr:`127`) `Riley X. Brady`_.
 
 Features
 --------
-- Add `dim` and `weights` for probabilistic metrics. (:pr:121) `Aaron Spring`_
+- Add ``dim`` and ``weights`` for probabilistic metrics. (:pr:`121`) `Aaron Spring`_
 
 
 xskillscore v0.0.16 (2020-07-18)
