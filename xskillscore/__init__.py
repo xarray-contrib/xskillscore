@@ -1,4 +1,6 @@
 # flake8: noqa
+from pkg_resources import DistributionNotFound, get_distribution
+
 from .core.accessor import XSkillScoreAccessor
 from .core.deterministic import (
     effective_sample_size,
@@ -23,3 +25,10 @@ from .core.probabilistic import (
     xr_crps_quadrature as crps_quadrature,
     xr_threshold_brier_score as threshold_brier_score,
 )
+from .versioning.print_versions import show_versions
+
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    pass

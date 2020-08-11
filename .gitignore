@@ -11,3 +11,6 @@ build
 
 # asv environments
 .asv
+
+# Mac stuff
+.DS_Store

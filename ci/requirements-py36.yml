@@ -9,11 +9,14 @@ dependencies:
   - sphinx_rtd_theme
   - sphinx
   - sphinxcontrib-napoleon
+  # IDE
+  - jupyterlab
   # Numerics
   - bottleneck
   - cftime
   - dask
   - numba
+  - numpy
   - scikit-learn
   - scipy
   - xarray
@@ -22,6 +25,7 @@ dependencies:
   - black
   - coveralls
   - doc8
+  - importlib_metadata
   - isort
   - flake8
   - pre-commit
