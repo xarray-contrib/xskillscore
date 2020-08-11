@@ -1,0 +1,8 @@
+bottleneck
+cftime
+dask
+numba
+properscoring
+scikit-learn
+scipy
+xarray

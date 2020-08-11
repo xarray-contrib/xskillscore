@@ -8,16 +8,8 @@ AUTHOR_EMAIL = 'rayjohnbell0@gmail.com'
 DESCRIPTION = 'xskillscore'
 LONG_DESCRIPTION = """Metrics for verifying forecasts"""
 URL = 'https://github.com/raybellwaves/xskillscore'
-INSTALL_REQUIRES = [
-    'scikit-learn',
-    'xarray',
-    'cftime',
-    'dask',
-    'scipy',
-    'properscoring',
-    'numba',
-    'bottleneck',
-]
+with open('requirements.txt') as f:
+    INSTALL_REQUIRES = f.read().strip().split('\n')
 TESTS_REQUIRE = ['pytest']
 PYTHON_REQUIRE = '>=3.6'
 
