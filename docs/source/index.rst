@@ -43,6 +43,7 @@ You can also install the bleeding edge (pre-release versions) by running:
 
 **Help & Reference**
 
+* :doc:`api`
 * :doc:`contributing`
 * :doc:`changelog`
 * :doc:`release_procedure`
@@ -53,6 +54,7 @@ You can also install the bleeding edge (pre-release versions) by running:
    :hidden:
    :caption: Help & Reference
 
+   api
    contributing
    changelog
    release_procedure

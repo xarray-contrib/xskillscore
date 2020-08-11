@@ -158,8 +158,7 @@ def _determine_input_core_dims(dim, weights):
 
 
 def pearson_r(a, b, dim, weights=None, skipna=False):
-    """
-    Pearson's correlation coefficient.
+    """Pearson's correlation coefficient.
 
     Parameters
     ----------
@@ -185,9 +184,20 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
     scipy.stats.pearsonr
     xskillscore.core.np_deterministic._pearson_r
 
-    Reference
-    ---------
-    https://en.wikipedia.org/wiki/Pearson_correlation_coefficient
+    Notes
+    -----
+    .. [1] https://en.wikipedia.org/wiki/Pearson_correlation_coefficient
+
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import pearson_r
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> pearson_r(a, b, dim='time')
 
     """
     dim, _ = _preprocess_dims(dim)
@@ -209,8 +219,7 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
 
 
 def r2(a, b, dim, weights=None, skipna=False):
-    """
-    R^2 (coefficient of determination) score.
+    """R^2 (coefficient of determination) score.
 
     Parameters
     ----------
@@ -235,9 +244,21 @@ def r2(a, b, dim, weights=None, skipna=False):
     xarray.apply_ufunc
     sklearn.metrics.r2_score
 
-    Reference
-    ---------
-    https://en.wikipedia.org/wiki/Coefficient_of_determination
+    Notes
+    -----
+    .. [1] https://en.wikipedia.org/wiki/Coefficient_of_determination
+
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import r2
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> r2(a, b, dim='time')
+
     """
     dim, _ = _preprocess_dims(dim)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
@@ -258,8 +279,7 @@ def r2(a, b, dim, weights=None, skipna=False):
 
 
 def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
-    """
-    2-tailed p-value associated with pearson's correlation coefficient.
+    """2-tailed p-value associated with pearson's correlation coefficient.
 
     Parameters
     ----------
@@ -284,6 +304,17 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
     xarray.apply_ufunc
     scipy.stats.pearsonr
     xskillscore.core.np_deterministic._pearson_r_p_value
+
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import pearson_r_p_value
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> pearson_r_p_value(a, b, dim='time')
 
     """
     dim, _ = _preprocess_dims(dim)
@@ -341,12 +372,23 @@ def effective_sample_size(a, b, dim, skipna=False):
     xarray.Dataset or xarray.DataArray
         Effective sample size.
 
-    Reference
-    ---------
-    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+    Notes
+    -----
+    .. [1] Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
-    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+    .. [2] Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
+
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import effective_sample_size
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> effective_sample_size(a, b, dim='time')
 
     """
     dim, _ = _preprocess_dims(dim)
@@ -425,11 +467,22 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False):
     scipy.stats.pearsonr
     xskillscore.core.np_deterministic._pearson_r_eff_p_value
 
-    Reference
-    ---------
-    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import pearson_r_eff_p_value
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> pearson_r_eff_p_value(a, b, dim='time')
+
+    Notes
+    -----
+    .. [1] Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
-    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+    .. [2] Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
 
     """
@@ -458,8 +511,7 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False):
 
 
 def spearman_r(a, b, dim, weights=None, skipna=False):
-    """
-    Spearman's correlation coefficient.
+    """Spearman's correlation coefficient.
 
     Parameters
     ----------
@@ -485,10 +537,21 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
     scipy.stats.spearman_r
     xskillscore.core.np_deterministic._spearman_r
 
-    Reference
-    ---------
-    https://github.com/scipy/scipy/blob/v1.3.1/scipy/stats/stats.py#L3613-L3764
-    https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
+    Notes
+    -----
+    .. [1] https://github.com/scipy/scipy/blob/v1.3.1/scipy/stats/stats.py#L3613-L3764
+    .. [2] https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
+
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import spearman_r
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> spearman_r(a, b, dim='time')
 
     """
     dim, _ = _preprocess_dims(dim)
@@ -509,8 +572,7 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
 
 
 def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
-    """
-    2-tailed p-value associated with Spearman's correlation coefficient.
+    """2-tailed p-value associated with Spearman's correlation coefficient.
 
     Parameters
     ----------
@@ -535,6 +597,17 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
     xarray.apply_ufunc
     scipy.stats.spearman_r
     xskillscore.core.np_deterministic._spearman_r_p_value
+
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import spearman_r_p_value
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> spearman_r_p_value(a, b, dim='time')
 
     """
     dim, _ = _preprocess_dims(dim)
@@ -600,18 +673,29 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False):
         2-tailed p-value of Spearman's correlation coefficient, accounting for
         autocorrelation.
 
-    Reference
-    ---------
-    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
-      freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
-    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
-      Academic press, 2011.
-
     See Also
     --------
     xarray.apply_ufunc
     scipy.stats.spearman_r
     xskillscore.core.np_deterministic._spearman_r_eff_p_value
+
+    Notes
+    -----
+    .. [1] Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+      freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
+    .. [2] Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+      Academic press, 2011.
+
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import spearman_r_eff_p_value
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> spearman_r_eff_p_value(a, b, dim='time')
 
     """
     dim, _ = _preprocess_dims(dim)
@@ -639,8 +723,7 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False):
 
 
 def rmse(a, b, dim, weights=None, skipna=False):
-    """
-    Root Mean Squared Error.
+    """Root Mean Squared Error.
 
     Parameters
     ----------
@@ -666,9 +749,20 @@ def rmse(a, b, dim, weights=None, skipna=False):
     sklearn.metrics.mean_squared_error
     xskillscore.core.np_deterministic._rmse
 
-    Reference
-    ---------
-    https://en.wikipedia.org/wiki/Root-mean-square_deviation
+    Notes
+    -----
+    .. [1] https://en.wikipedia.org/wiki/Root-mean-square_deviation
+
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import rmse
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> rmse(a, b, dim='time')
 
     """
     dim, axis = _preprocess_dims(dim)
@@ -688,8 +782,7 @@ def rmse(a, b, dim, weights=None, skipna=False):
 
 
 def mse(a, b, dim, weights=None, skipna=False):
-    """
-    Mean Squared Error.
+    """Mean Squared Error.
 
     Parameters
     ----------
@@ -715,9 +808,20 @@ def mse(a, b, dim, weights=None, skipna=False):
     sklearn.metrics.mean_squared_error
     xskillscore.core.np_deterministic._mse
 
-    Reference
-    ---------
-    https://en.wikipedia.org/wiki/Mean_squared_error
+    Notes
+    -----
+    .. [1] https://en.wikipedia.org/wiki/Mean_squared_error
+
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import mse
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> mse(a, b, dim='time')
 
     """
     dim, axis = _preprocess_dims(dim)
@@ -737,8 +841,7 @@ def mse(a, b, dim, weights=None, skipna=False):
 
 
 def mae(a, b, dim, weights=None, skipna=False):
-    """
-    Mean Absolute Error.
+    """Mean Absolute Error.
 
     Parameters
     ----------
@@ -764,9 +867,20 @@ def mae(a, b, dim, weights=None, skipna=False):
     sklearn.metrics.mean_absolute_error
     xskillscore.core.np_deterministic._mae
 
-    Reference
-    ---------
-    https://en.wikipedia.org/wiki/Mean_absolute_error
+    Notes
+    -----
+    .. [1] https://en.wikipedia.org/wiki/Mean_absolute_error
+
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import mae
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> mae(a, b, dim='time')
 
     """
     dim, axis = _preprocess_dims(dim)
@@ -811,6 +925,17 @@ def median_absolute_error(a, b, dim, skipna=False):
     xarray.apply_ufunc
     xskillscore.core.np_deterministic._median_absolute_error
 
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import median_absolute_error
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> median_absolute_error(a, b, dim='time')
+
     """
     dim, axis = _preprocess_dims(dim)
 
@@ -826,8 +951,7 @@ def median_absolute_error(a, b, dim, skipna=False):
 
 
 def mape(a, b, dim, weights=None, skipna=False):
-    """
-    Mean Absolute Percentage Error.
+    """Mean Absolute Percentage Error.
 
     Parameters
     ----------
@@ -853,9 +977,20 @@ def mape(a, b, dim, weights=None, skipna=False):
     xarray.apply_ufunc
     xskillscore.core.np_deterministic._mape
 
-    Reference
-    ---------
-    https://en.wikipedia.org/wiki/Mean_absolute_percentage_error
+    Notes
+    -----
+    .. [1] https://en.wikipedia.org/wiki/Mean_absolute_percentage_error
+
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import mape
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> mape(a, b, dim='time')
 
     """
     dim, axis = _preprocess_dims(dim)
@@ -875,8 +1010,7 @@ def mape(a, b, dim, weights=None, skipna=False):
 
 
 def smape(a, b, dim, weights=None, skipna=False):
-    """
-    Symmetric Mean Absolute Percentage Error.
+    """Symmetric Mean Absolute Percentage Error.
 
     Parameters
     ----------
@@ -902,9 +1036,20 @@ def smape(a, b, dim, weights=None, skipna=False):
     xarray.apply_ufunc
     xskillscore.core.np_deterministic._smape
 
-    Reference
-    ---------
-    https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
+    Notes
+    -----
+    .. [1] https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
+
+    Examples
+    --------
+    >>> import numpy
+    >>> import xarray
+    >>> from xskillscore import smape
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> smape(a, b, dim='time')
 
     """
     dim, axis = _preprocess_dims(dim)

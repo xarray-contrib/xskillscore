@@ -1,12 +1,6 @@
 import numpy as np
+import properscoring
 import xarray as xr
-from properscoring import (
-    brier_score,
-    crps_ensemble,
-    crps_gaussian,
-    crps_quadrature,
-    threshold_brier_score,
-)
 
 __all__ = [
     'brier_score',
@@ -17,10 +11,8 @@ __all__ = [
 ]
 
 
-def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None):
-    """
-    xarray version of properscoring.crps_gaussian: Continuous Ranked
-     Probability Score with a Gaussian distribution.
+def crps_gaussian(observations, mu, sig, dim=None, weights=None):
+    """Continuous Ranked Probability Score with a Gaussian distribution.
 
     Parameters
     ----------
@@ -56,7 +48,7 @@ def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None):
     if sig.dims != observations.dims:
         observations, sig = xr.broadcast(observations, sig)
     res = xr.apply_ufunc(
-        crps_gaussian,
+        properscoring.crps_gaussian,
         observations,
         mu,
         sig,
@@ -73,12 +65,10 @@ def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None):
             return res.mean(dim)
 
 
-def xr_crps_quadrature(
+def crps_quadrature(
     x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, dim=None, weights=None
 ):
-    """
-    xarray version of properscoring.crps_quadrature: Continuous Ranked
-     Probability Score with numerical integration of the normal distribution
+    """Continuous Ranked Probability Score with numerical integration of the normal distribution.
 
     Parameters
     ----------
@@ -105,7 +95,7 @@ def xr_crps_quadrature(
 
     """
     res = xr.apply_ufunc(
-        crps_quadrature,
+        properscoring.crps_quadrature,
         x,
         cdf_or_dist,
         xmin,
@@ -124,7 +114,7 @@ def xr_crps_quadrature(
             return res.mean(dim)
 
 
-def xr_crps_ensemble(
+def crps_ensemble(
     observations,
     forecasts,
     member_weights=None,
@@ -133,9 +123,7 @@ def xr_crps_ensemble(
     dim=None,
     weights=None,
 ):
-    """
-    xarray version of properscoring.crps_ensemble: Continuous Ranked
-     Probability Score with the ensemble distribution
+    """Continuous Ranked Probability Score with the ensemble distribution
 
     Parameters
     ----------
@@ -170,7 +158,7 @@ def xr_crps_ensemble(
 
     """
     res = xr.apply_ufunc(
-        crps_ensemble,
+        properscoring.crps_ensemble,
         observations,
         forecasts,
         input_core_dims=[[], [member_dim]],
@@ -187,9 +175,8 @@ def xr_crps_ensemble(
             return res.mean(dim)
 
 
-def xr_brier_score(observations, forecasts, dim=None, weights=None):
-    """
-    xarray version of properscoring.brier_score: Calculate Brier score (BS).
+def brier_score(observations, forecasts, dim=None, weights=None):
+    """Calculate Brier score (BS).
 
     ..math:
         BS(p, k) = (p_1 - k)^2
@@ -210,21 +197,21 @@ def xr_brier_score(observations, forecasts, dim=None, weights=None):
     -------
     xarray.Dataset or xarray.DataArray
 
-    References
-    ----------
-    Gneiting, Tilmann, and Adrian E Raftery. “Strictly Proper Scoring Rules,
-      Prediction, and Estimation.” Journal of the American Statistical
-      Association 102, no. 477 (March 1, 2007): 359–78.
-      https://doi.org/10/c6758w.
-
     See Also
     --------
     properscoring.brier_score
     xarray.apply_ufunc
 
+    Notes
+    -----
+    .. [1] Gneiting, Tilmann, and Adrian E Raftery. “Strictly Proper Scoring Rules,
+      Prediction, and Estimation.” Journal of the American Statistical
+      Association 102, no. 477 (March 1, 2007): 359–78.
+      https://doi.org/10/c6758w.
+
     """
     res = xr.apply_ufunc(
-        brier_score,
+        properscoring.brier_score,
         observations,
         forecasts,
         input_core_dims=[[], []],
@@ -240,7 +227,7 @@ def xr_brier_score(observations, forecasts, dim=None, weights=None):
             return res.mean(dim)
 
 
-def xr_threshold_brier_score(
+def threshold_brier_score(
     observations,
     forecasts,
     threshold,
@@ -249,9 +236,7 @@ def xr_threshold_brier_score(
     dim=None,
     weights=None,
 ):
-    """
-    xarray version of properscoring.threshold_brier_score: Calculate the Brier
-     scores of an ensemble for exceeding given thresholds.
+    """Calculate the Brier scores of an ensemble for exceeding given thresholds.
 
     Parameters
     ----------
@@ -279,16 +264,16 @@ def xr_threshold_brier_score(
         observations. Otherwise, it will have an additional final dimension
         corresponding to the threshold levels. Not implemented yet.)
 
-    References
-    ----------
-    Gneiting, T. and Ranjan, R. Comparing density forecasts using threshold-
-       and quantile-weighted scoring rules. J. Bus. Econ. Stat. 29, 411-422
-       (2011). http://www.stat.washington.edu/research/reports/2008/tr533.pdf
-
     See Also
     --------
     properscoring.threshold_brier_score
     xarray.apply_ufunc
+
+    Notes
+    -----
+    .. [1] Gneiting, T. and Ranjan, R. Comparing density forecasts using threshold-
+       and quantile-weighted scoring rules. J. Bus. Econ. Stat. 29, 411-422
+       (2011). http://www.stat.washington.edu/research/reports/2008/tr533.pdf
 
     """
     if isinstance(threshold, list):
@@ -313,7 +298,7 @@ def xr_threshold_brier_score(
             type(threshold),
         )
     res = xr.apply_ufunc(
-        threshold_brier_score,
+        properscoring.threshold_brier_score,
         observations,
         forecasts,
         threshold,
