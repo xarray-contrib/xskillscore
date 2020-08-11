@@ -34,7 +34,7 @@ def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None):
         Dimension to mean over after calculating crps_gaussian.
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
-        Weigths for `weighted.mean(dim)`. Defaults to None implying unweighted mean.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
 
     Returns
     -------
@@ -92,7 +92,7 @@ def xr_crps_quadrature(
         Dimension to mean over after calculating crps_gaussian.
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
-        Weigths for `weighted.mean(dim)`. Defaults to None implying unweighted mean.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
 
     Returns
     -------
@@ -157,7 +157,7 @@ def xr_crps_ensemble(
         Dimension to mean over after calculating crps_gaussian.
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
-        Weigths for `weighted.mean(dim)`. Defaults to None implying unweighted mean.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
 
     Returns
     -------
@@ -204,7 +204,7 @@ def xr_brier_score(observations, forecasts, dim=None, weights=None):
         Dimension to mean over after calculating crps_gaussian.
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
-        Weigths for `weighted.mean(dim)`. Defaults to None implying unweighted mean.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
 
     Returns
     -------
@@ -270,7 +270,7 @@ def xr_threshold_brier_score(
         Dimension to mean over after calculating crps_gaussian.
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
-        Weigths for `weighted.mean(dim)`. Defaults to None implying unweighted mean.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
 
     Returns
     -------
