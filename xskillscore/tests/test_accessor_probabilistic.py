@@ -5,11 +5,11 @@ from scipy.stats import norm
 from xarray.tests import assert_allclose
 
 from xskillscore.core.probabilistic import (
-    xr_brier_score as brier_score,
-    xr_crps_ensemble as crps_ensemble,
-    xr_crps_gaussian as crps_gaussian,
-    xr_crps_quadrature as crps_quadrature,
-    xr_threshold_brier_score as threshold_brier_score,
+    brier_score,
+    crps_ensemble,
+    crps_gaussian,
+    crps_quadrature,
+    threshold_brier_score,
 )
 
 
