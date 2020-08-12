@@ -43,17 +43,23 @@ class XSkillScoreAccessor(object):
     def pearson_r(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return pearson_r(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
+        return pearson_r(
+            a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+        )
 
     def r2(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
         return r2(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
 
-    def pearson_r_p_value(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
+    def pearson_r_p_value(
+        self, a, b, dim, weights=None, skipna=False, keep_attrs=False
+    ):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return pearson_r_p_value(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
+        return pearson_r_p_value(
+            a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+        )
 
     def effective_sample_size(self, a, b, dim, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
@@ -68,12 +74,18 @@ class XSkillScoreAccessor(object):
     def spearman_r(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return spearman_r(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
+        return spearman_r(
+            a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+        )
 
-    def spearman_r_p_value(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
+    def spearman_r_p_value(
+        self, a, b, dim, weights=None, skipna=False, keep_attrs=False
+    ):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return spearman_r_p_value(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
+        return spearman_r_p_value(
+            a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+        )
 
     def spearman_r_eff_p_value(self, a, b, dim, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
@@ -110,7 +122,9 @@ class XSkillScoreAccessor(object):
         b = self._in_ds(b)
         return smape(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
 
-    def crps_gaussian(self, observations, mu, sig, dim=None, weights=None, keep_attrs=False):
+    def crps_gaussian(
+        self, observations, mu, sig, dim=None, weights=None, keep_attrs=False
+    ):
         observations = self._in_ds(observations)
         mu = self._in_ds(mu)
         sig = self._in_ds(sig)
@@ -139,8 +153,15 @@ class XSkillScoreAccessor(object):
         )
 
     def crps_quadrature(
-        self, x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, dim=None, weights=None,
-        keep_attrs=False
+        self,
+        x,
+        cdf_or_dist,
+        xmin=None,
+        xmax=None,
+        tol=1e-6,
+        dim=None,
+        weights=None,
+        keep_attrs=False,
     ):
         x = self._in_ds(x)
         cdf_or_dist = self._in_ds(cdf_or_dist)
@@ -157,7 +178,7 @@ class XSkillScoreAccessor(object):
         dim=None,
         member_dim='member',
         weights=None,
-        keep_attrs=False
+        keep_attrs=False,
     ):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)

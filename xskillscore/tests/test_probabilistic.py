@@ -119,12 +119,6 @@ def test_xr_crps_gaussian_dask(o_dask, f_dask, keep_attrs):
     else:
         assert actual.attrs == {}
 
-def test_xr_crps_gaussian_dask_b_int(o_dask):
-    mu = 0
-    sig = 1
-    actual = xr_crps_gaussian(o_dask, mu, sig)
-    assert actual is not None
-
 
 @pytest.mark.parametrize('dim', DIMS)
 def test_xr_crps_gaussian_dim(o, f, dim):
@@ -132,6 +126,7 @@ def test_xr_crps_gaussian_dim(o, f, dim):
     sig = f.std('member')
     actual = xr_crps_gaussian(o, mu, sig, dim=dim)
     assert_only_dim_reduced(dim, actual, o)
+
 
 @pytest.mark.parametrize('keep_attrs', [True, False])
 def test_xr_crps_quadrature_dask(o_dask, keep_attrs):
@@ -286,6 +281,7 @@ def test_xr_brier_score(o_dask, f_dask, keep_attrs):
     else:
         assert actual.attrs == {}
 
+
 @pytest.mark.parametrize('dim', DIMS)
 def test_xr_threshold_brier_score_dim(o, f, dim):
     actual = xr_threshold_brier_score(o, f, threshold=0.5, dim=dim)
@@ -298,19 +294,6 @@ def test_xr_threshold_brier_score_dim(o, f, dim):
 def test_xr_threshold_brier_score_dask_threshold(o_dask, f_dask, threshold):
     actual = xr_threshold_brier_score(o_dask, f_dask, threshold)
     assert actual.chunks is not None
-
-
-def test_xr_threshold_brier_score_multiple_thresholds_xr(o, f):
-    threshold = xr.DataArray([0.1, 0.3, 0.5], dims='threshold')
-    actual = xr_threshold_brier_score(o, f, threshold)
-    assert 'threshold' in actual.dims
-
-
-def test_xr_threshold_brier_score_multiple_thresholds_dask(o_dask, f_dask):
-    threshold = xr.DataArray([0.1, 0.3, 0.5], dims='threshold').chunk()
-    actual = xr_threshold_brier_score(o_dask, f_dask, threshold)
-    assert actual.chunks is not None
-    assert 'threshold' in actual.dims
 
 
 @pytest.mark.parametrize('dim', DIMS)
@@ -327,7 +310,7 @@ def test_xr_brier_score_dask(o_dask, f_dask, keep_attrs):
         keep_attrs=keep_attrs,
     )
     assert actual.chunks is not None
-    expected = brier_score((o_dask > .5), (f_dask > 0.5).mean('member'))
+    expected = brier_score((o_dask > 0.5), (f_dask > 0.5).mean('member'))
     expected = xr.DataArray(expected, coords=o_dask.coords)
     # test for numerical identity of xr_brier_score and brier_score
     assert_allclose(actual, expected)

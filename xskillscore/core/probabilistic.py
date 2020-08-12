@@ -16,6 +16,7 @@ __all__ = [
     'threshold_brier_score',
 ]
 
+
 def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=False):
     """
     xarray version of properscoring.crps_gaussian: Continuous Ranked
@@ -79,8 +80,14 @@ def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=F
 
 
 def xr_crps_quadrature(
-    x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, dim=None,
-    weights=None, keep_attrs=False
+    x,
+    cdf_or_dist,
+    xmin=None,
+    xmax=None,
+    tol=1e-6,
+    dim=None,
+    weights=None,
+    keep_attrs=False,
 ):
     """
     xarray version of properscoring.crps_quadrature: Continuous Ranked
@@ -205,6 +212,7 @@ def xr_crps_ensemble(
         else:
             return res.mean(dim, keep_attrs=keep_attrs)
 
+
 def xr_brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=False):
     """
     xarray version of properscoring.brier_score: Calculate Brier score (BS).
@@ -272,7 +280,7 @@ def xr_threshold_brier_score(
     member_dim='member',
     dim=None,
     weights=None,
-    keep_attrs=False
+    keep_attrs=False,
 ):
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
