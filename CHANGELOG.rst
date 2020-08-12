@@ -5,13 +5,18 @@ Changelog History
 xskillscore v0.0.17 (2020-08-xx)
 ================================
 
-Breaking Changes
+Internal Changes
 ----------------
-- Rename `dim` to `member_dim` in probabilistic metrics. (:pr:121) `Aaron Spring`_
+- Added ``utils`` module to house utilities shared across multiple modules. `Dougie Squire`_
 
 Features
 --------
-- Add `dim` and `weights` for probabilistic metrics. (:pr:121) `Aaron Spring`_
+- Added contingency table and associated metrics (:pr:`119`). `Dougie Squire`_
+- Add `dim` and `weights` for probabilistic metrics. (:pr:`121`) `Aaron Spring`_
+
+Breaking Changes
+----------------
+- Rename `dim` to `member_dim` in probabilistic metrics. (:pr:`121`) `Aaron Spring`_
 
 
 xskillscore v0.0.16 (2020-07-18)
@@ -102,5 +107,6 @@ Testing
 
 .. _`Aaron Spring`: https://github.com/aaronspring
 .. _`Andrew Huang`: https://github.com/ahuang11
+.. _`Dougie Squire`: https://github.com/dougiesquire
 .. _`Riley X. Brady`: https://github.com/bradyrx
 .. _`Ray Bell`: https://github.com/raybellwaves
