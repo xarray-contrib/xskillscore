@@ -5,11 +5,10 @@ This page provides an auto-generated summary of ``xskillscore``'s API.
 For more details and examples, refer to the relevant chapters in the main part of the
 documentation.
 
+.. currentmodule:: xskillscore
+
 Deterministic Metrics
 ---------------------
-
-.. currentmodule:: xskillscore.core.deterministic
-
 
 Correlation Metrics
 ~~~~~~~~~~~~~~~~~~~
@@ -43,8 +42,6 @@ Distance Metrics
 Probabilistic Metrics
 ---------------------
 
-.. currentmodule:: xskillscore.core.probabilistic
-
 Currently, our probabilistic metrics are ported over from
 `properscoring <https://github.com/TheClimateCorporation/properscoring>`__ to work with
 ``xarray`` DataArrays and Datasets.
@@ -60,8 +57,6 @@ Currently, our probabilistic metrics are ported over from
 
 Dichotomous Metrics
 -------------------
-
-.. currentmodule:: xskillscore
 
 These metrics rely upon the construction of a ``Contingency`` object for dichotomous (yes/no)
 forecasts. The user calls the individual methods to access metrics based on the table.
