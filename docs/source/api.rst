@@ -57,3 +57,36 @@ Currently, our probabilistic metrics are ported over from
     crps_gaussian
     crps_quadrature
     threshold_brier_score
+
+Dichotomous Metrics
+-------------------
+
+.. currentmodule:: xskillscore
+
+These metrics rely upon the construction of a ``Contingency`` object for dichotomous (yes/no)
+forecasts. The user calls the individual methods to access metrics based on the table.
+
+.. autosummary::
+    :toctree: api/
+
+    Contingency
+
+Dichotomous-Only Metrics
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+    :toctree: api/
+
+    Contingency.hits
+    Contingency.misses
+    Contingency.false_alarms
+    Contingency.correct_negatives
+    Contingency.bias_score
+    Contingency.hit_rate
+    Contingency.false_alarm_ratio
+    Contingency.false_alarm_rate
+    Contingency.success_ratio
+    Contingency.threat_score
+    Contingency.equit_threat_score
+    Contingency.odds_ratio
+    Contingency.odds_ratio_skill_score
