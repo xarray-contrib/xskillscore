@@ -20,6 +20,7 @@ dependencies:
   - scikit-learn
   - scipy
   - xarray
+  - xhistogram
   # Package Management
   - asv
   - black
