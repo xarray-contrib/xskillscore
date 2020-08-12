@@ -7,3 +7,4 @@ properscoring
 scikit-learn
 scipy
 xarray
+xhistogram
