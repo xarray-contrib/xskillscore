@@ -201,7 +201,7 @@ Examples
    ### Contingency-based
    dichotomous_category_edges = np.array([0, 0.5, 1]) # "dichotomous" mean two-category
    dichotomous_contingency = xs.Contingency(obs, fct,
-                                            dichotomous_category_edges, 
+                                            dichotomous_category_edges,
                                             dichotomous_category_edges,
                                             dim=['lat','lon'])
 
@@ -237,7 +237,7 @@ Examples
 
    multi_category_edges = np.array([0, 0.25, 0.75, 1])
    multicategory_contingency = xs.Contingency(obs, fct,
-                                              multi_category_edges, 
+                                              multi_category_edges,
                                               multi_category_edges,
                                               dim=['lat','lon'])
 
