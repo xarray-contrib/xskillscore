@@ -1,5 +1,6 @@
 # flake8: noqa
 from .core.accessor import XSkillScoreAccessor
+from .core.contingency import Contingency
 from .core.deterministic import (
     effective_sample_size,
     mae,

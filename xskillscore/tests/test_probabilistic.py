@@ -19,9 +19,11 @@ from xskillscore.core.probabilistic import (
     xr_threshold_brier_score,
 )
 
+DIMS = ['lon', 'lat', ['lon', 'lat'], None, []]
+
 
 @pytest.fixture
-def o_dask():
+def o():
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(lats), len(lons))
@@ -31,14 +33,42 @@ def o_dask():
 
 
 @pytest.fixture
-def f_dask():
+def o_dask(o):
+    return o.chunk()
+
+
+@pytest.fixture
+def weights(o):
+    """Latitudinal weighting"""
+    return o.lat
+
+
+@pytest.fixture
+def f():
+    """Forecast has same dimensions as observation and member dimension."""
     members = np.arange(3)
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(members), len(lats), len(lons))
     return xr.DataArray(
         data, coords=[members, lats, lons], dims=['member', 'lat', 'lon']
-    ).chunk()
+    )
+
+
+@pytest.fixture
+def f_dask(f):
+    return f.chunk()
+
+
+def assert_only_dim_reduced(dim, actual, obs):
+    """Check that actual is only reduced by dims in dim."""
+    if not isinstance(dim, list):
+        dim = [dim]
+    for d in dim:
+        assert d not in actual.dims
+    for d in obs.dims:
+        if d not in dim:
+            assert d in actual.dims
 
 
 @pytest.mark.parametrize('keep_attrs', [True, False])
@@ -56,6 +86,19 @@ def test_xr_crps_ensemble_dask(o_dask, f_dask, keep_attrs):
         assert actual.attrs == o_dask.attrs
     else:
         assert actual.attrs == {}
+
+
+@pytest.mark.parametrize('dim', DIMS)
+def test_xr_crps_ensemble_dim(o, f, dim):
+    actual = xr_crps_ensemble(o, f, dim=dim)
+    assert_only_dim_reduced(dim, actual, o)
+
+
+@pytest.mark.parametrize('keep_attrs', [True, False])
+def test_xr_crps_ensemble_weighted(o, f, weights, keep_attrs):
+    dim = ['lon', 'lat']
+    actual = xr_crps_ensemble(o, f, dim=dim, weights=weights, keep_attrs=keep_attrs)
+    assert_only_dim_reduced(dim, actual, o)
 
 
 @pytest.mark.parametrize('keep_attrs', [True, False])
@@ -76,9 +119,22 @@ def test_xr_crps_gaussian_dask(o_dask, f_dask, keep_attrs):
     else:
         assert actual.attrs == {}
 
+def test_xr_crps_gaussian_dask_b_int(o_dask):
+    mu = 0
+    sig = 1
+    actual = xr_crps_gaussian(o_dask, mu, sig)
+    assert actual is not None
+
+
+@pytest.mark.parametrize('dim', DIMS)
+def test_xr_crps_gaussian_dim(o, f, dim):
+    mu = f.mean('member')
+    sig = f.std('member')
+    actual = xr_crps_gaussian(o, mu, sig, dim=dim)
+    assert_only_dim_reduced(dim, actual, o)
 
 @pytest.mark.parametrize('keep_attrs', [True, False])
-def test_xr_crps_quadrature_dask(o_dask, f_dask, keep_attrs):
+def test_xr_crps_quadrature_dask(o_dask, keep_attrs):
     cdf_or_dist = norm
     actual = xr_crps_quadrature(o_dask, cdf_or_dist, keep_attrs=keep_attrs)
     expected = crps_quadrature(o_dask, cdf_or_dist)
@@ -112,6 +168,18 @@ def test_xr_crps_quadrature_args(o_dask, f_dask, keep_attrs):
     assert expected.chunks is None
     if keep_attrs:
         assert actual.attrs == o_dask.attrs
+    else:
+        assert actual.attrs == {}
+
+
+@pytest.mark.parametrize('dim', DIMS)
+@pytest.mark.parametrize('keep_attrs', [True, False])
+def test_xr_crps_quadrature_dim(o, f, dim, keep_attrs):
+    cdf_or_dist = norm
+    actual = xr_crps_quadrature(o, cdf_or_dist, dim=dim, keep_attrs=keep_attrs)
+    assert_only_dim_reduced(dim, actual, o)
+    if keep_attrs:
+        assert actual.attrs == o.attrs
     else:
         assert actual.attrs == {}
 
@@ -218,6 +286,38 @@ def test_xr_brier_score(o_dask, f_dask, keep_attrs):
     else:
         assert actual.attrs == {}
 
+@pytest.mark.parametrize('dim', DIMS)
+def test_xr_threshold_brier_score_dim(o, f, dim):
+    actual = xr_threshold_brier_score(o, f, threshold=0.5, dim=dim)
+    assert_only_dim_reduced(dim, actual, o)
+
+
+@pytest.mark.parametrize(
+    'threshold', [0, 0.5, [0.1, 0.3, 0.5]], ids=['int', 'flat', 'list']
+)
+def test_xr_threshold_brier_score_dask_threshold(o_dask, f_dask, threshold):
+    actual = xr_threshold_brier_score(o_dask, f_dask, threshold)
+    assert actual.chunks is not None
+
+
+def test_xr_threshold_brier_score_multiple_thresholds_xr(o, f):
+    threshold = xr.DataArray([0.1, 0.3, 0.5], dims='threshold')
+    actual = xr_threshold_brier_score(o, f, threshold)
+    assert 'threshold' in actual.dims
+
+
+def test_xr_threshold_brier_score_multiple_thresholds_dask(o_dask, f_dask):
+    threshold = xr.DataArray([0.1, 0.3, 0.5], dims='threshold').chunk()
+    actual = xr_threshold_brier_score(o_dask, f_dask, threshold)
+    assert actual.chunks is not None
+    assert 'threshold' in actual.dims
+
+
+@pytest.mark.parametrize('dim', DIMS)
+def test_xr_brier_score_dim(o, f, dim):
+    actual = xr_brier_score((o > 0.5), (f > 0.5).mean('member'), dim=dim)
+    assert_only_dim_reduced(dim, actual, o)
+
 
 @pytest.mark.parametrize('keep_attrs', [True, False])
 def test_xr_brier_score_dask(o_dask, f_dask, keep_attrs):
@@ -227,7 +327,7 @@ def test_xr_brier_score_dask(o_dask, f_dask, keep_attrs):
         keep_attrs=keep_attrs,
     )
     assert actual.chunks is not None
-    expected = brier_score((o_dask > 0.5), (f_dask > 0.5).mean('member'))
+    expected = brier_score((o_dask > .5), (f_dask > 0.5).mean('member'))
     expected = xr.DataArray(expected, coords=o_dask.coords)
     # test for numerical identity of xr_brier_score and brier_score
     assert_allclose(actual, expected)

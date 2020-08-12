@@ -16,11 +16,11 @@ __all__ = [
     'threshold_brier_score',
 ]
 
-
-def xr_crps_gaussian(observations, mu, sig, keep_attrs=False):
+def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=False):
     """
     xarray version of properscoring.crps_gaussian: Continuous Ranked
      Probability Score with a Gaussian distribution.
+
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -29,6 +29,11 @@ def xr_crps_gaussian(observations, mu, sig, keep_attrs=False):
         The mean of the forecast normal distribution.
     sig : xarray.Dataset or xarray.DataArray
         The standard deviation of the forecast distribution.
+    dim : str or list of str, optional
+        Dimension to mean over after calculating crps_gaussian.
+        Defaults to None implying averaging.
+    weights : xr.DataArray with dimensions from dim, optional
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -37,11 +42,13 @@ def xr_crps_gaussian(observations, mu, sig, keep_attrs=False):
 
     Returns
     -------
-    xarray.Dataset or xarray.DataArray
+    xarray.Dataset or xarray.DataArray reduced by dimension dim
+
     See Also
     --------
     properscoring.crps_gaussian
     xarray.apply_ufunc
+
     """
     # check if same dimensions
     if isinstance(mu, (int, float)):
@@ -52,7 +59,7 @@ def xr_crps_gaussian(observations, mu, sig, keep_attrs=False):
         observations, mu = xr.broadcast(observations, mu)
     if sig.dims != observations.dims:
         observations, sig = xr.broadcast(observations, sig)
-    return xr.apply_ufunc(
+    res = xr.apply_ufunc(
         crps_gaussian,
         observations,
         mu,
@@ -62,14 +69,23 @@ def xr_crps_gaussian(observations, mu, sig, keep_attrs=False):
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
+    if dim is None:
+        return res
+    else:
+        if weights is not None:
+            return res.weighted(weights).mean(dim)
+        else:
+            return res.mean(dim)
 
 
 def xr_crps_quadrature(
-    x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, keep_attrs=False
+    x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, dim=None,
+    weights=None, keep_attrs=False
 ):
     """
     xarray version of properscoring.crps_quadrature: Continuous Ranked
      Probability Score with numerical integration of the normal distribution
+
     Parameters
     ----------
     x : xarray.Dataset or xarray.DataArray
@@ -77,6 +93,12 @@ def xr_crps_quadrature(
     cdf_or_dist : callable or scipy.stats.distribution
         Function which returns the cumulative density of the forecast
         distribution at value x.
+    xmin, xmax, tol: see properscoring.crps_quadrature
+    dim : str or list of str, optional
+        Dimension to mean over after calculating crps_gaussian.
+        Defaults to None implying averaging.
+    weights : xr.DataArray with dimensions from dim, optional
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -86,12 +108,14 @@ def xr_crps_quadrature(
     Returns
     -------
     xarray.Dataset or xarray.DataArray
+
     See Also
     --------
     properscoring.crps_quadrature
     xarray.apply_ufunc
+
     """
-    return xr.apply_ufunc(
+    res = xr.apply_ufunc(
         crps_quadrature,
         x,
         cdf_or_dist,
@@ -103,26 +127,36 @@ def xr_crps_quadrature(
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
+    if dim is None:
+        return res
+    else:
+        if weights is not None:
+            return res.weighted(weights).mean(dim)
+        else:
+            return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def xr_crps_ensemble(
     observations,
     forecasts,
-    weights=None,
+    member_weights=None,
     issorted=False,
-    dim='member',
+    member_dim='member',
+    dim=None,
+    weights=None,
     keep_attrs=False,
 ):
     """
     xarray version of properscoring.crps_ensemble: Continuous Ranked
      Probability Score with the ensemble distribution
+
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
         The observations or set of observations.
     forecasts : xarray.Dataset or xarray.DataArray
         Forecast with required member dimension ``dim``.
-    weights : xarray.Dataset or xarray.DataArray
+    member_weights : xarray.Dataset or xarray.DataArray
         If provided, the CRPS is calculated exactly with the assigned
         probability weights to each forecast. Weights should be positive,
         but do not need to be normalized. By default, each forecast is
@@ -130,8 +164,13 @@ def xr_crps_ensemble(
     issorted : bool, optional
         Optimization flag to indicate that the elements of `ensemble` are
         already sorted along `axis`.
-    dim : str, optional
+    member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
+    dim : str or list of str, optional
+        Dimension to mean over after calculating crps_gaussian.
+        Defaults to None implying averaging.
+    weights : xr.DataArray with dimensions from dim, optional
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -141,34 +180,49 @@ def xr_crps_ensemble(
     Returns
     -------
     xarray.Dataset or xarray.DataArray
+
     See Also
     --------
     properscoring.crps_ensemble
     xarray.apply_ufunc
+
     """
-    return xr.apply_ufunc(
+    res = xr.apply_ufunc(
         crps_ensemble,
         observations,
         forecasts,
-        input_core_dims=[[], [dim]],
-        kwargs={'axis': -1, 'issorted': issorted, 'weights': weights},
+        input_core_dims=[[], [member_dim]],
+        kwargs={'axis': -1, 'issorted': issorted, 'weights': member_weights},
         dask='parallelized',
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
+    if dim is None:
+        return res
+    else:
+        if weights is not None:
+            return res.weighted(weights).mean(dim)
+        else:
+            return res.mean(dim, keep_attrs=keep_attrs)
 
-
-def xr_brier_score(observations, forecasts, keep_attrs=False):
+def xr_brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=False):
     """
     xarray version of properscoring.brier_score: Calculate Brier score (BS).
+
     ..math:
-        BS(p, k) = (p_1 - k)^2,
+        BS(p, k) = (p_1 - k)^2
+
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
         The observations or set of observations.
     forecasts : xarray.Dataset or xarray.DataArray
         The forecasts associated with the observations.
+    dim : str or list of str, optional
+        Dimension to mean over after calculating crps_gaussian.
+        Defaults to None implying averaging.
+    weights : xr.DataArray with dimensions from dim, optional
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -178,18 +232,21 @@ def xr_brier_score(observations, forecasts, keep_attrs=False):
     Returns
     -------
     xarray.Dataset or xarray.DataArray
+
     References
     ----------
     Gneiting, Tilmann, and Adrian E Raftery. “Strictly Proper Scoring Rules,
       Prediction, and Estimation.” Journal of the American Statistical
       Association 102, no. 477 (March 1, 2007): 359–78.
       https://doi.org/10/c6758w.
+
     See Also
     --------
     properscoring.brier_score
     xarray.apply_ufunc
+
     """
-    return xr.apply_ufunc(
+    res = xr.apply_ufunc(
         brier_score,
         observations,
         forecasts,
@@ -198,14 +255,29 @@ def xr_brier_score(observations, forecasts, keep_attrs=False):
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
+    if dim is None:
+        return res
+    else:
+        if weights is not None:
+            return res.weighted(weights).mean(dim)
+        else:
+            return res.mean(dim)
 
 
 def xr_threshold_brier_score(
-    observations, forecasts, threshold, issorted=False, dim='member', keep_attrs=False
+    observations,
+    forecasts,
+    threshold,
+    issorted=False,
+    member_dim='member',
+    dim=None,
+    weights=None,
+    keep_attrs=False
 ):
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
      scores of an ensemble for exceeding given thresholds.
+
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -217,8 +289,13 @@ def xr_threshold_brier_score(
     issorted : bool, optional
         Optimization flag to indicate that the elements of `ensemble` are
         already sorted along `axis`.
-    dim : str, optional
+    member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
+    dim : str or list of str, optional
+        Dimension to mean over after calculating crps_gaussian.
+        Defaults to None implying averaging.
+    weights : xr.DataArray with dimensions from dim, optional
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -231,15 +308,18 @@ def xr_threshold_brier_score(
         (If ``threshold`` is a scalar, the result will have the same shape as
         observations. Otherwise, it will have an additional final dimension
         corresponding to the threshold levels. Not implemented yet.)
+
     References
     ----------
     Gneiting, T. and Ranjan, R. Comparing density forecasts using threshold-
        and quantile-weighted scoring rules. J. Bus. Econ. Stat. 29, 411-422
        (2011). http://www.stat.washington.edu/research/reports/2008/tr533.pdf
+
     See Also
     --------
     properscoring.threshold_brier_score
     xarray.apply_ufunc
+
     """
     if isinstance(threshold, list):
         threshold.sort()
@@ -251,10 +331,10 @@ def xr_threshold_brier_score(
             raise ValueError(
                 'please provide threshold with threshold dim, found', threshold.dims,
             )
-        input_core_dims = [[], [dim], ['threshold']]
+        input_core_dims = [[], [member_dim], ['threshold']]
         output_core_dims = [['threshold']]
     elif isinstance(threshold, (int, float)):
-        input_core_dims = [[], [dim], []]
+        input_core_dims = [[], [member_dim], []]
         output_core_dims = [[]]
     else:
         raise ValueError(
@@ -262,7 +342,7 @@ def xr_threshold_brier_score(
             or xr.object with threshold dimension; found',
             type(threshold),
         )
-    return xr.apply_ufunc(
+    res = xr.apply_ufunc(
         threshold_brier_score,
         observations,
         forecasts,
@@ -274,3 +354,10 @@ def xr_threshold_brier_score(
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
+    if dim is None:
+        return res
+    else:
+        if weights is not None:
+            return res.weighted(weights).mean(dim)
+        else:
+            return res.mean(dim)
