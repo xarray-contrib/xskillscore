@@ -394,7 +394,7 @@ class Contingency:
 
         Notes
         -----
-        .. [1] http://www.cawcr.gov.au/projects/verification/
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.hits(yes_category) / (
@@ -420,7 +420,7 @@ class Contingency:
 
         Notes
         -----
-        .. [1] http://www.cawcr.gov.au/projects/verification/
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.false_alarms(yes_category) / (
@@ -448,7 +448,7 @@ class Contingency:
 
         Notes
         -----
-        .. [1] http://www.cawcr.gov.au/projects/verification/
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.false_alarms(yes_category) / (
@@ -474,7 +474,7 @@ class Contingency:
 
         Notes
         -----
-        .. [1] http://www.cawcr.gov.au/projects/verification/
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.hits(yes_category) / (
@@ -500,7 +500,7 @@ class Contingency:
 
         Notes
         -----
-        .. [1] http://www.cawcr.gov.au/projects/verification/
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.hits(yes_category) / (
@@ -533,7 +533,7 @@ class Contingency:
 
         Notes
         -----
-        .. [1] http://www.cawcr.gov.au/projects/verification/
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         hits_random = (
@@ -568,7 +568,7 @@ class Contingency:
 
         Notes
         -----
-        .. [1] http://www.cawcr.gov.au/projects/verification/
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return (self.hits(yes_category) * self.correct_negatives(yes_category)) / (
@@ -596,7 +596,7 @@ class Contingency:
 
         Notes
         -----
-        .. [1] http://www.cawcr.gov.au/projects/verification/
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return (
@@ -609,17 +609,18 @@ class Contingency:
 
     def accuracy(self):
         """Returns the accuracy score(s) for a contingency table with K categories
-            .. math::
-                A = \frac{1}{N}\sum_{i=1}^{K} n(F_i, O_i)
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the accuracy score(s)
+        .. math::
+            A = \\frac{1}{N}\\sum_{i=1}^{K} n(F_i, O_i)
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the accuracy score(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         corr = self.table.where(
@@ -635,17 +636,20 @@ class Contingency:
 
     def heidke_score(self):
         """Returns the Heidke skill score(s) for a contingency table with K categories
-            .. math::
-                HSS = \frac{\frac{1}{N}\sum_{i=1}^{K}n(F_i, O_i) - \frac{1}{N^2}\sum_{i=1}^{K}N(F_i)N(O_i)}{1 - \frac{1}{N^2}\sum_{i=1}^{K}N(F_i)N(O_i)}
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the Heidke score(s)
+        .. math::
+            HSS = \\frac{\\frac{1}{N}\\sum_{i=1}^{K}n(F_i, O_i) -
+                  \\frac{1}{N^2}\\sum_{i=1}^{K}N(F_i)N(O_i)}
+                  {1 - \\frac{1}{N^2}\\sum_{i=1}^{K}N(F_i)N(O_i)}
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the Heidke score(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         numer_1 = self.table.where(
@@ -665,18 +669,22 @@ class Contingency:
         return (numer_1 - numer_2) / denom
 
     def peirce_score(self):
-        """Returns the Peirce skill score(s) (Hanssen and Kuipers discriminantor true skill statistic) for a contingency table with K categories
-            .. math::
-                PS = \frac{\frac{1}{N}\sum_{i=1}^{K}n(F_i, O_i) - \frac{1}{N^2}\sum_{i=1}^{K}N(F_i)N(O_i)}{1 - \frac{1}{N^2}\sum_{i=1}^{K}N(O_i)^2}
+        """Returns the Peirce skill score(s) (Hanssen and Kuipers discriminantor true
+        skill statistic) for a contingency table with K categories.
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the Peirce score(s)
+        .. math::
+            PS = \\frac{\\frac{1}{N}\\sum_{i=1}^{K}n(F_i, O_i) -
+                 \\frac{1}{N^2}\\sum_{i=1}^{K}N(F_i)N(O_i)}{1 -
+                 \\frac{1}{N^2}\\sum_{i=1}^{K}N(O_i)^2}
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the Peirce score(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         numer_1 = self.table.where(
@@ -698,33 +706,41 @@ class Contingency:
         return (numer_1 - numer_2) / denom
 
     def gerrity_score(self):
-        """Returns Gerrity equitable score for a contingency table with K categories
-            .. math::
-                GS = \frac{1}{N}\sum_{i=1}^{K}\sum_{j=1}^{K}n(F_i, O_j)s_{ij}
-                s_{ii} = \frac{1}{K-1}(\sum_{r=1}^{i-1}a_r^{-1} + \sum_{r=i}^{K-1}a_r)
-                s_{ij} = \frac{1}{K-1}(\sum_{r=1}^{i-1}a_r^{-1} - (j - i) + \sum_{r=j}^{K-1}a_r);\, 1 \leq i < j \leq K
-                s_{ji} = s_{ij}
-                a_i = (1 - \sum_{r=1}^{i}p_r) / \sum_{r=1}^{i}p_r;\, p_i=N(O_i)/N
+        """Returns Gerrity equitable score for a contingency table with K categories.
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the Gerrity scores
+        .. math::
+                GS = \\frac{1}{N}\\sum_{i=1}^{K}\\sum_{j=1}^{K}n(F_i, O_j)s_{ij}
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        .. math::
+                s_{ii} = \\frac{1}{K-1}(\\sum_{r=1}^{i-1}a_r^{-1} + \\sum_{r=i}^{K-1}a_r)
 
-            To do
+        .. math::
+                s_{ij} = \\frac{1}{K-1}(\\sum_{r=1}^{i-1}a_r^{-1} - (j - i) +
+                        \\sum_{r=j}^{K-1}a_r);\, 1 \\leq i < j \\leq K
 
-            - Currently computes the Gerrity scoring matrix using nested for-loops. Is it possible \
-                    to remove these?
+        .. math::
+            s_{ji} = s_{ij}
+
+        .. math::
+            a_i = \\frac{(1 - \\sum_{r=1}^{i}p_r)}{\\sum_{r=1}^{i}p_r}
+
+        .. math::
+            p_i = \\frac{N(O_i)}{N}
+
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the Gerrity scores
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
+        # TODO: Currently computes the Gerrity scoring matrix using nested for-loops.
+        # Is it possible to remove these?
 
         def _gerrity_s(table):
-            """
-                Returns Gerrity scoring matrix, s
-            """
+            """Returns Gerrity scoring matrix, s"""
             p_o = (table.sum(axis=-1).T / table.sum(axis=(-2, -1)).T).T
             p_sum = np.cumsum(p_o, axis=-1)
             a = (1.0 - p_sum) / p_sum

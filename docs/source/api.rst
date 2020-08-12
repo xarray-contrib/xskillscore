@@ -90,3 +90,14 @@ Dichotomous-Only Metrics
     Contingency.equit_threat_score
     Contingency.odds_ratio
     Contingency.odds_ratio_skill_score
+
+Multi-Category Metrics
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+    :toctree: api/
+
+    Contingency.accuracy
+    Contingency.heidke_score
+    Contingency.peirce_score
+    Contingency.gerrity_score
