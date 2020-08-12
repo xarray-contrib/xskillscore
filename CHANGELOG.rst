@@ -8,7 +8,8 @@ xskillscore v0.0.17 (2020-08-xx)
 Internal Changes
 ----------------
 - Rename ``dim`` to ``member_dim`` in probabilistic metrics. (:pr:`121`) `Aaron Spring`_
-- Added ``utils`` module to house utilities shared across multiple modules (:pr:`119`). `Dougie Squire`_
+- Added ``utils`` module to house utilities shared across multiple modules
+  (:pr:`119`). `Dougie Squire`_
 
 Documentation
 -------------
