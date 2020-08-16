@@ -157,7 +157,7 @@ def _determine_input_core_dims(dim, weights):
     return input_core_dims
 
 
-def pearson_r(a, b, dim, weights=None, skipna=False):
+def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     """Pearson's correlation coefficient.
 
     Parameters
@@ -173,6 +173,11 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -216,10 +221,11 @@ def pearson_r(a, b, dim, weights=None, skipna=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def r2(a, b, dim, weights=None, skipna=False):
+def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     """R^2 (coefficient of determination) score.
 
     Parameters
@@ -235,6 +241,11 @@ def r2(a, b, dim, weights=None, skipna=False):
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -277,10 +288,11 @@ def r2(a, b, dim, weights=None, skipna=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
+def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     """2-tailed p-value associated with pearson's correlation coefficient.
 
     Parameters
@@ -296,6 +308,11 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -334,10 +351,11 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def effective_sample_size(a, b, dim, skipna=False):
+def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
     """Effective sample size for temporally correlated data.
 
     .. note::
@@ -370,6 +388,11 @@ def effective_sample_size(a, b, dim, skipna=False):
         be reduced as a result.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -416,10 +439,11 @@ def effective_sample_size(a, b, dim, skipna=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def pearson_r_eff_p_value(a, b, dim, skipna=False):
+def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
     """
     2-tailed p-value associated with Pearson's correlation coefficient,
     accounting for autocorrelation.
@@ -459,6 +483,11 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False):
         be reduced as a result.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -512,10 +541,11 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def spearman_r(a, b, dim, weights=None, skipna=False):
+def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     """Spearman's correlation coefficient.
 
     Parameters
@@ -531,6 +561,11 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -574,10 +609,11 @@ def spearman_r(a, b, dim, weights=None, skipna=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
+def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     """2-tailed p-value associated with Spearman's correlation coefficient.
 
     Parameters
@@ -593,6 +629,11 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -631,10 +672,11 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def spearman_r_eff_p_value(a, b, dim, skipna=False):
+def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
     """
     2-tailed p-value associated with Spearman rank correlation coefficient,
     accounting for autocorrelation.
@@ -674,6 +716,11 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False):
         be reduced as a result.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -727,10 +774,11 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False):
         kwargs={'axis': -1, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def rmse(a, b, dim, weights=None, skipna=False):
+def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     """Root Mean Squared Error.
 
     Parameters
@@ -746,6 +794,11 @@ def rmse(a, b, dim, weights=None, skipna=False):
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -787,10 +840,11 @@ def rmse(a, b, dim, weights=None, skipna=False):
         kwargs={'axis': axis, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def mse(a, b, dim, weights=None, skipna=False):
+def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     """Mean Squared Error.
 
     Parameters
@@ -806,6 +860,11 @@ def mse(a, b, dim, weights=None, skipna=False):
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -847,10 +906,11 @@ def mse(a, b, dim, weights=None, skipna=False):
         kwargs={'axis': axis, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def mae(a, b, dim, weights=None, skipna=False):
+def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     """Mean Absolute Error.
 
     Parameters
@@ -866,6 +926,11 @@ def mae(a, b, dim, weights=None, skipna=False):
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -907,10 +972,11 @@ def mae(a, b, dim, weights=None, skipna=False):
         kwargs={'axis': axis, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def median_absolute_error(a, b, dim, skipna=False):
+def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
     """
     Median Absolute Error.
 
@@ -925,6 +991,11 @@ def median_absolute_error(a, b, dim, skipna=False):
         Note that this dimension will be reduced as a result.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -959,10 +1030,11 @@ def median_absolute_error(a, b, dim, skipna=False):
         kwargs={'axis': axis, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def mape(a, b, dim, weights=None, skipna=False):
+def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     """Mean Absolute Percentage Error.
 
     Parameters
@@ -979,6 +1051,11 @@ def mape(a, b, dim, weights=None, skipna=False):
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -1019,10 +1096,11 @@ def mape(a, b, dim, weights=None, skipna=False):
         kwargs={'axis': axis, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
 
 
-def smape(a, b, dim, weights=None, skipna=False):
+def smape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     """Symmetric Mean Absolute Percentage Error.
 
     Parameters
@@ -1039,6 +1117,11 @@ def smape(a, b, dim, weights=None, skipna=False):
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
         If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -1079,4 +1162,5 @@ def smape(a, b, dim, weights=None, skipna=False):
         kwargs={'axis': axis, 'skipna': skipna},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )

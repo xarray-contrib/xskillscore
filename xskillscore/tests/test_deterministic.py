@@ -73,7 +73,12 @@ def a():
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(times), len(lats), len(lons))
-    return xr.DataArray(data, coords=[times, lats, lons], dims=['time', 'lat', 'lon'])
+    return xr.DataArray(
+        data,
+        coords=[times, lats, lons],
+        dims=['time', 'lat', 'lon'],
+        attrs={'source': 'testing'},
+    )
 
 
 @pytest.fixture
@@ -287,7 +292,6 @@ def test_distance_metrics_xr_dask(
 @pytest.mark.parametrize('dim', AXES)
 @pytest.mark.parametrize('metric', [smape])
 def test_percentage_metric_in_interval_0_1(a, b, dim, metric):
-    print(a, b)
     """Test smape to be within bounds."""
     res = metric(a, b, dim)
     assert not (res < 0).any()
@@ -309,5 +313,20 @@ def test_pearson_r_p_value_skipna(a, b_nan):
 
 def test_pearson_r_integer():
     """Test whether arrays as integers work."""
+    da = xr.DataArray([0, 1, 2], dims=['time'])
+    assert pearson_r(da, da, dim='time') == 1
+
+
+@pytest.mark.parametrize('metrics', correlation_metrics + distance_metrics)
+@pytest.mark.parametrize('keep_attrs', [True, False])
+def test_keep_attrs(a, b, metrics, keep_attrs):
+    """Test keep_attrs for all metrics."""
+    metric, _metric = metrics
+    # ths tests only copying attrs from a
+    res = metric(a, b, 'time', keep_attrs=keep_attrs)
+    if keep_attrs:
+        assert res.attrs == a.attrs
+    else:
+        assert res.attrs == {}
     da = xr.DataArray([0, 1, 2], dims=['time'])
     assert pearson_r(da, da, dim='time') == 1
