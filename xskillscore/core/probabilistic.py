@@ -23,7 +23,7 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
     sig : xarray.Dataset or xarray.DataArray
         The standard deviation of the forecast distribution.
     dim : str or list of str, optional
-        Dimension to mean over after calculating crps_gaussian.
+        Dimension over which to compute mean after computing ``crps_gaussian``.
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
@@ -92,7 +92,7 @@ def crps_quadrature(
         distribution at value x.
     xmin, xmax, tol: see properscoring.crps_quadrature
     dim : str or list of str, optional
-        Dimension to mean over after calculating crps_gaussian.
+        Dimension over which to compute mean after computing ``crps_quadrature``.
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
@@ -150,7 +150,7 @@ def crps_ensemble(
     observations : xarray.Dataset or xarray.DataArray
         The observations or set of observations.
     forecasts : xarray.Dataset or xarray.DataArray
-        Forecast with required member dimension ``dim``.
+        Forecast with required member dimension ``member_dim``.
     member_weights : xarray.Dataset or xarray.DataArray
         If provided, the CRPS is calculated exactly with the assigned
         probability weights to each forecast. Weights should be positive,
@@ -162,7 +162,7 @@ def crps_ensemble(
     member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
     dim : str or list of str, optional
-        Dimension to mean over after calculating crps_gaussian.
+        Dimension over which to compute mean after computing ``crps_ensemble``.
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
@@ -214,7 +214,7 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
     forecasts : xarray.Dataset or xarray.DataArray
         The forecasts associated with the observations.
     dim : str or list of str, optional
-        Dimension to mean over after calculating crps_gaussian.
+        Dimension over which to compute mean after computing ``brier_score``.
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
@@ -277,7 +277,7 @@ def threshold_brier_score(
     observations : xarray.Dataset or xarray.DataArray
         The observations or set of observations.
     forecasts : xarray.Dataset or xarray.DataArray
-        Forecast with required member dimension ``dim``.
+        Forecast with required member dimension ``member_dim``.
     threshold : scalar or 1d scalar
         Threshold values at which to calculate exceedence Brier scores.
     issorted : bool, optional
@@ -286,7 +286,7 @@ def threshold_brier_score(
     member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
     dim : str or list of str, optional
-        Dimension to mean over after calculating crps_gaussian.
+        Dimension over which to compute mean after computing ``threshold_brier_score``.
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
