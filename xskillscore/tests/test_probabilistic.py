@@ -324,7 +324,7 @@ def test_xr_brier_score_dask(o_dask, f_dask, keep_attrs):
         assert actual.attrs == o_dask.attrs
     else:
         assert actual.attrs == {}
-        
+
 
 @pytest.mark.parametrize('dim', DIMS)
 @pytest.mark.parametrize('obj', ['da', 'ds', 'chunked_da', 'chunked_ds'])
