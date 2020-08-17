@@ -67,7 +67,7 @@ def assert_only_dim_reduced(dim, actual, obs):
 
 @pytest.mark.parametrize('keep_attrs', [True, False])
 def test_crps_ensemble_dask(o_dask, f_dask, keep_attrs):
-    actual = crps_ensemble(o_dask, f_dask, keep_attrs=keep-attrs)
+    actual = crps_ensemble(o_dask, f_dask, keep_attrs=keep_attrs)
     expected = properscoring.crps_ensemble(o_dask, f_dask, axis=0)
     expected = xr.DataArray(expected, coords=o_dask.coords)
     # test for numerical identity of xskillscore crps and properscoring crps
