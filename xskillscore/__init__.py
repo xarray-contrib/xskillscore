@@ -18,6 +18,7 @@ from .core.deterministic import (
     spearman_r_p_value,
 )
 from .core.probabilistic import (
+    discrimination,
     rank_histogram,
     xr_brier_score as brier_score,
     xr_crps_ensemble as crps_ensemble,

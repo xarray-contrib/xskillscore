@@ -12,6 +12,7 @@ from scipy.stats import norm
 from xarray.tests import assert_allclose, assert_identical
 
 from xskillscore.core.probabilistic import (
+    discrimination,
     rank_histogram,
     xr_brier_score,
     xr_crps_ensemble,
@@ -248,3 +249,55 @@ def test_rank_histogram_dask(o_dask, f_dask):
     """
     actual = rank_histogram(o_dask, f_dask)
     assert actual.chunks is not None
+
+
+@pytest.mark.parametrize('dim', DIMS)
+@pytest.mark.parametrize('obj', ['da', 'ds', 'chunked_da', 'chunked_ds'])
+def test_discrimination_sum(o, f, dim, obj):
+    """Test that the number of samples in the rank histogram is correct
+    """
+    if 'ds' in obj:
+        name = 'var'
+        o = o.to_dataset(name=name)
+        f = f.to_dataset(name=name)
+    if 'chunked' in obj:
+        o = o.chunk()
+        f = f.chunk()
+    if dim == []:
+        with pytest.raises(ValueError):
+            discrimination(o > 0.5, (f > 0.5).mean('member'), dim=dim)
+    else:
+        hist_event, hist_no_event = discrimination(
+            o > 0.5, (f > 0.5).mean('member'), dim=dim
+        )
+        if 'ds' in obj:
+            hist_event = hist_event[name]
+            hist_no_event = hist_no_event[name]
+        hist_event_sum = hist_event.sum('forecast_probability', skipna=False).values
+        hist_no_event_sum = hist_no_event.sum(
+            'forecast_probability', skipna=False
+        ).values
+        # Note, xarray's assert_allclose is already imported but won't compare to scalar
+        assert np.allclose(hist_event_sum[~np.isnan(hist_event_sum)], 1)
+        assert np.allclose(hist_no_event_sum[~np.isnan(hist_no_event_sum)], 1)
+
+
+def test_discrimination_values(o):
+    """Test values for perfect forecast
+    """
+    f = xr.concat(10 * [o], dim='member')
+    hist_event, hist_no_event = discrimination(o > 0.5, (f > 0.5).mean('member'))
+    assert np.allclose(hist_event[-1], 1)
+    assert np.allclose(hist_event[:-1], 0)
+    assert np.allclose(hist_no_event[0], 1)
+    assert np.allclose(hist_no_event[1:], 0)
+
+
+def test_discrimination_dask(o_dask, f_dask):
+    """Test that rank_histogram returns dask array if provided dask array
+    """
+    hist_event, hist_no_event = discrimination(
+        o_dask > 0.5, (f_dask > 0.5).mean('member')
+    )
+    assert hist_event.chunks is not None
+    assert hist_no_event.chunks is not None

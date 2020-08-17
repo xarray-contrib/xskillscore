@@ -201,6 +201,9 @@ Examples
    # Rank histogram
    rank_histogram = xs.rank_histogram(obs3, fct3)
 
+   # Discrimination
+   hist_event, hist_no_event = xs.discrimination(obs3 > 0.5, (fct3 > 0.5).mean("member"))
+
    ### Contingency-based
    dichotomous_category_edges = np.array([0, 0.5, 1]) # "dichotomous" mean two-category
    dichotomous_contingency = xs.Contingency(obs, fct,
