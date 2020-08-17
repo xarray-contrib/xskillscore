@@ -22,7 +22,7 @@ __all__ = [
 ]
 
 
-def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None):
+def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=False):
     """
     xarray version of properscoring.crps_gaussian: Continuous Ranked
      Probability Score with a Gaussian distribution.
@@ -40,6 +40,11 @@ def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None):
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -68,6 +73,7 @@ def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None):
         input_core_dims=[[], [], []],
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
     if dim is None:
         return res
@@ -79,7 +85,14 @@ def xr_crps_gaussian(observations, mu, sig, dim=None, weights=None):
 
 
 def xr_crps_quadrature(
-    x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, dim=None, weights=None
+    x,
+    cdf_or_dist,
+    xmin=None,
+    xmax=None,
+    tol=1e-6,
+    dim=None,
+    weights=None,
+    keep_attrs=False,
 ):
     """
     xarray version of properscoring.crps_quadrature: Continuous Ranked
@@ -98,6 +111,11 @@ def xr_crps_quadrature(
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -119,6 +137,7 @@ def xr_crps_quadrature(
         input_core_dims=[[], [], [], [], []],
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
     if dim is None:
         return res
@@ -126,7 +145,7 @@ def xr_crps_quadrature(
         if weights is not None:
             return res.weighted(weights).mean(dim)
         else:
-            return res.mean(dim)
+            return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def xr_crps_ensemble(
@@ -137,6 +156,7 @@ def xr_crps_ensemble(
     member_dim='member',
     dim=None,
     weights=None,
+    keep_attrs=False,
 ):
     """
     xarray version of properscoring.crps_ensemble: Continuous Ranked
@@ -163,6 +183,11 @@ def xr_crps_ensemble(
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -182,6 +207,7 @@ def xr_crps_ensemble(
         kwargs={'axis': -1, 'issorted': issorted, 'weights': member_weights},
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
     if dim is None:
         return res
@@ -189,10 +215,10 @@ def xr_crps_ensemble(
         if weights is not None:
             return res.weighted(weights).mean(dim)
         else:
-            return res.mean(dim)
+            return res.mean(dim, keep_attrs=keep_attrs)
 
 
-def xr_brier_score(observations, forecasts, dim=None, weights=None):
+def xr_brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=False):
     """
     xarray version of properscoring.brier_score: Calculate Brier score (BS).
 
@@ -210,6 +236,11 @@ def xr_brier_score(observations, forecasts, dim=None, weights=None):
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -235,6 +266,7 @@ def xr_brier_score(observations, forecasts, dim=None, weights=None):
         input_core_dims=[[], []],
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
     if dim is None:
         return res
@@ -253,6 +285,7 @@ def xr_threshold_brier_score(
     member_dim='member',
     dim=None,
     weights=None,
+    keep_attrs=False,
 ):
     """
     xarray version of properscoring.threshold_brier_score: Calculate the Brier
@@ -276,6 +309,11 @@ def xr_threshold_brier_score(
         Defaults to None implying averaging.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
 
     Returns
     -------
@@ -327,6 +365,7 @@ def xr_threshold_brier_score(
         output_core_dims=output_core_dims,
         dask='parallelized',
         output_dtypes=[float],
+        keep_attrs=keep_attrs,
     )
     if dim is None:
         return res
