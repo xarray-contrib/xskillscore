@@ -43,77 +43,91 @@ class XSkillScoreAccessor(object):
         else:
             return self._obj[x]
 
-    def pearson_r(self, a, b, dim, weights=None, skipna=False):
+    def pearson_r(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return pearson_r(a, b, dim, weights=weights, skipna=skipna)
+        return pearson_r(
+            a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+        )
 
-    def r2(self, a, b, dim, weights=None, skipna=False):
+    def r2(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return r2(a, b, dim, weights=weights, skipna=skipna)
+        return r2(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
 
-    def pearson_r_p_value(self, a, b, dim, weights=None, skipna=False):
+    def pearson_r_p_value(
+        self, a, b, dim, weights=None, skipna=False, keep_attrs=False
+    ):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return pearson_r_p_value(a, b, dim, weights=weights, skipna=skipna)
+        return pearson_r_p_value(
+            a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+        )
 
-    def effective_sample_size(self, a, b, dim, skipna=False):
+    def effective_sample_size(self, a, b, dim, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return effective_sample_size(a, b, dim, skipna=skipna)
+        return effective_sample_size(a, b, dim, skipna=skipna, keep_attrs=keep_attrs)
 
-    def pearson_r_eff_p_value(self, a, b, dim, skipna=False):
+    def pearson_r_eff_p_value(self, a, b, dim, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return pearson_r_eff_p_value(a, b, dim, skipna=skipna)
+        return pearson_r_eff_p_value(a, b, dim, skipna=skipna, keep_attrs=keep_attrs)
 
-    def spearman_r(self, a, b, dim, weights=None, skipna=False):
+    def spearman_r(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return spearman_r(a, b, dim, weights=weights, skipna=skipna)
+        return spearman_r(
+            a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+        )
 
-    def spearman_r_p_value(self, a, b, dim, weights=None, skipna=False):
+    def spearman_r_p_value(
+        self, a, b, dim, weights=None, skipna=False, keep_attrs=False
+    ):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return spearman_r_p_value(a, b, dim, weights=weights, skipna=skipna)
+        return spearman_r_p_value(
+            a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+        )
 
-    def spearman_r_eff_p_value(self, a, b, dim, skipna=False):
+    def spearman_r_eff_p_value(self, a, b, dim, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return spearman_r_eff_p_value(a, b, dim, skipna=skipna)
+        return spearman_r_eff_p_value(a, b, dim, skipna=skipna, keep_attrs=keep_attrs)
 
-    def rmse(self, a, b, dim, weights=None, skipna=False):
+    def rmse(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return rmse(a, b, dim, weights=weights, skipna=skipna)
+        return rmse(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
 
-    def mse(self, a, b, dim, weights=None, skipna=False):
+    def mse(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return mse(a, b, dim, weights=weights, skipna=skipna)
+        return mse(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
 
-    def mae(self, a, b, dim, weights=None, skipna=False):
+    def mae(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return mae(a, b, dim, weights=weights, skipna=skipna)
+        return mae(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
 
-    def median_absolute_error(self, a, b, dim, skipna=False):
+    def median_absolute_error(self, a, b, dim, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return median_absolute_error(a, b, dim, skipna=skipna)
+        return median_absolute_error(a, b, dim, skipna=skipna, keep_attrs=keep_attrs)
 
-    def mape(self, a, b, dim, weights=None, skipna=False):
+    def mape(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return mape(a, b, dim, weights=weights, skipna=skipna)
+        return mape(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
 
-    def smape(self, a, b, dim, weights=None, skipna=False):
+    def smape(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return smape(a, b, dim, weights=weights, skipna=skipna)
+        return smape(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
 
-    def crps_gaussian(self, observations, mu, sig, dim=None, weights=None):
+    def crps_gaussian(
+        self, observations, mu, sig, dim=None, weights=None, keep_attrs=False
+    ):
         observations = self._in_ds(observations)
         mu = self._in_ds(mu)
         sig = self._in_ds(sig)
@@ -142,7 +156,15 @@ class XSkillScoreAccessor(object):
         )
 
     def crps_quadrature(
-        self, x, cdf_or_dist, xmin=None, xmax=None, tol=1e-6, dim=None, weights=None
+        self,
+        x,
+        cdf_or_dist,
+        xmin=None,
+        xmax=None,
+        tol=1e-6,
+        dim=None,
+        weights=None,
+        keep_attrs=False,
     ):
         x = self._in_ds(x)
         cdf_or_dist = self._in_ds(cdf_or_dist)
@@ -159,6 +181,7 @@ class XSkillScoreAccessor(object):
         dim=None,
         member_dim='member',
         weights=None,
+        keep_attrs=False,
     ):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
