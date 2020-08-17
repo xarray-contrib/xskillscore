@@ -6,8 +6,7 @@ __all__ = ['get_bin_edges', 'histogram']
 
 
 def get_bin_edges(bins):
-    """
-        Returns bin edges of provided bins
+    """Returns bin edges of provided bins
 
         Parameters
         ----------
