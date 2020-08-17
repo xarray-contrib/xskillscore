@@ -341,7 +341,11 @@ def test_rank_histogram_sum(o, f, dim, obj):
         with pytest.raises(ValueError):
             rank_histogram(o, f, dim=dim)
     else:
-        assert rank_histogram(o, f, dim=dim).sum() == o.count()
+        rank_hist = rank_histogram(o, f, dim=dim)
+        if 'ds' in obj:
+            rank_hist = rank_hist[name]
+            o = o[name]
+        assert_allclose(rank_hist.sum(), o.count())
 
 
 def test_rank_histogram_values(o, f):
