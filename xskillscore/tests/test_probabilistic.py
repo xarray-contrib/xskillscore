@@ -12,6 +12,7 @@ from scipy.stats import norm
 from xarray.tests import assert_allclose, assert_identical
 
 from xskillscore.core.probabilistic import (
+    rank_histogram,
     xr_brier_score,
     xr_crps_ensemble,
     xr_crps_gaussian,
@@ -213,3 +214,37 @@ def test_xr_brier_score_dask(o_dask, f_dask):
     assert actual.chunks is not None
     # show that brier_score returns no chunks
     assert expected.chunks is None
+
+
+@pytest.mark.parametrize('dim', DIMS)
+@pytest.mark.parametrize('obj', ['da', 'ds', 'chunked_da', 'chunked_ds'])
+def test_rank_histogram_sum(o, f, dim, obj):
+    """Test that the number of samples in the rank histogram is correct
+    """
+    if 'ds' in obj:
+        name = 'var'
+        o = o.to_dataset(name=name)
+        f = f.to_dataset(name=name)
+    if 'chunked' in obj:
+        o = o.chunk()
+        f = f.chunk()
+    if dim == []:
+        with pytest.raises(ValueError):
+            rank_histogram(o, f, dim=dim)
+    else:
+        assert rank_histogram(o, f, dim=dim).sum() == o.count()
+
+
+def test_rank_histogram_values(o, f):
+    """Test values in extreme cases (observations all smaller/larger \
+        than forecasts)
+    """
+    assert rank_histogram((f.min() - 1) + 0 * o, f)[0] == o.size
+    assert rank_histogram((f.max() + 1) + 0 * o, f)[-1] == o.size
+
+
+def test_rank_histogram_dask(o_dask, f_dask):
+    """Test that rank_histogram returns dask array if provided dask array
+    """
+    actual = rank_histogram(o_dask, f_dask)
+    assert actual.chunks is not None

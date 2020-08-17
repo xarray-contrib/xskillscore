@@ -198,6 +198,9 @@ Examples
    # Brier score
    brier_score = xs.brier_score(obs3 > 0.5, (fct3 > 0.5).mean("member"))
 
+   # Rank histogram
+   rank_histogram = xs.rank_histogram(obs3, fct3)
+
    ### Contingency-based
    dichotomous_category_edges = np.array([0, 0.5, 1]) # "dichotomous" mean two-category
    dichotomous_contingency = xs.Contingency(obs, fct,

@@ -2,7 +2,38 @@ import numpy as np
 import xarray as xr
 from xhistogram.xarray import histogram as xhist
 
-__all__ = ['histogram']
+__all__ = ['get_bin_edges', 'histogram']
+
+
+def get_bin_edges(bins):
+    """
+        Returns bin edges of provided bins
+
+        Parameters
+        ----------
+        bins : array_like
+            One-dimensional array of bin values to compute bin edges
+
+        Returns
+        -------
+        edges : np.array
+            Array of bin edges where the first and last edge are computed using the spacing between \
+                    the first-and-second and second-last-and-last bins, respectively. This array is one\
+                    element larger than the input array
+
+        Examples
+        --------
+        >>> bins = np.linspace(-2,2,10)
+        >>> bin_edges = get_bin_edges(bins)
+        array([-2.5, -1.5, -0.5,  0.5,  1.5,  2.5])
+    """
+
+    dbin = np.diff(bins) / 2
+    bin_edges = np.concatenate(
+        ([bins[0] - dbin[0]], bins[:-1] + dbin, [bins[-1] + dbin[-1]])
+    )
+
+    return bin_edges
 
 
 def histogram(*args, bins=None, bin_names=None, **kwargs):

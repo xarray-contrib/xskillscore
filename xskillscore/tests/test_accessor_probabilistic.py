@@ -5,6 +5,7 @@ from scipy.stats import norm
 from xarray.tests import assert_allclose
 
 from xskillscore.core.probabilistic import (
+    rank_histogram,
     xr_brier_score as brier_score,
     xr_crps_ensemble as crps_ensemble,
     xr_crps_gaussian as crps_gaussian,
@@ -132,4 +133,23 @@ def test_brier_score_accessor(o, f, threshold, dask_bool, outer_bool):
         expected = ds.xs.brier_score('o', (f > threshold).mean('member'))
     else:
         expected = ds.xs.brier_score('o', 'f')
+    assert_allclose(actual, expected)
+
+
+@pytest.mark.parametrize('outer_bool', [False, True])
+@pytest.mark.parametrize('dask_bool', [False, True])
+def test_rank_histogram_accessor(o, f, dask_bool, outer_bool):
+    if dask_bool:
+        o = o.chunk()
+        f = f.chunk()
+    actual = rank_histogram(o, f)
+
+    ds = xr.Dataset()
+    ds['o'] = o
+    ds['f'] = f
+    if outer_bool:
+        ds = ds.drop_vars('f')
+        expected = ds.xs.rank_histogram('o', f)
+    else:
+        expected = ds.xs.rank_histogram('o', 'f')
     assert_allclose(actual, expected)

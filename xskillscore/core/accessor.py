@@ -17,6 +17,7 @@ from .deterministic import (
     spearman_r_p_value,
 )
 from .probabilistic import (
+    rank_histogram,
     xr_brier_score as brier_score,
     xr_crps_ensemble as crps_ensemble,
     xr_crps_gaussian as crps_gaussian,
@@ -173,3 +174,8 @@ class XSkillScoreAccessor(object):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
         return brier_score(observations, forecasts, dim=dim, weights=weights)
+
+    def rank_histogram(self, observations, forecasts, dim=None, member_dim='member'):
+        observations = self._in_ds(observations)
+        forecasts = self._in_ds(forecasts)
+        return rank_histogram(observations, forecasts, dim=dim, member_dim=member_dim)

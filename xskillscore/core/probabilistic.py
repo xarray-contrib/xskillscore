@@ -1,3 +1,4 @@
+import bottleneck as bn
 import numpy as np
 import xarray as xr
 from properscoring import (
@@ -8,12 +9,15 @@ from properscoring import (
     threshold_brier_score,
 )
 
+from .utils import get_bin_edges, histogram
+
 __all__ = [
     'brier_score',
     'crps_ensemble',
     'crps_gaussian',
     'crps_quadrature',
     'threshold_brier_score',
+    'rank_histogram',
 ]
 
 
@@ -330,3 +334,77 @@ def xr_threshold_brier_score(
             return res.weighted(weights).mean(dim)
         else:
             return res.mean(dim)
+
+
+def rank_histogram(observations, forecasts, dim=None, member_dim='member'):
+    """Returns the rank histogram (Talagrand diagram) along the specified dimensions.
+
+        Parameters
+        ----------
+        observations : xarray.Dataset or xarray.DataArray
+            The observations or set of observations.
+        forecasts : xarray.Dataset or xarray.DataArray
+            Forecast with required member dimension ``member_dim``.
+        dim : str or list of str, optional
+            Dimension(s) over which to compute the histogram of ranks.
+            Defaults to None meaning compute over all dimensions
+        member_dim : str, optional
+            Name of ensemble member dimension. By default, 'member'.
+
+        Returns
+        -------
+        rank_histogram : xarray.Dataset or xarray.DataArray
+            New object containing the histogram of ranks
+
+        Examples
+        --------
+        >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+        ...                             coords=[('x', np.arange(3)),
+        ...                                     ('y', np.arange(3))])
+        >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+        ...                          coords=[('x', np.arange(3)),
+        ...                                  ('y', np.arange(3)),
+        ...                                  ('member', np.arange(3))])
+        >>> rank_histogram(observations, forecasts, dim='x')
+        <xarray.DataArray 'histogram_rank' (y: 3, rank: 4)>
+        array([[0, 1, 1, 1],
+               [0, 1, 0, 2],
+               [1, 0, 1, 1]])
+        Coordinates:
+          * y        (y) int64 0 1 2
+          * rank     (rank) float64 1.0 2.0 3.0 4.0
+
+        Notes
+        -----
+        See http://www.cawcr.gov.au/projects/verification/
+    """
+
+    def _rank_first(x, y):
+        """ Concatenates x and y and returns the rank of the first element along the last axes """
+        xy = np.concatenate((x[..., np.newaxis], y), axis=-1)
+        return bn.nanrankdata(xy, axis=-1)[..., 0]
+
+    if dim is not None:
+        if len(dim) == 0:
+            raise ValueError(
+                'At least one dimension must be supplied to compute rank histogram over'
+            )
+        if member_dim in dim:
+            raise ValueError(f'"{member_dim}" cannot be specified as an input to dim')
+
+    ranks = xr.apply_ufunc(
+        _rank_first,
+        observations,
+        forecasts,
+        input_core_dims=[[], [member_dim]],
+        dask='parallelized',
+        output_dtypes=[int],
+    )
+
+    # Initialise bins -----
+    bins = range(1, len(forecasts[member_dim]) + 2)
+    bin_edges = get_bin_edges(bins)
+
+    return histogram(
+        ranks, bins=[bin_edges], bin_names=['rank'], dim=dim, bin_dim_suffix=''
+    )
