@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- Project information -----------------------------------------------------
 current_year = datetime.datetime.now().year
 project = 'xskillscore'
-copyright = f'2020-{current_year}, Ray Bell'
+copyright = f'2018-{current_year}, Ray Bell'
 author = 'Ray Bell'
 
 # The full version, including alpha/beta/rc tags
