@@ -17,4 +17,4 @@ dependencies:
   - xhistogram
   - pip:
     - properscoring
-    - -e ../..
+    - -e ..
