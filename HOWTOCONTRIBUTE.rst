@@ -197,7 +197,6 @@ defined in ``deterministic.py``.
 
 #. Add yourself to the contributors list via ``docs/source/contributors.rst``.
 
-
 #. Finally, submit a pull request through the GitHub website using this data::
 
     head-fork: YOUR_GITHUB_USERNAME/xskillscore
