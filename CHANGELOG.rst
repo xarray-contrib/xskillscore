@@ -7,7 +7,14 @@ xskillscore v0.0.17 (2020-08-xx)
 
 Internal Changes
 ----------------
-- Added ``utils`` module to house utilities shared across multiple modules. `Dougie Squire`_
+- Rename ``dim`` to ``member_dim`` in probabilistic metrics. (:pr:`121`) `Aaron Spring`_
+- Added ``utils`` module to house utilities shared across multiple modules
+  (:pr:`119`). `Dougie Squire`_
+
+Documentation
+-------------
+- Added ``sphinx`` documentation with full API and a quick start notebook.
+  (:pr:`127`) `Riley X. Brady`_.
 
 Features
 --------

@@ -65,11 +65,30 @@ Talk to developers to find out how you can fix specific bugs.
 Write documentation
 -------------------
 
-``xskillscore`` could always use more documentation. We have an open issue to build the documentation on a website: https://github.com/raybellwaves/xskillscore/issues/36
+``xskillscore`` could always use more documentation. What could you add?
 
+* More complementary documentation. Have you perhaps found something unclear?
+* Docstrings.
+* Example notebooks of ``xskillscore`` being used in real analyses.
 
- .. _`pull requests`:
- .. _pull-requests:
+Our documentation is written in reStructuredText. You can follow our conventions in already written
+documents. Some helpful guides are located
+`here <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`__ and
+`here <https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst>`__.
+
+.. note::
+    Build the documentation locally with the following command:
+
+    .. code:: bash
+
+        $ conda env update -f ci/requirements-py36.yml
+        $ cd docs
+        $ make html
+
+    The build documentation should be available in the ``docs/build/`` folder.
+
+If you are adding new functions to the API, run ``sphinx-autogen -o api api.rst`` from the
+``docs/source`` directory and add the functions to ``api.rst``.
 
 Preparing Pull Requests
 -----------------------
@@ -176,6 +195,7 @@ defined in ``deterministic.py``.
    - Add yourself to list of authors at the end of ``CHANGELOG.rst`` file if not there yet, in
      alphabetical order.
 
+#. Add yourself to the contributors list via ``docs/source/contributors.rst``.
 
 #. Finally, submit a pull request through the GitHub website using this data::
 

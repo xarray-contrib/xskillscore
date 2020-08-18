@@ -233,17 +233,22 @@ class Contingency:
 
     @dichotomous_only
     def hits(self, yes_category=2):
-        """ Returns the number of hits (true positives) for dichotomous contingency data
+        """Returns the number of hits (true positives) for dichotomous
+        contingency data.
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes'
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes'
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the number of hits
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the number of hits
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.table.sel(
@@ -256,17 +261,22 @@ class Contingency:
 
     @dichotomous_only
     def misses(self, yes_category=2):
-        """ Returns the number of misses (false negatives) for dichotomous contingency data
+        """Returns the number of misses (false negatives) for dichotomous
+        contingency data.
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes'
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes'
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the number of misses
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the number of misses
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
         no_category = abs(yes_category - 2) + 1
 
@@ -280,17 +290,22 @@ class Contingency:
 
     @dichotomous_only
     def false_alarms(self, yes_category=2):
-        """ Returns the number of false alarms (false positives) for dichotomous contingency data
+        """Returns the number of false alarms (false positives) for dichotomous
+        contingency data.
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes'
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes'
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the number of false alarms
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the number of false alarms
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
         no_category = abs(yes_category - 2) + 1
 
@@ -304,17 +319,22 @@ class Contingency:
 
     @dichotomous_only
     def correct_negatives(self, yes_category=2):
-        """ Returns the number of correct negatives (true negatives) for dichotomous contingency data
+        """Returns the number of correct negatives (true negatives) for dichotomous
+        contingency data.
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes'
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes'
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the number of correct negatives
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the number of correct negatives
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
         no_category = abs(yes_category - 2) + 1
 
@@ -329,22 +349,25 @@ class Contingency:
     @dichotomous_only
     def bias_score(self, yes_category=2):
         """Returns the bias score(s) for dichotomous contingency data
-            .. math::
-                BS = \frac{hits + false_alarms}{hits + misses}
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes'
+        .. math::
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the bias score(s)
+            BS = \\frac{\\mathrm{hits} + \\mathrm{false~alarms}}
+                 {\\mathrm{hits} + \\mathrm{misses}}
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes'
+
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the bias score(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return (self.hits(yes_category) + self.false_alarms(yes_category)) / (
@@ -353,23 +376,25 @@ class Contingency:
 
     @dichotomous_only
     def hit_rate(self, yes_category=2):
-        """Returns the hit rate(s) (probability of detection) for dichotomous contingency data
-            .. math::
-                HR = \frac{hits}{hits + misses}
+        """Returns the hit rate(s) (probability of detection) for
+        dichotomous contingency data.
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes' (1 or 2)
+        .. math::
+            HR = \\frac{hits}{hits + misses}
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the hit rate(s)
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes' (1 or 2)
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the hit rate(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.hits(yes_category) / (
@@ -378,23 +403,24 @@ class Contingency:
 
     @dichotomous_only
     def false_alarm_ratio(self, yes_category=2):
-        """Returns the false alarm ratio(s) for dichotomous contingency data
-            .. math::
-                FAR = \frac{false_alarms}{hits + false_alarms}
+        """Returns the false alarm ratio(s) for dichotomous contingency data.
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes'
+        .. math::
+            FAR = \\frac{\\mathrm{false~alarms}}{hits + \\mathrm{false~alarms}}
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the false alarm ratio(s)
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes'
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the false alarm ratio(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.false_alarms(yes_category) / (
@@ -403,23 +429,26 @@ class Contingency:
 
     @dichotomous_only
     def false_alarm_rate(self, yes_category=2):
-        """Returns the false alarm rate(s) (probability of false detection) for dichotomous contingency data
-            .. math::
-                FA = \frac{false_alarms}{correct_negatives + false_alarms}
+        """Returns the false alarm rate(s) (probability of false detection)
+        for dichotomous contingency data.
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes'
+        .. math::
+            FA = \\frac{\\mathrm{false~alarms}}
+                 {\\mathrm{correct~negatives} + \\mathrm{false~alarms}}
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the false alarm rate(s)
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes'
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the false alarm rate(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.false_alarms(yes_category) / (
@@ -428,23 +457,24 @@ class Contingency:
 
     @dichotomous_only
     def success_ratio(self, yes_category=2):
-        """Returns the success ratio(s) for dichotomous contingency data
-            .. math::
-                SR = \frac{hits}{hits + false_alarms}
+        """Returns the success ratio(s) for dichotomous contingency data.
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes'
+        .. math::
+            SR = \\frac{hits}{hits + \\mathrm{false~alarms}}
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the success ratio(s)
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes'
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the success ratio(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.hits(yes_category) / (
@@ -453,23 +483,24 @@ class Contingency:
 
     @dichotomous_only
     def threat_score(self, yes_category=2):
-        """Returns the threat score(s) for dichotomous contingency data
-            .. math::
-                TS = \frac{hits}{hits + misses + false_alarms}
+        """Returns the threat score(s) for dichotomous contingency data.
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes'
+        .. math::
+            TS = \\frac{hits}{hits + misses + \\mathrm{false~alarms}}
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the threat score(s)
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes'
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the threat score(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.hits(yes_category) / (
@@ -480,24 +511,29 @@ class Contingency:
 
     @dichotomous_only
     def equit_threat_score(self, yes_category=2):
-        """Returns the equitable threat score(s) for dichotomous contingency data
-            .. math::
-                ETS = \frac{hits - hits_{random}}{hits + misses + false_alarms - hits_{random}}
-                hits_{random} = \frac{(hits + misses)(hits + false_alarms)}{total}
+        """Returns the equitable threat score(s) for dichotomous contingency data.
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes'
+        .. math::
+            ETS = \\frac{hits - hits_{random}}
+                  {hits + misses + \\mathrm{false~alarms} - hits_{random}}
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the equitable threat score(s)
+        .. math::
+            hits_{random} = \\frac{(hits + misses
+                            (hits + \\mathrm{false~alarms})}{total}
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes'
+
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the equitable threat score(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         hits_random = (
@@ -515,22 +551,24 @@ class Contingency:
     @dichotomous_only
     def odds_ratio(self, yes_category=2):
         """Returns the odds ratio(s) for dichotomous contingency data
-            .. math::
-                OR = \frac{hits * correct_negatives}{misses * false_alarms}
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes'
+        .. math::
+            OR = \\frac{hits * \\mathrm{correct~negatives}}
+                       {misses * \\mathrm{false~alarms}}
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the equitable odds ratio(s)
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes'
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the equitable odds ratio(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return (self.hits(yes_category) * self.correct_negatives(yes_category)) / (
@@ -540,22 +578,25 @@ class Contingency:
     @dichotomous_only
     def odds_ratio_skill_score(self, yes_category=2):
         """Returns the odds ratio skill score(s) for dichotomous contingency data
-            .. math::
-                ORSS = \frac{hits * correct_negatives - misses * false_alarms}{hits * correct_negatives + misses * false_alarms}
 
-            Parameters
-            ----------
-            yes_category : value, optional
-                The category coordinate value of the category corresponding to 'yes'
+        .. math::
+            ORSS = \\frac{hits * \\mathrm{correct~negatives}
+                      - misses * \\mathrm{false~alarms}}
+            {hits * \\mathrm{correct~negatives} + misses * \\mathrm{false~alarms}}
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the equitable odds ratio skill score(s)
+        Parameters
+        ----------
+        yes_category : value, optional
+            The category coordinate value of the category corresponding to 'yes'
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the equitable odds ratio skill score(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return (
@@ -568,17 +609,18 @@ class Contingency:
 
     def accuracy(self):
         """Returns the accuracy score(s) for a contingency table with K categories
-            .. math::
-                A = \frac{1}{N}\sum_{i=1}^{K} n(F_i, O_i)
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the accuracy score(s)
+        .. math::
+            A = \\frac{1}{N}\\sum_{i=1}^{K} n(F_i, O_i)
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the accuracy score(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         corr = self.table.where(
@@ -594,17 +636,20 @@ class Contingency:
 
     def heidke_score(self):
         """Returns the Heidke skill score(s) for a contingency table with K categories
-            .. math::
-                HSS = \frac{\frac{1}{N}\sum_{i=1}^{K}n(F_i, O_i) - \frac{1}{N^2}\sum_{i=1}^{K}N(F_i)N(O_i)}{1 - \frac{1}{N^2}\sum_{i=1}^{K}N(F_i)N(O_i)}
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the Heidke score(s)
+        .. math::
+            HSS = \\frac{\\frac{1}{N}\\sum_{i=1}^{K}n(F_i, O_i) -
+                  \\frac{1}{N^2}\\sum_{i=1}^{K}N(F_i)N(O_i)}
+                  {1 - \\frac{1}{N^2}\\sum_{i=1}^{K}N(F_i)N(O_i)}
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the Heidke score(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         numer_1 = self.table.where(
@@ -624,18 +669,22 @@ class Contingency:
         return (numer_1 - numer_2) / denom
 
     def peirce_score(self):
-        """Returns the Peirce skill score(s) (Hanssen and Kuipers discriminantor true skill statistic) for a contingency table with K categories
-            .. math::
-                PS = \frac{\frac{1}{N}\sum_{i=1}^{K}n(F_i, O_i) - \frac{1}{N^2}\sum_{i=1}^{K}N(F_i)N(O_i)}{1 - \frac{1}{N^2}\sum_{i=1}^{K}N(O_i)^2}
+        """Returns the Peirce skill score(s) (Hanssen and Kuipers discriminantor true
+        skill statistic) for a contingency table with K categories.
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the Peirce score(s)
+        .. math::
+            PS = \\frac{\\frac{1}{N}\\sum_{i=1}^{K}n(F_i, O_i) -
+                 \\frac{1}{N^2}\\sum_{i=1}^{K}N(F_i)N(O_i)}{1 -
+                 \\frac{1}{N^2}\\sum_{i=1}^{K}N(O_i)^2}
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the Peirce score(s)
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         numer_1 = self.table.where(
@@ -657,33 +706,41 @@ class Contingency:
         return (numer_1 - numer_2) / denom
 
     def gerrity_score(self):
-        """Returns Gerrity equitable score for a contingency table with K categories
-            .. math::
-                GS = \frac{1}{N}\sum_{i=1}^{K}\sum_{j=1}^{K}n(F_i, O_j)s_{ij}
-                s_{ii} = \frac{1}{K-1}(\sum_{r=1}^{i-1}a_r^{-1} + \sum_{r=i}^{K-1}a_r)
-                s_{ij} = \frac{1}{K-1}(\sum_{r=1}^{i-1}a_r^{-1} - (j - i) + \sum_{r=j}^{K-1}a_r);\, 1 \leq i < j \leq K
-                s_{ji} = s_{ij}
-                a_i = (1 - \sum_{r=1}^{i}p_r) / \sum_{r=1}^{i}p_r;\, p_i=N(O_i)/N
+        """Returns Gerrity equitable score for a contingency table with K categories.
 
-            Returns
-            -------
-            xarray.Dataset or xarray.DataArray
-                An array containing the Gerrity scores
+        .. math::
+                GS = \\frac{1}{N}\\sum_{i=1}^{K}\\sum_{j=1}^{K}n(F_i, O_j)s_{ij}
 
-            Notes
-            -----
-            See http://www.cawcr.gov.au/projects/verification/
+        .. math::
+                s_{ii} = \\frac{1}{K-1}(\\sum_{r=1}^{i-1}a_r^{-1} + \\sum_{r=i}^{K-1}a_r)
 
-            To do
+        .. math::
+                s_{ij} = \\frac{1}{K-1}(\\sum_{r=1}^{i-1}a_r^{-1} - (j - i) +
+                        \\sum_{r=j}^{K-1}a_r);\, 1 \\leq i < j \\leq K
 
-            - Currently computes the Gerrity scoring matrix using nested for-loops. Is it possible \
-                    to remove these?
+        .. math::
+            s_{ji} = s_{ij}
+
+        .. math::
+            a_i = \\frac{(1 - \\sum_{r=1}^{i}p_r)}{\\sum_{r=1}^{i}p_r}
+
+        .. math::
+            p_i = \\frac{N(O_i)}{N}
+
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing the Gerrity scores
+
+        Notes
+        -----
+        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
+        # TODO: Currently computes the Gerrity scoring matrix using nested for-loops.
+        # Is it possible to remove these?
 
         def _gerrity_s(table):
-            """
-                Returns Gerrity scoring matrix, s
-            """
+            """Returns Gerrity scoring matrix, s"""
             p_o = (table.sum(axis=-1).T / table.sum(axis=(-2, -1)).T).T
             p_sum = np.cumsum(p_o, axis=-1)
             a = (1.0 - p_sum) / p_sum
