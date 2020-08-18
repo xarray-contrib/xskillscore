@@ -6,13 +6,8 @@
 
 import datetime
 import os
-import pathlib
 import subprocess
 import sys
-
-root = pathlib.Path(__file__).absolute().parent.parent.parent
-os.environ["PYTHONPATH"] = str(root)
-sys.path.insert(0, str(root))
 
 import xskillscore
 
@@ -26,7 +21,8 @@ else:
     print("pip environment:")
     subprocess.run(["pip", "list"])
 
-print("xskillscore: %s, %s" % (xskillscore.__version__, xskillscore.__file__))
+# TODO add back in after release
+#print("xskillscore: %s, %s" % (xskillscore.__version__, xskillscore.__file__))
 
 # -- Project information -----------------------------------------------------
 current_year = datetime.datetime.now().year
@@ -35,7 +31,8 @@ copyright = f'2018-{current_year}, Ray Bell'
 author = 'Ray Bell'
 
 # The full version, including alpha/beta/rc tags
-version = xskillscore.__version__
+# TODO add back in after release
+#version = xskillscore.__version__
 
 # -- General configuration ---------------------------------------------------
 
