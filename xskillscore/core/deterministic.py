@@ -793,7 +793,7 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
     )
 
 
-def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def rmse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Root Mean Squared Error.
 
     Parameters
@@ -804,7 +804,7 @@ def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the rmse along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -859,7 +859,7 @@ def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Squared Error.
 
     Parameters
@@ -870,7 +870,7 @@ def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the mse along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -925,7 +925,7 @@ def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def mae(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Absolute Error.
 
     Parameters
@@ -936,7 +936,7 @@ def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the mae along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -991,7 +991,7 @@ def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
+def median_absolute_error(a, b, dim=None, skipna=False, keep_attrs=False):
     """
     Median Absolute Error.
 
@@ -1003,7 +1003,7 @@ def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the median absolute error along.
-        Note that this dimension will be reduced as a result.
+        Note that this dimension will be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
@@ -1049,7 +1049,7 @@ def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
     )
 
 
-def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Absolute Percentage Error.
 
     Parameters
@@ -1060,8 +1060,8 @@ def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the mae along. Note that this dimension will
-        be reduced as a result.
+        The dimension(s) to apply mape along. Note that this dimension will
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -1115,7 +1115,7 @@ def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def smape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def smape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Symmetric Mean Absolute Percentage Error.
 
     Parameters
@@ -1126,8 +1126,8 @@ def smape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the mae along. Note that this dimension will
-        be reduced as a result.
+        The dimension(s) to apply the smape along. Note that this dimension will
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool

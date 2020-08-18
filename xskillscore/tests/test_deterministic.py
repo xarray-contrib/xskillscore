@@ -158,7 +158,7 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     # check that no chunks for no chunk inputs
     assert actual.chunks is None
 
-    dim, _ = _preprocess_dims(dim)
+    dim, _ = _preprocess_dims(dim, a)
     if len(dim) > 1:
         new_dim = '_'.join(dim)
         _a = a.stack(**{new_dim: dim})
@@ -203,7 +203,7 @@ def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics):
         actual = metric(a, b, dim, weights=weights)
     assert actual.chunks is None
 
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
     _a = a
     _b = b
     _weights = _preprocess_weights(_a, dim, dim, weights)
