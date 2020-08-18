@@ -6,11 +6,27 @@
 
 import datetime
 import os
+import pathlib
+import subprocess
 import sys
+
+root = pathlib.Path(__file__).absolute().parent.parent
+os.environ["PYTHONPATH"] = str(root)
+sys.path.insert(0, str(root))
 
 import xskillscore
 
-sys.path.insert(0, os.path.abspath('../..'))
+print("python exec:", sys.executable)
+print("sys.path:", sys.path)
+
+if "conda" in sys.executable:
+    print("conda environment:")
+    subprocess.run(["conda", "list"])
+else:
+    print("pip environment:")
+    subprocess.run(["pip", "list"])
+
+print("xskillscore: %s, %s" % (xskillscore.__version__, xskillscore.__file__))
 
 # -- Project information -----------------------------------------------------
 current_year = datetime.datetime.now().year
