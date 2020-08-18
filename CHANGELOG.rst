@@ -24,7 +24,7 @@ Features
 Breaking Changes
 ----------------
 - Rename `dim` to `member_dim` in probabilistic metrics. (:pr:`121`) `Aaron Spring`_
-- Argument `dim` becomes keyword `dim=None` in all distance-based metrics.
+- Argument `dim` becomes keyword `dim=None` in all metrics.
   (:issue:`137`, :pr:`143`) `Aaron Spring`_
 - `dim=None` reduces all dimensions as in `xr.mean(dim=None)`.
   (:issue:`137`, :pr:`143`) `Aaron Spring`_

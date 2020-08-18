@@ -164,7 +164,7 @@ def _determine_input_core_dims(dim, weights):
     return input_core_dims
 
 
-def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Pearson's correlation coefficient.
 
     Parameters
@@ -175,7 +175,7 @@ def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -233,7 +233,7 @@ def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """R^2 (coefficient of determination) score.
 
     Parameters
@@ -244,7 +244,7 @@ def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -301,7 +301,7 @@ def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def pearson_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """2-tailed p-value associated with pearson's correlation coefficient.
 
     Parameters
@@ -312,7 +312,7 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -365,7 +365,7 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
+def effective_sample_size(a, b, dim=None, skipna=False, keep_attrs=False):
     """Effective sample size for temporally correlated data.
 
     .. note::
@@ -395,7 +395,7 @@ def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the function along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
@@ -454,7 +454,7 @@ def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
     )
 
 
-def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
+def pearson_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
     """
     2-tailed p-value associated with Pearson's correlation coefficient,
     accounting for autocorrelation.
@@ -491,7 +491,7 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to compute the p value over. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
@@ -557,7 +557,7 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
     )
 
 
-def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def spearman_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Spearman's correlation coefficient.
 
     Parameters
@@ -568,7 +568,7 @@ def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -626,7 +626,7 @@ def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def spearman_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """2-tailed p-value associated with Spearman's correlation coefficient.
 
     Parameters
@@ -637,7 +637,7 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -690,7 +690,7 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
+def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
     """
     2-tailed p-value associated with Spearman rank correlation coefficient,
     accounting for autocorrelation.
@@ -727,7 +727,7 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to compute the p value over. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
