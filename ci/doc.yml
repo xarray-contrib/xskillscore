@@ -1,0 +1,14 @@
+name: xskillscore-docs
+channels:
+  - conda-forge
+dependencies:
+  - python=3.6
+  - bottleneck
+  - importlib_metadata
+  - nbsphinx
+  - numpy
+  - sphinx
+  - sphinxcontrib-napoleon
+  - sphinx_rtd_theme
+  - toolz
+  - xarray 
