@@ -2,7 +2,7 @@
 Changelog History
 =================
 
-xskillscore v0.0.17 (2020-08-xx)
+xskillscore v0.0.17 (2020-08-17)
 ================================
 
 Internal Changes
