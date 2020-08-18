@@ -10,7 +10,7 @@ import pathlib
 import subprocess
 import sys
 
-root = pathlib.Path(__file__).absolute().parent.parent
+root = pathlib.Path(__file__).absolute().parent.parent.parent
 os.environ["PYTHONPATH"] = str(root)
 sys.path.insert(0, str(root))
 
