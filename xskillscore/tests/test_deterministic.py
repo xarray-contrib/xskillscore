@@ -330,3 +330,18 @@ def test_keep_attrs(a, b, metrics, keep_attrs):
         assert res.attrs == {}
     da = xr.DataArray([0, 1, 2], dims=['time'])
     assert pearson_r(da, da, dim='time') == 1
+
+
+@pytest.mark.parametrize('metrics', correlation_metrics + distance_metrics)
+def test_dim_None(a, b, metrics):
+    """Test that `dim=None` reduces all dimensions as xr.mean(dim=None) and fails for
+    correlation metrics."""
+    if metrics in correlation_metrics:
+        metric, _metric = metrics
+        with pytest.raises(ValueError) as excinfo:
+            metric(a, b, dim=None)
+        assert 'requires `dim` not being `None`' in str(excinfo.value)
+    elif metrics in distance_metrics:
+        metric, _metric = metrics
+        res = metric(a, b, dim=None)
+        assert len(res.dims) == 0, print(res.dims)
