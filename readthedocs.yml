@@ -4,10 +4,9 @@ build:
     image: latest
 
 conda:
-    environment: docs/requirements.txt
+    environment: ci/doc.yml
 
 sphinx:
-  configuration: docs/source/conf.py
   fail_on_warning: true
 
 formats: []
