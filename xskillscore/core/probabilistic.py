@@ -62,13 +62,10 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
-    if dim is None:
-        return res
+    if weights is not None:
+        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
-        if weights is not None:
-            return res.weighted(weights).mean(dim)
-        else:
-            return res.mean(dim)
+        return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def crps_quadrature(
@@ -124,13 +121,10 @@ def crps_quadrature(
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
-    if dim is None:
-        return res
+    if weights is not None:
+        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
-        if weights is not None:
-            return res.weighted(weights).mean(dim)
-        else:
-            return res.mean(dim, keep_attrs=keep_attrs)
+        return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def crps_ensemble(
@@ -192,13 +186,10 @@ def crps_ensemble(
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
-    if dim is None:
-        return res
+    if weights is not None:
+        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
-        if weights is not None:
-            return res.weighted(weights).mean(dim)
-        else:
-            return res.mean(dim, keep_attrs=keep_attrs)
+        return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=False):
@@ -251,13 +242,10 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
-    if dim is None:
-        return res
+    if weights is not None:
+        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
-        if weights is not None:
-            return res.weighted(weights).mean(dim)
-        else:
-            return res.mean(dim)
+        return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def threshold_brier_score(
@@ -348,10 +336,7 @@ def threshold_brier_score(
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
-    if dim is None:
-        return res
+    if weights is not None:
+        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
-        if weights is not None:
-            return res.weighted(weights).mean(dim)
-        else:
-            return res.mean(dim)
+        return res.mean(dim, keep_attrs=keep_attrs)
