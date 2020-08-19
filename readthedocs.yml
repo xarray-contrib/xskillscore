@@ -1,0 +1,12 @@
+version: 2
+
+build:
+    image: latest
+
+conda:
+    environment: ci/doc.yml
+
+sphinx:
+  fail_on_warning: true
+
+formats: []

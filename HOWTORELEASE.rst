@@ -1,7 +1,7 @@
 Release Procedure
 -----------------
 
-#. Create a new branch ``release-vX.x.x`` with the version for the release.
+#. Create a new branch ``release-v0.0.x`` with the version for the release.
 
  * Update ``CHANGELOG.rst``
  * Make sure all new changes, features are reflected in the documentation.
@@ -12,7 +12,7 @@ Release Procedure
 
 #. Tag a release and push to github::
 
-    $ git tag -a v1.0.0 -m "Version 1.0.0"
+    $ git tag -a v0.0.17 -m "Version 0.0.17"
     $ git push origin master --tags
 
 #. Build and publish release on PyPI::

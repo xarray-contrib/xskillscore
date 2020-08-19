@@ -1,4 +1,4 @@
-xskillscore.smape
+﻿xskillscore.smape
 =================
 
 .. currentmodule:: xskillscore

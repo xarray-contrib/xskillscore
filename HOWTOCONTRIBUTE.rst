@@ -81,7 +81,8 @@ documents. Some helpful guides are located
 
     .. code:: bash
 
-        $ conda env update -f ci/requirements-py36.yml
+        $ conda env update -f ci/doc.yml
+        $ conda activate xskillscore-docs
         $ cd docs
         $ make html
 
