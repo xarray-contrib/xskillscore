@@ -786,4 +786,3 @@ class Contingency:
             dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
             skipna=True,
         ) / self._sum_categories("total")
-
