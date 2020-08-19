@@ -5,16 +5,18 @@ dependencies:
   - python=3.6
   - bottleneck
   - importlib_metadata
+  - ipykernel
+  - ipython
   - nbsphinx
   - numpy
   - pip
+  - properscoring
   - scipy
   - sphinx
-  - sphinxcontrib-napoleon
   - sphinx_rtd_theme
+  - sphinx-autosummary-accessors
   - toolz
   - xarray
   - xhistogram
   - pip:
-    - properscoring
     - -e ..

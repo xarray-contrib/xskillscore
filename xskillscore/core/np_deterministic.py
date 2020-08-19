@@ -4,18 +4,18 @@ from scipy import special
 from scipy.stats import distributions
 
 __all__ = [
-    '_pearson_r',
-    '_pearson_r_p_value',
-    '_rmse',
-    '_mse',
-    '_mae',
-    '_median_absolute_error',
-    '_smape',
-    '_mape',
-    '_spearman_r',
-    '_spearman_r_p_value',
-    '_effective_sample_size',
-    '_r2',
+    "_pearson_r",
+    "_pearson_r_p_value",
+    "_rmse",
+    "_mse",
+    "_mae",
+    "_median_absolute_error",
+    "_smape",
+    "_mape",
+    "_spearman_r",
+    "_spearman_r_p_value",
+    "_effective_sample_size",
+    "_r2",
 ]
 
 
@@ -30,6 +30,7 @@ def _match_nans(a, b, weights):
     a, b, weights : ndarray
         a, b, and weights (if not None) with nans placed at
         pairwise locations.
+
     """
     if np.isnan(a).any() or np.isnan(b).any():
         # Avoids mutating original arrays and bypasses read-only issue.
@@ -110,13 +111,12 @@ def _effective_sample_size(a, b, axis, skipna):
     n_eff : ndarray
         Effective sample size.
 
-    Reference
-    ---------
-    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+    References
+    ----------
+    Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
-    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+    Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
-
     """
     if skipna:
         a, b, _ = _match_nans(a, b, None)
@@ -163,7 +163,6 @@ def _pearson_r(a, b, weights, axis, skipna):
     See Also
     --------
     scipy.stats.pearsonr
-
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
     if skipna:
@@ -216,8 +215,8 @@ def _r2(a, b, weights, axis, skipna):
     --------
     sklearn.metrics.r2_score
 
-    Reference
-    ---------
+    References
+    ----------
     https://en.wikipedia.org/wiki/Coefficient_of_determination
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
@@ -268,7 +267,6 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
     See Also
     --------
     scipy.stats.pearsonr
-
     """
     if skipna:
         a, b, weights = _match_nans(a, b, weights)
@@ -320,13 +318,12 @@ def _pearson_r_eff_p_value(a, b, axis, skipna):
     res : ndarray
         2-tailed p-value.
 
-    Reference
-    ---------
-    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+    References
+    ----------
+    Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
-    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+    Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
-
     """
     if skipna:
         a, b, _ = _match_nans(a, b, None)
@@ -374,7 +371,6 @@ def _spearman_r(a, b, weights, axis, skipna):
     See Also
     --------
     scipy.stats.spearmanr
-
     """
     if skipna:
         a, b, weights = _match_nans(a, b, weights)
@@ -410,10 +406,9 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
     --------
     scipy.stats.spearmanr
 
-    Reference
-    ---------
+    References
+    ----------
     https://github.com/scipy/scipy/blob/v1.3.1/scipy/stats/stats.py#L3613-L3764
-
     """
     if skipna:
         a, b, weights = _match_nans(a, b, weights)
@@ -456,13 +451,12 @@ def _spearman_r_eff_p_value(a, b, axis, skipna):
     --------
     scipy.stats.spearmanr
 
-    Reference
-    ---------
-    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+    References
+    ----------
+    Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
-    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+    Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
-
     """
     if skipna:
         a, b, _ = _match_nans(a, b, None)
@@ -498,7 +492,6 @@ def _rmse(a, b, weights, axis, skipna):
     See Also
     --------
     sklearn.metrics.mean_squared_error
-
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
     if skipna:
@@ -541,7 +534,6 @@ def _mse(a, b, weights, axis, skipna):
     See Also
     --------
     sklearn.metrics.mean_squared_error
-
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
     if skipna:
@@ -580,7 +572,6 @@ def _mae(a, b, weights, axis, skipna):
     See Also
     --------
     sklearn.metrics.mean_absolute_error
-
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
     if skipna:
@@ -619,7 +610,6 @@ def _median_absolute_error(a, b, axis, skipna):
     See Also
     --------
     sklearn.metrics.median_absolute_error
-
     """
     medianfunc = np.nanmedian if skipna else np.median
     if skipna:
@@ -652,16 +642,16 @@ def _mape(a, b, weights, axis, skipna):
     res : ndarray
         Mean Absolute Percentage Error.
 
-    Reference
-    ---------
-    https://en.wikipedia.org/wiki/Mean_absolute_percentage_error
-
     Notes
     -----
     The percent error is calculated in reference to ``a``.
 
     Percent error is reported as decimal percent. I.e., a value of
     1 is 100%.
+
+    References
+    ----------
+    https://en.wikipedia.org/wiki/Mean_absolute_percentage_error
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
     if skipna:
@@ -699,14 +689,14 @@ def _smape(a, b, weights, axis, skipna):
     res : ndarray
         Symmetric Mean Absolute Percentage Error.
 
-    Reference
-    ---------
-    https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
-
     Notes
     -----
     Symmetric percent error is reported as decimal percent. I.e., a value of 1
     is 100%.
+
+    References
+    ----------
+    https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
     """
     sumfunc, meanfunc = _get_numpy_funcs(skipna)
     if skipna:
