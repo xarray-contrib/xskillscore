@@ -206,10 +206,17 @@ class XSkillScoreAccessor(object):
         return rank_histogram(observations, forecasts, dim=dim, member_dim=member_dim)
 
     def discrimination(
-        self, observations, forecasts, dim=None, probability_bins=np.linspace(0, 1, 5)
+        self,
+        observations,
+        forecasts,
+        dim=None,
+        probability_bin_edges=np.linspace(-1 / 8, 1 + 1 / 8, 6),
     ):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
         return discrimination(
-            observations, forecasts, dim=dim, probability_bins=probability_bins
+            observations,
+            forecasts,
+            dim=dim,
+            probability_bin_edges=probability_bin_edges,
         )

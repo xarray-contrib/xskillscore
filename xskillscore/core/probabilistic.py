@@ -9,7 +9,7 @@ from properscoring import (
     threshold_brier_score,
 )
 
-from .utils import get_bin_edges, histogram
+from .utils import histogram
 
 __all__ = [
     'brier_score',
@@ -441,17 +441,17 @@ def rank_histogram(observations, forecasts, dim=None, member_dim='member'):
         output_dtypes=[int],
     )
 
-    # Initialise bins -----
-    bins = range(1, len(forecasts[member_dim]) + 2)
-    bin_edges = get_bin_edges(bins)
-
+    bin_edges = np.arange(0.5, len(forecasts[member_dim]) + 2)
     return histogram(
         ranks, bins=[bin_edges], bin_names=['rank'], dim=dim, bin_dim_suffix=''
     )
 
 
 def discrimination(
-    observations, forecasts, dim=None, probability_bins=np.linspace(0, 1, 5)
+    observations,
+    forecasts,
+    dim=None,
+    probability_bin_edges=np.linspace(-1 / 8, 1 + 1 / 8, 6),
 ):
     """Returns the data required to construct the discrimination diagram for an event; the \
             histogram of forecasts likelihood when observations indicate an event has occurred \
@@ -467,8 +467,9 @@ def discrimination(
         dim : str or list of str, optional
             Dimension(s) over which to compute the histograms
             Defaults to None meaning compute over all dimensions.
-        probability_bins : array_like, optional
-            Probability bin centres used to compute the histograms. Defaults to 5 equally spaced bins between 0 and 1
+        probability_bin_edges : array_like, optional
+            Probability bin edges (right edge inclusive) used to compute the histograms. Defaults to 6 \
+            equally spaced edges between -0.125 and 1.125 (i.e. bin centres at [0, 0.25, 0.5, 0.75, 1])
 
         Returns
         -------
@@ -500,8 +501,6 @@ def discrimination(
             raise ValueError(
                 'At least one dimension must be supplied to compute rank histogram over'
             )
-
-    probability_bin_edges = get_bin_edges(probability_bins)
 
     hist_event = histogram(
         forecasts.where(observations),
