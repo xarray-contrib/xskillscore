@@ -5,17 +5,17 @@ import xarray as xr
 
 from .utils import histogram
 
-__all__ = ["Contingency"]
+__all__ = ['Contingency']
 
-OBSERVATIONS_NAME = "observations"
-FORECASTS_NAME = "forecasts"
+OBSERVATIONS_NAME = 'observations'
+FORECASTS_NAME = 'forecasts'
 
 
 def _get_category_bounds(category_edges):
     """Return formatted string of category bounds given list of category edges
     """
     return [
-        f"({str(category_edges[i])}, {str(category_edges[i + 1])}]"
+        f'({str(category_edges[i])}, {str(category_edges[i + 1])}]'
         for i in range(len(category_edges) - 1)
     ]
 
@@ -28,7 +28,7 @@ def dichotomous_only(method):
     def wrapper(self, *args, **kwargs):
         if not self.dichotomous:
             raise AttributeError(
-                f"{method.__name__} can only be computed for dichotomous (2-category) data"
+                f'{method.__name__} can only be computed for dichotomous (2-category) data'
             )
         return method(self, *args, **kwargs)
 
@@ -38,8 +38,8 @@ def dichotomous_only(method):
 def _display_metadata(self):
     """Called when Contingency objects are printed
     """
-    header = f"<xskillscore.{type(self).__name__}>\n"
-    summary = header + "\n".join(str(self.table).split("\n")[1:]) + "\n"
+    header = f'<xskillscore.{type(self).__name__}>\n'
+    summary = header + '\n'.join(str(self.table).split('\n')[1:]) + '\n'
     return summary
 
 
@@ -155,40 +155,40 @@ class Contingency:
             bins=[self.observation_category_edges, self.forecast_category_edges],
             bin_names=[OBSERVATIONS_NAME, FORECASTS_NAME],
             dim=dim,
-            bin_dim_suffix="_bin",
+            bin_dim_suffix='_bin',
         )
 
         # Add some coordinates to simplify interpretation/post-processing
         table = table.assign_coords(
             {
                 OBSERVATIONS_NAME
-                + "_bin": _get_category_bounds(self.observation_category_edges)
+                + '_bin': _get_category_bounds(self.observation_category_edges)
             }
-        ).rename({OBSERVATIONS_NAME + "_bin": OBSERVATIONS_NAME + "_category_bounds"})
+        ).rename({OBSERVATIONS_NAME + '_bin': OBSERVATIONS_NAME + '_category_bounds'})
         table = table.assign_coords(
             {
                 FORECASTS_NAME
-                + "_bin": _get_category_bounds(self.forecast_category_edges)
+                + '_bin': _get_category_bounds(self.forecast_category_edges)
             }
-        ).rename({FORECASTS_NAME + "_bin": FORECASTS_NAME + "_category_bounds"})
+        ).rename({FORECASTS_NAME + '_bin': FORECASTS_NAME + '_category_bounds'})
         table = table.assign_coords(
             {
                 OBSERVATIONS_NAME
-                + "_category": (
-                    OBSERVATIONS_NAME + "_category_bounds",
+                + '_category': (
+                    OBSERVATIONS_NAME + '_category_bounds',
                     range(1, len(self.observation_category_edges)),
                 ),
                 FORECASTS_NAME
-                + "_category": (
-                    FORECASTS_NAME + "_category_bounds",
+                + '_category': (
+                    FORECASTS_NAME + '_category_bounds',
                     range(1, len(self.forecast_category_edges)),
                 ),
             }
         )
         table = table.swap_dims(
             {
-                OBSERVATIONS_NAME + "_category_bounds": OBSERVATIONS_NAME + "_category",
-                FORECASTS_NAME + "_category_bounds": FORECASTS_NAME + "_category",
+                OBSERVATIONS_NAME + '_category_bounds': OBSERVATIONS_NAME + '_category',
+                FORECASTS_NAME + '_category_bounds': FORECASTS_NAME + '_category',
             }
         )
 
@@ -208,18 +208,18 @@ class Contingency:
 
         """
 
-        if categories == "total":
+        if categories == 'total':
             N = self.table.sum(
-                dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
+                dim=(OBSERVATIONS_NAME + '_category', FORECASTS_NAME + '_category'),
                 skipna=True,
             )
-        elif categories == "observations":
-            N = self.table.sum(dim=FORECASTS_NAME + "_category", skipna=True).rename(
-                {OBSERVATIONS_NAME + "_category": "category"}
+        elif categories == 'observations':
+            N = self.table.sum(dim=FORECASTS_NAME + '_category', skipna=True).rename(
+                {OBSERVATIONS_NAME + '_category': 'category'}
             )
-        elif categories == "forecasts":
-            N = self.table.sum(dim=OBSERVATIONS_NAME + "_category", skipna=True).rename(
-                {FORECASTS_NAME + "_category": "category"}
+        elif categories == 'forecasts':
+            N = self.table.sum(dim=OBSERVATIONS_NAME + '_category', skipna=True).rename(
+                {FORECASTS_NAME + '_category': 'category'}
             )
         else:
             raise ValueError(
@@ -253,8 +253,8 @@ class Contingency:
 
         return self.table.sel(
             {
-                OBSERVATIONS_NAME + "_category": yes_category,
-                FORECASTS_NAME + "_category": yes_category,
+                OBSERVATIONS_NAME + '_category': yes_category,
+                FORECASTS_NAME + '_category': yes_category,
             },
             drop=True,
         )
@@ -282,8 +282,8 @@ class Contingency:
 
         return self.table.sel(
             {
-                OBSERVATIONS_NAME + "_category": yes_category,
-                FORECASTS_NAME + "_category": no_category,
+                OBSERVATIONS_NAME + '_category': yes_category,
+                FORECASTS_NAME + '_category': no_category,
             },
             drop=True,
         )
@@ -311,8 +311,8 @@ class Contingency:
 
         return self.table.sel(
             {
-                OBSERVATIONS_NAME + "_category": no_category,
-                FORECASTS_NAME + "_category": yes_category,
+                OBSERVATIONS_NAME + '_category': no_category,
+                FORECASTS_NAME + '_category': yes_category,
             },
             drop=True,
         )
@@ -340,8 +340,8 @@ class Contingency:
 
         return self.table.sel(
             {
-                OBSERVATIONS_NAME + "_category": no_category,
-                FORECASTS_NAME + "_category": no_category,
+                OBSERVATIONS_NAME + '_category': no_category,
+                FORECASTS_NAME + '_category': no_category,
             },
             drop=True,
         )
@@ -539,7 +539,7 @@ class Contingency:
         hits_random = (
             (self.hits(yes_category) + self.misses(yes_category))
             * (self.hits(yes_category) + self.false_alarms(yes_category))
-        ) / self._sum_categories("total")
+        ) / self._sum_categories('total')
 
         return (self.hits(yes_category) - hits_random) / (
             self.hits(yes_category)
@@ -624,13 +624,13 @@ class Contingency:
         """
 
         corr = self.table.where(
-            self.table[OBSERVATIONS_NAME + "_category"]
-            == self.table[FORECASTS_NAME + "_category"]
+            self.table[OBSERVATIONS_NAME + '_category']
+            == self.table[FORECASTS_NAME + '_category']
         ).sum(
-            dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
+            dim=(OBSERVATIONS_NAME + '_category', FORECASTS_NAME + '_category'),
             skipna=True,
         )
-        N = self._sum_categories("total")
+        N = self._sum_categories('total')
 
         return corr / N
 
@@ -653,17 +653,17 @@ class Contingency:
         """
 
         numer_1 = self.table.where(
-            self.table[OBSERVATIONS_NAME + "_category"]
-            == self.table[FORECASTS_NAME + "_category"]
+            self.table[OBSERVATIONS_NAME + '_category']
+            == self.table[FORECASTS_NAME + '_category']
         ).sum(
-            dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
+            dim=(OBSERVATIONS_NAME + '_category', FORECASTS_NAME + '_category'),
             skipna=True,
         ) / self._sum_categories(
-            "total"
+            'total'
         )
         numer_2 = (
-            self._sum_categories("observations") * self._sum_categories("forecasts")
-        ).sum(dim="category", skipna=True) / self._sum_categories("total") ** 2
+            self._sum_categories('observations') * self._sum_categories('forecasts')
+        ).sum(dim='category', skipna=True) / self._sum_categories('total') ** 2
         denom = 1 - numer_2
 
         return (numer_1 - numer_2) / denom
@@ -688,20 +688,20 @@ class Contingency:
         """
 
         numer_1 = self.table.where(
-            self.table[OBSERVATIONS_NAME + "_category"]
-            == self.table[FORECASTS_NAME + "_category"]
+            self.table[OBSERVATIONS_NAME + '_category']
+            == self.table[FORECASTS_NAME + '_category']
         ).sum(
-            dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
+            dim=(OBSERVATIONS_NAME + '_category', FORECASTS_NAME + '_category'),
             skipna=True,
         ) / self._sum_categories(
-            "total"
+            'total'
         )
         numer_2 = (
-            self._sum_categories("observations") * self._sum_categories("forecasts")
-        ).sum(dim="category", skipna=True) / self._sum_categories("total") ** 2
-        denom = 1 - (self._sum_categories("observations") ** 2).sum(
-            dim="category", skipna=True
-        ) / (self._sum_categories("total") ** 2)
+            self._sum_categories('observations') * self._sum_categories('forecasts')
+        ).sum(dim='category', skipna=True) / self._sum_categories('total') ** 2
+        denom = 1 - (self._sum_categories('observations') ** 2).sum(
+            dim='category', skipna=True
+        ) / (self._sum_categories('total') ** 2)
 
         return (numer_1 - numer_2) / denom
 
@@ -774,15 +774,15 @@ class Contingency:
             _gerrity_s,
             self.table,
             input_core_dims=[
-                [OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"]
+                [OBSERVATIONS_NAME + '_category', FORECASTS_NAME + '_category']
             ],
             output_core_dims=[
-                [OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"]
+                [OBSERVATIONS_NAME + '_category', FORECASTS_NAME + '_category']
             ],
-            dask="allowed",
+            dask='allowed',
         )
 
         return (self.table * s).sum(
-            dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
+            dim=(OBSERVATIONS_NAME + '_category', FORECASTS_NAME + '_category'),
             skipna=True,
-        ) / self._sum_categories("total")
+        ) / self._sum_categories('total')
