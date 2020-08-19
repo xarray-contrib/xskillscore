@@ -41,7 +41,6 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
     --------
     properscoring.crps_gaussian
     xarray.apply_ufunc
-
     """
     # check if same dimensions
     if isinstance(mu, (int, float)):
@@ -110,7 +109,6 @@ def crps_quadrature(
     --------
     properscoring.crps_quadrature
     xarray.apply_ufunc
-
     """
     res = xr.apply_ufunc(
         properscoring.crps_quadrature,
@@ -180,7 +178,6 @@ def crps_ensemble(
     --------
     properscoring.crps_ensemble
     xarray.apply_ufunc
-
     """
     res = xr.apply_ufunc(
         properscoring.crps_ensemble,
@@ -233,14 +230,15 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
     properscoring.brier_score
     xarray.apply_ufunc
 
-    Notes
-    -----
-    .. [1] Gneiting, Tilmann, and Adrian E Raftery. “Strictly Proper Scoring Rules,
+    References
+    ----------
+    Gneiting, Tilmann, and Adrian E Raftery. “Strictly Proper Scoring Rules,
       Prediction, and Estimation.” Journal of the American Statistical
       Association 102, no. 477 (March 1, 2007): 359–78.
       https://doi.org/10/c6758w.
-    .. [2] https://journals.ametsoc.org/doi/abs/10.1175/1520-0493%281950%29078%3C0001%3AVOFEIT%3E2.0.CO%3B2
-
+    Brier, Glenn W. "VERIFICATION OF FORECASTS EXPRESSED IN TERMS OF PROBABILITY."
+      Monthly Weather Review, 78(1): 1-3
+      https://journals.ametsoc.org/doi/abs/10.1175/1520-0493%281950%29078%3C0001%3AVOFEIT%3E2.0.CO%3B2
     """
     res = xr.apply_ufunc(
         properscoring.brier_score,
@@ -308,12 +306,11 @@ def threshold_brier_score(
     properscoring.threshold_brier_score
     xarray.apply_ufunc
 
-    Notes
-    -----
-    .. [1] Gneiting, T. and Ranjan, R. Comparing density forecasts using threshold-
-       and quantile-weighted scoring rules. J. Bus. Econ. Stat. 29, 411-422
-       (2011). http://www.stat.washington.edu/research/reports/2008/tr533.pdf
-
+    References
+    ----------
+    Gneiting, T. and Ranjan, R. Comparing density forecasts using threshold-
+      and quantile-weighted scoring rules. J. Bus. Econ. Stat. 29, 411-422
+      (2011). http://www.stat.washington.edu/research/reports/2008/tr533.pdf
     """
     if isinstance(threshold, list):
         threshold.sort()

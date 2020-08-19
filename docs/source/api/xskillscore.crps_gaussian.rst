@@ -1,4 +1,4 @@
-xskillscore.crps\_gaussian
+﻿xskillscore.crps\_gaussian
 ==========================
 
 .. currentmodule:: xskillscore

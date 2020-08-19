@@ -14,7 +14,7 @@ Internal Changes
 Documentation
 -------------
 - Added ``sphinx`` documentation with full API and a quick start notebook.
-  (:pr:`127`) `Riley X. Brady`_.
+  (:pr:`127`) `Riley X. Brady`_ and `Ray Bell`_.
 
 Features
 --------

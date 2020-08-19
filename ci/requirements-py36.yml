@@ -6,9 +6,9 @@ dependencies:
   # Documentation
   - nbsphinx
   - nbstripout
-  - sphinx_rtd_theme
   - sphinx
-  - sphinxcontrib-napoleon
+  - sphinx_rtd_theme
+  - sphinx-autosummary-accessors
   # IDE
   - jupyterlab
   # Numerics
@@ -17,6 +17,7 @@ dependencies:
   - dask
   - numba
   - numpy
+  - properscoring
   - scikit-learn
   - scipy
   - xarray
@@ -34,7 +35,3 @@ dependencies:
   - pytest-cov
   - pytest-lazy-fixture
   - pytest-sugar
-  - pip
-  - pip:
-      - properscoring
-      - pygments

@@ -87,9 +87,9 @@ class Contingency:
             test2                         (observations_category, forecasts_category) int64 ...
             test1                         (observations_category, forecasts_category) int64 ...
 
-        Notes
-        -----
-        See http://www.cawcr.gov.au/projects/verification/
+        References
+        ----------
+        http://www.cawcr.gov.au/projects/verification/
     """
 
     def __init__(
@@ -246,9 +246,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the number of hits
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.table.sel(
@@ -274,9 +274,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the number of misses
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
         no_category = abs(yes_category - 2) + 1
 
@@ -303,9 +303,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the number of false alarms
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
         no_category = abs(yes_category - 2) + 1
 
@@ -332,9 +332,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the number of correct negatives
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
         no_category = abs(yes_category - 2) + 1
 
@@ -365,9 +365,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the bias score(s)
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return (self.hits(yes_category) + self.false_alarms(yes_category)) / (
@@ -392,9 +392,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the hit rate(s)
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.hits(yes_category) / (
@@ -418,9 +418,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the false alarm ratio(s)
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.false_alarms(yes_category) / (
@@ -446,9 +446,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the false alarm rate(s)
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.false_alarms(yes_category) / (
@@ -472,9 +472,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the success ratio(s)
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.hits(yes_category) / (
@@ -498,9 +498,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the threat score(s)
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return self.hits(yes_category) / (
@@ -531,9 +531,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the equitable threat score(s)
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         hits_random = (
@@ -566,9 +566,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the equitable odds ratio(s)
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return (self.hits(yes_category) * self.correct_negatives(yes_category)) / (
@@ -594,9 +594,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the equitable odds ratio skill score(s)
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         return (
@@ -618,9 +618,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the accuracy score(s)
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         corr = self.table.where(
@@ -647,9 +647,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the Heidke score(s)
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         numer_1 = self.table.where(
@@ -682,9 +682,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the Peirce score(s)
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
         numer_1 = self.table.where(
@@ -732,9 +732,9 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the Gerrity scores
 
-        Notes
-        -----
-        .. [1] https://www.cawcr.gov.au/projects/verification/#Contingency_table
+        References
+        ----------
+        https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
         # TODO: Currently computes the Gerrity scoring matrix using nested for-loops.
         # Is it possible to remove these?
