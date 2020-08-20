@@ -1,4 +1,4 @@
-﻿xskillscore.rmse
+xskillscore.rmse
 ================
 
 .. currentmodule:: xskillscore

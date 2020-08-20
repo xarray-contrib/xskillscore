@@ -1,4 +1,4 @@
-﻿xskillscore.Contingency.heidke\_score
+xskillscore.Contingency.heidke\_score
 =====================================
 
 .. currentmodule:: xskillscore

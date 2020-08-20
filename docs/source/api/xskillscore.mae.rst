@@ -1,4 +1,4 @@
-﻿xskillscore.mae
+xskillscore.mae
 ===============
 
 .. currentmodule:: xskillscore

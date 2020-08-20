@@ -1,4 +1,4 @@
-﻿xskillscore.spearman\_r
+xskillscore.spearman\_r
 =======================
 
 .. currentmodule:: xskillscore
