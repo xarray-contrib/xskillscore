@@ -3,23 +3,35 @@ channels:
   - conda-forge
 dependencies:
   - python=3.6
-  - scikit-learn
-  - xarray
+  # Documentation
+  - nbsphinx
+  - nbstripout
+  - sphinx
+  - sphinx_rtd_theme
+  - sphinx-autosummary-accessors
+  # IDE
+  - jupyterlab
+  # Numerics
+  - bottleneck
   - cftime
   - dask
-  - scipy
-  - xhistogram
   - numba
-  - bottleneck
-  - pytest
-  - flake8
+  - numpy
+  - properscoring
+  - scikit-learn
+  - scipy
+  - xarray
+  - xhistogram
+  # Package Management
+  - asv
   - black
+  - coveralls
   - doc8
+  - importlib_metadata
   - isort
+  - flake8
   - pre-commit
-  - pip
-  - pip:
-      - properscoring
-      - asv
-      - coveralls
-      - pygments
+  - pytest
+  - pytest-cov
+  - pytest-lazy-fixture
+  - pytest-sugar
