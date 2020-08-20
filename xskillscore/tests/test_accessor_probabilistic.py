@@ -9,10 +9,11 @@ from xskillscore.core.probabilistic import (
     crps_ensemble,
     crps_gaussian,
     crps_quadrature,
-    threshold_brier_score,
-    rank_histogram,
     discrimination,
+    rank_histogram,
+    threshold_brier_score,
 )
+
 
 @pytest.fixture
 def o():
