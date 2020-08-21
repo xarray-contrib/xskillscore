@@ -6,6 +6,7 @@ dist
 build
 
 .ipynb_checkpoints/
+.eggs/
 
 .vscode
 
