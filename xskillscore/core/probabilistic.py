@@ -212,9 +212,10 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
-        The observations or set of observations.
+        The observations or set of observations of the event. Data should be boolean or logical \
+        (True or 1 for event occurance, False or 0 for non-occurance).
     forecasts : xarray.Dataset or xarray.DataArray
-        The forecasts associated with the observations.
+        The forecast likelihoods of the event. Data should be between 0 and 1.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``brier_score``.
         Defaults to None implying averaging.
@@ -443,8 +444,8 @@ def discrimination(
         Parameters
         ----------
         observations : xarray.Dataset or xarray.DataArray
-            The observations or set of observations of the event. Data should be boolean (True for event
-            occurance, False for non-occurance).
+            The observations or set of observations of the event. Data should be boolean or logical \
+            (True or 1 for event occurance, False or 0 for non-occurance).
         forecasts : xarray.Dataset or xarray.DataArray
             The forecast likelihoods of the event. Data should be between 0 and 1.
         dim : str or list of str, optional
