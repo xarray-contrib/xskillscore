@@ -335,13 +335,31 @@ def test_keep_attrs(a, b, metrics, keep_attrs):
 @pytest.mark.parametrize('metrics', correlation_metrics + distance_metrics)
 def test_dim_None(a, b, metrics):
     """Test that `dim=None` reduces all dimensions as xr.mean(dim=None) and fails for
+    effective metrics."""
+    metric, _metric = metrics
+    if metric in [effective_sample_size, spearman_r_eff_p_value, pearson_r_eff_p_value]:
+        with pytest.raises(ValueError) as excinfo:
+            metric(a, b, dim=None)
+        assert (
+            'Effective sample size should only be applied to a singular time dimension.'
+            in str(excinfo.value)
+        )
+    else:
+        metric, _metric = metrics
+        res = metric(a, b, dim=None)
+        assert len(res.dims) == 0, print(res.dims)
+
+
+@pytest.mark.parametrize('metrics', correlation_metrics + distance_metrics)
+def test_dim_empty_list(a, b, metrics):
+    """Test that `dim=[]` reduces no dimensions as xr.mean(dim=[]) and fails for
     correlation metrics."""
     if metrics in correlation_metrics:
         metric, _metric = metrics
         with pytest.raises(ValueError) as excinfo:
-            metric(a, b, dim=None)
-        assert 'requires `dim` not being `None`' in str(excinfo.value)
+            metric(a, b, dim=[])
+        assert 'requires `dim` not being empty, found dim' in str(excinfo.value)
     elif metrics in distance_metrics:
         metric, _metric = metrics
-        res = metric(a, b, dim=None)
-        assert len(res.dims) == 0, print(res.dims)
+        res = metric(a, b, dim=[])
+        assert len(res.dims) == len(a.dims), print(res.dims)

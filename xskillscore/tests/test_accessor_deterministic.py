@@ -124,17 +124,19 @@ def test_deterministic_metrics_accessor(
 
     accessor_func = getattr(ds.xs, metric.__name__)
     if metric in temporal_only_metrics or metric == median_absolute_error:
-        actual = metric(a, b, dim, skipna=skipna_bool)
+        actual = metric(a, b, dim=dim, skipna=skipna_bool)
         if outer_bool:
-            expected = accessor_func('a', b, dim, skipna=skipna_bool)
+            expected = accessor_func('a', b, dim=dim, skipna=skipna_bool)
         else:
-            expected = accessor_func('a', 'b', dim, skipna=skipna_bool)
+            expected = accessor_func('a', 'b', dim=dim, skipna=skipna_bool)
     else:
-        actual = metric(a, b, dim, weights=_weights, skipna=skipna_bool)
+        actual = metric(a, b, dim=dim, weights=_weights, skipna=skipna_bool)
         if outer_bool:
-            expected = accessor_func('a', b, dim, weights=_weights, skipna=skipna_bool)
+            expected = accessor_func(
+                'a', b, dim=dim, weights=_weights, skipna=skipna_bool
+            )
         else:
             expected = accessor_func(
-                'a', 'b', dim, weights=_weights, skipna=skipna_bool
+                'a', 'b', dim=dim, weights=_weights, skipna=skipna_bool
             )
     assert_allclose(actual, expected)

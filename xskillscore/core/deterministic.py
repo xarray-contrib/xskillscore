@@ -53,9 +53,12 @@ def _preprocess_dims(dim, a):
     return dim, axis
 
 
-def _fail_if_dim_is_None(dim):
-    if dim is None:
-        raise ValueError(f'requires `dim` not being `None`, found dim={dim}')
+def _fail_if_dim_empty(dim):
+    if dim == []:
+        raise ValueError(
+            'metric must be applied along one dimension, therefore '
+            f'requires `dim` not being empty, found dim={dim}'
+        )
 
 
 def _stack_input_if_needed(a, b, dim, weights):
@@ -211,7 +214,7 @@ def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> pearson_r(a, b, dim='time')
     """
-    _fail_if_dim_is_None(dim)
+    _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
@@ -278,7 +281,7 @@ def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> r2(a, b, dim='time')
     """
-    _fail_if_dim_is_None(dim)
+    _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
@@ -342,7 +345,7 @@ def pearson_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fal
                         dims=['time', 'x', 'y'])
     >>> pearson_r_p_value(a, b, dim='time')
     """
-    _fail_if_dim_is_None(dim)
+    _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
@@ -361,7 +364,7 @@ def pearson_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fal
     )
 
 
-def effective_sample_size(a, b, dim=None, skipna=False, keep_attrs=False):
+def effective_sample_size(a, b, dim='time', skipna=False, keep_attrs=False):
     """Effective sample size for temporally correlated data.
 
     .. note::
@@ -424,7 +427,7 @@ def effective_sample_size(a, b, dim=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> effective_sample_size(a, b, dim='time')
     """
-    _fail_if_dim_is_None(dim)
+    _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
     if len(dim) > 1:
         raise ValueError(
@@ -527,7 +530,7 @@ def pearson_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> pearson_r_eff_p_value(a, b, dim='time')
     """
-    _fail_if_dim_is_None(dim)
+    _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
     if len(dim) > 1:
         raise ValueError(
@@ -602,7 +605,7 @@ def spearman_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> spearman_r(a, b, dim='time')
     """
-    _fail_if_dim_is_None(dim)
+    _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
@@ -665,7 +668,7 @@ def spearman_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fa
                         dims=['time', 'x', 'y'])
     >>> spearman_r_p_value(a, b, dim='time')
     """
-    _fail_if_dim_is_None(dim)
+    _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
@@ -761,7 +764,7 @@ def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> spearman_r_eff_p_value(a, b, dim='time')
     """
-    _fail_if_dim_is_None(dim)
+    _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
     if len(dim) > 1:
         raise ValueError(

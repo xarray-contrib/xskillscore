@@ -238,7 +238,6 @@ def test_threshold_brier_score_multiple_thresholds_list(o, f, keep_attrs):
 def test_threshold_brier_score_multiple_thresholds_xr(o, f, keep_attrs):
     threshold = xr.DataArray([0.1, 0.3, 0.5], dims='threshold')
     actual = threshold_brier_score(o, f, threshold, keep_attrs=keep_attrs)
-    print(actual.chunks)
     assert actual.chunks is None or actual.chunks == ()
     if keep_attrs:
         assert actual.attrs == o.attrs
