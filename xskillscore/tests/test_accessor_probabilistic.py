@@ -158,18 +158,22 @@ def test_rank_histogram_accessor(o, f, dask_bool, outer_bool):
 
 @pytest.mark.parametrize('outer_bool', [False, True])
 @pytest.mark.parametrize('dask_bool', [False, True])
-def test_discrimination_accessor(o, f, dask_bool, outer_bool):
+def test_discrimination_accessor(o, f, threshold, dask_bool, outer_bool):
     if dask_bool:
         o = o.chunk()
         f = f.chunk()
-    hist_event_actual, hist_no_event_actual = discrimination(o, f)
+    hist_event_actual, hist_no_event_actual = discrimination(
+        o > threshold, (f > threshold).mean('member')
+    )
 
     ds = xr.Dataset()
-    ds['o'] = o
-    ds['f'] = f
+    ds['o'] = o > threshold
+    ds['f'] = (f > threshold).mean('member')
     if outer_bool:
         ds = ds.drop_vars('f')
-        hist_event_expected, hist_no_event_expected = ds.xs.discrimination('o', f)
+        hist_event_expected, hist_no_event_expected = ds.xs.discrimination(
+            'o', (f > threshold).mean('member')
+        )
     else:
         hist_event_expected, hist_no_event_expected = ds.xs.discrimination('o', 'f')
     assert_allclose(hist_event_actual, hist_event_expected)
