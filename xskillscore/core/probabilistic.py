@@ -14,9 +14,7 @@ __all__ = [
     'reliability',
 ]
 
-
-PROBABILITY_BIN_NAME = 'probability_bin'
-
+FORECAST_PROBABILITY_DIM = 'forecast_probability'
 
 def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=False):
     """Continuous Ranked Probability Score with a Gaussian distribution.
@@ -365,7 +363,7 @@ def reliability(
     observations,
     forecasts,
     dim=None,
-    probability_bin_edges=np.linspace(0, 1, 6),
+    probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
     keep_attrs=False,
 ):
     """
@@ -383,8 +381,8 @@ def reliability(
             Dimension(s) over which to compute the histograms
             Defaults to None meaning compute over all dimensions.
         probability_bin_edges : array_like, optional
-            Probability bin edges (right edge inclusive) used to compute the histograms. Defaults to 6 \
-            equally spaced edges between 0 and 1
+            Probability bin edges used to compute the reliability. Bins include the left most edge, \
+            but not the right. Defaults to 6 equally spaced edges between 0 and 1+1e-8
         keep_attrs : bool
             If True, the attributes (attrs) will be copied
             from the first input to the new one.
@@ -471,16 +469,16 @@ def reliability(
         probability_bin_edges,
         input_core_dims=[[stack_dim], [stack_dim], []],
         dask='allowed',
-        output_core_dims=[[PROBABILITY_BIN_NAME], [PROBABILITY_BIN_NAME]],
+        output_core_dims=[[FORECAST_PROBABILITY_DIM], [FORECAST_PROBABILITY_DIM]],
         keep_attrs=keep_attrs,
     )
 
     # Add probability bin coordinate
     rel = rel.assign_coords(
-        {PROBABILITY_BIN_NAME: _get_bin_centers(probability_bin_edges)}
+        {FORECAST_PROBABILITY_DIM: _get_bin_centers(probability_bin_edges)}
     )
     samp = samp.assign_coords(
-        {PROBABILITY_BIN_NAME: _get_bin_centers(probability_bin_edges)}
+        {FORECAST_PROBABILITY_DIM: _get_bin_centers(probability_bin_edges)}
     )
 
     return rel, samp
