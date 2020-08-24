@@ -42,7 +42,7 @@ Distance Metrics
 Probabilistic Metrics
 ---------------------
 
-Currently, our probabilistic metrics are ported over from
+Currently, most of our probabilistic metrics are ported over from
 `properscoring <https://github.com/TheClimateCorporation/properscoring>`__ to work with
 ``xarray`` DataArrays and Datasets.
 
@@ -54,6 +54,8 @@ Currently, our probabilistic metrics are ported over from
     crps_gaussian
     crps_quadrature
     threshold_brier_score
+    rank_histogram
+    discrimination
 
 Contingency-based Metrics
 -------------------------

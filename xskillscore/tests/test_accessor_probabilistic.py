@@ -9,6 +9,8 @@ from xskillscore.core.probabilistic import (
     crps_ensemble,
     crps_gaussian,
     crps_quadrature,
+    discrimination,
+    rank_histogram,
     threshold_brier_score,
 )
 
@@ -133,3 +135,42 @@ def test_brier_score_accessor(o, f, threshold, dask_bool, outer_bool):
     else:
         expected = ds.xs.brier_score('o', 'f')
     assert_allclose(actual, expected)
+
+
+@pytest.mark.parametrize('outer_bool', [False, True])
+@pytest.mark.parametrize('dask_bool', [False, True])
+def test_rank_histogram_accessor(o, f, dask_bool, outer_bool):
+    if dask_bool:
+        o = o.chunk()
+        f = f.chunk()
+    actual = rank_histogram(o, f)
+
+    ds = xr.Dataset()
+    ds['o'] = o
+    ds['f'] = f
+    if outer_bool:
+        ds = ds.drop_vars('f')
+        expected = ds.xs.rank_histogram('o', f)
+    else:
+        expected = ds.xs.rank_histogram('o', 'f')
+    assert_allclose(actual, expected)
+
+
+@pytest.mark.parametrize('outer_bool', [False, True])
+@pytest.mark.parametrize('dask_bool', [False, True])
+def test_discrimination_accessor(o, f, dask_bool, outer_bool):
+    if dask_bool:
+        o = o.chunk()
+        f = f.chunk()
+    hist_event_actual, hist_no_event_actual = discrimination(o, f)
+
+    ds = xr.Dataset()
+    ds['o'] = o
+    ds['f'] = f
+    if outer_bool:
+        ds = ds.drop_vars('f')
+        hist_event_expected, hist_no_event_expected = ds.xs.discrimination('o', f)
+    else:
+        hist_event_expected, hist_no_event_expected = ds.xs.discrimination('o', 'f')
+    assert_allclose(hist_event_actual, hist_event_expected)
+    assert_allclose(hist_no_event_actual, hist_no_event_expected)
