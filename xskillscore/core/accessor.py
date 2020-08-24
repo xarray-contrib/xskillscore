@@ -210,7 +210,7 @@ class XSkillScoreAccessor(object):
         observations,
         forecasts,
         dim=None,
-        probability_bin_edges=np.linspace(-1 / 8, 1 + 1 / 8, 6),
+        probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
     ):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)

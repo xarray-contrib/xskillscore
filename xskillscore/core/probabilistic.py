@@ -435,7 +435,7 @@ def discrimination(
     observations,
     forecasts,
     dim=None,
-    probability_bin_edges=np.linspace(-1 / 8, 1 + 1 / 8, 6),
+    probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
 ):
     """Returns the data required to construct the discrimination diagram for an event; the \
             histogram of forecasts likelihood when observations indicate an event has occurred \
@@ -452,8 +452,8 @@ def discrimination(
             Dimension(s) over which to compute the histograms
             Defaults to None meaning compute over all dimensions.
         probability_bin_edges : array_like, optional
-            Probability bin edges (right edge inclusive) used to compute the histograms. Defaults to 6 \
-            equally spaced edges between -0.125 and 1.125 (i.e. bin centres at [0, 0.25, 0.5, 0.75, 1])
+            Probability bin edges used to compute the histograms. Bins include the left most edge, \
+            but not the right. Defaults to 6 equally spaced edges between 0 and 1+1e-8
 
         Returns
         -------
