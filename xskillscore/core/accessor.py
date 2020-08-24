@@ -1,3 +1,4 @@
+import numpy as np
 import xarray as xr
 
 from .deterministic import (
@@ -21,6 +22,8 @@ from .probabilistic import (
     crps_ensemble,
     crps_gaussian,
     crps_quadrature,
+    discrimination,
+    rank_histogram,
     threshold_brier_score,
 )
 
@@ -196,3 +199,24 @@ class XSkillScoreAccessor(object):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
         return brier_score(observations, forecasts, dim=dim, weights=weights)
+
+    def rank_histogram(self, observations, forecasts, dim=None, member_dim='member'):
+        observations = self._in_ds(observations)
+        forecasts = self._in_ds(forecasts)
+        return rank_histogram(observations, forecasts, dim=dim, member_dim=member_dim)
+
+    def discrimination(
+        self,
+        observations,
+        forecasts,
+        dim=None,
+        probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
+    ):
+        observations = self._in_ds(observations)
+        forecasts = self._in_ds(forecasts)
+        return discrimination(
+            observations,
+            forecasts,
+            dim=dim,
+            probability_bin_edges=probability_bin_edges,
+        )

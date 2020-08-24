@@ -1,6 +1,9 @@
+import bottleneck as bn
 import numpy as np
 import properscoring
 import xarray as xr
+
+from .utils import histogram
 
 __all__ = [
     'brier_score',
@@ -8,7 +11,11 @@ __all__ = [
     'crps_gaussian',
     'crps_quadrature',
     'threshold_brier_score',
+    'rank_histogram',
+    'discrimination',
 ]
+
+FORECAST_PROBABILITY_DIM = 'forecast_probability'
 
 
 def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=False):
@@ -207,9 +214,10 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
-        The observations or set of observations.
+        The observations or set of observations of the event. Data should be boolean or logical \
+        (True or 1 for event occurance, False or 0 for non-occurance).
     forecasts : xarray.Dataset or xarray.DataArray
-        The forecasts associated with the observations.
+        The forecast likelihoods of the event. Data should be between 0 and 1.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``brier_score``.
         Defaults to None implying averaging.
@@ -352,3 +360,148 @@ def threshold_brier_score(
             return res.weighted(weights).mean(dim)
         else:
             return res.mean(dim)
+
+
+def rank_histogram(observations, forecasts, dim=None, member_dim='member'):
+    """Returns the rank histogram (Talagrand diagram) along the specified dimensions.
+
+        Parameters
+        ----------
+        observations : xarray.Dataset or xarray.DataArray
+            The observations or set of observations.
+        forecasts : xarray.Dataset or xarray.DataArray
+            Forecast with required member dimension ``member_dim``.
+        dim : str or list of str, optional
+            Dimension(s) over which to compute the histogram of ranks.
+            Defaults to None meaning compute over all dimensions
+        member_dim : str, optional
+            Name of ensemble member dimension. By default, 'member'.
+
+        Returns
+        -------
+        rank_histogram : xarray.Dataset or xarray.DataArray
+            New object containing the histogram of ranks
+
+        Examples
+        --------
+        >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+        ...                             coords=[('x', np.arange(3)),
+        ...                                     ('y', np.arange(3))])
+        >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+        ...                          coords=[('x', np.arange(3)),
+        ...                                  ('y', np.arange(3)),
+        ...                                  ('member', np.arange(3))])
+        >>> rank_histogram(observations, forecasts, dim='x')
+        <xarray.DataArray 'histogram_rank' (y: 3, rank: 4)>
+        array([[0, 1, 1, 1],
+               [0, 1, 0, 2],
+               [1, 0, 1, 1]])
+        Coordinates:
+          * y        (y) int64 0 1 2
+          * rank     (rank) float64 1.0 2.0 3.0 4.0
+
+        Notes
+        -----
+        See http://www.cawcr.gov.au/projects/verification/
+    """
+
+    def _rank_first(x, y):
+        """ Concatenates x and y and returns the rank of the first element along the last axes """
+        xy = np.concatenate((x[..., np.newaxis], y), axis=-1)
+        return bn.nanrankdata(xy, axis=-1)[..., 0]
+
+    if dim is not None:
+        if len(dim) == 0:
+            raise ValueError(
+                'At least one dimension must be supplied to compute rank histogram over'
+            )
+        if member_dim in dim:
+            raise ValueError(f'"{member_dim}" cannot be specified as an input to dim')
+
+    ranks = xr.apply_ufunc(
+        _rank_first,
+        observations,
+        forecasts,
+        input_core_dims=[[], [member_dim]],
+        dask='parallelized',
+        output_dtypes=[int],
+    )
+
+    bin_edges = np.arange(0.5, len(forecasts[member_dim]) + 2)
+    return histogram(
+        ranks, bins=[bin_edges], bin_names=['rank'], dim=dim, bin_dim_suffix=''
+    )
+
+
+def discrimination(
+    observations,
+    forecasts,
+    dim=None,
+    probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
+):
+    """Returns the data required to construct the discrimination diagram for an event; the \
+            histogram of forecasts likelihood when observations indicate an event has occurred \
+            and has not occurred.
+
+        Parameters
+        ----------
+        observations : xarray.Dataset or xarray.DataArray
+            The observations or set of observations of the event. Data should be boolean or logical \
+            (True or 1 for event occurance, False or 0 for non-occurance).
+        forecasts : xarray.Dataset or xarray.DataArray
+            The forecast likelihoods of the event. Data should be between 0 and 1.
+        dim : str or list of str, optional
+            Dimension(s) over which to compute the histograms
+            Defaults to None meaning compute over all dimensions.
+        probability_bin_edges : array_like, optional
+            Probability bin edges used to compute the histograms. Bins include the left most edge, \
+            but not the right. Defaults to 6 equally spaced edges between 0 and 1+1e-8
+
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            Histogram of forecast probabilities when the event was observed
+        xarray.Dataset or xarray.DataArray
+            Histogram of forecast probabilities when the event was not observed
+
+        Examples
+        --------
+        >>> observations = xr.DataArray(np.random.normal(size=(30,30)),
+        ...                             coords=[('x', np.arange(30)),
+        ...                                     ('y', np.arange(30))])
+        >>> forecasts = xr.DataArray(np.random.normal(size=(30,30,10)),
+        ...                          coords=[('x', np.arange(30)),
+        ...                                  ('y', np.arange(30)),
+        ...                                  ('member', np.arange(10))])
+        >>> forecast_event_likelihood = (forecasts > 0).mean('member')
+        >>> observed_event = observations > 0
+        >>> hist_event, hist_no_event = discrimination(observed_event, forecast_event_likelihood, dim=['x','y'])
+
+        Notes
+        -----
+        See http://www.cawcr.gov.au/projects/verification/
+    """
+
+    if dim is not None:
+        if len(dim) == 0:
+            raise ValueError(
+                'At least one dimension must be supplied to compute discrimination over'
+            )
+
+    hist_event = histogram(
+        forecasts.where(observations),
+        bins=[probability_bin_edges],
+        bin_names=[FORECAST_PROBABILITY_DIM],
+        bin_dim_suffix='',
+        dim=dim,
+    ) / (observations).sum(dim=dim)
+
+    hist_no_event = histogram(
+        forecasts.where(xr.ufuncs.logical_not(observations)),
+        bins=[probability_bin_edges],
+        bin_names=[FORECAST_PROBABILITY_DIM],
+        bin_dim_suffix='',
+        dim=dim,
+    ) / (xr.ufuncs.logical_not(observations)).sum(dim=dim)
+
+    return hist_event, hist_no_event
