@@ -17,6 +17,7 @@ __all__ = [
 
 FORECAST_PROBABILITY_DIM = 'forecast_probability'
 
+
 def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=False):
     """Continuous Ranked Probability Score with a Gaussian distribution.
 
