@@ -96,8 +96,14 @@ def _preprocess_weights(a, dim, new_dim, weights):
             # Broadcast weights to full size of main object.
             _, weights = xr.broadcast(a, weights)
         return weights
-    
-    
+
+
+def _get_bin_centers(bin_edges):
+    """Return the arithmetic mean of the bin_edges
+        """
+    return 0.5 * (bin_edges[:-1] + bin_edges[1:])
+
+
 def histogram(*args, bins=None, bin_names=None, **kwargs):
     """Wrapper on xhistogram to deal with Datasets appropriately
     """

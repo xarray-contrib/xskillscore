@@ -18,11 +18,7 @@ from .np_deterministic import (
     _spearman_r_eff_p_value,
     _spearman_r_p_value,
 )
-from .utils import (
-    _preprocess_dims,
-    _stack_input_if_needed,
-    _preprocess_weights,
-    )
+from .utils import _preprocess_dims, _preprocess_weights, _stack_input_if_needed
 
 __all__ = [
     'pearson_r',
@@ -42,14 +38,14 @@ __all__ = [
 ]
 
 
-def _determine_input_core_dims(dim, weights): 
+def _determine_input_core_dims(dim, weights):
     """
     Determine input_core_dims based on type of dim and weights.
 
     Parameters
     ----------
     dim : str, list
-        The dimension(s) to apply the correlation along.
+        The dimension(s) to apply the metric along.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
 

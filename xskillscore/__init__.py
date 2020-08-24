@@ -24,6 +24,7 @@ from .core.probabilistic import (
     crps_ensemble,
     crps_gaussian,
     crps_quadrature,
+    reliability,
     threshold_brier_score,
 )
 from .versioning.print_versions import show_versions
