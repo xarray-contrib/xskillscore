@@ -365,7 +365,7 @@ def reliability(
     observations,
     forecasts,
     dim=None,
-    probability_bin_edges=np.linspace(-1 / 8, 1 + 1 / 8, 6),
+    probability_bin_edges=np.linspace(0, 1, 6),
     keep_attrs=False,
 ):
     """
@@ -384,7 +384,7 @@ def reliability(
             Defaults to None meaning compute over all dimensions.
         probability_bin_edges : array_like, optional
             Probability bin edges (right edge inclusive) used to compute the histograms. Defaults to 6 \
-            equally spaced edges between -0.125 and 1.125 (i.e. bin centres at [0, 0.25, 0.5, 0.75, 1])
+            equally spaced edges between 0 and 1
         keep_attrs : bool
             If True, the attributes (attrs) will be copied
             from the first input to the new one.
@@ -431,7 +431,12 @@ def reliability(
             N = np.zeros_like(r)
 
         for i in range(len(bin_edges) - 1):
-            f_in_bin = (f > bin_edges[i]) & (f <= bin_edges[i + 1])
+            # Follow numpy: all but the last (righthand-most) bin is half-open
+            # https://numpy.org/doc/stable/reference/generated/numpy.histogram.html
+            if (i + 1) == len(bin_edges):
+                f_in_bin = (f >= bin_edges[i]) & (f <= bin_edges[i + 1])
+            else:
+                f_in_bin = (f >= bin_edges[i]) & (f < bin_edges[i + 1])
             o_f_in_bin = o & f_in_bin
             N_f_in_bin = f_in_bin.sum(axis=-1)
             N_o_f_in_bin = o_f_in_bin.sum(axis=-1)

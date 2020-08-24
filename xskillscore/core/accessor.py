@@ -204,7 +204,7 @@ class XSkillScoreAccessor(object):
         observations,
         forecasts,
         dim=None,
-        probability_bin_edges=np.linspace(-1 / 8, 1 + 1 / 8, 6),
+        probability_bin_edges=np.linspace(0, 1, 6),
         keep_attrs=False,
     ):
         observations = self._in_ds(observations)
