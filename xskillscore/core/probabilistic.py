@@ -15,6 +15,7 @@ __all__ = [
     'discrimination',
 ]
 
+FORECAST_PROBABILITY_DIM = 'forecast_probability'
 
 def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=False):
     """Continuous Ranked Probability Score with a Gaussian distribution.
@@ -483,13 +484,13 @@ def discrimination(
     if dim is not None:
         if len(dim) == 0:
             raise ValueError(
-                'At least one dimension must be supplied to compute rank histogram over'
+                'At least one dimension must be supplied to compute discrimination over'
             )
 
     hist_event = histogram(
         forecasts.where(observations),
         bins=[probability_bin_edges],
-        bin_names=['forecast_probability'],
+        bin_names=[FORECAST_PROBABILITY_DIM],
         bin_dim_suffix='',
         dim=dim,
     ) / (observations).sum(dim=dim)
@@ -497,7 +498,7 @@ def discrimination(
     hist_no_event = histogram(
         forecasts.where(xr.ufuncs.logical_not(observations)),
         bins=[probability_bin_edges],
-        bin_names=['forecast_probability'],
+        bin_names=[FORECAST_PROBABILITY_DIM],
         bin_dim_suffix='',
         dim=dim,
     ) / (xr.ufuncs.logical_not(observations)).sum(dim=dim)
