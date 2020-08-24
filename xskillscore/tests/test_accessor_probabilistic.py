@@ -9,6 +9,7 @@ from xskillscore.core.probabilistic import (
     crps_ensemble,
     crps_gaussian,
     crps_quadrature,
+    reliability,
     threshold_brier_score,
 )
 
@@ -133,3 +134,25 @@ def test_brier_score_accessor(o, f, threshold, dask_bool, outer_bool):
     else:
         expected = ds.xs.brier_score('o', 'f')
     assert_allclose(actual, expected)
+
+
+@pytest.mark.parametrize('outer_bool', [False, True])
+@pytest.mark.parametrize('dask_bool', [False, True])
+def test_reliability_accessor(o, f, threshold, dask_bool, outer_bool):
+    if dask_bool:
+        o = o.chunk()
+        f = f.chunk()
+    rel_actual, samp_actual = reliability(o > threshold, (f > threshold).mean('member'))
+
+    ds = xr.Dataset()
+    ds['o'] = o > threshold
+    ds['f'] = (f > threshold).mean('member')
+    if outer_bool:
+        ds = ds.drop_vars('f')
+        rel_expected, samp_expected = ds.xs.reliability(
+            'o', (f > threshold).mean('member')
+        )
+    else:
+        rel_expected, samp_expected = ds.xs.reliability('o', 'f')
+    assert_allclose(rel_actual, rel_expected)
+    assert_allclose(samp_actual, samp_expected)

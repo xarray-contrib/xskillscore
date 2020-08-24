@@ -1,3 +1,4 @@
+import numpy as np
 import xarray as xr
 
 from .deterministic import (
@@ -21,6 +22,7 @@ from .probabilistic import (
     crps_ensemble,
     crps_gaussian,
     crps_quadrature,
+    reliability,
     threshold_brier_score,
 )
 
@@ -196,3 +198,21 @@ class XSkillScoreAccessor(object):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
         return brier_score(observations, forecasts, dim=dim, weights=weights)
+
+    def reliability(
+        self,
+        observations,
+        forecasts,
+        dim=None,
+        probability_bin_edges=np.linspace(-1 / 8, 1 + 1 / 8, 6),
+        keep_attrs=False,
+    ):
+        observations = self._in_ds(observations)
+        forecasts = self._in_ds(forecasts)
+        return reliability(
+            observations,
+            forecasts,
+            dim=dim,
+            probability_bin_edges=probability_bin_edges,
+            keep_attrs=keep_attrs,
+        )

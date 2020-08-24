@@ -407,7 +407,7 @@ def reliability(
         >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
         ...                            coords=[('x', np.arange(3)),
         ...                                    ('y', np.arange(3))])
-        >>> reliability, samples = reliability(observations > 0.1, (forecasts > 0.1).mean('ensemble'), dim='x')
+        >>> rel, samples = reliability(observations > 0.1, (forecasts > 0.1).mean('ensemble'), dim='x')
 
 
         Notes
@@ -418,37 +418,36 @@ def reliability(
     def _reliability(o, f, bin_edges):
         """Return the reliability and number of samples per bin
         """
+        # I couldn't get dask='parallelized' working in this case so dealing with dask arrays explicitly
+        is_dask_array = isinstance(o, darray.core.Array) | isinstance(
+            f, darray.core.Array
+        )
 
-        def _get_reliability(o, f, bin_edge_pair):
-            """The shared logic between np and darray implementations
-            """
-            f_in_bin = (f > bin_edge_pair[0]) & (f <= bin_edge_pair[1])
-            o_f_in_bin = o & f_in_bin
-            return f_in_bin.sum(axis=-1), o_f_in_bin.sum(axis=-1)
-
-        # I couldn't get dask='parallelized' working easily in this case so deal with dask arrays explicitly
-        if isinstance(o, darray.core.Array) | isinstance(f, darray.core.Array):
+        if is_dask_array:
             r = []
             N = []
-            for i in range(len(bin_edges) - 1):
-                N_f_in_bin, N_o_f_in_bin = _get_reliability(
-                    o, f, (bin_edges[i], bin_edges[i + 1])
-                )
+        else:
+            r = np.zeros((*o.shape[:-1], len(bin_edges) - 1), dtype=float)
+            N = np.zeros_like(r)
+
+        for i in range(len(bin_edges) - 1):
+            f_in_bin = (f > bin_edges[i]) & (f <= bin_edges[i + 1])
+            o_f_in_bin = o & f_in_bin
+            N_f_in_bin = f_in_bin.sum(axis=-1)
+            N_o_f_in_bin = o_f_in_bin.sum(axis=-1)
+            if is_dask_array:
                 r.append(N_o_f_in_bin / N_f_in_bin)
                 N.append(N_f_in_bin)
+            else:
+                r[..., i] = N_o_f_in_bin / N_f_in_bin
+                N[..., i] = N_f_in_bin
+
+        if is_dask_array:
             return (
                 darray.stack(r, axis=-1).rechunk({-1: -1}),
                 darray.stack(N, axis=-1).rechunk({-1: -1}),
             )
         else:
-            r = np.zeros((*o.shape[:-1], len(bin_edges) - 1), dtype=float)
-            N = np.zeros_like(r)
-            for i in range(len(bin_edges) - 1):
-                N_f_in_bin, N_o_f_in_bin = _get_reliability(
-                    o, f, (bin_edges[i], bin_edges[i + 1])
-                )
-                N[..., i] = N_f_in_bin
-                r[..., i] = N_o_f_in_bin / N_f_in_bin
             return r, N
 
     # Compute over all dims if dim is None
@@ -460,7 +459,7 @@ def reliability(
         observations, forecasts, dim, weights=None
     )
 
-    reliability, samples = xr.apply_ufunc(
+    rel, samp = xr.apply_ufunc(
         _reliability,
         observations,
         forecasts,
@@ -472,11 +471,11 @@ def reliability(
     )
 
     # Add probability bin coordinate
-    reliability = reliability.assign_coords(
+    rel = rel.assign_coords(
         {PROBABILITY_BIN_NAME: _get_bin_centers(probability_bin_edges)}
     )
-    samples = samples.assign_coords(
+    samp = samp.assign_coords(
         {PROBABILITY_BIN_NAME: _get_bin_centers(probability_bin_edges)}
     )
 
-    return reliability, samples
+    return rel, samp
