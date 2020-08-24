@@ -1,4 +1,4 @@
-﻿xskillscore.Contingency.false\_alarms
+xskillscore.Contingency.false\_alarms
 =====================================
 
 .. currentmodule:: xskillscore

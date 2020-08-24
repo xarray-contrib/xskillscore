@@ -1,4 +1,4 @@
-﻿xskillscore.pearson\_r
+xskillscore.pearson\_r
 ======================
 
 .. currentmodule:: xskillscore
