@@ -1,3 +1,4 @@
+import numpy as np
 import xarray as xr
 
 from .deterministic import (
@@ -21,6 +22,8 @@ from .probabilistic import (
     crps_ensemble,
     crps_gaussian,
     crps_quadrature,
+    discrimination,
+    rank_histogram,
     threshold_brier_score,
 )
 
@@ -61,14 +64,14 @@ class XSkillScoreAccessor(object):
             a, b, dim=dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
         )
 
-    def effective_sample_size(self, a, b, dim=None, skipna=False, keep_attrs=False):
+    def effective_sample_size(self, a, b, dim='time', skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
         return effective_sample_size(
             a, b, dim=dim, skipna=skipna, keep_attrs=keep_attrs
         )
 
-    def pearson_r_eff_p_value(self, a, b, dim=None, skipna=False, keep_attrs=False):
+    def pearson_r_eff_p_value(self, a, b, dim='time', skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
         return pearson_r_eff_p_value(
@@ -79,7 +82,7 @@ class XSkillScoreAccessor(object):
         a = self._in_ds(a)
         b = self._in_ds(b)
         return spearman_r(
-            a, b, dim=dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+            a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
         )
 
     def spearman_r_p_value(
@@ -88,10 +91,10 @@ class XSkillScoreAccessor(object):
         a = self._in_ds(a)
         b = self._in_ds(b)
         return spearman_r_p_value(
-            a, b, dim=dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+            a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
         )
 
-    def spearman_r_eff_p_value(self, a, b, dim=None, skipna=False, keep_attrs=False):
+    def spearman_r_eff_p_value(self, a, b, dim='time', skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
         return spearman_r_eff_p_value(
@@ -142,9 +145,7 @@ class XSkillScoreAccessor(object):
         observations = self._in_ds(observations)
         mu = self._in_ds(mu)
         sig = self._in_ds(sig)
-        return crps_gaussian(
-            observations, mu, sig, dim=dim, weights=weights, keep_attrs=keep_attrs
-        )
+        return crps_gaussian(observations, mu, sig, dim=dim, weights=weights)
 
     def crps_ensemble(
         self,
@@ -155,7 +156,6 @@ class XSkillScoreAccessor(object):
         dim=None,
         member_dim='member',
         weights=None,
-        keep_attrs=False,
     ):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
@@ -167,7 +167,6 @@ class XSkillScoreAccessor(object):
             member_dim=member_dim,
             dim=dim,
             weights=weights,
-            keep_attrs=keep_attrs,
         )
 
     def crps_quadrature(
@@ -184,14 +183,7 @@ class XSkillScoreAccessor(object):
         x = self._in_ds(x)
         cdf_or_dist = self._in_ds(cdf_or_dist)
         return crps_quadrature(
-            x,
-            cdf_or_dist,
-            xmin=xmin,
-            xmax=xmax,
-            tol=1e-6,
-            dim=dim,
-            weights=weights,
-            keep_attrs=keep_attrs,
+            x, cdf_or_dist, xmin=xmin, xmax=xmax, tol=1e-6, dim=dim, weights=weights
         )
 
     def threshold_brier_score(
@@ -215,14 +207,30 @@ class XSkillScoreAccessor(object):
             dim=dim,
             member_dim=member_dim,
             weights=weights,
-            keep_attrs=keep_attrs,
         )
 
-    def brier_score(
-        self, observations, forecasts, dim=None, weights=None, keep_attrs=False
+    def brier_score(self, observations, forecasts, dim=None, weights=None):
+        observations = self._in_ds(observations)
+        forecasts = self._in_ds(forecasts)
+        return brier_score(observations, forecasts, dim=dim, weights=weights)
+
+    def rank_histogram(self, observations, forecasts, dim=None, member_dim='member'):
+        observations = self._in_ds(observations)
+        forecasts = self._in_ds(forecasts)
+        return rank_histogram(observations, forecasts, dim=dim, member_dim=member_dim)
+
+    def discrimination(
+        self,
+        observations,
+        forecasts,
+        dim=None,
+        probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
     ):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
-        return brier_score(
-            observations, forecasts, dim=dim, weights=weights, keep_attrs=keep_attrs
+        return discrimination(
+            observations,
+            forecasts,
+            dim=dim,
+            probability_bin_edges=probability_bin_edges,
         )

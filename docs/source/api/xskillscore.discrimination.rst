@@ -1,6 +1,6 @@
-xskillscore.crps\_ensemble
+xskillscore.discrimination
 ==========================
 
 .. currentmodule:: xskillscore
 
-.. autofunction:: crps_ensemble
+.. autofunction:: discrimination

@@ -15,7 +15,7 @@ def _get_category_bounds(category_edges):
     """Return formatted string of category bounds given list of category edges
     """
     return [
-        f'({str(category_edges[i])}, {str(category_edges[i + 1])}]'
+        f'[{str(category_edges[i])}, {str(category_edges[i + 1])})'
         for i in range(len(category_edges) - 1)
     ]
 
@@ -53,9 +53,9 @@ class Contingency:
         forecasts : xarray.Dataset or xarray.DataArray
             Labeled array(s) over which to apply the function.
         observation_category_edges : array_like
-            Bin edges for categorising observations
+            Bin edges for categorising observations. Bins include the left most edge, but not the right.
         forecast_category_edges : array_like
-            Bin edges for categorising forecasts
+            Bin edges for categorising forecasts. Bins include the left most edge, but not the right.
         dim : str, list
             The dimension(s) over which to compute the contingency table
 
