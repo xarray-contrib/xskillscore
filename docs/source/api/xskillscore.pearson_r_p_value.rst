@@ -1,4 +1,4 @@
-﻿xskillscore.pearson\_r\_p\_value
+xskillscore.pearson\_r\_p\_value
 ================================
 
 .. currentmodule:: xskillscore

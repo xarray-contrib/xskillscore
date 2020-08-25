@@ -1,4 +1,4 @@
-﻿xskillscore.Contingency.equit\_threat\_score
+xskillscore.Contingency.equit\_threat\_score
 ============================================
 
 .. currentmodule:: xskillscore
