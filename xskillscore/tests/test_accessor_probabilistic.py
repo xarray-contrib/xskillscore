@@ -80,9 +80,8 @@ def test_crps_ensemble_accessor(o, f, dask_bool, outer_bool):
     assert_allclose(actual, expected)
 
 
-@pytest.mark.parametrize('outer_bool', [False, True])
 @pytest.mark.parametrize('dask_bool', [False, True])
-def test_crps_quadrature_accessor(o, dask_bool, outer_bool):
+def test_crps_quadrature_accessor(o, dask_bool):
     cdf_or_dist = norm
     if dask_bool:
         o = o.chunk()
@@ -90,12 +89,7 @@ def test_crps_quadrature_accessor(o, dask_bool, outer_bool):
 
     ds = xr.Dataset()
     ds['o'] = o
-    ds['cdf_or_dist'] = cdf_or_dist
-    if outer_bool:
-        ds = ds.drop_vars('cdf_or_dist')
-        expected = ds.xs.crps_quadrature('o', cdf_or_dist)
-    else:
-        expected = ds.xs.crps_quadrature('o', 'cdf_or_dist')
+    expected = ds.xs.crps_quadrature('o', cdf_or_dist)
     assert_allclose(actual, expected)
 
 
