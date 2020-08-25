@@ -57,19 +57,27 @@ Currently, most of our probabilistic metrics are ported over from
     rank_histogram
     discrimination
 
-Dichotomous Metrics
--------------------
+Contingency-based Metrics
+-------------------------
 
-These metrics rely upon the construction of a ``Contingency`` object for dichotomous (yes/no)
-forecasts. The user calls the individual methods to access metrics based on the table.
+These metrics rely upon the construction of a ``Contingency`` object. The user calls the
+individual methods to access metrics based on the table.
 
 .. autosummary::
     :toctree: api/
 
     Contingency
 
-Dichotomous-Only Metrics
-~~~~~~~~~~~~~~~~~~~~~~~~
+Contingency table
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+    :toctree: api/
+
+    Contingency.table
+
+Dichotomous-Only (yes/no) Metrics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autosummary::
     :toctree: api/

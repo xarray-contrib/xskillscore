@@ -18,7 +18,7 @@ Documentation
 
 Features
 --------
-- Added contingency table and associated metrics (:pr:`119`). `Dougie Squire`_
+- Added contingency table and associated metrics (:pr:`119`, :pr:`153`). `Dougie Squire`_
 - Added ``rank_histogram`` and ``discrimination`` to probabilistic metrics (:pr:`136`).
   `Dougie Squire`_
 - Added ``dim`` and ``weights`` for probabilistic metrics. (:pr:`121`) `Aaron Spring`_
