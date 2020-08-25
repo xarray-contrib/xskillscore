@@ -37,7 +37,7 @@ __all__ = [
 ]
 
 
-def _preprocess_dims(dim):
+def _preprocess_dims(dim, a):
     """Preprocesses dimensions to prep for stacking.
 
     Parameters
@@ -45,10 +45,20 @@ def _preprocess_dims(dim):
     dim : str, list
         The dimension(s) to apply the function along.
     """
-    if isinstance(dim, str):
+    if dim is None:
+        dim = list(a.dims)
+    elif isinstance(dim, str):
         dim = [dim]
     axis = tuple(range(-1, -len(dim) - 1, -1))
     return dim, axis
+
+
+def _fail_if_dim_empty(dim):
+    if dim == []:
+        raise ValueError(
+            'metric must be applied along one dimension, therefore '
+            f'requires `dim` not being empty, found dim={dim}'
+        )
 
 
 def _stack_input_if_needed(a, b, dim, weights):
@@ -156,7 +166,7 @@ def _determine_input_core_dims(dim, weights):
     return input_core_dims
 
 
-def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Pearson's correlation coefficient.
 
     Parameters
@@ -167,7 +177,7 @@ def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -204,7 +214,8 @@ def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> pearson_r(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
@@ -223,7 +234,7 @@ def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """R^2 (coefficient of determination) score.
 
     Parameters
@@ -234,7 +245,7 @@ def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -270,7 +281,8 @@ def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> r2(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
@@ -289,7 +301,7 @@ def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def pearson_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """2-tailed p-value associated with pearson's correlation coefficient.
 
     Parameters
@@ -300,7 +312,7 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -333,7 +345,8 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> pearson_r_p_value(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
     input_core_dims = _determine_input_core_dims(new_dim, weights)
@@ -351,7 +364,7 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
+def effective_sample_size(a, b, dim='time', skipna=False, keep_attrs=False):
     """Effective sample size for temporally correlated data.
 
     .. note::
@@ -381,7 +394,7 @@ def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the function along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
@@ -414,7 +427,8 @@ def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> effective_sample_size(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     if len(dim) > 1:
         raise ValueError(
             'Effective sample size should only be applied to a singular time dimension.'
@@ -439,7 +453,7 @@ def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
     )
 
 
-def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
+def pearson_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
     """
     2-tailed p-value associated with Pearson's correlation coefficient,
     accounting for autocorrelation.
@@ -476,7 +490,7 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to compute the p value over. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
@@ -516,7 +530,8 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> pearson_r_eff_p_value(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     if len(dim) > 1:
         raise ValueError(
             'Effective sample size should only be applied to a singular time dimension.'
@@ -541,7 +556,7 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
     )
 
 
-def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def spearman_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Spearman's correlation coefficient.
 
     Parameters
@@ -552,7 +567,7 @@ def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -590,7 +605,8 @@ def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> spearman_r(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
     input_core_dims = _determine_input_core_dims(new_dim, weights)
@@ -608,7 +624,7 @@ def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def spearman_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """2-tailed p-value associated with Spearman's correlation coefficient.
 
     Parameters
@@ -619,7 +635,7 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -652,7 +668,8 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> spearman_r_p_value(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
     input_core_dims = _determine_input_core_dims(new_dim, weights)
@@ -670,7 +687,7 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
+def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
     """
     2-tailed p-value associated with Spearman rank correlation coefficient,
     accounting for autocorrelation.
@@ -707,7 +724,7 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to compute the p value over. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
@@ -747,7 +764,8 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> spearman_r_eff_p_value(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     if len(dim) > 1:
         raise ValueError(
             'Effective sample size should only be applied to a singular time dimension.'
@@ -772,7 +790,7 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
     )
 
 
-def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def rmse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Root Mean Squared Error.
 
     Parameters
@@ -783,7 +801,7 @@ def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the rmse along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -820,7 +838,7 @@ def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> rmse(a, b, dim='time')
     """
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
@@ -837,7 +855,7 @@ def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Squared Error.
 
     Parameters
@@ -848,7 +866,7 @@ def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the mse along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -885,7 +903,7 @@ def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> mse(a, b, dim='time')
     """
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
@@ -902,7 +920,7 @@ def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def mae(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Absolute Error.
 
     Parameters
@@ -913,7 +931,7 @@ def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the mae along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -950,7 +968,7 @@ def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> mae(a, b, dim='time')
     """
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
@@ -967,7 +985,7 @@ def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
+def median_absolute_error(a, b, dim=None, skipna=False, keep_attrs=False):
     """
     Median Absolute Error.
 
@@ -979,7 +997,7 @@ def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the median absolute error along.
-        Note that this dimension will be reduced as a result.
+        Note that this dimension will be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
@@ -1010,7 +1028,7 @@ def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> median_absolute_error(a, b, dim='time')
     """
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
 
     return xr.apply_ufunc(
         _median_absolute_error,
@@ -1024,7 +1042,7 @@ def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
     )
 
 
-def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Absolute Percentage Error.
 
     Parameters
@@ -1035,8 +1053,8 @@ def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the mae along. Note that this dimension will
-        be reduced as a result.
+        The dimension(s) to apply mape along. Note that this dimension will
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -1072,7 +1090,7 @@ def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> mape(a, b, dim='time')
     """
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
@@ -1089,7 +1107,7 @@ def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def smape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def smape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Symmetric Mean Absolute Percentage Error.
 
     Parameters
@@ -1100,8 +1118,8 @@ def smape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the mae along. Note that this dimension will
-        be reduced as a result.
+        The dimension(s) to apply the smape along. Note that this dimension will
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -1137,7 +1155,7 @@ def smape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> smape(a, b, dim='time')
     """
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 

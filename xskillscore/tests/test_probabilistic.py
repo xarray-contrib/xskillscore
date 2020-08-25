@@ -58,7 +58,9 @@ def f_dask(f):
 
 def assert_only_dim_reduced(dim, actual, obs):
     """Check that actual is only reduced by dims in dim."""
-    if not isinstance(dim, list):
+    if dim is None:
+        dim = list(obs.dims)
+    elif not isinstance(dim, list):
         dim = [dim]
     for d in dim:
         assert d not in actual.dims
@@ -71,7 +73,7 @@ def assert_only_dim_reduced(dim, actual, obs):
 def test_crps_ensemble_dask(o_dask, f_dask, keep_attrs):
     actual = crps_ensemble(o_dask, f_dask, keep_attrs=keep_attrs)
     expected = properscoring.crps_ensemble(o_dask, f_dask, axis=0)
-    expected = xr.DataArray(expected, coords=o_dask.coords)
+    expected = xr.DataArray(expected, coords=o_dask.coords).mean()
     # test for numerical identity of xskillscore crps and properscoring crps
     assert_allclose(actual, expected)
     # test that xskillscore crps_ensemble returns chunks
@@ -103,7 +105,7 @@ def test_crps_gaussian_dask(o_dask, f_dask, keep_attrs):
     sig = f_dask.std('member')
     actual = crps_gaussian(o_dask, mu, sig, keep_attrs=keep_attrs)
     expected = properscoring.crps_gaussian(o_dask, mu, sig)
-    expected = xr.DataArray(expected, coords=o_dask.coords)
+    expected = xr.DataArray(expected, coords=o_dask.coords).mean()
     # test for numerical identity of xskillscore crps and properscoring crps
     assert_allclose(actual, expected)
     # test that xskillscore crps_ensemble returns chunks
@@ -125,7 +127,7 @@ def test_crps_quadrature_dask(o_dask, keep_attrs):
     cdf_or_dist = norm
     actual = crps_quadrature(o_dask, cdf_or_dist, keep_attrs=keep_attrs)
     expected = properscoring.crps_quadrature(o_dask, cdf_or_dist)
-    expected = xr.DataArray(expected, coords=o_dask.coords)
+    expected = xr.DataArray(expected, coords=o_dask.coords).mean()
     # test for numerical identity of xskillscore crps and properscoring crps
     assert_allclose(actual, expected)
     # test that xskillscore crps_ensemble returns chunks
@@ -146,7 +148,7 @@ def test_crps_quadrature_args(o_dask, f_dask, keep_attrs):
         o_dask, cdf_or_dist, xmin, xmax, tol, keep_attrs=keep_attrs
     )
     expected = properscoring.crps_quadrature(o_dask, cdf_or_dist, xmin, xmax, tol)
-    expected = xr.DataArray(expected, coords=o_dask.coords)
+    expected = xr.DataArray(expected, coords=o_dask.coords).mean()
     # test for numerical identity of xskillscore crps and crps
     assert_allclose(actual, expected)
     # test that xskillscore crps_ensemble returns chunks
@@ -176,7 +178,7 @@ def test_threshold_brier_score_dask(o_dask, f_dask, keep_attrs):
     threshold = 0.5
     actual = threshold_brier_score(o_dask, f_dask, threshold, keep_attrs=keep_attrs)
     expected = properscoring.threshold_brier_score(o_dask, f_dask, threshold, axis=0)
-    expected = xr.DataArray(expected, coords=o_dask.coords)
+    expected = xr.DataArray(expected, coords=o_dask.coords).mean()
     # test for numerical identity of xskillscore threshold and properscorin threshold
     assert_identical(actual, expected.assign_attrs(**actual.attrs))
     # test that xskillscore crps_ensemble returns chunks
@@ -224,27 +226,23 @@ def test_threshold_brier_score_dask_b_int(o_dask, f_dask, keep_attrs):
 
 
 @pytest.mark.parametrize('keep_attrs', [True, False])
-def test_threshold_brier_score_multiple_thresholds_list(o_dask, f_dask, keep_attrs):
+def test_threshold_brier_score_multiple_thresholds_list(o, f, keep_attrs):
     threshold = [0.1, 0.3, 0.5]
-    actual = threshold_brier_score(
-        o_dask.compute(), f_dask.compute(), threshold, keep_attrs=keep_attrs
-    )
-    assert actual.chunks is None
+    actual = threshold_brier_score(o, f, threshold, keep_attrs=keep_attrs)
+    assert actual.chunks is None or actual.chunks == ()
     if keep_attrs:
-        assert actual.attrs == o_dask.attrs
+        assert actual.attrs == o.attrs
     else:
         assert actual.attrs == {}
 
 
 @pytest.mark.parametrize('keep_attrs', [True, False])
-def test_threshold_brier_score_multiple_thresholds_xr(o_dask, f_dask, keep_attrs):
+def test_threshold_brier_score_multiple_thresholds_xr(o, f, keep_attrs):
     threshold = xr.DataArray([0.1, 0.3, 0.5], dims='threshold')
-    actual = threshold_brier_score(
-        o_dask.compute(), f_dask.compute(), threshold, keep_attrs=keep_attrs
-    )
-    assert actual.chunks is None
+    actual = threshold_brier_score(o, f, threshold, keep_attrs=keep_attrs)
+    assert actual.chunks is None or actual.chunks == ()
     if keep_attrs:
-        assert actual.attrs == o_dask.attrs
+        assert actual.attrs == o.attrs
     else:
         assert actual.attrs == {}
 
@@ -261,15 +259,15 @@ def test_threshold_brier_score_multiple_thresholds_dask(o_dask, f_dask, keep_att
 
 
 @pytest.mark.parametrize('keep_attrs', [True, False])
-def test_brier_score(o_dask, f_dask, keep_attrs):
+def test_brier_score(o, f, keep_attrs):
     actual = brier_score(
-        (o_dask > 0.5).compute().assign_attrs(**o_dask.attrs),
-        (f_dask > 0.5).mean('member').compute(),
+        (o > 0.5).assign_attrs(**o.attrs),
+        (f > 0.5).mean('member'),
         keep_attrs=keep_attrs,
     )
-    assert actual.chunks is None
+    assert actual.chunks is None or actual.chunks == ()
     if keep_attrs:
-        assert actual.attrs == o_dask.attrs
+        assert actual.attrs == o.attrs
     else:
         assert actual.attrs == {}
 
@@ -303,7 +301,7 @@ def test_brier_score_dask(o_dask, f_dask, keep_attrs):
     )
     assert actual.chunks is not None
     expected = properscoring.brier_score((o_dask > 0.5), (f_dask > 0.5).mean('member'))
-    expected = xr.DataArray(expected, coords=o_dask.coords)
+    expected = xr.DataArray(expected, coords=o_dask.coords).mean()
     # test for numerical identity of brier_score and properscoring brier_score
     assert_allclose(actual, expected)
     # test that xskillscore brier_score returns chunks

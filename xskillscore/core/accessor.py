@@ -43,38 +43,42 @@ class XSkillScoreAccessor(object):
         else:
             return self._obj[x]
 
-    def pearson_r(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
+    def pearson_r(self, a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
         return pearson_r(
-            a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+            a, b, dim=dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
         )
 
-    def r2(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
+    def r2(self, a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return r2(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
+        return r2(a, b, dim=dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
 
     def pearson_r_p_value(
-        self, a, b, dim, weights=None, skipna=False, keep_attrs=False
+        self, a, b, dim=None, weights=None, skipna=False, keep_attrs=False
     ):
         a = self._in_ds(a)
         b = self._in_ds(b)
         return pearson_r_p_value(
-            a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+            a, b, dim=dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
         )
 
-    def effective_sample_size(self, a, b, dim, skipna=False, keep_attrs=False):
+    def effective_sample_size(self, a, b, dim='time', skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return effective_sample_size(a, b, dim, skipna=skipna, keep_attrs=keep_attrs)
+        return effective_sample_size(
+            a, b, dim=dim, skipna=skipna, keep_attrs=keep_attrs
+        )
 
-    def pearson_r_eff_p_value(self, a, b, dim, skipna=False, keep_attrs=False):
+    def pearson_r_eff_p_value(self, a, b, dim='time', skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return pearson_r_eff_p_value(a, b, dim, skipna=skipna, keep_attrs=keep_attrs)
+        return pearson_r_eff_p_value(
+            a, b, dim=dim, skipna=skipna, keep_attrs=keep_attrs
+        )
 
-    def spearman_r(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
+    def spearman_r(self, a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
         return spearman_r(
@@ -82,7 +86,7 @@ class XSkillScoreAccessor(object):
         )
 
     def spearman_r_p_value(
-        self, a, b, dim, weights=None, skipna=False, keep_attrs=False
+        self, a, b, dim=None, weights=None, skipna=False, keep_attrs=False
     ):
         a = self._in_ds(a)
         b = self._in_ds(b)
@@ -90,40 +94,50 @@ class XSkillScoreAccessor(object):
             a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
         )
 
-    def spearman_r_eff_p_value(self, a, b, dim, skipna=False, keep_attrs=False):
+    def spearman_r_eff_p_value(self, a, b, dim='time', skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return spearman_r_eff_p_value(a, b, dim, skipna=skipna, keep_attrs=keep_attrs)
+        return spearman_r_eff_p_value(
+            a, b, dim=dim, skipna=skipna, keep_attrs=keep_attrs
+        )
 
-    def rmse(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
+    def rmse(self, a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return rmse(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
+        return rmse(
+            a, b, dim=dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+        )
 
-    def mse(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
+    def mse(self, a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return mse(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
+        return mse(a, b, dim=dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
 
-    def mae(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
+    def mae(self, a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return mae(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
+        return mae(a, b, dim=dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
 
-    def median_absolute_error(self, a, b, dim, skipna=False, keep_attrs=False):
+    def median_absolute_error(self, a, b, dim=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return median_absolute_error(a, b, dim, skipna=skipna, keep_attrs=keep_attrs)
+        return median_absolute_error(
+            a, b, dim=dim, skipna=skipna, keep_attrs=keep_attrs
+        )
 
-    def mape(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
+    def mape(self, a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return mape(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
+        return mape(
+            a, b, dim=dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+        )
 
-    def smape(self, a, b, dim, weights=None, skipna=False, keep_attrs=False):
+    def smape(self, a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         a = self._in_ds(a)
         b = self._in_ds(b)
-        return smape(a, b, dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs)
+        return smape(
+            a, b, dim=dim, weights=weights, skipna=skipna, keep_attrs=keep_attrs
+        )
 
     def crps_gaussian(
         self, observations, mu, sig, dim=None, weights=None, keep_attrs=False

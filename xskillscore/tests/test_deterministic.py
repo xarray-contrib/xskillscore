@@ -158,7 +158,7 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     # check that no chunks for no chunk inputs
     assert actual.chunks is None
 
-    dim, _ = _preprocess_dims(dim)
+    dim, _ = _preprocess_dims(dim, a)
     if len(dim) > 1:
         new_dim = '_'.join(dim)
         _a = a.stack(**{new_dim: dim})
@@ -203,7 +203,7 @@ def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics):
         actual = metric(a, b, dim, weights=weights)
     assert actual.chunks is None
 
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
     _a = a
     _b = b
     _weights = _preprocess_weights(_a, dim, dim, weights)
@@ -330,3 +330,36 @@ def test_keep_attrs(a, b, metrics, keep_attrs):
         assert res.attrs == {}
     da = xr.DataArray([0, 1, 2], dims=['time'])
     assert pearson_r(da, da, dim='time') == 1
+
+
+@pytest.mark.parametrize('metrics', correlation_metrics + distance_metrics)
+def test_dim_None(a, b, metrics):
+    """Test that `dim=None` reduces all dimensions as xr.mean(dim=None) and fails for
+    effective metrics."""
+    metric, _metric = metrics
+    if metric in [effective_sample_size, spearman_r_eff_p_value, pearson_r_eff_p_value]:
+        with pytest.raises(ValueError) as excinfo:
+            metric(a, b, dim=None)
+        assert (
+            'Effective sample size should only be applied to a singular time dimension.'
+            in str(excinfo.value)
+        )
+    else:
+        metric, _metric = metrics
+        res = metric(a, b, dim=None)
+        assert len(res.dims) == 0, print(res.dims)
+
+
+@pytest.mark.parametrize('metrics', correlation_metrics + distance_metrics)
+def test_dim_empty_list(a, b, metrics):
+    """Test that `dim=[]` reduces no dimensions as xr.mean(dim=[]) and fails for
+    correlation metrics."""
+    if metrics in correlation_metrics:
+        metric, _metric = metrics
+        with pytest.raises(ValueError) as excinfo:
+            metric(a, b, dim=[])
+        assert 'requires `dim` not being empty, found dim' in str(excinfo.value)
+    elif metrics in distance_metrics:
+        metric, _metric = metrics
+        res = metric(a, b, dim=[])
+        assert len(res.dims) == len(a.dims), print(res.dims)
