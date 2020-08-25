@@ -9,9 +9,9 @@ from xskillscore.core.probabilistic import (
     crps_ensemble,
     crps_gaussian,
     crps_quadrature,
-    reliability,
     discrimination,
     rank_histogram,
+    reliability,
     threshold_brier_score,
 )
 

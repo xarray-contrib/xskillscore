@@ -1,5 +1,5 @@
-import dask.array as darray
 import bottleneck as bn
+import dask.array as darray
 import numpy as np
 import properscoring
 import xarray as xr
@@ -18,6 +18,7 @@ __all__ = [
 ]
 
 FORECAST_PROBABILITY_DIM = 'forecast_probability'
+
 
 def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=False):
     """Continuous Ranked Probability Score with a Gaussian distribution.
@@ -514,7 +515,7 @@ def reliability(
     dim=None,
     probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
     keep_attrs=False,
-)
+):
     """Returns the data required to construct the reliability diagram for an event; the relative frequencies \
             of occurrence of an event for a range of forecast probability bins
         Parameters
