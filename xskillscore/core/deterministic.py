@@ -195,9 +195,7 @@ def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.pearsonr
-    xskillscore.core.np_deterministic._pearson_r
 
     References
     ----------
@@ -263,7 +261,6 @@ def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     sklearn.metrics.r2_score
 
     References
@@ -330,9 +327,7 @@ def pearson_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fal
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.pearsonr
-    xskillscore.core.np_deterministic._pearson_r_p_value
 
     Examples
     --------
@@ -507,9 +502,7 @@ def pearson_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.pearsonr
-    xskillscore.core.np_deterministic._pearson_r_eff_p_value
 
     References
     ----------
@@ -585,9 +578,7 @@ def spearman_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.spearman_r
-    xskillscore.core.np_deterministic._spearman_r
 
     References
     ----------
@@ -653,9 +644,7 @@ def spearman_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fa
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.spearman_r
-    xskillscore.core.np_deterministic._spearman_r_p_value
 
     Examples
     --------
@@ -741,9 +730,7 @@ def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.spearman_r
-    xskillscore.core.np_deterministic._spearman_r_eff_p_value
 
     References
     ----------
@@ -819,9 +806,7 @@ def rmse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     sklearn.metrics.mean_squared_error
-    xskillscore.core.np_deterministic._rmse
 
     References
     ----------
@@ -884,9 +869,7 @@ def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     sklearn.metrics.mean_squared_error
-    xskillscore.core.np_deterministic._mse
 
     References
     ----------
@@ -949,9 +932,7 @@ def mae(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     sklearn.metrics.mean_absolute_error
-    xskillscore.core.np_deterministic._mae
 
     References
     ----------
@@ -1014,8 +995,6 @@ def median_absolute_error(a, b, dim=None, skipna=False, keep_attrs=False):
     See Also
     --------
     sklearn.metrics.median_absolute_error
-    xarray.apply_ufunc
-    xskillscore.core.np_deterministic._median_absolute_error
 
     Examples
     --------
@@ -1069,11 +1048,6 @@ def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     -------
     xarray.Dataset or xarray.DataArray
         Mean Absolute Percentage Error.
-
-    See Also
-    --------
-    xarray.apply_ufunc
-    xskillscore.core.np_deterministic._mape
 
     References
     ----------
@@ -1134,11 +1108,6 @@ def smape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     -------
     xarray.Dataset or xarray.DataArray
         Symmetric Mean Absolute Percentage Error.
-
-    See Also
-    --------
-    xarray.apply_ufunc
-    xskillscore.core.np_deterministic._smape
 
     References
     ----------
