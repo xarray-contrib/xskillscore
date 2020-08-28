@@ -1,4 +1,4 @@
-﻿xskillscore.rank\_histogram
+xskillscore.rank\_histogram
 ===========================
 
 .. currentmodule:: xskillscore
