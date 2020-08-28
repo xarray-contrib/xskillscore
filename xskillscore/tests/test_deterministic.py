@@ -67,62 +67,6 @@ temporal_only_metrics = [
 ]
 
 
-@pytest.fixture
-def a():
-    times = pd.date_range('1/1/2000', '1/3/2000', freq='D')
-    lats = np.arange(4)
-    lons = np.arange(5)
-    data = np.random.rand(len(times), len(lats), len(lons))
-    return xr.DataArray(
-        data,
-        coords=[times, lats, lons],
-        dims=['time', 'lat', 'lon'],
-        attrs={'source': 'testing'},
-    )
-
-
-@pytest.fixture
-def b(a):
-    b = a.copy()
-    b.values = np.random.rand(a.shape[0], a.shape[1], a.shape[2])
-    return b
-
-
-@pytest.fixture
-def b_nan(b):
-    return b.where(b < 0.5)
-
-
-@pytest.fixture
-def weights(a):
-    """Weighting array by cosine of the latitude."""
-    a_weighted = a.copy()
-    cos = np.abs(np.cos(a.lat))
-    data = np.tile(cos, (a.shape[0], a.shape[2], 1)).reshape(
-        a.shape[0], a.shape[1], a.shape[2]
-    )
-    a_weighted.values = data
-    return a_weighted
-
-
-@pytest.fixture
-def a_dask(a):
-    return a.chunk()
-
-
-@pytest.fixture
-def b_dask(b):
-    return b.chunk()
-
-
-@pytest.fixture
-def weights_dask(weights):
-    """
-    Weighting array by cosine of the latitude.
-    """
-    return weights.chunk()
-
-
 def adjust_weights(dim, weight_bool, weights):
     """
     Adjust the weights test data to only span the core dimension

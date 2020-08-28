@@ -30,23 +30,6 @@ correlation_metrics = [
 ]
 
 
-@pytest.fixture
-def a():
-    time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
-    lats = np.arange(4)
-    lons = np.arange(5)
-    data = np.random.rand(len(time), len(lats), len(lons))
-    da = xr.DataArray(data, coords=[time, lats, lons], dims=['time', 'lat', 'lon'])
-    return da
-
-
-@pytest.fixture
-def b(a):
-    b = a.copy()
-    b.values = np.random.rand(a.shape[0], a.shape[1], a.shape[2])
-    return b
-
-
 def mask_land_data(da):
     """Masks sample data arbitrarily like a block of land."""
     da.data[:, 1:3, 1:3] = np.nan
