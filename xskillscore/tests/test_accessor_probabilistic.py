@@ -61,8 +61,11 @@ def test_crps_ensemble_accessor(o, f_prob, dask_bool, outer_bool):
     assert_allclose(actual, expected)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize('dask_bool', [False, True])
 def test_crps_quadrature_accessor(o, dask_bool):
+    # to speed things up
+    o = o.isel(time=0, drop=True)
     cdf_or_dist = norm
     if dask_bool:
         o = o.chunk()
