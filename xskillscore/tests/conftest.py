@@ -99,6 +99,21 @@ def weights(a):
 
 
 @pytest.fixture
+def weights_lonlat(a_3d):
+    weights = np.cos(np.deg2rad(a_3d.lat))
+    _, weights = xr.broadcast(a_3d, weights)
+    weights = weights.isel(time=0)
+    return weights
+
+
+@pytest.fixture
+def weights_time():
+    time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
+    da = xr.DataArray([1, 2, 3], dims=['time'], coords=[time])
+    return da
+
+
+@pytest.fixture
 def weights_dask(weights):
     """
     Weighting array by cosine of the latitude.

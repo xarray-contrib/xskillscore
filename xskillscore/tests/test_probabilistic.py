@@ -87,6 +87,8 @@ def test_crps_gaussian_dim(o, f_prob, dim):
 @pytest.mark.slow
 @pytest.mark.parametrize('keep_attrs', [True, False])
 def test_crps_quadrature_dask(o_dask, keep_attrs):
+    # to speed things up
+    o_dask = o_dask.isel(time=0, drop=True)
     cdf_or_dist = norm
     actual = crps_quadrature(o_dask, cdf_or_dist, keep_attrs=keep_attrs)
     expected = properscoring.crps_quadrature(o_dask, cdf_or_dist)
@@ -106,6 +108,9 @@ def test_crps_quadrature_dask(o_dask, keep_attrs):
 @pytest.mark.slow
 @pytest.mark.parametrize('keep_attrs', [True, False])
 def test_crps_quadrature_args(o_dask, f_prob_dask, keep_attrs):
+    # to speed things up
+    o_dask = o_dask.isel(time=0, drop=True)
+    f_prob_dask = f_prob_dask.isel(time=0, drop=True)
     xmin, xmax, tol = -10, 10, 1e-6
     cdf_or_dist = norm
     actual = crps_quadrature(
@@ -125,9 +130,12 @@ def test_crps_quadrature_args(o_dask, f_prob_dask, keep_attrs):
         assert actual.attrs == {}
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize('dim', DIMS)
 @pytest.mark.parametrize('keep_attrs', [True, False])
 def test_crps_quadrature_dim(o, dim, keep_attrs):
+    # to speed things up
+    o = o.isel(time=0, drop=True)
     cdf_or_dist = norm
     actual = crps_quadrature(o, cdf_or_dist, dim=dim, keep_attrs=keep_attrs)
     assert_only_dim_reduced(dim, actual, o)
@@ -314,11 +322,11 @@ def test_rank_histogram_sum(o, f_prob, dim, obj):
         assert_allclose(rank_hist.sum(), o.count())
 
 
-def test_rank_histogram_values(o, f):
+def test_rank_histogram_values(o, f_prob):
     """Test values in extreme cases that observations all smaller/larger than forecasts
     """
-    assert rank_histogram((f.min() - 1) + 0 * o, f)[0] == o.size
-    assert rank_histogram((f.max() + 1) + 0 * o, f)[-1] == o.size
+    assert rank_histogram((f_prob.min() - 1) + 0 * o, f_prob)[0] == o.size
+    assert rank_histogram((f_prob.max() + 1) + 0 * o, f_prob)[-1] == o.size
 
 
 def test_rank_histogram_dask(o_dask, f_prob_dask):

@@ -48,13 +48,6 @@ def b(a):
 
 
 @pytest.fixture
-def weights():
-    time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
-    da = xr.DataArray([1, 2, 3], dims=['time'], coords=[time])
-    return da
-
-
-@pytest.fixture
 def a_3d():
     da = xr.DataArray(
         np.repeat(np.array([[0, 1, 2], [4, 5, 6], [7, 8, 9]]), 3).reshape(3, 3, 3),
@@ -71,14 +64,6 @@ def a_3d():
 @pytest.fixture
 def b_3d(a_3d):
     return a_3d.copy()
-
-
-@pytest.fixture
-def weights_3d(a_3d):
-    weights = np.cos(np.deg2rad(a_3d.lat))
-    _, weights = xr.broadcast(a_3d, weights)
-    weights = weights.isel(time=0)
-    return weights
 
 
 def drop_nans(a, b, weights=None, dim='time'):
@@ -105,13 +90,15 @@ def test_skipna_returns_same_value_as_dropped_pairwise_nans(a, b, metric):
 
 @pytest.mark.parametrize('metric', WEIGHTED_METRICS)
 def test_skipna_returns_same_value_as_dropped_pairwise_nans_with_weights(
-    a, b, weights, metric
+    a, b, weights_time, metric
 ):
     """Tests that DataArrays with pairwise nans return the same result
     as the same two with those nans dropped."""
-    a_dropped, b_dropped, weights_dropped = drop_nans(a, b, weights)
-    res_with_nans = metric(a, b, 'time', skipna=True, weights=weights)
-    res_dropped_nans = metric(a_dropped, b_dropped, 'time', weights=weights_dropped)
+    a_dropped, b_dropped, weights_time_dropped = drop_nans(a, b, weights_time)
+    res_with_nans = metric(a, b, 'time', skipna=True, weights=weights_time)
+    res_dropped_nans = metric(
+        a_dropped, b_dropped, 'time', weights=weights_time_dropped
+    )
     assert_allclose(res_with_nans, res_dropped_nans)
 
 
@@ -125,11 +112,13 @@ def test_skipna_returns_nan_when_false(a, b, metric):
 
 @pytest.mark.parametrize('metric', WEIGHTED_METRICS)
 def test_skipna_broadcast_weights_assignment_destination(
-    a_3d, b_3d, weights_3d, metric
+    a_3d, b_3d, weights_lonlat, metric
 ):
     """Tests that 'assignment destination is read-only' is not raised
     https://github.com/raybellwaves/xskillscore/issues/79"""
     a_3d_nan = a_3d.where(a_3d > 0)
     b_3d_nan = b_3d.where(b_3d > 0)
-    res = metric(a_3d_nan, b_3d_nan, ['lat', 'lon'], weights=weights_3d, skipna=True)
+    res = metric(
+        a_3d_nan, b_3d_nan, ['lat', 'lon'], weights=weights_lonlat, skipna=True
+    )
     assert all([not np.isnan(r) for r in res])

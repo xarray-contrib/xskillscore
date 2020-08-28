@@ -9,6 +9,8 @@ Internal Changes
 ----------------
 - Added ``utils`` module to house utilities shared across multiple modules
   (:pr:`119`). `Dougie Squire`_
+- ``conftest.py`` gathers all ``pytest.fixtures`` (:issue:`126`, :pr:`159`) `Aaron Spring`_
+- Removed ``
 
 Documentation
 -------------
