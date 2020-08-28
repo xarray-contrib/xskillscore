@@ -21,17 +21,22 @@ def o():
 
 
 @pytest.fixture
+def o_dask(o):
+    return o.chunk()
+
+
+@pytest.fixture
 def f_prob():
     """Probabilistic forecast containing also a member dimension."""
     times = xr.cftime_range(start='2000', periods=PERIODS, freq='D')
     members = np.arange(3)
     lats = np.arange(4)
     lons = np.arange(5)
-    data = np.random.rand(len(times), len(members), len(lats), len(lons))
+    data = np.random.rand(len(members), len(times), len(lats), len(lons))
     return xr.DataArray(
         data,
-        coords=[times, members, lats, lons],
-        dims=['time', 'member', 'lat', 'lon'],
+        coords=[members, times, lats, lons],
+        dims=['member', 'time', 'lat', 'lon'],
         attrs={'source': 'test'},
     )
 
@@ -40,6 +45,11 @@ def f_prob():
 def f(f_prob):
     """Deterministic forecast matching observation o."""
     return f_prob.isel(member=0, drop=True)
+
+
+@pytest.fixture
+def f_prob_dask(f_prob):
+    return f_prob.chunk()
 
 
 @pytest.fixture
