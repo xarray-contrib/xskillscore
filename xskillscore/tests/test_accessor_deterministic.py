@@ -49,34 +49,6 @@ distance_metrics = [
 AXES = ('time', 'lat', 'lon', ['lat', 'lon'], ['time', 'lat', 'lon'])
 
 
-@pytest.fixture
-def a():
-    times = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
-    lats = np.arange(4)
-    lons = np.arange(5)
-    data = np.random.rand(len(times), len(lats), len(lons))
-    return xr.DataArray(data, coords=[times, lats, lons], dims=['time', 'lat', 'lon'])
-
-
-@pytest.fixture
-def b(a):
-    b = a.copy()
-    b.values = np.random.rand(a.shape[0], a.shape[1], a.shape[2])
-    return b
-
-
-@pytest.fixture
-def weights(a):
-    """Weighting array by cosine of the latitude."""
-    a_weighted = a.copy()
-    cos = np.abs(np.cos(a.lat))
-    data = np.tile(cos, (a.shape[0], a.shape[2], 1)).reshape(
-        a.shape[0], a.shape[1], a.shape[2]
-    )
-    a_weighted.values = data
-    return a_weighted
-
-
 def _ds(a, b, skipna_bool, dask_bool):
     ds = xr.Dataset()
     ds['a'] = a

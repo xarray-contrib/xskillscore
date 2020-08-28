@@ -16,37 +16,18 @@ from xskillscore.core.probabilistic import (
 
 
 @pytest.fixture
-def o():
-    lats = np.arange(4)
-    lons = np.arange(5)
-    data = np.random.rand(len(lats), len(lons))
-    return xr.DataArray(data, coords=[lats, lons], dims=['lat', 'lon'])
-
-
-@pytest.fixture
-def f():
-    members = np.arange(3)
-    lats = np.arange(4)
-    lons = np.arange(5)
-    data = np.random.rand(len(members), len(lats), len(lons))
-    return xr.DataArray(
-        data, coords=[members, lats, lons], dims=['member', 'lat', 'lon']
-    )
-
-
-@pytest.fixture
 def threshold():
     return 0.5
 
 
 @pytest.mark.parametrize('outer_bool', [False, True])
 @pytest.mark.parametrize('dask_bool', [False, True])
-def test_crps_gaussian_accessor(o, f, dask_bool, outer_bool):
+def test_crps_gaussian_accessor(o, f_prob, dask_bool, outer_bool):
     if dask_bool:
         o = o.chunk()
-        f = f.chunk()
-    mu = f.mean('member')
-    sig = f.std('member')
+        f_prob = f_prob.chunk()
+    mu = f_prob.mean('member')
+    sig = f_prob.std('member')
     actual = crps_gaussian(o, mu, sig)
 
     ds = xr.Dataset()
@@ -63,20 +44,20 @@ def test_crps_gaussian_accessor(o, f, dask_bool, outer_bool):
 
 @pytest.mark.parametrize('outer_bool', [False, True])
 @pytest.mark.parametrize('dask_bool', [False, True])
-def test_crps_ensemble_accessor(o, f, dask_bool, outer_bool):
+def test_crps_ensemble_accessor(o, f_prob, dask_bool, outer_bool):
     if dask_bool:
         o = o.chunk()
-        f = f.chunk()
-    actual = crps_ensemble(o, f)
+        f_prob = f_prob.chunk()
+    actual = crps_ensemble(o, f_prob)
 
     ds = xr.Dataset()
     ds['o'] = o
-    ds['f'] = f
+    ds['f_prob'] = f_prob
     if outer_bool:
-        ds = ds.drop_vars('f')
-        expected = ds.xs.crps_ensemble('o', f)
+        ds = ds.drop_vars('f_prob')
+        expected = ds.xs.crps_ensemble('o', f_prob)
     else:
-        expected = ds.xs.crps_ensemble('o', 'f')
+        expected = ds.xs.crps_ensemble('o', 'f_prob')
     assert_allclose(actual, expected)
 
 
@@ -95,80 +76,82 @@ def test_crps_quadrature_accessor(o, dask_bool):
 
 @pytest.mark.parametrize('outer_bool', [False, True])
 @pytest.mark.parametrize('dask_bool', [False, True])
-def test_threshold_brier_score_accessor(o, f, threshold, dask_bool, outer_bool):
+def test_threshold_brier_score_accessor(o, f_prob, threshold, dask_bool, outer_bool):
     if dask_bool:
         o = o.chunk()
-        f = f.chunk()
-    actual = threshold_brier_score(o, f, threshold)
+        f_prob = f_prob.chunk()
+    actual = threshold_brier_score(o, f_prob, threshold)
 
     ds = xr.Dataset()
     ds['o'] = o
-    ds['f'] = f
+    ds['f_prob'] = f_prob
     if outer_bool:
-        ds = ds.drop_vars('f')
-        expected = ds.xs.threshold_brier_score('o', f, threshold)
+        ds = ds.drop_vars('f_prob')
+        expected = ds.xs.threshold_brier_score('o', f_prob, threshold)
     else:
-        expected = ds.xs.threshold_brier_score('o', 'f', threshold)
+        expected = ds.xs.threshold_brier_score('o', 'f_prob', threshold)
     assert_allclose(actual, expected)
 
 
 @pytest.mark.parametrize('outer_bool', [False, True])
 @pytest.mark.parametrize('dask_bool', [False, True])
-def test_brier_score_accessor(o, f, threshold, dask_bool, outer_bool):
+def test_brier_score_accessor(o, f_prob, threshold, dask_bool, outer_bool):
     if dask_bool:
         o = o.chunk()
-        f = f.chunk()
-    actual = brier_score(o > threshold, (f > threshold).mean('member'))
+        f_prob = f_prob.chunk()
+    actual = brier_score(o > threshold, (f_prob > threshold).mean('member'))
 
     ds = xr.Dataset()
     ds['o'] = o > threshold
-    ds['f'] = (f > threshold).mean('member')
+    ds['f_prob'] = (f_prob > threshold).mean('member')
     if outer_bool:
-        ds = ds.drop_vars('f')
-        expected = ds.xs.brier_score('o', (f > threshold).mean('member'))
+        ds = ds.drop_vars('f_prob')
+        expected = ds.xs.brier_score('o', (f_prob > threshold).mean('member'))
     else:
-        expected = ds.xs.brier_score('o', 'f')
+        expected = ds.xs.brier_score('o', 'f_prob')
     assert_allclose(actual, expected)
 
 
 @pytest.mark.parametrize('outer_bool', [False, True])
 @pytest.mark.parametrize('dask_bool', [False, True])
-def test_rank_histogram_accessor(o, f, dask_bool, outer_bool):
+def test_rank_histogram_accessor(o, f_prob, dask_bool, outer_bool):
     if dask_bool:
         o = o.chunk()
-        f = f.chunk()
-    actual = rank_histogram(o, f)
+        f_prob = f_prob.chunk()
+    actual = rank_histogram(o, f_prob)
 
     ds = xr.Dataset()
     ds['o'] = o
-    ds['f'] = f
+    ds['f_prob'] = f_prob
     if outer_bool:
-        ds = ds.drop_vars('f')
-        expected = ds.xs.rank_histogram('o', f)
+        ds = ds.drop_vars('f_prob')
+        expected = ds.xs.rank_histogram('o', f_prob)
     else:
-        expected = ds.xs.rank_histogram('o', 'f')
+        expected = ds.xs.rank_histogram('o', 'f_prob')
     assert_allclose(actual, expected)
 
 
 @pytest.mark.parametrize('outer_bool', [False, True])
 @pytest.mark.parametrize('dask_bool', [False, True])
-def test_discrimination_accessor(o, f, threshold, dask_bool, outer_bool):
+def test_discrimination_accessor(o, f_prob, threshold, dask_bool, outer_bool):
     if dask_bool:
         o = o.chunk()
-        f = f.chunk()
+        f_prob = f_prob.chunk()
     hist_event_actual, hist_no_event_actual = discrimination(
-        o > threshold, (f > threshold).mean('member')
+        o > threshold, (f_prob > threshold).mean('member')
     )
 
     ds = xr.Dataset()
     ds['o'] = o > threshold
-    ds['f'] = (f > threshold).mean('member')
+    ds['f_prob'] = (f_prob > threshold).mean('member')
     if outer_bool:
-        ds = ds.drop_vars('f')
+        ds = ds.drop_vars('f_prob')
         hist_event_expected, hist_no_event_expected = ds.xs.discrimination(
-            'o', (f > threshold).mean('member')
+            'o', (f_prob > threshold).mean('member')
         )
     else:
-        hist_event_expected, hist_no_event_expected = ds.xs.discrimination('o', 'f')
+        hist_event_expected, hist_no_event_expected = ds.xs.discrimination(
+            'o', 'f_prob'
+        )
     assert_allclose(hist_event_actual, hist_event_expected)
     assert_allclose(hist_no_event_actual, hist_no_event_expected)
