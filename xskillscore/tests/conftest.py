@@ -21,11 +21,6 @@ def o():
 
 
 @pytest.fixture
-def o_dask(o):
-    return o.chunk()
-
-
-@pytest.fixture
 def f_prob():
     """Probabilistic forecast containing also a member dimension."""
     times = xr.cftime_range(start='2000', periods=PERIODS, freq='D')
@@ -47,11 +42,7 @@ def f(f_prob):
     return f_prob.isel(member=0, drop=True)
 
 
-@pytest.fixture
-def f_prob_dask(f_prob):
-    return f_prob.chunk()
-
-
+# a vs. b in deterministic, o vs. f in probabilistic
 @pytest.fixture
 def a(o):
     return o
@@ -62,6 +53,42 @@ def b(f):
     return f
 
 
+# nan
+@pytest.fixture
+def a_nan(a):
+    """Masked"""
+    return a.copy().where(a < 0.5)
+
+
+@pytest.fixture
+def b_nan(b):
+    """Masked"""
+    return b.copy().where(b < 0.5)
+
+
+# dask
+@pytest.fixture
+def a_dask(a):
+    """Chunked"""
+    return a.chunk()
+
+
+@pytest.fixture
+def b_dask(b):
+    return b.chunk()
+
+
+@pytest.fixture
+def o_dask(o):
+    return o.chunk()
+
+
+@pytest.fixture
+def f_prob_dask(f_prob):
+    return f_prob.chunk()
+
+
+# 1D time
 @pytest.fixture
 def a_1d(a):
     """Timeseries of a"""
@@ -75,23 +102,19 @@ def b_1d(b):
 
 
 @pytest.fixture
-def b_nan(b):
-    """Masked"""
-    b = b.copy()
-    return b.where(b < 0.5)
+def a_1d_nan():
+    time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
+    return xr.DataArray([3, np.nan, 5], dims=['time'], coords=[time])
 
 
 @pytest.fixture
-def a_dask(a):
-    """Chunked"""
-    return a.chunk()
+def b_1d_nan(a_1d_nan):
+    b = a_1d_nan.copy()
+    b.values = [7, 2, np.nan]
+    return b
 
 
-@pytest.fixture
-def b_dask(b):
-    return b.chunk()
-
-
+# weights
 @pytest.fixture
 def weights(a):
     """Weighting array by cosine of the latitude."""
@@ -99,18 +122,16 @@ def weights(a):
 
 
 @pytest.fixture
-def weights_lonlat(a_3d):
-    weights = np.cos(np.deg2rad(a_3d.lat))
-    _, weights = xr.broadcast(a_3d, weights)
-    weights = weights.isel(time=0)
-    return weights
+def weights_lonlat(a):
+    weights = np.cos(np.deg2rad(a.lat))
+    _, weights = xr.broadcast(a, weights)
+    return weights.isel(time=0, drop=True)
 
 
 @pytest.fixture
 def weights_time():
     time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
-    da = xr.DataArray([1, 2, 3], dims=['time'], coords=[time])
-    return da
+    return xr.DataArray([1, 2, 3], dims=['time'], coords=[time])
 
 
 @pytest.fixture
