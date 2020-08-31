@@ -1,18 +1,14 @@
 import numpy as np
 import pytest
+import sklearn.metrics
 import xarray as xr
 from scipy.stats import pearsonr, spearmanr
-from sklearn.metrics import (
-    mean_absolute_error,
-    mean_squared_error,
-    median_absolute_error as sklearn_med_abs,
-    r2_score,
-)
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
+import xskillscore as xs
 from xskillscore.core.deterministic import (
     mae,
     mape,
-    median_absolute_error,
     mse,
     pearson_r,
     pearson_r_p_value,
@@ -23,86 +19,67 @@ from xskillscore.core.deterministic import (
     spearman_r_p_value,
 )
 
+xs_skl_metrics = [
+    (r2, r2_score),
+    (mse, mean_squared_error),
+    (mae, mean_absolute_error),
+]
 
-@pytest.fixture
-def a():
-    time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
-    da = xr.DataArray(np.random.rand(len(time)), dims=['time'], coords=[time])
-    return da
-
-
-@pytest.fixture
-def b(a):
-    b = a.copy()
-    b.values = np.random.rand(b.shape[0])
-    return b
-
-
-def test_pearsonr_same_as_scipy(a, b):
-    """Tests that pearson r correlation and pvalue is same as computed from
-    scipy."""
-    xs_corr = pearson_r(a, b, 'time')
-    xs_p = pearson_r_p_value(a, b, 'time')
-    scipy_corr, scipy_p = pearsonr(a, b)
-    assert np.allclose(xs_corr, scipy_corr)
-    assert np.allclose(xs_p, scipy_p)
+xs_scipy_metrics = [
+    (pearson_r, pearsonr, 0),
+    (spearman_r, spearmanr, 0),
+    (pearson_r_p_value, pearsonr, 1),
+    (spearman_r_p_value, spearmanr, 1),
+]
 
 
-def test_r2_same_as_sklearn(a, b):
-    """Tests that r2 is same as computed from sklearn."""
-    xs_r2 = r2(a, b, 'time')
-    sklearn_r2 = r2_score(a, b)
-    assert np.allclose(xs_r2, sklearn_r2)
+xs_np_metrics = [
+    (mape, lambda x, y: np.mean(np.abs((x - y) / x))),
+    (smape, lambda x, y: 1 / len(x) * np.sum(np.abs(y - x) / (np.abs(x) + np.abs(y)))),
+]
 
 
-def test_spearmanr_same_as_scipy(a, b):
-    """Tests that spearman r correlation and pvalue is same as computed from
-    scipy."""
-    xs_corr = spearman_r(a, b, 'time')
-    xs_p = spearman_r_p_value(a, b, 'time')
-    scipy_corr, scipy_p = spearmanr(a, b)
-    assert np.allclose(xs_corr, scipy_corr)
-    assert np.allclose(xs_p, scipy_p)
+@pytest.mark.parametrize('xs_skl_metrics', xs_skl_metrics)
+def test_xs_same_as_skl(a_1d, b_1d, xs_skl_metrics):
+    """Tests xskillscore metric is same as scikit-learn metric."""
+    xs_metric, skl_metric = xs_skl_metrics
+    actual = xs_metric(a_1d, b_1d, 'time')
+    expected = skl_metric(a_1d, b_1d)
+    assert np.allclose(actual, expected)
 
 
-def test_rmse_same_as_sklearn(a, b):
-    """Tests that root mean squared error is same as computed from sklearn."""
-    xs_rmse = rmse(a, b, 'time')
-    sklearn_rmse = np.sqrt(mean_squared_error(a, b))
-    assert np.allclose(xs_rmse, sklearn_rmse)
+@pytest.mark.parametrize('squared', [False])
+def test_xs_same_as_skl_rmse(a_1d, b_1d, squared):
+    actual = rmse(a_1d, b_1d, 'time')
+    expected = mean_squared_error(a_1d, b_1d, squared=squared)
+    assert np.allclose(actual, expected)
 
 
-def test_mse_same_as_sklearn(a, b):
-    """Tests that mean squared error is same as computed from sklearn."""
-    xs_mse = mse(a, b, 'time')
-    sklearn_mse = mean_squared_error(a, b)
-    assert np.allclose(xs_mse, sklearn_mse)
+@pytest.fixture(params=['median_absolute_error'])
+def test_xs_same_as_skl_same_name(a_1d, b_1d, request):
+    """Tests xskillscore metric is same as scikit-learn metric for metrics with same name."""
+    xs_metric, skl_metric = (
+        getattr(xs, request.param),
+        getattr(sklearn.metrics, request.param),
+    )
+    actual = xs_metric(a_1d, b_1d, 'time')
+    expected = skl_metric(a_1d, b_1d)
+    assert np.allclose(actual, expected)
 
 
-def test_mae_same_as_sklearn(a, b):
-    """Tests that mean absolute error is same as computed from sklearn."""
-    xs_mae = mae(a, b, 'time')
-    sklearn_mae = mean_absolute_error(a, b)
-    assert np.allclose(xs_mae, sklearn_mae)
+@pytest.mark.parametrize('xs_scipy_metrics', xs_scipy_metrics)
+def test_xs_same_as_scipy(a_1d, b_1d, xs_scipy_metrics):
+    """Tests xskillscore metric is same as scipy metric."""
+    xs_metric, scipy_metric, i = xs_scipy_metrics
+    actual = xs_metric(a_1d, b_1d, 'time')
+    expected = scipy_metric(a_1d, b_1d)[i]
+    assert np.allclose(actual, expected)
 
 
-def test_median_absolute_error_same_as_sklearn(a, b):
-    """Tests that median absolute error is same as computed from sklearn."""
-    xs_median_absolute_error = median_absolute_error(a, b, 'time')
-    sklearn_median_absolute_error = sklearn_med_abs(a, b)
-    assert np.allclose(xs_median_absolute_error, sklearn_median_absolute_error)
-
-
-def test_mape_same_as_numpy(a, b):
-    """Tests that mean absolute percent error is same as computed from numpy."""
-    xs_mape = mape(a, b, 'time')
-    np_mape = np.mean(np.abs((a - b) / a))
-    assert np.allclose(xs_mape, np_mape)
-
-
-def test_smape_same_as_numpy(a, b):
-    """Tests that symmetric mean absolute percent error is same as computed
-    from numpy."""
-    xs_smape = smape(a, b, 'time')
-    np_smape = 1 / len(a) * np.sum(np.abs(b - a) / (np.abs(a) + np.abs(b)))
-    assert np.allclose(xs_smape, np_smape)
+@pytest.mark.parametrize('xs_np_metrics', xs_np_metrics)
+def test_mape_same_as_numpy(a_1d, b_1d, xs_np_metrics):
+    """Tests xskillscore metric is same as metric using numpy."""
+    xs_metric, np_metric = xs_np_metrics
+    actual = xs_metric(a_1d, b_1d, 'time')
+    expected = np_metric(a_1d, b_1d)
+    assert np.allclose(actual, expected)

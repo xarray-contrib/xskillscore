@@ -13,22 +13,6 @@ from xskillscore.core.deterministic import (
 DIM = 'time'
 
 
-@pytest.fixture
-def a():
-    times = xr.cftime_range('2000-01-01', '2000-02-03', freq='D')
-    lats = np.arange(4)
-    lons = np.arange(5)
-    data = np.random.rand(len(times), len(lats), len(lons))
-    return xr.DataArray(data, coords=[times, lats, lons], dims=['time', 'lat', 'lon'])
-
-
-@pytest.fixture
-def b(a):
-    b = a.copy()
-    b.values = np.random.rand(a.shape[0], a.shape[1], a.shape[2])
-    return b
-
-
 def test_eff_sample_size_smaller_than_n(a, b):
     """Tests that the effective sample size is less than or equal to the normal
     sample size."""
@@ -42,14 +26,19 @@ def test_eff_sample_size_smaller_than_n(a, b):
 def test_eff_pearson_p_greater_or_equal_to_normal_p(a, b):
     """Tests that the effective Pearson p value is greater than or equal to the
     normal Pearson p value."""
-    normal_p = pearson_r_p_value(a, b, 'time')
-    eff_p = pearson_r_eff_p_value(a, b, 'time')
+    print(a)
+    print(b)
+    normal_p = pearson_r_p_value(a, b, DIM)
+    eff_p = pearson_r_eff_p_value(a, b, DIM)
+    print('\n' * 3)
+    print(normal_p)
+    print(eff_p)
     assert (eff_p >= normal_p).all()
 
 
 def test_eff_spearman_p_greater_or_equal_to_normal_p(a, b):
     """Tests that the effective Spearman p value is greater than or equal to the
     normal Spearman p value."""
-    normal_p = spearman_r_p_value(a, b, 'time')
-    eff_p = spearman_r_eff_p_value(a, b, 'time')
+    normal_p = spearman_r_p_value(a, b, DIM)
+    eff_p = spearman_r_eff_p_value(a, b, DIM)
     assert (eff_p >= normal_p).all()
