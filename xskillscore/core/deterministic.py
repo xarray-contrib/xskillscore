@@ -169,6 +169,11 @@ def _determine_input_core_dims(dim, weights):
 def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Pearson's correlation coefficient.
 
+    .. math::
+        r_{ab} = \\frac{ \\sum_{i=i}^{n} (a_{i} - \\bar{a}) (b_{i} - \\bar{b}) }
+                 {\\sqrt{ \\sum_{i=1}^{n} (a_{i} - \\bar{a})^{2} }
+                  \\sqrt{ \\sum_{i=1}^{n} (b_{i} - \\bar{b})^{2} }}
+
     Parameters
     ----------
     a : xarray.Dataset or xarray.DataArray
@@ -195,9 +200,7 @@ def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.pearsonr
-    xskillscore.core.np_deterministic._pearson_r
 
     References
     ----------
@@ -237,6 +240,29 @@ def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """R^2 (coefficient of determination) score.
 
+    We first take the total sum of squares of our known vector, a.
+
+    .. math::
+        SS_{\\mathrm{tot}} = \\sum_{i=1}^{n} (a_{i} - \\bar{a})^{2}
+
+    Next, we take the sum of squares of the error between our known vector
+    a and the predicted vector, b.
+
+    .. math::
+        SS_{\\mathrm{res}} = \\sum_{i=1}^{n} (a_{i} - b_{i})^{2}
+
+    Lastly we compute the coefficient of determiniation using these two
+    terms.
+
+    .. math::
+        R^{2} = 1 - \\frac{SS_{\\mathrm{res}}}{SS_{\\mathrm{tot}}}
+
+    .. note::
+        The coefficient of determination is *not* symmetric. In other words,
+        ``r2(a, b) != r2(b, a)``. Be careful and note that by our
+        convention, ``b`` is the modeled/predicted vector and ``a`` is the
+        observed vector.
+
     Parameters
     ----------
     a : xarray.Dataset or xarray.DataArray
@@ -263,7 +289,6 @@ def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     sklearn.metrics.r2_score
 
     References
@@ -330,9 +355,7 @@ def pearson_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fal
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.pearsonr
-    xskillscore.core.np_deterministic._pearson_r_p_value
 
     Examples
     --------
@@ -374,7 +397,7 @@ def effective_sample_size(a, b, dim='time', skipna=False, keep_attrs=False):
         autocorrelation.
 
     The effective sample size extracts the number of independent samples
-    between two time series being correlated ([1]_). This is derived by assessing
+    between two time series being correlated. This is derived by assessing
     the magnitude of the lag-1 autocorrelation coefficient in each of the time series
     being correlated. A higher autocorrelation induces a lower effective sample
     size which raises the correlation coefficient for a given p value.
@@ -410,10 +433,9 @@ def effective_sample_size(a, b, dim='time', skipna=False, keep_attrs=False):
 
     References
     ----------
-    .. [1] Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
-
-    Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
 
     Examples
@@ -465,7 +487,7 @@ def pearson_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
         autocorrelation.
 
     The effective p value is computed by replacing the sample size :math:`N` in the
-    t-statistic with the effective sample size ([1]_), :math:`N_{eff}`. The same Pearson
+    t-statistic with the effective sample size, :math:`N_{eff}`. The same Pearson
     product-moment correlation coefficient :math:`r` is used as when computing the
     standard p value.
 
@@ -507,16 +529,13 @@ def pearson_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.pearsonr
-    xskillscore.core.np_deterministic._pearson_r_eff_p_value
 
     References
     ----------
-    .. [1] Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
-
-    Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
 
     Examples
@@ -585,9 +604,7 @@ def spearman_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.spearman_r
-    xskillscore.core.np_deterministic._spearman_r
 
     References
     ----------
@@ -653,9 +670,7 @@ def spearman_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fa
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.spearman_r
-    xskillscore.core.np_deterministic._spearman_r_p_value
 
     Examples
     --------
@@ -699,7 +714,7 @@ def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
         autocorrelation.
 
     The effective p value is computed by replacing the sample size :math:`N` in the
-    t-statistic with the effective sample size ([1]_), :math:`N_{eff}`. The same Spearman's
+    t-statistic with the effective sample size, :math:`N_{eff}`. The same Spearman's
     rank correlation coefficient :math:`r` is used as when computing the standard p
     value.
 
@@ -741,17 +756,16 @@ def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.spearman_r
-    xskillscore.core.np_deterministic._spearman_r_eff_p_value
 
     References
     ----------
-    .. [1] Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
-
-    Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
+
+
 
     Examples
     --------
@@ -793,6 +807,9 @@ def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
 def rmse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Root Mean Squared Error.
 
+    .. math::
+        \\mathrm{RMSE} = \\sqrt{\\frac{1}{n}\\sum_{i=1}^{n}(a_{i} - b_{i})^{2}}
+
     Parameters
     ----------
     a : xarray.Dataset or xarray.DataArray
@@ -819,9 +836,7 @@ def rmse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     sklearn.metrics.mean_squared_error
-    xskillscore.core.np_deterministic._rmse
 
     References
     ----------
@@ -858,6 +873,9 @@ def rmse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Squared Error.
 
+    .. math::
+        \\mathrm{MSE} = \\frac{1}{n}\\sum_{i=1}^{n}(a_{i} - b_{i})^{2}
+
     Parameters
     ----------
     a : xarray.Dataset or xarray.DataArray
@@ -884,9 +902,7 @@ def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     sklearn.metrics.mean_squared_error
-    xskillscore.core.np_deterministic._mse
 
     References
     ----------
@@ -923,6 +939,9 @@ def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 def mae(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Absolute Error.
 
+    .. math::
+        \\mathrm{MAE} = \\frac{1}{n}\\sum_{i=1}^{n}\\vert a - b\\vert
+
     Parameters
     ----------
     a : xarray.Dataset or xarray.DataArray
@@ -949,9 +968,7 @@ def mae(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     sklearn.metrics.mean_absolute_error
-    xskillscore.core.np_deterministic._mae
 
     References
     ----------
@@ -989,6 +1006,9 @@ def median_absolute_error(a, b, dim=None, skipna=False, keep_attrs=False):
     """
     Median Absolute Error.
 
+    .. math::
+        \\mathrm{median}(\\vert a - b\\vert)
+
     Parameters
     ----------
     a : xarray.Dataset or xarray.DataArray
@@ -1014,8 +1034,6 @@ def median_absolute_error(a, b, dim=None, skipna=False, keep_attrs=False):
     See Also
     --------
     sklearn.metrics.median_absolute_error
-    xarray.apply_ufunc
-    xskillscore.core.np_deterministic._median_absolute_error
 
     Examples
     --------
@@ -1045,6 +1063,16 @@ def median_absolute_error(a, b, dim=None, skipna=False, keep_attrs=False):
 def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Absolute Percentage Error.
 
+    .. math::
+        \\mathrm{MAPE} = \\frac{1}{n} \\sum_{i=1}^{n}
+                         \\frac{\\vert a_{i} - b_{i} \\vert}
+                               {\\vert a_{i} \\vert}
+
+    .. note::
+        The percent error is calculated in reference to ``a``. Percent
+        error is reported as decimal percent. I.e., a value of 1 is
+        100%.
+
     Parameters
     ----------
     a : xarray.Dataset or xarray.DataArray
@@ -1069,11 +1097,6 @@ def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     -------
     xarray.Dataset or xarray.DataArray
         Mean Absolute Percentage Error.
-
-    See Also
-    --------
-    xarray.apply_ufunc
-    xskillscore.core.np_deterministic._mape
 
     References
     ----------
@@ -1110,6 +1133,15 @@ def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 def smape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Symmetric Mean Absolute Percentage Error.
 
+    .. math::
+        \\mathrm{SMAPE} = \\frac{1}{n} \\sum_{i=1}^{n}
+                          \\frac{ \\vert a_{i} - b_{i} \\vert }
+                          { \\vert a_{i} \\vert + \\vert b_{i} \\vert  }
+
+    .. note::
+        Percent error is reported as decimal percent. I.e., a value of 1 is
+        100%.
+
     Parameters
     ----------
     a : xarray.Dataset or xarray.DataArray
@@ -1134,11 +1166,6 @@ def smape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     -------
     xarray.Dataset or xarray.DataArray
         Symmetric Mean Absolute Percentage Error.
-
-    See Also
-    --------
-    xarray.apply_ufunc
-    xskillscore.core.np_deterministic._smape
 
     References
     ----------
