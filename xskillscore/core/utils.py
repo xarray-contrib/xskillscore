@@ -13,7 +13,9 @@ def histogram(*args, bins=None, bin_names=None, **kwargs):
         if isinstance(kwargs['dim'], str):
             kwargs['dim'] = [kwargs['dim']]
     for bin in bins:
-        assert isinstance(bin, np.ndarray), 'all bins must be numpy arrays'
+        assert isinstance(
+            bin, np.ndarray
+        ), f'all bins must be numpy arrays, found {type(bin)}'
 
     if isinstance(args[0], xr.Dataset):
         # Get list of variables that are shared across all Datasets

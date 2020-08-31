@@ -26,6 +26,7 @@ from .core.probabilistic import (
     crps_quadrature,
     discrimination,
     rank_histogram,
+    rps,
     threshold_brier_score,
 )
 from .versioning.print_versions import show_versions

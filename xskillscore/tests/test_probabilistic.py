@@ -384,7 +384,7 @@ def test_discrimination_sum(o, f, dim, obj):
         assert np.allclose(hist_no_event_sum[~np.isnan(hist_no_event_sum)], 1)
 
 
-def test_discrimination_values(o):
+def test_discrimination_perfect_values(o):
     """Test values for perfect forecast
     """
     f = xr.concat(10 * [o], dim='member')
@@ -405,7 +405,29 @@ def test_discrimination_dask(o_dask, f_dask):
     assert hist_no_event.chunks is not None
 
 
+@pytest.fixture
+def bins():
+    return np.linspace(0, 1 + 1e-8, 6)
+
+
+def test_rps_dask(o_dask, f_dask, bins):
+    """Test that rps returns dask array if provided dask array
+    """
+    assert rps(o_dask, f_dask, bins=bins).chunks is not None
+
+
+def test_rps_perfect_values(o, bins):
+    """Test values for perfect forecast
+    """
+    f = xr.concat(10 * [o], dim='member')
+    res = rps(o, f, bins=bins)
+    assert (res == 0).all()
+
+
 def test_rps_wilks_example():
+    """Test with values from Wilks, D. S. (2006). Statistical methods in the
+    atmospheric sciences (2nd ed, Vol. 91). Amsterdam ; Boston: Academic Press. p.301
+    """
     bins = np.array([-0.01, 0.01, 0.24, 10])
     Obs = xr.DataArray([0.0001], name='test')
     F1 = xr.DataArray([0] * 2 + [0.1] * 5 + [0.3] * 3, dims='member', name='test')

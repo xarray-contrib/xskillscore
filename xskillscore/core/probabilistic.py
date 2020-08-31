@@ -348,29 +348,41 @@ def threshold_brier_score(
         return res.mean(dim, keep_attrs=keep_attrs)
 
 
-def rps(observations, forecasts, bins, dim=None, weights=None, keep_attrs=False):
-    if isinstance(bins, list):
-        bins = np.array(bins)
+def rps(
+    observations,
+    forecasts,
+    bins,
+    dim=None,
+    weights=None,
+    keep_attrs=False,
+    member_dim='member',
+):
     bin_names = ['category']
     bin_dim = f'{bin_names[0]}_bin'
-    observations = histogram(
-        observations, bins=[bins], bin_names=bin_names, dim=dim, weights=weights
-    )
+    # histogram(dim=[]) not allowed therefore add fake member dim to apply over when multi-dim observations
+    if len(observations.dims) == 1:
+        observations = histogram(
+            observations, bins=[bins], bin_names=bin_names, dim=None, weights=weights
+        )
+    else:
+        observations = histogram(
+            observations.expand_dims(member_dim),
+            bins=[bins],
+            bin_names=bin_names,
+            dim=[member_dim],
+            weights=weights,
+        )
     forecasts = histogram(
-        forecasts,
-        bins=[bins],
-        bin_names=bin_names,
-        dim=dim + ['member'] if dim != None else None,
-        weights=weights,
+        forecasts, bins=[bins], bin_names=bin_names, dim=[member_dim], weights=weights,
     )
     # normalize f.sum()=1
     forecasts = forecasts / forecasts.sum(bin_dim)
     observations = observations / observations.sum(bin_dim)
     # rps formula
     res = ((observations.cumsum(bin_dim) - forecasts.cumsum(bin_dim)) ** 2).sum(bin_dim)
-    # if weights is not None:
-    #    res = res.weighted(weights)
-    return res  # .mean(dim)
+    if weights is not None:
+        res = res.weighted(weights)
+    return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def rank_histogram(observations, forecasts, dim=None, member_dim='member'):
