@@ -12,6 +12,7 @@ from xskillscore.core.probabilistic import (
     crps_quadrature,
     discrimination,
     rank_histogram,
+    rps,
     threshold_brier_score,
 )
 
@@ -402,3 +403,12 @@ def test_discrimination_dask(o_dask, f_dask):
     )
     assert hist_event.chunks is not None
     assert hist_no_event.chunks is not None
+
+
+def test_rps_wilks_example():
+    bins = np.array([-0.01, 0.01, 0.24, 10])
+    Obs = xr.DataArray([0.0001], name='test')
+    F1 = xr.DataArray([0] * 2 + [0.1] * 5 + [0.3] * 3, dims='member', name='test')
+    F2 = xr.DataArray([0] * 2 + [0.1] * 3 + [0.3] * 5, dims='member', name='test')
+    np.testing.assert_allclose(rps(Obs, F2, bins), 0.89)
+    np.testing.assert_allclose(rps(Obs, F1, bins), 0.73)

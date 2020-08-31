@@ -13,6 +13,7 @@ __all__ = [
     'threshold_brier_score',
     'rank_histogram',
     'discrimination',
+    'rps',
 ]
 
 FORECAST_PROBABILITY_DIM = 'forecast_probability'
@@ -345,6 +346,31 @@ def threshold_brier_score(
         return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
         return res.mean(dim, keep_attrs=keep_attrs)
+
+
+def rps(observations, forecasts, bins, dim=None, weights=None, keep_attrs=False):
+    if isinstance(bins, list):
+        bins = np.array(bins)
+    bin_names = ['category']
+    bin_dim = f'{bin_names[0]}_bin'
+    observations = histogram(
+        observations, bins=[bins], bin_names=bin_names, dim=dim, weights=weights
+    )
+    forecasts = histogram(
+        forecasts,
+        bins=[bins],
+        bin_names=bin_names,
+        dim=dim + ['member'] if dim != None else None,
+        weights=weights,
+    )
+    # normalize f.sum()=1
+    forecasts = forecasts / forecasts.sum(bin_dim)
+    observations = observations / observations.sum(bin_dim)
+    # rps formula
+    res = ((observations.cumsum(bin_dim) - forecasts.cumsum(bin_dim)) ** 2).sum(bin_dim)
+    # if weights is not None:
+    #    res = res.weighted(weights)
+    return res  # .mean(dim)
 
 
 def rank_histogram(observations, forecasts, dim=None, member_dim='member'):
