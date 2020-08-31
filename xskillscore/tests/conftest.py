@@ -140,3 +140,9 @@ def weights_dask(weights):
     Weighting array by cosine of the latitude.
     """
     return weights.chunk()
+
+
+@pytest.fixture
+def bins():
+    """Bins between 0 and 1."""
+    return np.linspace(0, 1 + 1e-8, 6)

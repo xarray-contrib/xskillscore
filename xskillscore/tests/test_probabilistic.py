@@ -386,15 +386,10 @@ def test_discrimination_dask(o_dask, f_prob_dask):
     assert hist_no_event.chunks is not None
 
 
-@pytest.fixture
-def bins():
-    return np.linspace(0, 1 + 1e-8, 6)
-
-
-def test_rps_dask(o_dask, f_dask, bins):
+def test_rps_dask(o_dask, f_prob_dask, bins):
     """Test that rps returns dask array if provided dask array
     """
-    assert rps(o_dask, f_dask, bins=bins).chunks is not None
+    assert rps(o_dask, f_prob_dask, bins=bins).chunks is not None
 
 
 def test_rps_perfect_values(o, bins):
@@ -407,16 +402,16 @@ def test_rps_perfect_values(o, bins):
 
 @pytest.mark.parametrize('dim', DIMS)
 @pytest.mark.parametrize('obj', ['da', 'ds', 'chunked_da', 'chunked_ds'])
-def test_rps(o, f, bins, dim, obj):
+def test_rps(o, f_prob, bins, dim, obj):
     """Test that"""
     if 'ds' in obj:
         name = 'var'
         o = o.to_dataset(name=name)
-        f = f.to_dataset(name=name)
+        f_prob = f_prob.to_dataset(name=name)
     if 'chunked' in obj:
         o = o.chunk()
-        f = f.chunk()
-    actual = rps(o, f, bins=bins, dim=dim)
+        f_prob = f_prob.chunk()
+    actual = rps(o, f_prob, bins=bins, dim=dim)
     assert_only_dim_reduced(dim, actual, o)
 
 
@@ -432,10 +427,10 @@ def test_rps_wilks_example():
     np.testing.assert_allclose(rps(Obs, F1, bins), 0.73)
 
 
-def test_2_category_rps_equals_brier_score(o, f):
+def test_2_category_rps_equals_brier_score(o, f_prob):
     """Test that RPS for two categories equals the Brier Score."""
     bins = np.array([0.0, 0.5, 1.0])
     assert_allclose(
-        rps(o, f, bins=bins, dim=None),
-        brier_score(o > 0.5, (f > 0.5).mean('member'), dim=None),
+        rps(o, f_prob, bins=bins, dim=None),
+        brier_score(o > 0.5, (f_prob > 0.5).mean('member'), dim=None),
     )

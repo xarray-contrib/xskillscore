@@ -128,16 +128,16 @@ def test_discrimination_accessor(o, f_prob, threshold, outer_bool):
 
 
 @pytest.mark.parametrize('outer_bool', [False, True])
-def test_rps_accessor(o, f, outer_bool):
+def test_rps_accessor(o, f_prob, outer_bool):
     bins = np.linspace(0, 1 + 1e-8, 6)
-    expected = rps(o, f, bins=bins)
+    expected = rps(o, f_prob, bins=bins)
 
     ds = xr.Dataset()
     ds['o'] = o
-    ds['f'] = f
+    ds['f_prob'] = f_prob
     if outer_bool:
-        ds = ds.drop_vars('f')
-        actual = ds.xs.rps('o', f, bins=bins)
+        ds = ds.drop_vars('f_prob')
+        actual = ds.xs.rps('o', f_prob, bins=bins)
     else:
-        actual = ds.xs.rps('o', 'f', bins=bins)
+        actual = ds.xs.rps('o', 'f_prob', bins=bins)
     assert_allclose(actual, expected)
