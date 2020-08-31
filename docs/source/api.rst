@@ -54,6 +54,7 @@ Currently, most of our probabilistic metrics are ported over from
     crps_gaussian
     crps_quadrature
     threshold_brier_score
+    rps
     rank_histogram
     discrimination
 

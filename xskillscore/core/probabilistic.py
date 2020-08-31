@@ -34,7 +34,7 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
         Dimension over which to compute mean after computing ``crps_gaussian``.
         Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -98,7 +98,7 @@ def crps_quadrature(
         Dimension over which to compute mean after computing ``crps_quadrature``.
         Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -163,7 +163,7 @@ def crps_ensemble(
         Dimension over which to compute mean after computing ``crps_ensemble``.
         Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -197,8 +197,8 @@ def crps_ensemble(
 def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=False):
     """Calculate Brier score (BS).
 
-    ..math:
-        BS(p, k) = (p_1 - k)^2
+    .. math:
+        BS(p, k) = (p_1 - k)^{2}
 
     Parameters
     ----------
@@ -211,7 +211,7 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
         Dimension over which to compute mean after computing ``brier_score``.
         Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -280,7 +280,7 @@ def threshold_brier_score(
         Dimension over which to compute mean after computing ``threshold_brier_score``.
         Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is
         applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied from the first input to the new
@@ -353,8 +353,8 @@ def rps(
 ):
     """Calculate Ranked Probability Score.
 
-    ..math:
-        RPS(p, k) = 1/M \\sum{m=1}^{M} [(\\sum{k=1}^{m} p_k) - (\\sum{k=1}^{m} o_k)] ^ 2
+     .. math::
+        RPS(p, k) = 1/M \\sum_{m=1}^{M} [(\\sum_{k=1}^{m} p_k) - (\\sum_{k=1}^{m} o_k)]^{2}
 
     Parameters
     ----------
@@ -369,7 +369,7 @@ def rps(
         Dimension over which to compute mean after computing ``rps``.
         Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is
         applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied from the first input to the new
@@ -379,7 +379,8 @@ def rps(
 
     Returns
     -------
-    xarray.Dataset or xarray.DataArray
+    xarray.Dataset or xarray.DataArray:
+        ranked probability score
 
     References
     ----------
