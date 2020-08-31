@@ -449,3 +449,12 @@ def test_rps_wilks_example():
     F2 = xr.DataArray([0] * 2 + [0.1] * 3 + [0.3] * 5, dims='member')
     np.testing.assert_allclose(rps(Obs, F2, bins), 0.89)
     np.testing.assert_allclose(rps(Obs, F1, bins), 0.73)
+
+
+def test_2_category_rps_equals_brier_score(o, f):
+    """Test that RPS for two categories equals the Brier Score."""
+    bins = np.array([0.0, 0.5, 1.0])
+    assert_allclose(
+        rps(o, f, bins=bins, dim=None),
+        brier_score(o > 0.5, (f > 0.5).mean('member'), dim=None),
+    )
