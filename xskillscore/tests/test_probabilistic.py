@@ -424,13 +424,28 @@ def test_rps_perfect_values(o, bins):
     assert (res == 0).all()
 
 
+@pytest.mark.parametrize('dim', DIMS)
+@pytest.mark.parametrize('obj', ['da', 'ds', 'chunked_da', 'chunked_ds'])
+def test_rps(o, f, bins, dim, obj):
+    """Test that"""
+    if 'ds' in obj:
+        name = 'var'
+        o = o.to_dataset(name=name)
+        f = f.to_dataset(name=name)
+    if 'chunked' in obj:
+        o = o.chunk()
+        f = f.chunk()
+    actual = rps(o, f, bins=bins, dim=dim)
+    assert_only_dim_reduced(dim, actual, o)
+
+
 def test_rps_wilks_example():
     """Test with values from Wilks, D. S. (2006). Statistical methods in the
     atmospheric sciences (2nd ed, Vol. 91). Amsterdam ; Boston: Academic Press. p.301
     """
     bins = np.array([-0.01, 0.01, 0.24, 10])
-    Obs = xr.DataArray([0.0001], name='test')
-    F1 = xr.DataArray([0] * 2 + [0.1] * 5 + [0.3] * 3, dims='member', name='test')
-    F2 = xr.DataArray([0] * 2 + [0.1] * 3 + [0.3] * 5, dims='member', name='test')
+    Obs = xr.DataArray([0.0001])
+    F1 = xr.DataArray([0] * 2 + [0.1] * 5 + [0.3] * 3, dims='member')
+    F2 = xr.DataArray([0] * 2 + [0.1] * 3 + [0.3] * 5, dims='member')
     np.testing.assert_allclose(rps(Obs, F2, bins), 0.89)
     np.testing.assert_allclose(rps(Obs, F1, bins), 0.73)

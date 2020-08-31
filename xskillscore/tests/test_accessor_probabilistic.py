@@ -11,6 +11,7 @@ from xskillscore.core.probabilistic import (
     crps_quadrature,
     discrimination,
     rank_histogram,
+    rps,
     threshold_brier_score,
 )
 
@@ -172,3 +173,19 @@ def test_discrimination_accessor(o, f, threshold, dask_bool, outer_bool):
         hist_event_expected, hist_no_event_expected = ds.xs.discrimination('o', 'f')
     assert_allclose(hist_event_actual, hist_event_expected)
     assert_allclose(hist_no_event_actual, hist_no_event_expected)
+
+
+@pytest.mark.parametrize('outer_bool', [False, True])
+def test_rps_accessor(o, f, outer_bool):
+    bins = np.linspace(0, 1 + 1e-8, 6)
+    expected = rps(o, f, bins=bins)
+
+    ds = xr.Dataset()
+    ds['o'] = o
+    ds['f'] = f
+    if outer_bool:
+        ds = ds.drop_vars('f')
+        actual = ds.xs.rps('o', f, bins=bins)
+    else:
+        actual = ds.xs.rps('o', 'f', bins=bins)
+    assert_allclose(actual, expected)
