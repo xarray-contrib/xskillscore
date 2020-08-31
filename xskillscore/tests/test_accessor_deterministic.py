@@ -49,15 +49,12 @@ distance_metrics = [
 AXES = ('time', 'lat', 'lon', ['lat', 'lon'], ['time', 'lat', 'lon'])
 
 
-def _ds(a, b, skipna_bool, dask_bool):
+def _ds(a, b, skipna_bool):
     ds = xr.Dataset()
     ds['a'] = a
     ds['b'] = b
     if skipna_bool is True:
         ds['b'] = b.where(b < 0.5)
-    if dask_bool is True:
-        ds['a'] = a.chunk()
-        ds['b'] = b.chunk()
     return ds
 
 
@@ -78,10 +75,9 @@ def adjust_weights(dim, weight_bool, weights):
 @pytest.mark.parametrize('metric', correlation_metrics + distance_metrics)
 @pytest.mark.parametrize('dim', AXES)
 @pytest.mark.parametrize('weight_bool', [False, True])
-@pytest.mark.parametrize('dask_bool', [False, True])
 @pytest.mark.parametrize('skipna_bool', [False, True])
 def test_deterministic_metrics_accessor(
-    a, b, dim, skipna_bool, dask_bool, weight_bool, weights, metric, outer_bool
+    a, b, dim, skipna_bool, weight_bool, weights, metric, outer_bool
 ):
 
     # Update dim to time if testing temporal only metrics
@@ -89,7 +85,7 @@ def test_deterministic_metrics_accessor(
         dim = 'time'
 
     _weights = adjust_weights(dim, weight_bool, weights)
-    ds = _ds(a, b, skipna_bool, dask_bool)
+    ds = _ds(a, b, skipna_bool)
     b = ds['b']  # Update if populated with nans
     if outer_bool:
         ds = ds.drop_vars('b')
