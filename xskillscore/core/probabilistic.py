@@ -379,6 +379,8 @@ def rps(
     keep_attrs : bool
         If True, the attributes (attrs) will be copied from the first input to the new
         one. If False (default), the new object will be returned without attributes.
+    member_dim : str, optional
+        Name of ensemble member dimension. By default, 'member'.
 
     Returns
     -------
