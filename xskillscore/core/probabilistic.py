@@ -531,7 +531,7 @@ def reliability(
         >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
         ...                          coords=[('x', np.arange(3)),
         ...                                  ('y', np.arange(3)),
-        ...                                  ('ensemble', np.arange(3))])
+        ...                                  ('member', np.arange(3))])
         >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
         ...                            coords=[('x', np.arange(3)),
         ...                                    ('y', np.arange(3))])
