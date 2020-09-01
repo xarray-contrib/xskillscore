@@ -139,8 +139,7 @@ def _effective_sample_size(a, b, axis, skipna):
 
 
 def _pearson_r(a, b, weights, axis, skipna):
-    """
-    ndarray implementation of scipy.stats.pearsonr.
+    """ndarray implementation of scipy.stats.pearsonr.
 
     Parameters
     ----------
@@ -190,8 +189,7 @@ def _pearson_r(a, b, weights, axis, skipna):
 
 
 def _r2(a, b, weights, axis, skipna):
-    """
-    ndarray implementation of sklearn.metrics.r2_score.
+    """ndarray implementation of sklearn.metrics.r2_score.
 
     Parameters
     ----------
@@ -243,8 +241,7 @@ def _r2(a, b, weights, axis, skipna):
 
 
 def _pearson_r_p_value(a, b, weights, axis, skipna):
-    """
-    ndarray implementation of scipy.stats.pearsonr.
+    """ndarray implementation of scipy.stats.pearsonr.
 
     Parameters
     ----------
@@ -347,8 +344,7 @@ def _pearson_r_eff_p_value(a, b, axis, skipna):
 
 
 def _spearman_r(a, b, weights, axis, skipna):
-    """
-    ndarray implementation of scipy.stats.spearmanr.
+    """ndarray implementation of scipy.stats.spearmanr.
 
     Parameters
     ----------
@@ -381,8 +377,7 @@ def _spearman_r(a, b, weights, axis, skipna):
 
 
 def _spearman_r_p_value(a, b, weights, axis, skipna):
-    """
-    ndarray implementation of scipy.stats.spearmanr.
+    """ndarray implementation of scipy.stats.spearmanr.
 
     Parameters
     ----------
@@ -468,8 +463,7 @@ def _spearman_r_eff_p_value(a, b, axis, skipna):
 
 
 def _rmse(a, b, weights, axis, skipna):
-    """
-    Root Mean Squared Error.
+    """Root Mean Squared Error.
 
     Parameters
     ----------
@@ -510,8 +504,7 @@ def _rmse(a, b, weights, axis, skipna):
 
 
 def _mse(a, b, weights, axis, skipna):
-    """
-    Mean Squared Error.
+    """Mean Squared Error.
 
     Parameters
     ----------
@@ -548,8 +541,7 @@ def _mse(a, b, weights, axis, skipna):
 
 
 def _mae(a, b, weights, axis, skipna):
-    """
-    Mean Absolute Error.
+    """Mean Absolute Error.
 
     Parameters
     ----------
@@ -588,8 +580,7 @@ def _mae(a, b, weights, axis, skipna):
 
 
 def _median_absolute_error(a, b, axis, skipna):
-    """
-    Median Absolute Error.
+    """Median Absolute Error.
 
     Parameters
     ----------
@@ -619,10 +610,12 @@ def _median_absolute_error(a, b, axis, skipna):
 
 
 def _mape(a, b, weights, axis, skipna):
-    """
-    Mean Absolute Percentage Error.
+    """Mean Absolute Percentage Error.
 
-    :: math MAPE = 1/n \\sum \\frac{|F_t-A_t|}{|A_t|}
+    .. math::
+        \\mathrm{MAPE} = \\frac{1}{n} \\sum_{i=1}^{n}
+                         \\frac{\\vert a_{i} - b_{i} \\vert}
+                               {\\vert a_{i} \\vert}
 
     Parameters
     ----------
@@ -666,10 +659,12 @@ def _mape(a, b, weights, axis, skipna):
 
 
 def _smape(a, b, weights, axis, skipna):
-    """
-    Symmetric Mean Absolute Percentage Error.
+    """Symmetric Mean Absolute Percentage Error.
 
-    :: math SMAPE = 1/n \\sum \\frac{|F_t-A_t|}{(|A_t|+|F_t|)}
+    .. math::
+        \\mathrm{SMAPE} = \\frac{1}{n} \\sum_{i=1}^{n}
+                          \\frac{ \\vert a_{i} - b_{i} \\vert }
+                          { \\vert a_{i} \\vert + \\vert b_{i} \\vert  }
 
     Parameters
     ----------

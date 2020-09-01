@@ -7,9 +7,12 @@ xskillscore v0.0.17 (2020-08-xx)
 
 Internal Changes
 ----------------
-- Rename ``dim`` to ``member_dim`` in probabilistic metrics. (:pr:`121`) `Aaron Spring`_
 - Added ``utils`` module to house utilities shared across multiple modules
   (:pr:`119`). `Dougie Squire`_
+- ``conftest.py`` gathers all ``pytest.fixtures``. (:issue:`126`, :pr:`159`)
+  `Aaron Spring`_ and `Ray Bell`_
+- Removed ``test_np_deterministic`` covered by ``test_metric_results_accurate``.
+  (:pr:`159`) `Aaron Spring`_
 
 Documentation
 -------------
@@ -27,6 +30,10 @@ Features
 Breaking Changes
 ----------------
 - Rename `dim` to `member_dim` in probabilistic metrics. (:pr:`121`) `Aaron Spring`_
+- Argument `dim` becomes keyword `dim=None` in all metrics.
+  (:issue:`137`, :pr:`143`) `Aaron Spring`_
+- `dim=None` reduces all dimensions as in `xr.mean(dim=None)`.
+  (:issue:`137`, :pr:`143`) `Aaron Spring`_
 
 
 xskillscore v0.0.16 (2020-07-18)

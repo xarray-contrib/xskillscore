@@ -19,6 +19,13 @@ def _preprocess_dims(dim):
     return dim, axis
 
 
+def _fail_if_dim_empty(dim):
+    if dim == []:
+        raise ValueError(
+            'metric must be applied along one dimension, therefore '
+            f'requires `dim` not being empty, found dim={dim}'
+
+
 def _stack_input_if_needed(a, b, dim, weights):
     """
     Stack input arrays a, b if needed.

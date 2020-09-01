@@ -49,7 +49,6 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
     See Also
     --------
     properscoring.crps_gaussian
-    xarray.apply_ufunc
     """
     # check if same dimensions
     if isinstance(mu, (int, float)):
@@ -70,13 +69,10 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
-    if dim is None:
-        return res
+    if weights is not None:
+        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
-        if weights is not None:
-            return res.weighted(weights).mean(dim)
-        else:
-            return res.mean(dim)
+        return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def crps_quadrature(
@@ -117,7 +113,6 @@ def crps_quadrature(
     See Also
     --------
     properscoring.crps_quadrature
-    xarray.apply_ufunc
     """
     res = xr.apply_ufunc(
         properscoring.crps_quadrature,
@@ -131,13 +126,10 @@ def crps_quadrature(
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
-    if dim is None:
-        return res
+    if weights is not None:
+        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
-        if weights is not None:
-            return res.weighted(weights).mean(dim)
-        else:
-            return res.mean(dim, keep_attrs=keep_attrs)
+        return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def crps_ensemble(
@@ -186,7 +178,6 @@ def crps_ensemble(
     See Also
     --------
     properscoring.crps_ensemble
-    xarray.apply_ufunc
     """
     res = xr.apply_ufunc(
         properscoring.crps_ensemble,
@@ -198,13 +189,10 @@ def crps_ensemble(
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
-    if dim is None:
-        return res
+    if weights is not None:
+        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
-        if weights is not None:
-            return res.weighted(weights).mean(dim)
-        else:
-            return res.mean(dim, keep_attrs=keep_attrs)
+        return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=False):
@@ -238,7 +226,6 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
     See Also
     --------
     properscoring.brier_score
-    xarray.apply_ufunc
 
     References
     ----------
@@ -259,13 +246,10 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
-    if dim is None:
-        return res
+    if weights is not None:
+        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
-        if weights is not None:
-            return res.weighted(weights).mean(dim)
-        else:
-            return res.mean(dim)
+        return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def threshold_brier_score(
@@ -314,7 +298,6 @@ def threshold_brier_score(
     See Also
     --------
     properscoring.threshold_brier_score
-    xarray.apply_ufunc
 
     References
     ----------
@@ -355,13 +338,10 @@ def threshold_brier_score(
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
-    if dim is None:
-        return res
+    if weights is not None:
+        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
-        if weights is not None:
-            return res.weighted(weights).mean(dim)
-        else:
-            return res.mean(dim)
+        return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def rank_histogram(observations, forecasts, dim=None, member_dim='member'):

@@ -18,7 +18,7 @@ from .np_deterministic import (
     _spearman_r_eff_p_value,
     _spearman_r_p_value,
 )
-from .utils import _preprocess_dims, _preprocess_weights, _stack_input_if_needed
+from .utils import _preprocess_dims, _fail_if_dim_empty, _preprocess_weights, _stack_input_if_needed
 
 __all__ = [
     'pearson_r',
@@ -64,8 +64,13 @@ def _determine_input_core_dims(dim, weights):
     return input_core_dims
 
 
-def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Pearson's correlation coefficient.
+
+    .. math::
+        r_{ab} = \\frac{ \\sum_{i=i}^{n} (a_{i} - \\bar{a}) (b_{i} - \\bar{b}) }
+                 {\\sqrt{ \\sum_{i=1}^{n} (a_{i} - \\bar{a})^{2} }
+                  \\sqrt{ \\sum_{i=1}^{n} (b_{i} - \\bar{b})^{2} }}
 
     Parameters
     ----------
@@ -75,7 +80,7 @@ def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -93,9 +98,7 @@ def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.pearsonr
-    xskillscore.core.np_deterministic._pearson_r
 
     References
     ----------
@@ -112,7 +115,8 @@ def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> pearson_r(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
@@ -131,8 +135,31 @@ def pearson_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """R^2 (coefficient of determination) score.
+
+    We first take the total sum of squares of our known vector, a.
+
+    .. math::
+        SS_{\\mathrm{tot}} = \\sum_{i=1}^{n} (a_{i} - \\bar{a})^{2}
+
+    Next, we take the sum of squares of the error between our known vector
+    a and the predicted vector, b.
+
+    .. math::
+        SS_{\\mathrm{res}} = \\sum_{i=1}^{n} (a_{i} - b_{i})^{2}
+
+    Lastly we compute the coefficient of determiniation using these two
+    terms.
+
+    .. math::
+        R^{2} = 1 - \\frac{SS_{\\mathrm{res}}}{SS_{\\mathrm{tot}}}
+
+    .. note::
+        The coefficient of determination is *not* symmetric. In other words,
+        ``r2(a, b) != r2(b, a)``. Be careful and note that by our
+        convention, ``b`` is the modeled/predicted vector and ``a`` is the
+        observed vector.
 
     Parameters
     ----------
@@ -142,7 +169,7 @@ def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -160,7 +187,6 @@ def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     sklearn.metrics.r2_score
 
     References
@@ -178,7 +204,8 @@ def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> r2(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
@@ -197,7 +224,7 @@ def r2(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def pearson_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """2-tailed p-value associated with pearson's correlation coefficient.
 
     Parameters
@@ -208,7 +235,7 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -226,9 +253,7 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.pearsonr
-    xskillscore.core.np_deterministic._pearson_r_p_value
 
     Examples
     --------
@@ -241,7 +266,8 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> pearson_r_p_value(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
     input_core_dims = _determine_input_core_dims(new_dim, weights)
@@ -259,7 +285,7 @@ def pearson_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
+def effective_sample_size(a, b, dim='time', skipna=False, keep_attrs=False):
     """Effective sample size for temporally correlated data.
 
     .. note::
@@ -269,7 +295,7 @@ def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
         autocorrelation.
 
     The effective sample size extracts the number of independent samples
-    between two time series being correlated ([1]_). This is derived by assessing
+    between two time series being correlated. This is derived by assessing
     the magnitude of the lag-1 autocorrelation coefficient in each of the time series
     being correlated. A higher autocorrelation induces a lower effective sample
     size which raises the correlation coefficient for a given p value.
@@ -289,7 +315,7 @@ def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the function along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
@@ -305,10 +331,9 @@ def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
 
     References
     ----------
-    .. [1] Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
-
-    Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
 
     Examples
@@ -322,7 +347,8 @@ def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> effective_sample_size(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     if len(dim) > 1:
         raise ValueError(
             'Effective sample size should only be applied to a singular time dimension.'
@@ -347,7 +373,7 @@ def effective_sample_size(a, b, dim, skipna=False, keep_attrs=False):
     )
 
 
-def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
+def pearson_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
     """
     2-tailed p-value associated with Pearson's correlation coefficient,
     accounting for autocorrelation.
@@ -359,7 +385,7 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
         autocorrelation.
 
     The effective p value is computed by replacing the sample size :math:`N` in the
-    t-statistic with the effective sample size ([1]_), :math:`N_{eff}`. The same Pearson
+    t-statistic with the effective sample size, :math:`N_{eff}`. The same Pearson
     product-moment correlation coefficient :math:`r` is used as when computing the
     standard p value.
 
@@ -384,7 +410,7 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to compute the p value over. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
@@ -401,16 +427,13 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.pearsonr
-    xskillscore.core.np_deterministic._pearson_r_eff_p_value
 
     References
     ----------
-    .. [1] Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
-
-    Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
 
     Examples
@@ -424,7 +447,8 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> pearson_r_eff_p_value(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     if len(dim) > 1:
         raise ValueError(
             'Effective sample size should only be applied to a singular time dimension.'
@@ -449,7 +473,7 @@ def pearson_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
     )
 
 
-def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def spearman_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Spearman's correlation coefficient.
 
     Parameters
@@ -460,7 +484,7 @@ def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -478,9 +502,7 @@ def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.spearman_r
-    xskillscore.core.np_deterministic._spearman_r
 
     References
     ----------
@@ -498,7 +520,8 @@ def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> spearman_r(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
     input_core_dims = _determine_input_core_dims(new_dim, weights)
@@ -516,7 +539,7 @@ def spearman_r(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def spearman_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """2-tailed p-value associated with Spearman's correlation coefficient.
 
     Parameters
@@ -527,7 +550,7 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -545,9 +568,7 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.spearman_r
-    xskillscore.core.np_deterministic._spearman_r_p_value
 
     Examples
     --------
@@ -560,7 +581,8 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> spearman_r_p_value(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
     input_core_dims = _determine_input_core_dims(new_dim, weights)
@@ -578,7 +600,7 @@ def spearman_r_p_value(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
+def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
     """
     2-tailed p-value associated with Spearman rank correlation coefficient,
     accounting for autocorrelation.
@@ -590,7 +612,7 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
         autocorrelation.
 
     The effective p value is computed by replacing the sample size :math:`N` in the
-    t-statistic with the effective sample size ([1]_), :math:`N_{eff}`. The same Spearman's
+    t-statistic with the effective sample size, :math:`N_{eff}`. The same Spearman's
     rank correlation coefficient :math:`r` is used as when computing the standard p
     value.
 
@@ -615,7 +637,7 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to compute the p value over. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
@@ -632,17 +654,16 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     scipy.stats.spearman_r
-    xskillscore.core.np_deterministic._spearman_r_eff_p_value
 
     References
     ----------
-    .. [1] Bretherton, Christopher S., et al. "The effective number of spatial degrees of
+    * Bretherton, Christopher S., et al. "The effective number of spatial degrees of
       freedom of a time-varying field." Journal of climate 12.7 (1999): 1990-2009.
-
-    Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
+    * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
+
+
 
     Examples
     --------
@@ -655,7 +676,8 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> spearman_r_eff_p_value(a, b, dim='time')
     """
-    dim, _ = _preprocess_dims(dim)
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
     if len(dim) > 1:
         raise ValueError(
             'Effective sample size should only be applied to a singular time dimension.'
@@ -680,8 +702,11 @@ def spearman_r_eff_p_value(a, b, dim, skipna=False, keep_attrs=False):
     )
 
 
-def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def rmse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Root Mean Squared Error.
+
+    .. math::
+        \\mathrm{RMSE} = \\sqrt{\\frac{1}{n}\\sum_{i=1}^{n}(a_{i} - b_{i})^{2}}
 
     Parameters
     ----------
@@ -691,7 +716,7 @@ def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the rmse along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -709,9 +734,7 @@ def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     sklearn.metrics.mean_squared_error
-    xskillscore.core.np_deterministic._rmse
 
     References
     ----------
@@ -728,7 +751,7 @@ def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> rmse(a, b, dim='time')
     """
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
@@ -745,8 +768,11 @@ def rmse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Squared Error.
+
+    .. math::
+        \\mathrm{MSE} = \\frac{1}{n}\\sum_{i=1}^{n}(a_{i} - b_{i})^{2}
 
     Parameters
     ----------
@@ -756,7 +782,7 @@ def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the mse along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -774,9 +800,7 @@ def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     sklearn.metrics.mean_squared_error
-    xskillscore.core.np_deterministic._mse
 
     References
     ----------
@@ -793,7 +817,7 @@ def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> mse(a, b, dim='time')
     """
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
@@ -810,8 +834,11 @@ def mse(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def mae(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Absolute Error.
+
+    .. math::
+        \\mathrm{MAE} = \\frac{1}{n}\\sum_{i=1}^{n}\\vert a - b\\vert
 
     Parameters
     ----------
@@ -821,7 +848,7 @@ def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the mae along. Note that this dimension will
-        be reduced as a result.
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -839,9 +866,7 @@ def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
 
     See Also
     --------
-    xarray.apply_ufunc
     sklearn.metrics.mean_absolute_error
-    xskillscore.core.np_deterministic._mae
 
     References
     ----------
@@ -858,7 +883,7 @@ def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> mae(a, b, dim='time')
     """
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
@@ -875,9 +900,12 @@ def mae(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
+def median_absolute_error(a, b, dim=None, skipna=False, keep_attrs=False):
     """
     Median Absolute Error.
+
+    .. math::
+        \\mathrm{median}(\\vert a - b\\vert)
 
     Parameters
     ----------
@@ -887,7 +915,7 @@ def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
         Labeled array(s) over which to apply the function.
     dim : str, list
         The dimension(s) to apply the median absolute error along.
-        Note that this dimension will be reduced as a result.
+        Note that this dimension will be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
@@ -904,8 +932,6 @@ def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
     See Also
     --------
     sklearn.metrics.median_absolute_error
-    xarray.apply_ufunc
-    xskillscore.core.np_deterministic._median_absolute_error
 
     Examples
     --------
@@ -918,7 +944,7 @@ def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> median_absolute_error(a, b, dim='time')
     """
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
 
     return xr.apply_ufunc(
         _median_absolute_error,
@@ -932,8 +958,18 @@ def median_absolute_error(a, b, dim, skipna=False, keep_attrs=False):
     )
 
 
-def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Absolute Percentage Error.
+
+    .. math::
+        \\mathrm{MAPE} = \\frac{1}{n} \\sum_{i=1}^{n}
+                         \\frac{\\vert a_{i} - b_{i} \\vert}
+                               {\\vert a_{i} \\vert}
+
+    .. note::
+        The percent error is calculated in reference to ``a``. Percent
+        error is reported as decimal percent. I.e., a value of 1 is
+        100%.
 
     Parameters
     ----------
@@ -943,8 +979,8 @@ def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the mae along. Note that this dimension will
-        be reduced as a result.
+        The dimension(s) to apply mape along. Note that this dimension will
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -959,11 +995,6 @@ def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     -------
     xarray.Dataset or xarray.DataArray
         Mean Absolute Percentage Error.
-
-    See Also
-    --------
-    xarray.apply_ufunc
-    xskillscore.core.np_deterministic._mape
 
     References
     ----------
@@ -980,7 +1011,7 @@ def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> mape(a, b, dim='time')
     """
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
@@ -997,8 +1028,17 @@ def mape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def smape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
+def smape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Symmetric Mean Absolute Percentage Error.
+
+    .. math::
+        \\mathrm{SMAPE} = \\frac{1}{n} \\sum_{i=1}^{n}
+                          \\frac{ \\vert a_{i} - b_{i} \\vert }
+                          { \\vert a_{i} \\vert + \\vert b_{i} \\vert  }
+
+    .. note::
+        Percent error is reported as decimal percent. I.e., a value of 1 is
+        100%.
 
     Parameters
     ----------
@@ -1008,8 +1048,8 @@ def smape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the mae along. Note that this dimension will
-        be reduced as a result.
+        The dimension(s) to apply the smape along. Note that this dimension will
+        be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
@@ -1024,11 +1064,6 @@ def smape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
     -------
     xarray.Dataset or xarray.DataArray
         Symmetric Mean Absolute Percentage Error.
-
-    See Also
-    --------
-    xarray.apply_ufunc
-    xskillscore.core.np_deterministic._smape
 
     References
     ----------
@@ -1045,7 +1080,7 @@ def smape(a, b, dim, weights=None, skipna=False, keep_attrs=False):
                         dims=['time', 'x', 'y'])
     >>> smape(a, b, dim='time')
     """
-    dim, axis = _preprocess_dims(dim)
+    dim, axis = _preprocess_dims(dim, a)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
