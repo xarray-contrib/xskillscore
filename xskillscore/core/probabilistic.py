@@ -500,6 +500,7 @@ def reliability(
 ):
     """Returns the data required to construct the reliability diagram for an event; the relative frequencies \
             of occurrence of an event for a range of forecast probability bins
+
         Parameters
         ----------
         observations : xarray.Dataset or xarray.DataArray
