@@ -345,7 +345,7 @@ def threshold_brier_score(
 def rps(
     observations,
     forecasts,
-    bins,
+    category_edges,
     dim=None,
     weights=None,
     keep_attrs=False,
@@ -362,8 +362,8 @@ def rps(
         The observations or set of observations of the event.
     forecasts : xarray.Dataset or xarray.DataArray
         The forecasts for the event.
-    bins : array_like
-        Bin edges used to compute the histograms. Bins include the left most edge, \
+    category_edges : array_like
+        Category bin edges used to compute the CDFs. Bins include the left most edge, \
         but not the right.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``rps``.
@@ -391,20 +391,19 @@ def rps(
     # histogram(dim=[]) not allowed therefore add fake member dim to apply over when multi-dim observations
     if len(observations.dims) == 1:
         observations = histogram(
-            observations, bins=[bins], bin_names=bin_names, dim=None, weights=weights
+            observations, bins=[category_edges], bin_names=bin_names, dim=None
         )
     else:
         observations = histogram(
             observations.expand_dims(member_dim),
-            bins=[bins],
+            bins=[category_edges],
             bin_names=bin_names,
             dim=[member_dim],
-            weights=weights,
         )
     forecasts = histogram(
-        forecasts, bins=[bins], bin_names=bin_names, dim=[member_dim], weights=weights,
+        forecasts, bins=[category_edges], bin_names=bin_names, dim=[member_dim]
     )
-    # normalize f.sum()=1
+    # normalize f.sum()=1  # can remove this once density=True https://github.com/xgcm/xhistogram/pull/17
     forecasts = forecasts / forecasts.sum(bin_dim)
     observations = observations / observations.sum(bin_dim)
     # rps formula

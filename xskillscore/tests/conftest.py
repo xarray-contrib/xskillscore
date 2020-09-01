@@ -143,6 +143,6 @@ def weights_dask(weights):
 
 
 @pytest.fixture
-def bins():
-    """Bins between 0 and 1."""
+def category_edges():
+    """Category bin edges between 0 and 1."""
     return np.linspace(0, 1 + 1e-8, 6)
