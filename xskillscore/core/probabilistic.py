@@ -5,6 +5,7 @@ import properscoring
 import xarray as xr
 
 from .utils import (
+    _add_as_coord,
     _fail_if_dim_empty,
     _get_bin_centers,
     _preprocess_dims,
@@ -608,4 +609,4 @@ def reliability(
         {FORECAST_PROBABILITY_DIM: _get_bin_centers(probability_bin_edges)}
     )
 
-    return rel, samp
+    return _add_as_coord(rel, samp, coordinate_suffix='samples')

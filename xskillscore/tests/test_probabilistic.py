@@ -402,7 +402,7 @@ def test_reliability(o, f_prob, dim, obj):
         with pytest.raises(ValueError):
             reliability(o > 0.5, (f_prob > 0.5).mean('member'), dim)
     else:
-        rel, samp = reliability(o > 0.5, (f_prob > 0.5).mean('member'), dim=dim)
+        reliability(o > 0.5, (f_prob > 0.5).mean('member'), dim=dim)
 
 
 def test_reliability_values(o, f_prob):
@@ -411,31 +411,28 @@ def test_reliability_values(o, f_prob):
         for lat in f_prob.lat:
             o_1d = o.sel(lon=lon, lat=lat) > 0.5
             f_1d = (f_prob.sel(lon=lon, lat=lat) > 0.5).mean('member')
-            actual_rel, actual_samp = reliability(o_1d, f_1d)
-            expected_rel, _ = calibration_curve(
+            actual = reliability(o_1d, f_1d)
+            expected, _ = calibration_curve(
                 o_1d, f_1d, normalize=False, n_bins=5, strategy='uniform'
             )
-            npt.assert_allclose(
-                actual_rel.where(actual_rel.notnull(), drop=True), expected_rel
-            )
-            npt.assert_allclose(actual_samp.sum(), o_1d.size)
+            npt.assert_allclose(actual.where(actual.notnull(), drop=True), expected)
+            npt.assert_allclose(actual['samples'].sum(), o_1d.size)
 
 
 def test_reliability_perfect_values(o):
     """Test values for perfect forecast"""
     f_prob = xr.concat(10 * [o], dim='member')
-    actual, samples = reliability(o > 0.5, (f_prob > 0.5).mean('member'))
+    actual = reliability(o > 0.5, (f_prob > 0.5).mean('member'))
     expected_true_samples = (o > 0.5).sum()
     expected_false_samples = (o <= 0.5).sum()
     assert np.allclose(actual[0], 0)
     assert np.allclose(actual[-1], 1)
-    assert np.allclose(samples[0], expected_false_samples)
-    assert np.allclose(samples[-1], expected_true_samples)
-    assert np.allclose(samples.sum(), o.size)
+    assert np.allclose(actual['samples'][0], expected_false_samples)
+    assert np.allclose(actual['samples'][-1], expected_true_samples)
+    assert np.allclose(actual['samples'].sum(), o.size)
 
 
 def test_reliability_dask(o_dask, f_prob_dask):
     """Test that reliability returns dask array if provided dask array"""
-    actual, samples = reliability(o_dask > 0.5, (f_prob_dask > 0.5).mean('member'))
+    actual = reliability(o_dask > 0.5, (f_prob_dask > 0.5).mean('member'))
     assert actual.chunks is not None
-    assert samples.chunks is not None

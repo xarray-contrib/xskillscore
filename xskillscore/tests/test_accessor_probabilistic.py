@@ -129,19 +129,14 @@ def test_discrimination_accessor(o, f_prob, threshold, outer_bool):
 
 @pytest.mark.parametrize('outer_bool', [False, True])
 def test_reliability_accessor(o, f_prob, threshold, outer_bool):
-    rel_actual, samp_actual = reliability(
-        o > threshold, (f_prob > threshold).mean('member')
-    )
+    actual = reliability(o > threshold, (f_prob > threshold).mean('member'))
 
     ds = xr.Dataset()
     ds['o'] = o > threshold
     ds['f_prob'] = (f_prob > threshold).mean('member')
     if outer_bool:
         ds = ds.drop_vars('f_prob')
-        rel_expected, samp_expected = ds.xs.reliability(
-            'o', (f_prob > threshold).mean('member')
-        )
+        expected = ds.xs.reliability('o', (f_prob > threshold).mean('member'))
     else:
-        rel_expected, samp_expected = ds.xs.reliability('o', 'f_prob')
-    assert_allclose(rel_actual, rel_expected)
-    assert_allclose(samp_actual, samp_expected)
+        expected = ds.xs.reliability('o', 'f_prob')
+    assert_allclose(actual, expected)

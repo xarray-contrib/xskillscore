@@ -104,6 +104,20 @@ def _preprocess_weights(a, dim, new_dim, weights):
         return weights
 
 
+def _add_as_coord(ds1, ds2, coordinate_suffix):
+    """Add ds2 as a coordinate of ds1.
+        Assumes that ds1 and ds2 are the same type of xarray object
+    """
+    if isinstance(ds1, xr.Dataset):
+        for var in ds1.data_vars:
+            ds1 = ds1.assign_coords({f'{ds2[var].name}_{coordinate_suffix}': ds2[var]})
+    elif isinstance(ds1, xr.DataArray):
+        ds1 = ds1.assign_coords({coordinate_suffix: ds2})
+    else:
+        raise ValueError('Inputs ds1 and ds2 must be xarray objects')
+    return ds1
+
+
 def _get_bin_centers(bin_edges):
     """Return the arithmetic mean of the bin_edges
         """
