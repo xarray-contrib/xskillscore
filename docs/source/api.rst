@@ -56,6 +56,7 @@ Currently, most of our probabilistic metrics are ported over from
     threshold_brier_score
     rank_histogram
     discrimination
+    reliability
 
 Contingency-based Metrics
 -------------------------
