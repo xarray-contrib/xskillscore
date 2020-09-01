@@ -1,8 +1,10 @@
 import numpy as np
+import numpy.testing as npt
 import properscoring
 import pytest
 import xarray as xr
 from scipy.stats import norm
+from sklearn.calibration import calibration_curve
 from xarray.tests import assert_allclose, assert_identical
 
 from xskillscore.core.probabilistic import (
@@ -12,6 +14,7 @@ from xskillscore.core.probabilistic import (
     crps_quadrature,
     discrimination,
     rank_histogram,
+    reliability,
     threshold_brier_score,
 )
 
@@ -338,7 +341,7 @@ def test_rank_histogram_dask(o_dask, f_prob_dask):
 @pytest.mark.parametrize('dim', DIMS)
 @pytest.mark.parametrize('obj', ['da', 'ds', 'chunked_da', 'chunked_ds'])
 def test_discrimination_sum(o, f_prob, dim, obj):
-    """Test that the number of samples in the rank histogram is correct"""
+    """Test that the probabilities sum to 1"""
     if 'ds' in obj:
         name = 'var'
         o = o.to_dataset(name=name)
@@ -376,9 +379,63 @@ def test_discrimination_values(o):
 
 
 def test_discrimination_dask(o_dask, f_prob_dask):
-    """Test that rank_histogram returns dask array if provided dask array"""
+    """Test that discrimination returns dask array if provided dask array"""
     hist_event, hist_no_event = discrimination(
         o_dask > 0.5, (f_prob_dask > 0.5).mean('member')
     )
     assert hist_event.chunks is not None
     assert hist_no_event.chunks is not None
+
+
+@pytest.mark.parametrize('dim', DIMS)
+@pytest.mark.parametrize('obj', ['da', 'ds', 'chunked_da', 'chunked_ds'])
+def test_reliability(o, f_prob, dim, obj):
+    """Test that reliability object can be generated"""
+    if 'ds' in obj:
+        name = 'var'
+        o = o.to_dataset(name=name)
+        f_prob = f_prob.to_dataset(name=name)
+    if 'chunked' in obj:
+        o = o.chunk()
+        f_prob = f_prob.chunk()
+    if dim == []:
+        with pytest.raises(ValueError):
+            reliability(o > 0.5, (f_prob > 0.5).mean('member'), dim)
+    else:
+        rel, samp = reliability(o > 0.5, (f_prob > 0.5).mean('member'), dim=dim)
+
+
+def test_reliability_values(o, f_prob):
+    """Test 1D reliability values against sklearn calibration_curve"""
+    for lon in f_prob.lon:
+        for lat in f_prob.lat:
+            o_1d = o.sel(lon=lon, lat=lat) > 0.5
+            f_1d = (f_prob.sel(lon=lon, lat=lat) > 0.5).mean('member')
+            actual_rel, actual_samp = reliability(o_1d, f_1d)
+            expected_rel, _ = calibration_curve(
+                o_1d, f_1d, normalize=False, n_bins=5, strategy='uniform'
+            )
+            npt.assert_allclose(
+                actual_rel.where(actual_rel.notnull(), drop=True), expected_rel
+            )
+            npt.assert_allclose(actual_samp.sum(), o_1d.size)
+
+
+def test_reliability_perfect_values(o):
+    """Test values for perfect forecast"""
+    f_prob = xr.concat(10 * [o], dim='member')
+    actual, samples = reliability(o > 0.5, (f_prob > 0.5).mean('member'))
+    expected_true_samples = (o > 0.5).sum()
+    expected_false_samples = (o <= 0.5).sum()
+    assert np.allclose(actual[0], 0)
+    assert np.allclose(actual[-1], 1)
+    assert np.allclose(samples[0], expected_false_samples)
+    assert np.allclose(samples[-1], expected_true_samples)
+    assert np.allclose(samples.sum(), o.size)
+
+
+def test_reliability_dask(o_dask, f_prob_dask):
+    """Test that reliability returns dask array if provided dask array"""
+    actual, samples = reliability(o_dask > 0.5, (f_prob_dask > 0.5).mean('member'))
+    assert actual.chunks is not None
+    assert samples.chunks is not None

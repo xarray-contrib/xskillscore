@@ -18,7 +18,12 @@ from .np_deterministic import (
     _spearman_r_eff_p_value,
     _spearman_r_p_value,
 )
-from .utils import _preprocess_dims, _fail_if_dim_empty, _preprocess_weights, _stack_input_if_needed
+from .utils import (
+    _fail_if_dim_empty,
+    _preprocess_dims,
+    _preprocess_weights,
+    _stack_input_if_needed,
+)
 
 __all__ = [
     'pearson_r',

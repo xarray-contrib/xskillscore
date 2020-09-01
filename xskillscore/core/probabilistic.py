@@ -4,7 +4,13 @@ import numpy as np
 import properscoring
 import xarray as xr
 
-from .utils import _get_bin_centers, _preprocess_dims, _stack_input_if_needed, histogram
+from .utils import (
+    _fail_if_dim_empty,
+    _get_bin_centers,
+    _preprocess_dims,
+    _stack_input_if_needed,
+    histogram,
+)
 
 __all__ = [
     'brier_score',
@@ -464,11 +470,7 @@ def discrimination(
         See http://www.cawcr.gov.au/projects/verification/
     """
 
-    if dim is not None:
-        if len(dim) == 0:
-            raise ValueError(
-                'At least one dimension must be supplied to compute discrimination over'
-            )
+    _fail_if_dim_empty(dim)
 
     hist_event = histogram(
         forecasts.where(observations),
@@ -512,10 +514,8 @@ def reliability(
             Probability bin edges used to compute the reliability. Bins include the left most edge, \
             but not the right. Defaults to 6 equally spaced edges between 0 and 1+1e-8
         keep_attrs : bool
-            If True, the attributes (attrs) will be copied
-            from the first input to the new one.
-            If False (default), the new object will
-            be returned without attributes.
+            If True, the attributes (attrs) will be copied from the first input to the new one.
+            If False (default), the new object will be returned without attributes.
 
         Returns
         -------
@@ -556,12 +556,9 @@ def reliability(
             N = np.zeros_like(r)
 
         for i in range(len(bin_edges) - 1):
-            # Follow numpy: all but the last (righthand-most) bin is half-open
-            # https://numpy.org/doc/stable/reference/generated/numpy.histogram.html
-            if (i + 1) == len(bin_edges):
-                f_in_bin = (f >= bin_edges[i]) & (f <= bin_edges[i + 1])
-            else:
-                f_in_bin = (f >= bin_edges[i]) & (f < bin_edges[i + 1])
+            # Follow xhistogram: all bins are half-open
+            # https://github.com/xgcm/xhistogram/issues/18
+            f_in_bin = (f >= bin_edges[i]) & (f < bin_edges[i + 1])
             o_f_in_bin = o & f_in_bin
             N_f_in_bin = f_in_bin.sum(axis=-1)
             N_o_f_in_bin = o_f_in_bin.sum(axis=-1)
@@ -580,11 +577,13 @@ def reliability(
         else:
             return r, N
 
+    _fail_if_dim_empty(dim)
+
     # Compute over all dims if dim is None
     if dim is None:
-        dim = observations.dims
+        dim = list(observations.dims)
 
-    dim, _ = _preprocess_dims(dim)
+    dim, _ = _preprocess_dims(dim, observations)
     observations, forecasts, stack_dim, _ = _stack_input_if_needed(
         observations, forecasts, dim, weights=None
     )

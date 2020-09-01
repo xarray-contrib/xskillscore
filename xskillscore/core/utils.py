@@ -5,15 +5,16 @@ from xhistogram.xarray import histogram as xhist
 __all__ = ['histogram']
 
 
-def _preprocess_dims(dim):
+def _preprocess_dims(dim, a):
     """Preprocesses dimensions to prep for stacking.
-
     Parameters
     ----------
     dim : str, list
         The dimension(s) to apply the function along.
     """
-    if isinstance(dim, str):
+    if dim is None:
+        dim = list(a.dims)
+    elif isinstance(dim, str):
         dim = [dim]
     axis = tuple(range(-1, -len(dim) - 1, -1))
     return dim, axis
@@ -24,13 +25,13 @@ def _fail_if_dim_empty(dim):
         raise ValueError(
             'metric must be applied along one dimension, therefore '
             f'requires `dim` not being empty, found dim={dim}'
+        )
 
 
 def _stack_input_if_needed(a, b, dim, weights):
     """
-    Stack input arrays a, b if needed.
+    Stack input arrays a, b if needed in correlation metrics.
     Adapt dim and weights accordingly.
-
     Parameters
     ----------
     a : xarray.Dataset or xarray.DataArray
@@ -38,10 +39,9 @@ def _stack_input_if_needed(a, b, dim, weights):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : list
-        The dimension(s) to apply the metric along.
+        The dimension(s) to apply the correlation along.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
-
     Returns
     -------
     a : xarray.Dataset or xarray.DataArray stacked with new_dim
@@ -49,7 +49,7 @@ def _stack_input_if_needed(a, b, dim, weights):
     b : xarray.Dataset or xarray.DataArray stacked with new_dim
         Labeled array(s) over which to apply the function.
     new_dim : str
-        The dimension(s) to apply the metric along.
+        The dimension(s) to apply the correlation along.
     weights : xarray.Dataset or xarray.DataArray stacked with new_dim or None
         Weights matching dimensions of ``dim`` to apply during the function.
     """
@@ -66,7 +66,6 @@ def _stack_input_if_needed(a, b, dim, weights):
 
 def _preprocess_weights(a, dim, new_dim, weights):
     """Preprocesses weights array to prepare for numpy computation.
-
     Parameters
     ----------
     a : xarray.Dataset or xarray.DataArray
