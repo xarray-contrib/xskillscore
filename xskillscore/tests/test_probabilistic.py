@@ -12,6 +12,7 @@ from xskillscore.core.probabilistic import (
     crps_quadrature,
     discrimination,
     rank_histogram,
+    rps,
     threshold_brier_score,
 )
 
@@ -365,8 +366,9 @@ def test_discrimination_sum(o, f_prob, dim, obj):
         assert np.allclose(hist_no_event_sum[~np.isnan(hist_no_event_sum)], 1)
 
 
-def test_discrimination_values(o):
-    """Test values for perfect forecast"""
+def test_discrimination_perfect_values(o):
+    """Test values for perfect forecast
+    """
     f = xr.concat(10 * [o], dim='member')
     hist_event, hist_no_event = discrimination(o > 0.5, (f > 0.5).mean('member'))
     assert np.allclose(hist_event[-1], 1)
@@ -382,3 +384,53 @@ def test_discrimination_dask(o_dask, f_prob_dask):
     )
     assert hist_event.chunks is not None
     assert hist_no_event.chunks is not None
+
+
+def test_rps_dask(o_dask, f_prob_dask, category_edges):
+    """Test that rps returns dask array if provided dask array
+    """
+    assert rps(o_dask, f_prob_dask, category_edges=category_edges).chunks is not None
+
+
+def test_rps_perfect_values(o, category_edges):
+    """Test values for perfect forecast
+    """
+    f = xr.concat(10 * [o], dim='member')
+    res = rps(o, f, category_edges=category_edges)
+    assert (res == 0).all()
+
+
+@pytest.mark.parametrize('dim', DIMS)
+@pytest.mark.parametrize('obj', ['da', 'ds', 'chunked_da', 'chunked_ds'])
+def test_rps(o, f_prob, category_edges, dim, obj):
+    """Test that"""
+    if 'ds' in obj:
+        name = 'var'
+        o = o.to_dataset(name=name)
+        f_prob = f_prob.to_dataset(name=name)
+    if 'chunked' in obj:
+        o = o.chunk()
+        f_prob = f_prob.chunk()
+    actual = rps(o, f_prob, category_edges=category_edges, dim=dim)
+    assert_only_dim_reduced(dim, actual, o)
+
+
+def test_rps_wilks_example():
+    """Test with values from Wilks, D. S. (2006). Statistical methods in the
+    atmospheric sciences (2nd ed, Vol. 91). Amsterdam ; Boston: Academic Press. p.301
+    """
+    category_edges = np.array([-0.01, 0.01, 0.24, 10])
+    Obs = xr.DataArray([0.0001])
+    F1 = xr.DataArray([0] * 2 + [0.1] * 5 + [0.3] * 3, dims='member')
+    F2 = xr.DataArray([0] * 2 + [0.1] * 3 + [0.3] * 5, dims='member')
+    np.testing.assert_allclose(rps(Obs, F2, category_edges), 0.89)
+    np.testing.assert_allclose(rps(Obs, F1, category_edges), 0.73)
+
+
+def test_2_category_rps_equals_brier_score(o, f_prob):
+    """Test that RPS for two categories equals the Brier Score."""
+    category_edges = np.array([0.0, 0.5, 1.0])
+    assert_allclose(
+        rps(o, f_prob, category_edges=category_edges, dim=None),
+        brier_score(o > 0.5, (f_prob > 0.5).mean('member'), dim=None),
+    )
