@@ -219,6 +219,7 @@ def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
@@ -308,6 +309,7 @@ def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
 
@@ -370,6 +372,7 @@ def pearson_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fal
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
     input_core_dims = _determine_input_core_dims(new_dim, weights)
@@ -451,6 +454,8 @@ def effective_sample_size(a, b, dim='time', skipna=False, keep_attrs=False):
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
+
     if len(dim) > 1:
         raise ValueError(
             'Effective sample size should only be applied to a singular time dimension.'
@@ -551,6 +556,8 @@ def pearson_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
+
     if len(dim) > 1:
         raise ValueError(
             'Effective sample size should only be applied to a singular time dimension.'
@@ -624,6 +631,7 @@ def spearman_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
     input_core_dims = _determine_input_core_dims(new_dim, weights)
@@ -685,6 +693,7 @@ def spearman_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fa
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
     a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
     weights = _preprocess_weights(a, dim, new_dim, weights)
     input_core_dims = _determine_input_core_dims(new_dim, weights)
@@ -780,6 +789,8 @@ def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
+
     if len(dim) > 1:
         raise ValueError(
             'Effective sample size should only be applied to a singular time dimension.'
@@ -854,6 +865,7 @@ def rmse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     >>> rmse(a, b, dim='time')
     """
     dim, axis = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
@@ -920,6 +932,7 @@ def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     >>> mse(a, b, dim='time')
     """
     dim, axis = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
@@ -986,6 +999,7 @@ def mae(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     >>> mae(a, b, dim='time')
     """
     dim, axis = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
@@ -1047,6 +1061,7 @@ def median_absolute_error(a, b, dim=None, skipna=False, keep_attrs=False):
     >>> median_absolute_error(a, b, dim='time')
     """
     dim, axis = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
 
     return xr.apply_ufunc(
         _median_absolute_error,
@@ -1114,6 +1129,7 @@ def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     >>> mape(a, b, dim='time')
     """
     dim, axis = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
@@ -1183,6 +1199,7 @@ def smape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     >>> smape(a, b, dim='time')
     """
     dim, axis = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 

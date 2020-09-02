@@ -307,3 +307,16 @@ def test_dim_empty_list(a, b, metrics):
         metric, _metric = metrics
         res = metric(a, b, dim=[])
         assert len(res.dims) == len(a.dims), print(res.dims)
+
+
+@pytest.mark.parametrize('metrics', correlation_metrics)
+def test_correlation_broadcasts(a, b, metrics):
+    """Test whether correlation metric broadcasts dimensions other than dim."""
+    # unpack metrics
+    metric, _metric = metrics
+    metric(a, b.isel(lat=0), dim='time')
+    metric(a, b.isel(lat=[0]), dim='time')
+    b_changed_coords = b.isel(lat=[0]).assign_coords(lat=[123])
+    with pytest.raises(ValueError) as e:
+        metric(a, b_changed_coords, dim='lat')
+    assert 'indexes along dimension' in str(e.value)
