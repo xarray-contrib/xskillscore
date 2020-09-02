@@ -22,6 +22,7 @@ __all__ = [
     'rank_histogram',
     'discrimination',
     'reliability',
+    'rps',
 ]
 
 FORECAST_PROBABILITY_DIM = 'forecast_probability'
@@ -40,9 +41,9 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
         The standard deviation of the forecast distribution.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``crps_gaussian``.
-        Defaults to None implying averaging.
+        Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -104,9 +105,9 @@ def crps_quadrature(
     xmin, xmax, tol: see properscoring.crps_quadrature
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``crps_quadrature``.
-        Defaults to None implying averaging.
+        Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -169,9 +170,9 @@ def crps_ensemble(
         Name of ensemble member dimension. By default, 'member'.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``crps_ensemble``.
-        Defaults to None implying averaging.
+        Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -205,8 +206,8 @@ def crps_ensemble(
 def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=False):
     """Calculate Brier score (BS).
 
-    ..math:
-        BS(p, k) = (p_1 - k)^2
+    .. math:
+        BS(p, k) = (p_1 - k)^{2}
 
     Parameters
     ----------
@@ -217,9 +218,9 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
         The forecast likelihoods of the event. Data should be between 0 and 1.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``brier_score``.
-        Defaults to None implying averaging.
+        Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -286,14 +287,13 @@ def threshold_brier_score(
         Name of ensemble member dimension. By default, 'member'.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``threshold_brier_score``.
-        Defaults to None implying averaging.
+        Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no mean is applied.
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is
+        applied.
     keep_attrs : bool
-        If True, the attributes (attrs) will be copied
-        from the first input to the new one.
-        If False (default), the new object will
-        be returned without attributes.
+        If True, the attributes (attrs) will be copied from the first input to the new
+        one. If False (default), the new object will be returned without attributes.
 
     Returns
     -------
@@ -349,6 +349,77 @@ def threshold_brier_score(
         return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
         return res.mean(dim, keep_attrs=keep_attrs)
+
+
+def rps(
+    observations,
+    forecasts,
+    category_edges,
+    dim=None,
+    weights=None,
+    keep_attrs=False,
+    member_dim='member',
+):
+    """Calculate Ranked Probability Score.
+
+     .. math::
+        RPS(p, k) = 1/M \\sum_{m=1}^{M} [(\\sum_{k=1}^{m} p_k) - (\\sum_{k=1}^{m} o_k)]^{2}
+
+    Parameters
+    ----------
+    observations : xarray.Dataset or xarray.DataArray
+        The observations or set of observations of the event.
+    forecasts : xarray.Dataset or xarray.DataArray
+        The forecasts for the event.
+    category_edges : array_like
+        Category bin edges used to compute the CDFs. Bins include the left most edge, \
+        but not the right.
+    dim : str or list of str, optional
+        Dimension over which to compute mean after computing ``rps``.
+        Defaults to None implying averaging over all dimensions.
+    weights : xr.DataArray with dimensions from dim, optional
+        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is
+        applied.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied from the first input to the new
+        one. If False (default), the new object will be returned without attributes.
+    member_dim : str, optional
+        Name of ensemble member dimension. By default, 'member'.
+
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray:
+        ranked probability score
+
+    References
+    ----------
+    https://www.cawcr.gov.au/projects/verification/verif_web_page.html#RPS
+    """
+    bin_names = ['category']
+    bin_dim = f'{bin_names[0]}_bin'
+    # histogram(dim=[]) not allowed therefore add fake member dim to apply over when multi-dim observations
+    if len(observations.dims) == 1:
+        observations = histogram(
+            observations, bins=[category_edges], bin_names=bin_names, dim=None
+        )
+    else:
+        observations = histogram(
+            observations.expand_dims(member_dim),
+            bins=[category_edges],
+            bin_names=bin_names,
+            dim=[member_dim],
+        )
+    forecasts = histogram(
+        forecasts, bins=[category_edges], bin_names=bin_names, dim=[member_dim]
+    )
+    # normalize f.sum()=1  # can remove this once density=True https://github.com/xgcm/xhistogram/pull/17
+    forecasts = forecasts / forecasts.sum(bin_dim)
+    observations = observations / observations.sum(bin_dim)
+    # rps formula
+    res = ((observations.cumsum(bin_dim) - forecasts.cumsum(bin_dim)) ** 2).sum(bin_dim)
+    if weights is not None:
+        res = res.weighted(weights)
+    return res.mean(dim, keep_attrs=keep_attrs)
 
 
 def rank_histogram(observations, forecasts, dim=None, member_dim='member'):

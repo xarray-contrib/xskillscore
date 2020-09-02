@@ -27,6 +27,7 @@ from .core.probabilistic import (
     discrimination,
     rank_histogram,
     reliability,
+    rps,
     threshold_brier_score,
 )
 from .versioning.print_versions import show_versions

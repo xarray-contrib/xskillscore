@@ -25,6 +25,7 @@ from .probabilistic import (
     discrimination,
     rank_histogram,
     reliability,
+    rps,
     threshold_brier_score,
 )
 
@@ -143,6 +144,11 @@ class XSkillScoreAccessor(object):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
         return brier_score(observations, forecasts, *args, **kwargs)
+
+    def rps(self, observations, forecasts, *args, **kwargs):
+        observations = self._in_ds(observations)
+        forecasts = self._in_ds(forecasts)
+        return rps(observations, forecasts, *args, **kwargs)
 
     def rank_histogram(self, observations, forecasts, *args, **kwargs):
         observations = self._in_ds(observations)
