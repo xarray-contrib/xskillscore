@@ -385,21 +385,6 @@ def test_discrimination_dask(o_dask, f_prob_dask):
     assert disc.chunks is not None
 
 
-def test_rps_dask(o_dask, f_prob_dask, category_edges):
-    """Test that rps returns dask array if provided dask array
-    """
-    assert rps(o_dask, f_prob_dask, category_edges=category_edges).chunks is not None
-
-
-def test_rps_perfect_values(o, category_edges):
-    """Test values for perfect forecast
-    """
-    f = xr.concat(10 * [o], dim='member')
-    res = rps(o, f, category_edges=category_edges)
-    assert (res == 0).all()
-
-
-
 @pytest.mark.parametrize('dim', DIMS)
 @pytest.mark.parametrize('obj', ['da', 'ds', 'chunked_da', 'chunked_ds'])
 def test_reliability(o, f_prob, dim, obj):
@@ -479,3 +464,16 @@ def test_2_category_rps_equals_brier_score(o, f_prob):
         brier_score(o > 0.5, (f_prob > 0.5).mean('member'), dim=None),
     )
 
+
+def test_rps_perfect_values(o, category_edges):
+    """Test values for perfect forecast
+    """
+    f = xr.concat(10 * [o], dim='member')
+    res = rps(o, f, category_edges=category_edges)
+    assert (res == 0).all()
+
+
+def test_rps_dask(o_dask, f_prob_dask, category_edges):
+    """Test that rps returns dask array if provided dask array
+    """
+    assert rps(o_dask, f_prob_dask, category_edges=category_edges).chunks is not None

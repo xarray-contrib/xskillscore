@@ -134,19 +134,20 @@ def test_reliability_accessor(o, f_prob, threshold, outer_bool):
         expected = ds.xs.reliability('o', (f_prob > threshold).mean('member'))
     else:
         expected = ds.xs.reliability('o', 'f_prob')
+    assert_allclose(actual, expected)
 
 
 @pytest.mark.parametrize('outer_bool', [False, True])
 def test_rps_accessor(o, f_prob, outer_bool):
     category_edges = np.linspace(0, 1 + 1e-8, 6)
-    expected = rps(o, f_prob, category_edges=category_edges)
+    actual = rps(o, f_prob, category_edges=category_edges)
 
     ds = xr.Dataset()
     ds['o'] = o
     ds['f_prob'] = f_prob
     if outer_bool:
         ds = ds.drop_vars('f_prob')
-        actual = ds.xs.rps('o', f_prob, category_edges=category_edges)
+        expected = ds.xs.rps('o', f_prob, category_edges=category_edges)
     else:
-        actual = ds.xs.rps('o', 'f_prob', category_edges=category_edges)
+        expected = ds.xs.rps('o', 'f_prob', category_edges=category_edges)
     assert_allclose(actual, expected)
