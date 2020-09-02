@@ -481,12 +481,12 @@ def discrimination(
     ) / (observations).sum(dim=dim)
 
     hist_no_event = histogram(
-        forecasts.where(xr.ufuncs.logical_not(observations)),
+        forecasts.where(np.logical_not(observations)),
         bins=[probability_bin_edges],
         bin_names=[FORECAST_PROBABILITY_DIM],
         bin_dim_suffix='',
         dim=dim,
-    ) / (xr.ufuncs.logical_not(observations)).sum(dim=dim)
+    ) / (np.logical_not(observations)).sum(dim=dim)
 
     return xr.concat([hist_event, hist_no_event], dim='event').assign_coords(
         {'event': [True, False]}
