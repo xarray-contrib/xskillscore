@@ -353,16 +353,15 @@ def test_discrimination_sum(o, f_prob, dim, obj):
         with pytest.raises(ValueError):
             discrimination(o > 0.5, (f_prob > 0.5).mean('member'), dim=dim)
     else:
-        hist_event, hist_no_event = discrimination(
-            o > 0.5, (f_prob > 0.5).mean('member'), dim=dim
-        )
+        disc = discrimination(o > 0.5, (f_prob > 0.5).mean('member'), dim=dim)
         if 'ds' in obj:
-            hist_event = hist_event[name]
-            hist_no_event = hist_no_event[name]
-        hist_event_sum = hist_event.sum('forecast_probability', skipna=False).values
-        hist_no_event_sum = hist_no_event.sum(
-            'forecast_probability', skipna=False
-        ).values
+            disc = disc[name]
+        hist_event_sum = (
+            disc.sel(event=True).sum('forecast_probability', skipna=False).values
+        )
+        hist_no_event_sum = (
+            disc.sel(event=False).sum('forecast_probability', skipna=False).values
+        )
         # Note, xarray's assert_allclose is already imported but won't compare to scalar
         assert np.allclose(hist_event_sum[~np.isnan(hist_event_sum)], 1)
         assert np.allclose(hist_no_event_sum[~np.isnan(hist_no_event_sum)], 1)
@@ -371,20 +370,17 @@ def test_discrimination_sum(o, f_prob, dim, obj):
 def test_discrimination_values(o):
     """Test values for perfect forecast"""
     f = xr.concat(10 * [o], dim='member')
-    hist_event, hist_no_event = discrimination(o > 0.5, (f > 0.5).mean('member'))
-    assert np.allclose(hist_event[-1], 1)
-    assert np.allclose(hist_event[:-1], 0)
-    assert np.allclose(hist_no_event[0], 1)
-    assert np.allclose(hist_no_event[1:], 0)
+    disc = discrimination(o > 0.5, (f > 0.5).mean('member'))
+    assert np.allclose(disc.sel(event=True)[-1], 1)
+    assert np.allclose(disc.sel(event=True)[:-1], 0)
+    assert np.allclose(disc.sel(event=False)[0], 1)
+    assert np.allclose(disc.sel(event=False)[1:], 0)
 
 
 def test_discrimination_dask(o_dask, f_prob_dask):
     """Test that discrimination returns dask array if provided dask array"""
-    hist_event, hist_no_event = discrimination(
-        o_dask > 0.5, (f_prob_dask > 0.5).mean('member')
-    )
-    assert hist_event.chunks is not None
-    assert hist_no_event.chunks is not None
+    disc = discrimination(o_dask > 0.5, (f_prob_dask > 0.5).mean('member'))
+    assert disc.chunks is not None
 
 
 @pytest.mark.parametrize('dim', DIMS)

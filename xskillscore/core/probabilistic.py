@@ -449,9 +449,8 @@ def discrimination(
         Returns
         -------
         xarray.Dataset or xarray.DataArray
-            Histogram of forecast probabilities when the event was observed
-        xarray.Dataset or xarray.DataArray
-            Histogram of forecast probabilities when the event was not observed
+            Array with added dimension "event" containing the histograms of forecast probabilities \
+            when the event was observed and not observed
 
         Examples
         --------
@@ -464,7 +463,7 @@ def discrimination(
         ...                                  ('member', np.arange(10))])
         >>> forecast_event_likelihood = (forecasts > 0).mean('member')
         >>> observed_event = observations > 0
-        >>> hist_event, hist_no_event = discrimination(observed_event, forecast_event_likelihood, dim=['x','y'])
+        >>> disc = discrimination(observed_event, forecast_event_likelihood, dim=['x','y'])
 
         Notes
         -----
@@ -489,7 +488,9 @@ def discrimination(
         dim=dim,
     ) / (xr.ufuncs.logical_not(observations)).sum(dim=dim)
 
-    return hist_event, hist_no_event
+    return xr.concat([hist_event, hist_no_event], dim='event').assign_coords(
+        {'event': [True, False]}
+    )
 
 
 def reliability(
@@ -527,8 +528,6 @@ def reliability(
         -------
         xarray.Dataset or xarray.DataArray
             The relative frequency of occurrence for each probability bin
-        xarray.Dataset or xarray.DataArray
-            The sample size of each probability bin
 
         Examples
         --------
@@ -539,7 +538,7 @@ def reliability(
         >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
         ...                            coords=[('x', np.arange(3)),
         ...                                    ('y', np.arange(3))])
-        >>> rel, samples = reliability(observations > 0.1, (forecasts > 0.1).mean('ensemble'), dim='x')
+        >>> rel = reliability(observations > 0.1, (forecasts > 0.1).mean('ensemble'), dim='x')
 
         Notes
         -----
