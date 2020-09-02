@@ -27,6 +27,7 @@ Features
 - Added ``reliability`` to probabilistic metrics (:pr:`164`). `Dougie Squire`_
 - Added ``dim`` and ``weights`` for probabilistic metrics. (:pr:`121`) `Aaron Spring`_
 - Added ``keep_attrs`` for all metrics. (:pr:`122`) `Andrew Huang`_
+- Added ranked probability score ``rps``. (:pr:`163`) `Aaron Spring`_
 
 Breaking Changes
 ----------------
