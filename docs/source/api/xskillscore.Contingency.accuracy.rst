@@ -1,4 +1,4 @@
-xskillscore.Contingency.accuracy
+﻿xskillscore.Contingency.accuracy
 ================================
 
 .. currentmodule:: xskillscore

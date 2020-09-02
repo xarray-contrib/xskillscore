@@ -1,6 +1,6 @@
-﻿xskillscore.spearman\_r
+xskillscore.reliability
 =======================
 
 .. currentmodule:: xskillscore
 
-.. autofunction:: spearman_r
+.. autofunction:: reliability

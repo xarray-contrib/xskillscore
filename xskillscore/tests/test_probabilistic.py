@@ -1,8 +1,10 @@
 import numpy as np
+import numpy.testing as npt
 import properscoring
 import pytest
 import xarray as xr
 from scipy.stats import norm
+from sklearn.calibration import calibration_curve
 from xarray.tests import assert_allclose, assert_identical
 
 from xskillscore.core.probabilistic import (
@@ -12,6 +14,7 @@ from xskillscore.core.probabilistic import (
     crps_quadrature,
     discrimination,
     rank_histogram,
+    reliability,
     rps,
     threshold_brier_score,
 )
@@ -339,7 +342,7 @@ def test_rank_histogram_dask(o_dask, f_prob_dask):
 @pytest.mark.parametrize('dim', DIMS)
 @pytest.mark.parametrize('obj', ['da', 'ds', 'chunked_da', 'chunked_ds'])
 def test_discrimination_sum(o, f_prob, dim, obj):
-    """Test that the number of samples in the rank histogram is correct"""
+    """Test that the probabilities sum to 1"""
     if 'ds' in obj:
         name = 'var'
         o = o.to_dataset(name=name)
@@ -351,16 +354,15 @@ def test_discrimination_sum(o, f_prob, dim, obj):
         with pytest.raises(ValueError):
             discrimination(o > 0.5, (f_prob > 0.5).mean('member'), dim=dim)
     else:
-        hist_event, hist_no_event = discrimination(
-            o > 0.5, (f_prob > 0.5).mean('member'), dim=dim
-        )
+        disc = discrimination(o > 0.5, (f_prob > 0.5).mean('member'), dim=dim)
         if 'ds' in obj:
-            hist_event = hist_event[name]
-            hist_no_event = hist_no_event[name]
-        hist_event_sum = hist_event.sum('forecast_probability', skipna=False).values
-        hist_no_event_sum = hist_no_event.sum(
-            'forecast_probability', skipna=False
-        ).values
+            disc = disc[name]
+        hist_event_sum = (
+            disc.sel(event=True).sum('forecast_probability', skipna=False).values
+        )
+        hist_no_event_sum = (
+            disc.sel(event=False).sum('forecast_probability', skipna=False).values
+        )
         # Note, xarray's assert_allclose is already imported but won't compare to scalar
         assert np.allclose(hist_event_sum[~np.isnan(hist_event_sum)], 1)
         assert np.allclose(hist_no_event_sum[~np.isnan(hist_no_event_sum)], 1)
@@ -370,40 +372,23 @@ def test_discrimination_perfect_values(o):
     """Test values for perfect forecast
     """
     f = xr.concat(10 * [o], dim='member')
-    hist_event, hist_no_event = discrimination(o > 0.5, (f > 0.5).mean('member'))
-    assert np.allclose(hist_event[-1], 1)
-    assert np.allclose(hist_event[:-1], 0)
-    assert np.allclose(hist_no_event[0], 1)
-    assert np.allclose(hist_no_event[1:], 0)
+    disc = discrimination(o > 0.5, (f > 0.5).mean('member'))
+    assert np.allclose(disc.sel(event=True)[-1], 1)
+    assert np.allclose(disc.sel(event=True)[:-1], 0)
+    assert np.allclose(disc.sel(event=False)[0], 1)
+    assert np.allclose(disc.sel(event=False)[1:], 0)
 
 
 def test_discrimination_dask(o_dask, f_prob_dask):
-    """Test that rank_histogram returns dask array if provided dask array"""
-    hist_event, hist_no_event = discrimination(
-        o_dask > 0.5, (f_prob_dask > 0.5).mean('member')
-    )
-    assert hist_event.chunks is not None
-    assert hist_no_event.chunks is not None
-
-
-def test_rps_dask(o_dask, f_prob_dask, category_edges):
-    """Test that rps returns dask array if provided dask array
-    """
-    assert rps(o_dask, f_prob_dask, category_edges=category_edges).chunks is not None
-
-
-def test_rps_perfect_values(o, category_edges):
-    """Test values for perfect forecast
-    """
-    f = xr.concat(10 * [o], dim='member')
-    res = rps(o, f, category_edges=category_edges)
-    assert (res == 0).all()
+    """Test that discrimination returns dask array if provided dask array"""
+    disc = discrimination(o_dask > 0.5, (f_prob_dask > 0.5).mean('member'))
+    assert disc.chunks is not None
 
 
 @pytest.mark.parametrize('dim', DIMS)
 @pytest.mark.parametrize('obj', ['da', 'ds', 'chunked_da', 'chunked_ds'])
-def test_rps(o, f_prob, category_edges, dim, obj):
-    """Test that"""
+def test_reliability(o, f_prob, dim, obj):
+    """Test that reliability object can be generated"""
     if 'ds' in obj:
         name = 'var'
         o = o.to_dataset(name=name)
@@ -411,6 +396,50 @@ def test_rps(o, f_prob, category_edges, dim, obj):
     if 'chunked' in obj:
         o = o.chunk()
         f_prob = f_prob.chunk()
+    if dim == []:
+        with pytest.raises(ValueError):
+            reliability(o > 0.5, (f_prob > 0.5).mean('member'), dim)
+    else:
+        reliability(o > 0.5, (f_prob > 0.5).mean('member'), dim=dim)
+
+
+def test_reliability_values(o, f_prob):
+    """Test 1D reliability values against sklearn calibration_curve"""
+    for lon in f_prob.lon:
+        for lat in f_prob.lat:
+            o_1d = o.sel(lon=lon, lat=lat) > 0.5
+            f_1d = (f_prob.sel(lon=lon, lat=lat) > 0.5).mean('member')
+            actual = reliability(o_1d, f_1d)
+            expected, _ = calibration_curve(
+                o_1d, f_1d, normalize=False, n_bins=5, strategy='uniform'
+            )
+            npt.assert_allclose(actual.where(actual.notnull(), drop=True), expected)
+            npt.assert_allclose(actual['samples'].sum(), o_1d.size)
+
+
+def test_reliability_perfect_values(o):
+    """Test values for perfect forecast"""
+    f_prob = xr.concat(10 * [o], dim='member')
+    actual = reliability(o > 0.5, (f_prob > 0.5).mean('member'))
+    expected_true_samples = (o > 0.5).sum()
+    expected_false_samples = (o <= 0.5).sum()
+    assert np.allclose(actual[0], 0)
+    assert np.allclose(actual[-1], 1)
+    assert np.allclose(actual['samples'][0], expected_false_samples)
+    assert np.allclose(actual['samples'][-1], expected_true_samples)
+    assert np.allclose(actual['samples'].sum(), o.size)
+
+
+def test_reliability_dask(o_dask, f_prob_dask):
+    """Test that reliability returns dask array if provided dask array"""
+    actual = reliability(o_dask > 0.5, (f_prob_dask > 0.5).mean('member'))
+    assert actual.chunks is not None
+
+
+@pytest.mark.parametrize('dim', DIMS)
+@pytest.mark.parametrize('obj', ['da', 'ds', 'chunked_da', 'chunked_ds'])
+def test_rps(o, f_prob, category_edges, dim, obj):
+    """Test that rps reduced dim and works for (chunked) ds and da"""
     actual = rps(o, f_prob, category_edges=category_edges, dim=dim)
     assert_only_dim_reduced(dim, actual, o)
 
@@ -434,3 +463,17 @@ def test_2_category_rps_equals_brier_score(o, f_prob):
         rps(o, f_prob, category_edges=category_edges, dim=None),
         brier_score(o > 0.5, (f_prob > 0.5).mean('member'), dim=None),
     )
+
+
+def test_rps_perfect_values(o, category_edges):
+    """Test values for perfect forecast
+    """
+    f = xr.concat(10 * [o], dim='member')
+    res = rps(o, f, category_edges=category_edges)
+    assert (res == 0).all()
+
+
+def test_rps_dask(o_dask, f_prob_dask, category_edges):
+    """Test that rps returns dask array if provided dask array
+    """
+    assert rps(o_dask, f_prob_dask, category_edges=category_edges).chunks is not None

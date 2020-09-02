@@ -1,9 +1,17 @@
 import bottleneck as bn
+import dask.array as darray
 import numpy as np
 import properscoring
 import xarray as xr
 
-from .utils import histogram
+from .utils import (
+    _add_as_coord,
+    _fail_if_dim_empty,
+    _get_bin_centers,
+    _preprocess_dims,
+    _stack_input_if_needed,
+    histogram,
+)
 
 __all__ = [
     'brier_score',
@@ -13,6 +21,7 @@ __all__ = [
     'threshold_brier_score',
     'rank_histogram',
     'discrimination',
+    'reliability',
     'rps',
 ]
 
@@ -511,9 +520,8 @@ def discrimination(
         Returns
         -------
         xarray.Dataset or xarray.DataArray
-            Histogram of forecast probabilities when the event was observed
-        xarray.Dataset or xarray.DataArray
-            Histogram of forecast probabilities when the event was not observed
+            Array with added dimension "event" containing the histograms of forecast probabilities \
+            when the event was observed and not observed
 
         Examples
         --------
@@ -526,18 +534,14 @@ def discrimination(
         ...                                  ('member', np.arange(10))])
         >>> forecast_event_likelihood = (forecasts > 0).mean('member')
         >>> observed_event = observations > 0
-        >>> hist_event, hist_no_event = discrimination(observed_event, forecast_event_likelihood, dim=['x','y'])
+        >>> disc = discrimination(observed_event, forecast_event_likelihood, dim=['x','y'])
 
         Notes
         -----
         See http://www.cawcr.gov.au/projects/verification/
     """
 
-    if dim is not None:
-        if len(dim) == 0:
-            raise ValueError(
-                'At least one dimension must be supplied to compute discrimination over'
-            )
+    _fail_if_dim_empty(dim)
 
     hist_event = histogram(
         forecasts.where(observations),
@@ -548,11 +552,132 @@ def discrimination(
     ) / (observations).sum(dim=dim)
 
     hist_no_event = histogram(
-        forecasts.where(xr.ufuncs.logical_not(observations)),
+        forecasts.where(np.logical_not(observations)),
         bins=[probability_bin_edges],
         bin_names=[FORECAST_PROBABILITY_DIM],
         bin_dim_suffix='',
         dim=dim,
-    ) / (xr.ufuncs.logical_not(observations)).sum(dim=dim)
+    ) / (np.logical_not(observations)).sum(dim=dim)
 
-    return hist_event, hist_no_event
+    return xr.concat([hist_event, hist_no_event], dim='event').assign_coords(
+        {'event': [True, False]}
+    )
+
+
+def reliability(
+    observations,
+    forecasts,
+    dim=None,
+    probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
+    keep_attrs=False,
+):
+    """Returns the data required to construct the reliability diagram for an event; the relative frequencies \
+            of occurrence of an event for a range of forecast probability bins
+
+        Parameters
+        ----------
+        observations : xarray.Dataset or xarray.DataArray
+            The observations or set of observations of the event. Data should be boolean or logical \
+            (True or 1 for event occurance, False or 0 for non-occurance).
+        forecasts : xarray.Dataset or xarray.DataArray
+            The forecast likelihoods of the event. Data should be between 0 and 1.
+        dim : str or list of str, optional
+            Dimension(s) over which to compute the histograms
+            Defaults to None meaning compute over all dimensions.
+        probability_bin_edges : array_like, optional
+            Probability bin edges used to compute the reliability. Bins include the left most edge, \
+            but not the right. Defaults to 6 equally spaced edges between 0 and 1+1e-8
+        keep_attrs : bool, optional
+            If True, the attributes (attrs) will be copied from the first input to the new one.
+            If False (default), the new object will be returned without attributes.
+
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            The relative frequency of occurrence for each probability bin
+
+        Examples
+        --------
+        >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+        ...                          coords=[('x', np.arange(3)),
+        ...                                  ('y', np.arange(3)),
+        ...                                  ('member', np.arange(3))])
+        >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+        ...                            coords=[('x', np.arange(3)),
+        ...                                    ('y', np.arange(3))])
+        >>> rel = reliability(observations > 0.1, (forecasts > 0.1).mean('ensemble'), dim='x')
+
+        Notes
+        -----
+        See http://www.cawcr.gov.au/projects/verification/
+    """
+
+    def _reliability(o, f, bin_edges):
+        """Return the reliability and number of samples per bin
+        """
+        # I couldn't get dask='parallelized' working in this case so dealing with dask arrays explicitly
+        is_dask_array = isinstance(o, darray.core.Array) | isinstance(
+            f, darray.core.Array
+        )
+
+        if is_dask_array:
+            r = []
+            N = []
+        else:
+            r = np.zeros((*o.shape[:-1], len(bin_edges) - 1), dtype=float)
+            N = np.zeros_like(r)
+
+        for i in range(len(bin_edges) - 1):
+            # Follow xhistogram: all bins are half-open
+            # https://github.com/xgcm/xhistogram/issues/18
+            f_in_bin = (f >= bin_edges[i]) & (f < bin_edges[i + 1])
+            o_f_in_bin = o & f_in_bin
+            N_f_in_bin = f_in_bin.sum(axis=-1)
+            N_o_f_in_bin = o_f_in_bin.sum(axis=-1)
+            if is_dask_array:
+                r.append(N_o_f_in_bin / N_f_in_bin)
+                N.append(N_f_in_bin)
+            else:
+                r[..., i] = N_o_f_in_bin / N_f_in_bin
+                N[..., i] = N_f_in_bin
+
+        if is_dask_array:
+            return (
+                darray.stack(r, axis=-1).rechunk({-1: -1}),
+                darray.stack(N, axis=-1).rechunk({-1: -1}),
+            )
+        else:
+            return r, N
+
+    _fail_if_dim_empty(dim)
+
+    # Compute over all dims if dim is None
+    if dim is None:
+        dim = list(observations.dims)
+
+    dim, _ = _preprocess_dims(dim, observations)
+    observations, forecasts, stack_dim, _ = _stack_input_if_needed(
+        observations, forecasts, dim, weights=None
+    )
+
+    rel, samp = xr.apply_ufunc(
+        _reliability,
+        observations,
+        forecasts,
+        probability_bin_edges,
+        input_core_dims=[[stack_dim], [stack_dim], []],
+        dask='allowed',
+        output_core_dims=[[FORECAST_PROBABILITY_DIM], [FORECAST_PROBABILITY_DIM]],
+        keep_attrs=keep_attrs,
+    )
+
+    # Add probability bin coordinate
+    rel = rel.assign_coords(
+        {FORECAST_PROBABILITY_DIM: _get_bin_centers(probability_bin_edges)}
+    )
+    samp = samp.assign_coords(
+        {FORECAST_PROBABILITY_DIM: _get_bin_centers(probability_bin_edges)}
+    )
+
+    # Move samples to a coordinate
+    return _add_as_coord(rel, samp, coordinate_suffix='samples')

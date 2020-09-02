@@ -57,6 +57,7 @@ Currently, most of our probabilistic metrics are ported over from
     rps
     rank_histogram
     discrimination
+    reliability
 
 Contingency-based Metrics
 -------------------------

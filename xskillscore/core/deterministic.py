@@ -18,6 +18,12 @@ from .np_deterministic import (
     _spearman_r_eff_p_value,
     _spearman_r_p_value,
 )
+from .utils import (
+    _fail_if_dim_empty,
+    _preprocess_dims,
+    _preprocess_weights,
+    _stack_input_if_needed,
+)
 
 __all__ = [
     'pearson_r',
@@ -37,109 +43,6 @@ __all__ = [
 ]
 
 
-def _preprocess_dims(dim, a):
-    """Preprocesses dimensions to prep for stacking.
-
-    Parameters
-    ----------
-    dim : str, list
-        The dimension(s) to apply the function along.
-    """
-    if dim is None:
-        dim = list(a.dims)
-    elif isinstance(dim, str):
-        dim = [dim]
-    axis = tuple(range(-1, -len(dim) - 1, -1))
-    return dim, axis
-
-
-def _fail_if_dim_empty(dim):
-    if dim == []:
-        raise ValueError(
-            'metric must be applied along one dimension, therefore '
-            f'requires `dim` not being empty, found dim={dim}'
-        )
-
-
-def _stack_input_if_needed(a, b, dim, weights):
-    """
-    Stack input arrays a, b if needed in correlation metrics.
-    Adapt dim and weights accordingly.
-
-    Parameters
-    ----------
-    a : xarray.Dataset or xarray.DataArray
-        Labeled array(s) over which to apply the function.
-    b : xarray.Dataset or xarray.DataArray
-        Labeled array(s) over which to apply the function.
-    dim : list
-        The dimension(s) to apply the correlation along.
-    weights : xarray.Dataset or xarray.DataArray or None
-        Weights matching dimensions of ``dim`` to apply during the function.
-
-    Returns
-    -------
-    a : xarray.Dataset or xarray.DataArray stacked with new_dim
-        Labeled array(s) over which to apply the function.
-    b : xarray.Dataset or xarray.DataArray stacked with new_dim
-        Labeled array(s) over which to apply the function.
-    new_dim : str
-        The dimension(s) to apply the correlation along.
-    weights : xarray.Dataset or xarray.DataArray stacked with new_dim or None
-        Weights matching dimensions of ``dim`` to apply during the function.
-    """
-    if len(dim) > 1:
-        new_dim = '_'.join(dim)
-        a = a.stack(**{new_dim: dim})
-        b = b.stack(**{new_dim: dim})
-        if weights is not None:
-            weights = weights.stack(**{new_dim: dim})
-    else:
-        new_dim = dim[0]
-    return a, b, new_dim, weights
-
-
-def _preprocess_weights(a, dim, new_dim, weights):
-    """Preprocesses weights array to prepare for numpy computation.
-
-    Parameters
-    ----------
-    a : xarray.Dataset or xarray.DataArray
-        One of the arrays over which the function will be applied.
-    dim : str, list
-        The original dimension(s) to apply the function along.
-    new_dim : str
-        The newly named dimension after running ``_preprocess_dims``
-    weights : xarray.Dataset or xarray.DataArray or None
-        Weights to apply to function, matching the dimension size of
-        ``new_dim``.
-    """
-    if weights is None:
-        return None
-    else:
-        # Throw error if there are negative weights.
-        if weights.min() < 0:
-            raise ValueError(
-                'Weights has a minimum below 0. Please submit a weights array '
-                'of positive numbers.'
-            )
-        # Scale weights to vary from 0 to 1.
-        weights = weights / weights.max()
-        # Check that the weights array has the same size
-        # dimension(s) as those being applied over.
-        drop_dims = {k: 0 for k in a.dims if k not in new_dim}
-        if dict(weights.sizes) != dict(a.isel(drop_dims).sizes):
-            raise ValueError(
-                f'weights dimension(s) {dim} of size {dict(weights.sizes)} '
-                f"does not match DataArray's size "
-                f'{dict(a.isel(drop_dims).sizes)}'
-            )
-        if dict(weights.sizes) != dict(a.sizes):
-            # Broadcast weights to full size of main object.
-            _, weights = xr.broadcast(a, weights)
-        return weights
-
-
 def _determine_input_core_dims(dim, weights):
     """
     Determine input_core_dims based on type of dim and weights.
@@ -147,7 +50,7 @@ def _determine_input_core_dims(dim, weights):
     Parameters
     ----------
     dim : str, list
-        The dimension(s) to apply the correlation along.
+        The dimension(s) to apply the metric along.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
 

@@ -24,6 +24,7 @@ from .probabilistic import (
     crps_quadrature,
     discrimination,
     rank_histogram,
+    reliability,
     rps,
     threshold_brier_score,
 )
@@ -158,3 +159,8 @@ class XSkillScoreAccessor(object):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
         return discrimination(observations, forecasts, *args, **kwargs)
+
+    def reliability(self, observations, forecasts, *args, **kwargs):
+        observations = self._in_ds(observations)
+        forecasts = self._in_ds(forecasts)
+        return reliability(observations, forecasts, *args, **kwargs)

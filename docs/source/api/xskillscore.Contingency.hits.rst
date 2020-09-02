@@ -1,4 +1,4 @@
-xskillscore.Contingency.hits
+﻿xskillscore.Contingency.hits
 ============================
 
 .. currentmodule:: xskillscore
