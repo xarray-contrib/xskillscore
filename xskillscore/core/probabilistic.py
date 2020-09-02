@@ -498,7 +498,6 @@ def reliability(
     forecasts,
     dim=None,
     probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
-    fillna=False,
     keep_attrs=False,
 ):
     """Returns the data required to construct the reliability diagram for an event; the relative frequencies \
@@ -517,9 +516,6 @@ def reliability(
         probability_bin_edges : array_like, optional
             Probability bin edges used to compute the reliability. Bins include the left most edge, \
             but not the right. Defaults to 6 equally spaced edges between 0 and 1+1e-8
-        fillna : bool
-            If True, replace any nans resulting from having zero samples in a bin with zero.
-            If False (default), leave nans resulting from having zero samples in a bin
         keep_attrs : bool, optional
             If True, the attributes (attrs) will be copied from the first input to the new one.
             If False (default), the new object will be returned without attributes.
@@ -613,9 +609,4 @@ def reliability(
     )
 
     # Move samples to a coordinate
-    rel = _add_as_coord(rel, samp, coordinate_suffix='samples')
-
-    if fillna:
-        return rel.fillna(0.0)
-    else:
-        return rel
+    return _add_as_coord(rel, samp, coordinate_suffix='samples')
