@@ -3,9 +3,9 @@
 
 
 import numpy as np
-import xarray as xr
 from scipy.stats import norm
 
+import xarray as xr
 from xskillscore import (
     brier_score,
     crps_ensemble,
