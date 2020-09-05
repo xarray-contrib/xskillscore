@@ -1,9 +1,9 @@
 import numpy as np
 import numpy.testing as npt
-import pytest
-import xarray as xr
 from sklearn.metrics import confusion_matrix
 
+import pytest
+import xarray as xr
 from xskillscore import Contingency
 
 DIMS = (['time'], ['lon'], ['lat'], 'time', ['lon', 'lat', 'time'])

@@ -3,8 +3,8 @@
 
 
 import numpy as np
-import xarray as xr
 
+import xarray as xr
 from xskillscore import mae, mse, pearson_r, pearson_r_p_value, rmse
 
 from . import parameterized, randn, requires_dask

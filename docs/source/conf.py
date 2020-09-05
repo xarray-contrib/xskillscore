@@ -10,7 +10,6 @@ import subprocess
 import sys
 
 import sphinx_autosummary_accessors
-
 import xskillscore
 
 print('python exec:', sys.executable)
