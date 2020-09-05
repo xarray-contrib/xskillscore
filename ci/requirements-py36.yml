@@ -24,7 +24,7 @@ dependencies:
   - xhistogram
   # Package Management
   - asv
-  - black
+  - black==19.10b0
   - coveralls
   - doc8
   - importlib_metadata
