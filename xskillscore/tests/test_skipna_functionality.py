@@ -88,3 +88,9 @@ def test_skipna_broadcast_weights_assignment_destination(
     """Tests that 'assignment destination is read-only' is not raised
     https://github.com/raybellwaves/xskillscore/issues/79"""
     metric(a_nan, b_nan, ['lat', 'lon'], weights=weights_lonlat, skipna=True)
+
+
+def test_nan_skipna(a, b):
+    # Randomly add some nans to a
+    a = a.where(np.random.random(a.shape) < 0.5)
+    pearson_r(a, b, dim='lat', skipna=True)
