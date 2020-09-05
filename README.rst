@@ -32,6 +32,11 @@ or
 
 ``$ pip install git+https://github.com/raybellwaves/xskillscore``
 
+Documentation
+-------------
+Documentation can be found on `readthedocs <https://xskillscore.readthedocs.io/en/latest/>`_.
+
+
 See also
 --------
 
