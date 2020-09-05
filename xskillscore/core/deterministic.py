@@ -1199,7 +1199,7 @@ def smape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     >>> smape(a, b, dim='time')
     """
     dim, axis = _preprocess_dims(dim, a)
-    a, b = xr.broadcast(a, b)
+    a, b = xr.broadcast(a, b, exclude=dim)
     weights = _preprocess_weights(a, dim, dim, weights)
     input_core_dims = _determine_input_core_dims(dim, weights)
 
