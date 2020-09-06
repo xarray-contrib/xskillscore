@@ -1,4 +1,4 @@
-﻿xskillscore.brier\_score
+xskillscore.brier\_score
 ========================
 
 .. currentmodule:: xskillscore
