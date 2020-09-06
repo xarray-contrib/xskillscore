@@ -2,41 +2,47 @@
 Changelog History
 =================
 
-xskillscore v0.0.17 (2020-08-xx)
-================================
+xskillscore v0.0.17 (2020-09-06)
+
+Features
+--------
+- Added contingency table and associated metrics (:pr:`119`, :pr:`153`). `Dougie Squire`_
+- Added :py:func:`~xskillscore.rank_histogram` and :py:func:`~xskillscore.discrimination`
+  to probabilistic metrics (:pr:`136`). `Dougie Squire`_
+- Added :py:func:`~xskillscore.reliability` to probabilistic metrics (:pr:`164`). `Dougie Squire`_
+- Added ``dim`` and ``weights`` kwargs for probabilistic metrics. (:pr:`121`) `Aaron Spring`_
+- Added ``keep_attrs`` kwarg for all metrics. (:pr:`122`) `Andrew Huang`_
+- Added ranked probability score :py:func:`~xskillscore.rps`. (:pr:`163`) `Aaron Spring`_
+- Deterministic metrics now automatically broadcast any non-core dimensions. E.g., a single
+  time series can be compared to a gridded product spanning that same time span.
+  (:issue:`165`, :issue:`71`, :issue:`156`, :pr:`166`) `Aaron Spring`_
+
+Breaking Changes
+----------------
+- Renamed ``dim`` to ``member_dim`` in probabilistic metrics. (:pr:`121`) `Aaron Spring`_
+- Argument ``dim`` becomes keyword ``dim=None`` in all metrics.
+  (:issue:`137`, :pr:`143`) `Aaron Spring`_
+- ``dim=None`` reduces all dimensions as in ``xr.mean(dim=None)``.
+  (:issue:`137`, :pr:`143`) `Aaron Spring`_
+
+Bug Fixes
+---------
+- Fixes ``weights=None`` type issue with latest version of ``dask``.
+  (:issue:`168`, :pr:`171`) `Andrew Huang`_
+
+Documentation
+-------------
+- Added ``sphinx`` documentation with full API and a `quick start <quick-start.html>`__ notebook.
+  (:pr:`127`) `Riley X. Brady`_ and `Ray Bell`_.
 
 Internal Changes
 ----------------
 - Added ``utils`` module to house utilities shared across multiple modules
   (:pr:`119`). `Dougie Squire`_
-- ``conftest.py`` gathers all ``pytest.fixtures``. (:issue:`126`, :pr:`159`)
+- Added ``conftest.py`` to gather all ``pytest.fixtures``. (:issue:`126`, :pr:`159`).
   `Aaron Spring`_ and `Ray Bell`_
 - Removed ``test_np_deterministic`` covered by ``test_metric_results_accurate``.
   (:pr:`159`) `Aaron Spring`_
-
-Documentation
--------------
-- Added ``sphinx`` documentation with full API and a quick start notebook.
-  (:pr:`127`) `Riley X. Brady`_ and `Ray Bell`_.
-
-Features
---------
-- Added contingency table and associated metrics (:pr:`119`, :pr:`153`). `Dougie Squire`_
-- Added ``rank_histogram`` and ``discrimination`` to probabilistic metrics (:pr:`136`).
-  `Dougie Squire`_
-- Added ``reliability`` to probabilistic metrics (:pr:`164`). `Dougie Squire`_
-- Added ``dim`` and ``weights`` for probabilistic metrics. (:pr:`121`) `Aaron Spring`_
-- Added ``keep_attrs`` for all metrics. (:pr:`122`) `Andrew Huang`_
-- Added ranked probability score ``rps``. (:pr:`163`) `Aaron Spring`_
-
-Breaking Changes
-----------------
-- Rename `dim` to `member_dim` in probabilistic metrics. (:pr:`121`) `Aaron Spring`_
-- Argument `dim` becomes keyword `dim=None` in all metrics.
-  (:issue:`137`, :pr:`143`) `Aaron Spring`_
-- `dim=None` reduces all dimensions as in `xr.mean(dim=None)`.
-  (:issue:`137`, :pr:`143`) `Aaron Spring`_
-
 
 xskillscore v0.0.16 (2020-07-18)
 ================================

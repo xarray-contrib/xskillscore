@@ -10,6 +10,7 @@ import subprocess
 import sys
 
 import sphinx_autosummary_accessors
+
 import xskillscore
 
 print('python exec:', sys.executable)
@@ -77,6 +78,7 @@ copyright = '2018-%s, xskillscore Developers' % datetime.datetime.now().year
 # The full version, including alpha/beta/rc tags
 # TODO add back in after release
 # version = xskillscore.__version__
+version = '0.0.17'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
