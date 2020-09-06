@@ -38,9 +38,11 @@ def _match_nans(a, b, weights):
         # Find pairwise indices in a and b that have nans.
         idx = np.logical_or(np.isnan(a), np.isnan(b))
         a[idx], b[idx] = np.nan, np.nan
-        if weights is not None:
-            weights = weights.copy()
-            weights[idx] = np.nan
+        # https://github.com/raybellwaves/xskillscore/issues/168
+        if isinstance(weights, np.ndarray):
+            if weights.shape:  # not None
+                weights = weights.copy()
+                weights[idx] = np.nan
     return a, b, weights
 
 
