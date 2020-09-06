@@ -1,5 +1,4 @@
 import numpy as np
-
 import xarray as xr
 from xhistogram.xarray import histogram as xhist
 

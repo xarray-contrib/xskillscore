@@ -1,7 +1,6 @@
 from functools import wraps
 
 import numpy as np
-
 import xarray as xr
 
 from .utils import histogram

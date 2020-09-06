@@ -1,12 +1,12 @@
 import numpy as np
 import numpy.testing as npt
-from scipy.stats import norm
-from sklearn.calibration import calibration_curve
-
 import properscoring
 import pytest
 import xarray as xr
+from scipy.stats import norm
+from sklearn.calibration import calibration_curve
 from xarray.tests import assert_allclose, assert_identical
+
 from xskillscore.core.probabilistic import (
     brier_score,
     crps_ensemble,
