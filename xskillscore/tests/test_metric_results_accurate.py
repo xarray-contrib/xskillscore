@@ -1,10 +1,10 @@
 import numpy as np
+import pytest
 import sklearn.metrics
+import xarray as xr
 from scipy.stats import pearsonr, spearmanr
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
-import pytest
-import xarray as xr
 import xskillscore as xs
 from xskillscore.core.deterministic import (
     mae,
