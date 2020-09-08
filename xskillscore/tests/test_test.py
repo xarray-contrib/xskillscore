@@ -66,6 +66,8 @@ def test_sign_test_alpha(a_1d, a_1d_worse, b_1d):
         < actual_small_alpha.sel(results='confidence')
     ).all()
     # check identical sign_test
-    assert actual_large_alpha.sel(results='sign_test').drop('alpha').equals(
-        actual_small_alpha.sel(results='sign_test').drop('alpha')
+    assert (
+        actual_large_alpha.sel(results='sign_test')
+        .drop('alpha')
+        .equals(actual_small_alpha.sel(results='sign_test').drop('alpha'))
     )
