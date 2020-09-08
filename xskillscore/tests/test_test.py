@@ -21,6 +21,7 @@ def test_sign_test_raw(a_1d, a_1d_worse, b_1d):
         results='confidence'
     )
     crossing_after_timesteps = walk_larger_significance.argmax(dim='time')
+    # check timesteps after which sign_test larger confidence
     assert crossing_after_timesteps == 3
 
 
@@ -46,6 +47,7 @@ def test_sign_test_identical(a_1d, a_1d_worse, b_1d, categorical):
         a_1d_worse = logical(a_1d_worse)
         b_1d = logical(b_1d)
     actual = sign_test(a_1d, a_1d_worse, b_1d, dim='time', categorical=categorical)
+    # check flat
     assert (
         actual.sel(results='sign_test')
         .diff(dim='time')
@@ -58,10 +60,12 @@ def test_sign_test_alpha(a_1d, a_1d_worse, b_1d):
     """Test that larger alpha leads to small confidence bounds in sign_test."""
     actual_large_alpha = sign_test(a_1d, a_1d_worse, b_1d, dim='time', alpha=0.1)
     actual_small_alpha = sign_test(a_1d, a_1d_worse, b_1d, dim='time', alpha=0.01)
+    # check difference in confidence
     assert (
         actual_large_alpha.sel(results='confidence')
         < actual_small_alpha.sel(results='confidence')
     ).all()
-    assert actual_large_alpha.sel(results='sign_test').equals(
-        actual_small_alpha.sel(results='sign_test')
+    # check identical sign_test
+    assert actual_large_alpha.sel(results='sign_test').drop('alpha').equals(
+        actual_small_alpha.sel(results='sign_test').drop('alpha')
     )
