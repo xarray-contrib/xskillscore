@@ -30,9 +30,10 @@ def sign_test(
                   function return binary output
 
         dim : str
-            time dimension of dimension over which to compute the random walk
+            time dimension of dimension over which to compute the random walk.
+            This dimension is not reduced, unlike in other xskillscore functions.
         alpha : float
-            significance level
+            significance level for random walk.
         categorical : bool, optional
             If True, the winning forecast is only rewarded a point if it exactly equals
             the observations

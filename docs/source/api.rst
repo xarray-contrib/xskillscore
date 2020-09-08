@@ -108,3 +108,11 @@ Multi-Category Metrics
     Contingency.heidke_score
     Contingency.peirce_score
     Contingency.gerrity_score
+
+Tests
+~~~~~
+
+.. autosummary::
+    :toctree: api/
+
+    sign_test
