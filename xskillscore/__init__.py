@@ -30,9 +30,7 @@ from .core.probabilistic import (
     rps,
     threshold_brier_score,
 )
-
 from .core.test import sign_test
-
 from .versioning.print_versions import show_versions
 
 try:
