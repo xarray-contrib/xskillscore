@@ -55,7 +55,7 @@ def sign_test(
         >>> st = sign_test(f1, f2, o, dim='time')
         >>> st.sel(results='sign_test').plot()
         >>> st.sel(results='confidence').plot(c='gray')
-        >>> st.sel(results='confidence').plot(c='gray')
+        >>> (-1*st.sel(results='confidence')).plot(c='gray')
 
         References
         ----------
