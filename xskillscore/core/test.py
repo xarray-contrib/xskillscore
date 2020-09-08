@@ -1,7 +1,8 @@
+import scipy.stats as st
 import xarray as xr
 
 
-def sign_test(da_cmp1, da_cmp2, da_ref, dim=None, categorical=False):
+def sign_test(da_cmp1, da_cmp2, da_ref, dim=None, categorical=False, alpha=0.05):
     """
         Returns the Delsole and Tippett sign test over the given time period
 
@@ -18,6 +19,8 @@ def sign_test(da_cmp1, da_cmp2, da_ref, dim=None, categorical=False):
             Array containing data to use as reference
         dim : str,
             Name of dimension over which to compute the random walk
+        alpha : float
+            significance level
         categorical : bool, optional
             If True, the winning forecast is only rewarded a point if it exactly equals the observations
 
@@ -64,7 +67,8 @@ def sign_test(da_cmp1, da_cmp2, da_ref, dim=None, categorical=False):
     notnan = 1 * (cmp1_diff.notnull() & cmp2_diff.notnull())
     N = notnan.cumsum(dim)
     # z_alpha is the value at which the standardized cumulative Gaussian distributed exceeds alpha
-    confidence = 1.95996496 * xr.ufuncs.sqrt(N)
+    confidence = st.norm.ppf(1 - alpha / 2) * xr.ufuncs.sqrt(N)
+    # confidence = 1.96 * xr.ufuncs.sqrt(N)
     # confidence['alpha'] = alpha
 
     res = xr.concat([sign_test, confidence], dim='results')
