@@ -45,17 +45,21 @@ def sign_test(
 
         Examples
         --------
-        >>> f1 = xr.DataArray(np.random.normal(size=(3,3)),
-        ...                  coords=[('time', np.arange(3)), ('x', np.arange(3))])
-        >>> f2 = xr.DataArray(np.random.normal(size=(3,3)),
-        ...                 coords=[('time', np.arange(3)), ('x', np.arange(3))])
-        >>> o = xr.DataArray(np.random.normal(size=(3,3)),
-        ...                  coords=[('time', np.arange(3)), ('x', np.arange(3))])
+        >>> f1 = xr.DataArray(np.random.normal(size=(30)),
+        ...      coords=[('time', np.arange(30))])
+        >>> f2 = xr.DataArray(np.random.normal(size=(30)),
+        ...      coords=[('time', np.arange(30))])
+        >>> o = xr.DataArray(np.random.normal(size=(30)),
+        ...      coords=[('time', np.arange(30))])
         >>> st = sign_test(f1, f2, o, dim='time')
+        >>> st.sel(results='sign_test').plot()
+        >>> st.sel(results='confidence').plot(c='gray')
+        >>> st.sel(results='confidence').plot(c='gray')
 
-        Notes
-        -----
-        See Delsole and Tippett 2016 `Forecast Comparison Based on Random Walks`
+        References
+        ----------
+        * DelSole, T., & Tippett, M. K. (2016). Forecast Comparison Based on Random
+          Walks. Monthly Weather Review, 144(2), 615–626. doi: 10/f782pf
     """
     # two shortcuts for climpred
     climpred_keys = [
