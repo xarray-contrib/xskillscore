@@ -11,21 +11,22 @@ def sign_test(
         Parameters
         ----------
         forecast1 : xarray.Dataset or xarray.DataArray
-            containing data to be compared to forecast1
+            forecast1 to be compared to observation
         forecast2 : xarray.Dataset or xarray.DataArray
-            containing data to be compared to forecast2
+            forecast2 to be compared to observation
         observation : xarray.Dataset or xarray.DataArray
-            containing data to use as observation
-            if str, then assume that comparison of forecast1 and forecast2 with
-            observations has already been done and choose str from:
+            observation to be compared to both forecasts
 
-                - negatively_oriented_already_evaluated: metric between forecast1
+            if str, then assume that forecast1 and forecast2 have already been compared
+            to observations and choose from:
+
+                * ``negatively_oriented_already_evaluated``: metric between forecast1
                   (forecast2) and observations. Distances are positively oriented,
                   therefore the smaller distance wins.
-                - positively_oriented_already_evaluated: metric between forecast1
+                * ``positively_oriented_already_evaluated``: metric between forecast1
                   (forecast2) and observations. The larger positively oriented metric
                   wins.
-                - categorical_already_evaluated: categorical data following
+                * ``categorical_already_evaluated``: categorical data following
                   ``logical(forecast1)==logical(forecast2)`` where ``logical`` is a
                   function return binary output
 
@@ -40,8 +41,13 @@ def sign_test(
 
         Returns
         -------
-        xarray DataArray, Dataset reduced by dim containing the sign test and
-            confidence.
+        xarray.DataArray or xarray.Dataset reduced by dim containing the sign test and
+            confidence as new dimension results:
+
+                * ``sign_test``: positive (negative) number shows how many times over
+                    ``dim`` ``forecast1`` is better (worse) than ``forecast2``.
+                * ``confidence``: Positive boundary for the random walk at significance
+                    ``alpha``.
 
 
         Examples
