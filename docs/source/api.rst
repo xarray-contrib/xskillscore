@@ -110,7 +110,7 @@ Multi-Category Metrics
     Contingency.gerrity_score
 
 Tests
-~~~~~
+-----
 
 .. autosummary::
     :toctree: api/
