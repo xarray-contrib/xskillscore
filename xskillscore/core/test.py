@@ -10,11 +10,11 @@ def sign_test(
 
         Parameters
         ----------
-        forecast1 : xarray DataArray, Dataset
+        forecast1 : xarray.Dataset or xarray.DataArray
             containing data to be compared to forecast1
-        forecast2 : xarray DataArray, Dataset
+        forecast2 : xarray.Dataset or xarray.DataArray
             containing data to be compared to forecast2
-        observation : xarray DataArray, Dataset or str
+        observation : xarray.Dataset or xarray.DataArray
             containing data to use as observation
             if str, then assume that comparison of forecast1 and forecast2 with
             observations has already been done and choose str from:
