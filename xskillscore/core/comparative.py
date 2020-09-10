@@ -1,3 +1,5 @@
+import warnings
+
 import scipy.stats as st
 import xarray as xr
 
@@ -42,8 +44,8 @@ def sign_test(
         observation : xarray.Dataset or xarray.DataArray
             observation to be compared to both forecasts
 
-            if str, then assume that forecast1 and forecast2 have already been compared
-            to observations and choose from:
+            if None, then assume that forecast1 and forecast2 have already been compared
+            to observation. Decide comparison based on ``metric`` or choose from:
 
                 * ``negatively_oriented_already_evaluated``: metric between forecast1
                   (forecast2) and observations. Distances are positively oriented,
@@ -51,9 +53,6 @@ def sign_test(
                 * ``positively_oriented_already_evaluated``: metric between forecast1
                   (forecast2) and observations. The larger positively oriented metric
                   wins.
-                * ``categorical_already_evaluated``: categorical data following
-                  ``logical(forecast#)==logical(observation)`` where ``logical`` is a
-                  function return binary output
 
         dim : str
             time dimension of dimension over which to compute the random walk.
@@ -96,17 +95,19 @@ def sign_test(
             * DelSole, T., & Tippett, M. K. (2016). Forecast Comparison Based on Random
               Walks. Monthly Weather Review, 144(2), 615–626. doi: 10/f782pf
     """
+    # TODO: account for forecast, observation ordering in climpred and observation, forecast ordering in xskillscore; do we need to change something? I think NO
+
     # make sure metric is a callable
     if isinstance(metric, str):
         import xskillscore as xs
 
         if hasattr(xs, metric):
             metric = getattr(xs, metric)
-        else:
-            raise ValueError(
-                f'metric could not be found in xskillscore, requested {metric}'
-            )
-    metric_str = metric.__name__
+            metric_str = metric.__name__
+    elif callable(metric):
+        metric_str = metric.__name__
+    else:
+        metric_str = None
 
     if observation is not None:
         if categorical:
@@ -117,34 +118,41 @@ def sign_test(
                 diff1 = metric(forecast1, observation, dim=[])
                 diff2 = metric(forecast2, observation, dim=[])
             elif metric_str in metric_larger_is_better:
-                raise ValueError('not impl.')
+                if metric_larger_is_better == []:
+                    raise ValueError(
+                        'no metric which is better for larger values applicable in the sign test found.'
+                    )
+                diff1 = metric(forecast1, observation, dim=[])
+                diff2 = metric(forecast2, observation, dim=[])
+            else:
+                raise ValueError('dont know how to compare')
     else:
         # shortcuts for climpred
         climpred_keys = [
             'negatively_oriented_already_evaluated',
             'positively_oriented_already_evaluated',
-            'categorical_already_evaluated',
         ]
-        if (
-            metric_str in metric_smaller_is_better
-            or observation == 'negatively_oriented_already_evaluated'
-        ):
-            # mse, mae, rmse
-            diff1 = forecast1
-            diff2 = forecast2
-        elif (
-            metric_str in metric_larger_is_better
-            or observation == 'positively_oriented_already_evaluated'
-        ):  # 1-mse/std, msss
-            diff1 = forecast1
-            diff2 = forecast2
-        elif observation == 'categorical_already_evaluated':
+        if categorical:
             diff1 = ~forecast1
             diff2 = ~forecast2
         else:
-            raise ValueError(
-                f'special key not found in {climpred_keys}, or metric not found in xskillscore.'
-            )
+            if (
+                metric_str in metric_smaller_is_better
+                or observation == 'negatively_oriented_already_evaluated'
+            ):
+                # mse, mae, rmse
+                diff1 = forecast1
+                diff2 = forecast2
+            elif (
+                metric_str in metric_larger_is_better
+                or observation == 'positively_oriented_already_evaluated'
+            ):  # 1-mse/std, msss, correlation not applied to time dimension
+                diff1 = -forecast1
+                diff2 = -forecast2
+            else:
+                raise ValueError(
+                    f'special key not found in {climpred_keys}, or metric not found in xskillscore, found metric {metric}.'
+                )
 
     sign_test = (1 * (diff1 < diff2) - 1 * (diff2 < diff1)).cumsum(dim)
 

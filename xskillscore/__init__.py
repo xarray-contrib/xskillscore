@@ -2,6 +2,7 @@
 from pkg_resources import DistributionNotFound, get_distribution
 
 from .core.accessor import XSkillScoreAccessor
+from .core.comparative import sign_test
 from .core.contingency import Contingency
 from .core.deterministic import (
     effective_sample_size,
@@ -30,7 +31,6 @@ from .core.probabilistic import (
     rps,
     threshold_brier_score,
 )
-from .core.test import sign_test
 from .versioning.print_versions import show_versions
 
 try:
