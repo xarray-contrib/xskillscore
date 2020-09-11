@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+import xskillscore as xs
 from xskillscore import sign_test
 
 OFFSET = -1
@@ -71,3 +72,36 @@ def test_sign_test_alpha(a_1d, a_1d_worse, b_1d):
         .drop('alpha')
         .equals(actual_small_alpha.sel(results='sign_test').drop('alpha'))
     )
+
+
+@pytest.mark.parametrize('metric', ['mae', 'rmse', 'mse'])
+def test_sign_test_already_compared_orientation_negative(
+    a_1d, a_1d_worse, b_1d, metric
+):
+    a_b_diff = getattr(xs, metric)(a_1d, b_1d, dim=[])
+    a_worse_b_diff = getattr(xs, metric)(a_1d_worse, b_1d, dim=[])
+    actual = sign_test(
+        a_b_diff, a_worse_b_diff, observation=None, dim='time', orientation='negative'
+    )
+    assert actual.sel(results='sign_test').min('time') > 0
+
+
+def crpss(o, f_prob, dim=None):
+    return 1 - xs.crps_ensemble(o, f_prob, dim=dim) / xs.crps_gaussian(
+        o, o.mean('time'), o.std('time'), dim=[]
+    )
+
+
+@pytest.mark.parametrize('metric', [crpss], ids=['crpss'])
+def test_sign_test_already_compared_orientation_positive_probabilistic(
+    f_prob, o, metric
+):
+    o = o.isel(lon=0, lat=0, drop=True)
+    f_prob = f_prob.isel(lon=0, lat=0, drop=True)
+    f_prob_worse = f_prob + OFFSET
+    f_o_diff = metric(o, f_prob, dim=[])
+    f_worse_o_diff = metric(o, f_prob_worse, dim=[])
+    actual = sign_test(
+        f_o_diff, f_worse_o_diff, observation=None, dim='time', orientation='positive'
+    )
+    assert actual.sel(results='sign_test').min('time') > 0

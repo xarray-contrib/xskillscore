@@ -2,7 +2,16 @@
 Changelog History
 =================
 
+xskillscore v0.0.18 (2020-xx-xx)
+================================
+
+Features
+--------
+- Added the sign test described in DelSole and Tippett 2016:
+  :py:func:`~xskillscore.sign_test`. (:issue:`133`, :pr:`176`) `Aaron Spring`_
+
 xskillscore v0.0.17 (2020-09-06)
+================================
 
 Features
 --------
