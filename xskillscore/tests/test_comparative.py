@@ -17,6 +17,7 @@ def logical(ds):
 
 
 def test_sign_test_raw(a_1d, a_1d_worse, b_1d):
+    """Test sign_test where significance crossed (for np.random.seed(42) values)."""
     actual = sign_test(a_1d, a_1d_worse, b_1d, dim='time', alpha=0.05)
     walk_larger_significance = actual.sel(results='sign_test') > actual.sel(
         results='confidence'
@@ -74,16 +75,31 @@ def test_sign_test_alpha(a_1d, a_1d_worse, b_1d):
     )
 
 
+def test_sign_test_user_function(a_1d, a_1d_worse, b_1d):
+    """Test sign_test with user function as metric."""
+
+    def mse(a, b, dim):
+        return ((a - b) ** 2).mean(dim)
+
+    actual = sign_test(
+        a_1d, a_1d_worse, b_1d, dim='time', orientation='negative', metric=mse
+    )
+    assert actual.sel(results='sign_test').isel(time=-1) > 0
+
+
 @pytest.mark.parametrize('metric', ['mae', 'rmse', 'mse'])
 def test_sign_test_already_compared_orientation_negative(
     a_1d, a_1d_worse, b_1d, metric
 ):
+    """Test sign_test with forecasts already previously evaluated with observation for
+    negative orientation (smaller distances mean better forecast)."""
     a_b_diff = getattr(xs, metric)(a_1d, b_1d, dim=[])
     a_worse_b_diff = getattr(xs, metric)(a_1d_worse, b_1d, dim=[])
     actual = sign_test(
         a_b_diff, a_worse_b_diff, observation=None, dim='time', orientation='negative'
     )
-    assert actual.sel(results='sign_test').min('time') > 0
+    print(actual)
+    assert actual.sel(results='sign_test').isel(time=-1) > 0
 
 
 def crpss(o, f_prob, dim=None):
@@ -96,6 +112,7 @@ def crpss(o, f_prob, dim=None):
 def test_sign_test_already_compared_orientation_positive_probabilistic(
     f_prob, o, metric
 ):
+    """Test sign_test for probabilistic crpss metric with positive orientation."""
     o = o.isel(lon=0, lat=0, drop=True)
     f_prob = f_prob.isel(lon=0, lat=0, drop=True)
     f_prob_worse = f_prob + OFFSET
@@ -104,4 +121,20 @@ def test_sign_test_already_compared_orientation_positive_probabilistic(
     actual = sign_test(
         f_o_diff, f_worse_o_diff, observation=None, dim='time', orientation='positive'
     )
-    assert actual.sel(results='sign_test').min('time') > 0
+    assert actual.sel(results='sign_test').isel(time=-1) > 0
+
+
+@pytest.mark.parametrize('metric', ['no_valid_metric_string', (), 1])
+def test_sign_test_invalid_metric_fails(metric, a_1d, a_1d_worse, b_1d):
+    """Sign_test fails because of invalid metric keyword."""
+    with pytest.raises(ValueError) as e:
+        sign_test(a_1d, a_1d_worse, b_1d, metric=metric)
+    assert 'metric' in str(e.value)
+
+
+@pytest.mark.parametrize('orientation', ['categorical'])
+def test_sign_test_invalid_orientation_fails(orientation, a_1d, a_1d_worse, b_1d):
+    """Sign_test fails because of invalid orientation keyword."""
+    with pytest.raises(ValueError) as e:
+        sign_test(a_1d, a_1d_worse, b_1d, orientation=orientation)
+    assert '`orientation` requires to be either "positive" or' in str(e.value)
