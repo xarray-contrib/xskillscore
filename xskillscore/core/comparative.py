@@ -30,7 +30,7 @@ def sign_test(
     dim=None,
     categorical=False,
     alpha=0.05,
-    metric=mae,
+    metric=None,
     orientation='negative',
 ):
     """
@@ -54,15 +54,17 @@ def sign_test(
             significance level for random walk.
         categorical : bool, optional
             If ``True``, the winning forecast is only rewarded a point if it exactly
-            equals the observation. If False, use metric to compare forecast# with observation.
+            equals the observation. If False, use metric to compare forecast# with
+            observation.
         metric : callable, optional
-            metric to compare forecast# and observation or that has been used to
-            compare forecast# and observation before using ``sign_test``, if categorical is False. If categorical is True, metric is not considered. Also allows
-            strings to be convered to ``xskillscore.{metric}``.
-            Defaults to ``xs.mae``, which corresponds to ``negative`` orientation.
+            metric to compare forecast# and observation if metric is not None. If
+            metric is None, assume that forecast# have been compared observation before
+            using ``sign_test``. If categorical is True, metric is ignored. Also allows
+            strings to be convered to ``xskillscore.{metric}``. Defaults to None.
         orientation : str
             Which skill values correspond to better skill? Smaller values (negative) or
-            Larger values (positive). Defaults to 'negative'.
+            Larger values (positive). Defaults to 'negative'. Ignored if metric is None
+            or categorical.
 
         Returns
         -------
@@ -94,44 +96,57 @@ def sign_test(
               Walks. Monthly Weather Review, 144(2), 615–626. doi: 10/f782pf
     """
     # make sure metric is a callable
-    if isinstance(metric, str):
-        import xskillscore as xs
+    if metric is not None:
+        if isinstance(metric, str):
+            import xskillscore as xs
 
-        if hasattr(xs, metric):
-            metric = getattr(xs, metric)
+            if hasattr(xs, metric):
+                metric = getattr(xs, metric)
+            else:
+                raise ValueError(
+                    f'xskillscore.metric could not be derived from {metric}.'
+                )
+        elif not callable(metric):
+            raise ValueError(
+                f'metric needs to be a function/callable or None, found {type(metric)}'
+            )
+
+    if metric:
+        if observation is not None:
+            # Compare the forecasts and observation using metric
+            diff1 = metric(forecast1, observation, dim=[])
+            diff2 = metric(forecast2, observation, dim=[])
         else:
-            raise ValueError(f'xskillscore.metric could not be derived from {metric}.')
-    elif not callable(metric):
-        raise ValueError(
-            f'metric needs to be a function/callable, found {type(metric)}'
-        )
-
-    if not categorical:
+            raise ValueError(
+                'observations must be provided when metric is provided', UserWarning
+            )
+    else:  # if metric=None, already evaluated
+        if observation is not None:
+            warnings.warn(
+                'Ignoring provided observation because no metric was provided',
+                UserWarning,
+            )
+        if orientation == 'negative':
+            diff1 = forecast1
+            diff2 = forecast2
+        elif orientation == 'positive':
+            diff1 = -forecast1
+            diff2 = -forecast2
         if orientation not in ['negative', 'positive']:
             raise ValueError(
                 '`orientation` requires to be either "positive" or'
                 f'"negative"], found {orientation}.'
             )
 
-    if observation is not None:  # if observation is provided
-        if categorical:
+    if categorical:  # ignores orientation and warns if metric provided
+        if metric:
+            warnings.warn('Ignoring provided metric because categorical=True')
+        if observation is not None:
             diff1 = -1 * (forecast1 == observation)
             diff2 = -1 * (forecast2 == observation)
         else:
-            diff1 = metric(forecast1, observation, dim=[])
-            diff2 = metric(forecast2, observation, dim=[])
-
-    else:  # if forecasts have already been compared to observation
-        if categorical:
             diff1 = ~forecast1
             diff2 = ~forecast2
-        else:
-            if orientation == 'negative':
-                diff1 = forecast1
-                diff2 = forecast2
-            elif orientation == 'positive':
-                diff1 = -forecast1
-                diff2 = -forecast2
 
     sign_test = (1 * (diff1 < diff2) - 1 * (diff2 < diff1)).cumsum(dim)
 

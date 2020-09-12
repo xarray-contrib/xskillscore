@@ -18,7 +18,7 @@ def logical(ds):
 
 def test_sign_test_raw(a_1d, a_1d_worse, b_1d):
     """Test sign_test where significance crossed (for np.random.seed(42) values)."""
-    actual = sign_test(a_1d, a_1d_worse, b_1d, dim='time', alpha=0.05)
+    actual = sign_test(a_1d, a_1d_worse, b_1d, dim='time', alpha=0.05, metric='mae')
     walk_larger_significance = actual.sel(results='sign_test') > actual.sel(
         results='confidence'
     )
@@ -35,8 +35,8 @@ def test_sign_test_categorical(a_1d, a_1d_worse, b_1d):
     sign_test(a_1d, a_1d_worse, b_1d, dim='time', categorical=True)
 
 
-@pytest.mark.parametrize('categorical', [True, False])
-def test_sign_test_identical(a_1d, a_1d_worse, b_1d, categorical):
+@pytest.mark.parametrize('categorical,metric', [(True, None), (False, 'mae')])
+def test_sign_test_identical(a_1d, a_1d_worse, b_1d, categorical, metric):
     """Test that identical forecasts show no walk step."""
     identicals = [1, 7]
     for i in identicals:
@@ -48,7 +48,9 @@ def test_sign_test_identical(a_1d, a_1d_worse, b_1d, categorical):
         a_1d = logical(a_1d)
         a_1d_worse = logical(a_1d_worse)
         b_1d = logical(b_1d)
-    actual = sign_test(a_1d, a_1d_worse, b_1d, dim='time', categorical=categorical)
+    actual = sign_test(
+        a_1d, a_1d_worse, b_1d, dim='time', categorical=categorical, metric=metric
+    )
     # check flat
     assert (
         actual.sel(results='sign_test')
@@ -60,8 +62,12 @@ def test_sign_test_identical(a_1d, a_1d_worse, b_1d, categorical):
 
 def test_sign_test_alpha(a_1d, a_1d_worse, b_1d):
     """Test that larger alpha leads to small confidence bounds in sign_test."""
-    actual_large_alpha = sign_test(a_1d, a_1d_worse, b_1d, dim='time', alpha=0.1)
-    actual_small_alpha = sign_test(a_1d, a_1d_worse, b_1d, dim='time', alpha=0.01)
+    actual_large_alpha = sign_test(
+        a_1d, a_1d_worse, b_1d, dim='time', alpha=0.1, metric='mae'
+    )
+    actual_small_alpha = sign_test(
+        a_1d, a_1d_worse, b_1d, dim='time', alpha=0.01, metric='mae'
+    )
     # check difference in confidence
     assert (
         actual_large_alpha.sel(results='confidence')
@@ -136,5 +142,29 @@ def test_sign_test_invalid_metric_fails(metric, a_1d, a_1d_worse, b_1d):
 def test_sign_test_invalid_orientation_fails(orientation, a_1d, a_1d_worse, b_1d):
     """Sign_test fails because of invalid orientation keyword."""
     with pytest.raises(ValueError) as e:
-        sign_test(a_1d, a_1d_worse, b_1d, orientation=orientation)
+        sign_test(a_1d, a_1d_worse, b_1d, orientation=orientation, metric=None)
     assert '`orientation` requires to be either "positive" or' in str(e.value)
+
+
+@pytest.mark.filterwarnings('ignore:Ignoring provided observation')
+def test_sign_test_no_metric_but_observation_warns(a_1d, a_1d_worse, b_1d):
+    """Sign_test warns if no metric but observation, ignores observation."""
+    with_obs = sign_test(
+        a_1d, a_1d_worse, observation=b_1d, orientation='positive', metric=None
+    )
+    without_obs = sign_test(
+        a_1d, a_1d_worse, observation=None, orientation='positive', metric=None
+    )
+    assert (without_obs == with_obs).all()
+
+
+@pytest.mark.filterwarnings('ignore:Ignoring provided metric because categorical=True')
+def test_sign_test_categorical_but_also_metric_warns(a_1d, a_1d_worse, b_1d):
+    """Sign_test warns if categorical and metric, ignores metric."""
+    with_metric = sign_test(
+        a_1d, a_1d_worse, observation=b_1d, categorical=True, metric='mae'
+    )
+    without_metric = sign_test(
+        a_1d, a_1d_worse, observation=b_1d, categorical=True, metric=None
+    )
+    assert (without_metric == with_metric).all()
