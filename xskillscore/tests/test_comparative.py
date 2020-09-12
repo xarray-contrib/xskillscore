@@ -27,12 +27,17 @@ def test_sign_test_raw(a_1d, a_1d_worse, b_1d):
     assert crossing_after_timesteps == 3
 
 
-def test_sign_test_categorical(a_1d, a_1d_worse, b_1d):
+@pytest.mark.parametrize('observation', [True, False])
+def test_sign_test_categorical(a_1d, a_1d_worse, b_1d, observation):
     """Test sign_test categorical."""
     a_1d = logical(a_1d)
     a_1d_worse = logical(a_1d_worse)
     b_1d = logical(b_1d)
-    sign_test(a_1d, a_1d_worse, b_1d, dim='time', categorical=True)
+    if observation:
+        obs = b_1d
+    else:
+        obs = None
+    sign_test(a_1d, a_1d_worse, observation=obs, dim='time', categorical=True)
 
 
 @pytest.mark.parametrize('categorical,metric', [(True, None), (False, 'mae')])
@@ -136,6 +141,13 @@ def test_sign_test_invalid_metric_fails(metric, a_1d, a_1d_worse, b_1d):
     with pytest.raises(ValueError) as e:
         sign_test(a_1d, a_1d_worse, b_1d, metric=metric)
     assert 'metric' in str(e.value)
+
+
+def test_sign_test_observations_None_metric_fails(a_1d, a_1d_worse):
+    """Sign_test fails because observations None but metric provided."""
+    with pytest.raises(ValueError) as e:
+        sign_test(a_1d, a_1d_worse, observation=None, metric='mae')
+    assert 'observations must be provided when metric' in str(e.value)
 
 
 @pytest.mark.parametrize('orientation', ['categorical'])

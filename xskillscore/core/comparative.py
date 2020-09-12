@@ -3,25 +3,6 @@ import warnings
 import scipy.stats as st
 import xarray as xr
 
-from .deterministic import mae
-
-metric_larger_is_better = (
-    []
-)  # no xskillscore metric that allow dim=[] # pearson_r not allowed for sign_test see DelSole and Tippett (2016)
-metric_smaller_is_better = [
-    'mae',
-    'rmse',
-    'median_absolute_error',
-    'mse',
-    'brier_score',
-    'threshold_brier_score',
-    'crps_ensemble',
-    'median_absolute_error',
-    'smape',
-    'mape',
-    'rps',
-]
-
 
 def sign_test(
     forecast1,
