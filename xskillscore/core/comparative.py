@@ -5,9 +5,9 @@ import xarray as xr
 
 
 def sign_test(
+    observation,
     forecast1,
     forecast2,
-    observation=None,
     dim=None,
     alpha=0.05,
     metric=None,
@@ -18,31 +18,32 @@ def sign_test(
 
         Parameters
         ----------
+        observation : xarray.Dataset or xarray.DataArray or None
+            observation to be compared to both forecasts.
+            If ``None``, then assume that forecast1 and forecast2 have already been
+            compared to observation. If metric is None, this assumes forecasts to be
+            already compared to observation before and ignores observation. Please
+            adjust ``orientation`` accordingly.
         forecast1 : xarray.Dataset or xarray.DataArray
             forecast1 to be compared to observation
         forecast2 : xarray.Dataset or xarray.DataArray
             forecast2 to be compared to observation
-        observation : xarray.Dataset or xarray.DataArray or None
-            observation to be compared to both forecasts.
-            If ``None``, then assume that forecast1 and forecast2 have already been
-            compared to observation. Please adjust ``metric`` and ``orientation``
-            accordingly.
         dim : str
             time dimension of dimension over which to compute the random walk.
             This dimension is not reduced, unlike in other xskillscore functions.
         alpha : float
             significance level for random walk.
         metric : callable, optional
-            metric to compare forecast# and observation if metric is not None. If
+            metric to compare forecast# with observation if metric is not None. If
             metric is None, assume that forecast# have been compared observation before
-            using ``sign_test``. Use ``metric=categorical``, if the winning forecast
-            should only be rewarded a point if it exactly equals the observation.
-            Also allows strings to be convered to ``xskillscore.{metric}``.
-            Defaults to None.
+            using ``sign_test`` and adjust ``orientation``.
+            Use ``metric=categorical``, if the winning forecast should only be rewarded
+            a point if it exactly equals the observation. Also allows strings to be
+            convered to ``xskillscore.{metric}``. Defaults to None.
         orientation : str
             Which skill values correspond to better skill? Smaller values (negative) or
-            Larger values (positive). Defaults to 'negative'. Ignored if metric is None
-            or categorical.
+            Larger values (positive). Defaults to 'negative'. Ignored if
+            ``metric== categorical``.
 
         Returns
         -------
@@ -85,7 +86,7 @@ def sign_test(
                 metric = _categorical_metric
                 if orientation != 'positive':
                     warnings.warn(
-                        'Changing orientation to "positive" for consistency with "metric=categorical"',
+                        'Changing to "orientation=positive" for consistency with "metric=categorical"',
                         UserWarning,
                     )
                 orientation = 'positive'
