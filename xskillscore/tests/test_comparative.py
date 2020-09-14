@@ -33,15 +33,11 @@ def test_sign_test_categorical(a_1d, a_1d_worse, b_1d, observation):
     a_1d = logical(a_1d)
     a_1d_worse = logical(a_1d_worse)
     b_1d = logical(b_1d)
-    if observation:
-        obs = b_1d
-    else:
-        obs = None
-    sign_test(a_1d, a_1d_worse, observation=obs, dim='time', categorical=True)
+    sign_test(a_1d, a_1d_worse, observation=b_1d, dim='time', metric='categorical')
 
 
-@pytest.mark.parametrize('categorical,metric', [(True, None), (False, 'mae')])
-def test_sign_test_identical(a_1d, a_1d_worse, b_1d, categorical, metric):
+@pytest.mark.parametrize('metric', ['categorical', 'mae'])
+def test_sign_test_identical(a_1d, a_1d_worse, b_1d, metric):
     """Test that identical forecasts show no walk step."""
     identicals = [1, 7]
     for i in identicals:
@@ -49,13 +45,11 @@ def test_sign_test_identical(a_1d, a_1d_worse, b_1d, categorical, metric):
         a_1d_worse = a_1d_worse.where(a_1d_worse != a_1d_worse.isel(time=i)).fillna(
             a_1d.isel(time=i)
         )
-    if categorical:
+    if metric == 'categorical':
         a_1d = logical(a_1d)
         a_1d_worse = logical(a_1d_worse)
         b_1d = logical(b_1d)
-    actual = sign_test(
-        a_1d, a_1d_worse, b_1d, dim='time', categorical=categorical, metric=metric
-    )
+    actual = sign_test(a_1d, a_1d_worse, b_1d, dim='time', metric=metric)
     # check flat
     assert (
         actual.sel(results='sign_test')
@@ -96,6 +90,21 @@ def test_sign_test_user_function(a_1d, a_1d_worse, b_1d):
         a_1d, a_1d_worse, b_1d, dim='time', orientation='negative', metric=mse
     )
     assert actual.sel(results='sign_test').isel(time=-1) > 0
+
+
+@pytest.mark.parametrize('orientation', ['negative', 'positive'])
+def test_sign_test_orientation(a_1d, a_1d_worse, b_1d, orientation):
+    """Test sign_test orientation."""
+    actual = sign_test(
+        a_1d, a_1d_worse, b_1d, dim='time', orientation=orientation, metric='mae'
+    )
+    if orientation == 'negative':
+        # a_1d wins
+        assert actual.sel(results='sign_test').isel(time=-1) > 0
+    elif orientation == 'positive':
+        # a_1d_worse wins because of corrupted metric orientation
+        print(actual.sel(results='sign_test').isel(time=-1))
+        assert actual.sel(results='sign_test').isel(time=-1) < 0
 
 
 @pytest.mark.parametrize('metric', ['mae', 'rmse', 'mse'])
@@ -150,7 +159,7 @@ def test_sign_test_observations_None_metric_fails(a_1d, a_1d_worse):
     assert 'observations must be provided when metric' in str(e.value)
 
 
-@pytest.mark.parametrize('orientation', ['categorical'])
+@pytest.mark.parametrize('orientation', ['categorical', None])
 def test_sign_test_invalid_orientation_fails(orientation, a_1d, a_1d_worse, b_1d):
     """Sign_test fails because of invalid orientation keyword."""
     with pytest.raises(ValueError) as e:
@@ -168,15 +177,3 @@ def test_sign_test_no_metric_but_observation_warns(a_1d, a_1d_worse, b_1d):
         a_1d, a_1d_worse, observation=None, orientation='positive', metric=None
     )
     assert (without_obs == with_obs).all()
-
-
-@pytest.mark.filterwarnings('ignore:Ignoring provided metric because categorical=True')
-def test_sign_test_categorical_but_also_metric_warns(a_1d, a_1d_worse, b_1d):
-    """Sign_test warns if categorical and metric, ignores metric."""
-    with_metric = sign_test(
-        a_1d, a_1d_worse, observation=b_1d, categorical=True, metric='mae'
-    )
-    without_metric = sign_test(
-        a_1d, a_1d_worse, observation=b_1d, categorical=True, metric=None
-    )
-    assert (without_metric == with_metric).all()

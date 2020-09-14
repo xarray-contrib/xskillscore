@@ -9,7 +9,6 @@ def sign_test(
     forecast2,
     observation=None,
     dim=None,
-    categorical=False,
     alpha=0.05,
     metric=None,
     orientation='negative',
@@ -33,15 +32,13 @@ def sign_test(
             This dimension is not reduced, unlike in other xskillscore functions.
         alpha : float
             significance level for random walk.
-        categorical : bool, optional
-            If ``True``, the winning forecast is only rewarded a point if it exactly
-            equals the observation. If False, use metric to compare forecast# with
-            observation.
         metric : callable, optional
             metric to compare forecast# and observation if metric is not None. If
             metric is None, assume that forecast# have been compared observation before
-            using ``sign_test``. If categorical is True, metric is ignored. Also allows
-            strings to be convered to ``xskillscore.{metric}``. Defaults to None.
+            using ``sign_test``. Use ``metric=categorical``, if the winning forecast
+            should only be rewarded a point if it exactly equals the observation.
+            Also allows strings to be convered to ``xskillscore.{metric}``.
+            Defaults to None.
         orientation : str
             Which skill values correspond to better skill? Smaller values (negative) or
             Larger values (positive). Defaults to 'negative'. Ignored if metric is None
@@ -66,7 +63,7 @@ def sign_test(
         ...      coords=[('time', np.arange(30))])
         >>> o = xr.DataArray(np.random.normal(size=(30)),
         ...      coords=[('time', np.arange(30))])
-        >>> st = sign_test(f1, f2, o, dim='time')
+        >>> st = sign_test(f1, f2, o, dim='time', metric='mae', orientation='negative')
         >>> st.sel(results='sign_test').plot()
         >>> st.sel(results='confidence').plot(c='gray')
         >>> (-1*st.sel(results='confidence')).plot(c='gray')
@@ -76,63 +73,69 @@ def sign_test(
             * DelSole, T., & Tippett, M. K. (2016). Forecast Comparison Based on Random
               Walks. Monthly Weather Review, 144(2), 615–626. doi: 10/f782pf
     """
-    # make sure metric is a callable
-    if metric is not None:
-        if isinstance(metric, str):
-            import xskillscore as xs
 
-            if hasattr(xs, metric):
-                metric = getattr(xs, metric)
+    def _categorical_metric(observations, forecasts, dim):
+        """Returns True where forecasts exactly equals observations"""
+        return observations == forecasts
+
+    if metric is not None:
+        # make sure metric is a callable
+        if isinstance(metric, str):
+            if metric == 'categorical':
+                metric = _categorical_metric
+                if orientation != 'positive':
+                    warnings.warn(
+                        'Changing orientation to "positive" for consistency with "metric=categorical"',
+                        UserWarning,
+                    )
+                orientation = 'positive'
             else:
-                raise ValueError(
-                    f'xskillscore.metric could not be derived from {metric}.'
-                )
+                import xskillscore as xs
+
+                if hasattr(xs, metric):
+                    metric = getattr(xs, metric)
+                else:
+                    raise ValueError(
+                        f'xskillscore.metric could not be derived from {metric}.'
+                    )
         elif not callable(metric):
             raise ValueError(
                 f'metric needs to be a function/callable or None, found {type(metric)}'
             )
-
-    if metric:
         if observation is not None:
             # Compare the forecasts and observation using metric
-            diff1 = metric(forecast1, observation, dim=[])
-            diff2 = metric(forecast2, observation, dim=[])
+            metric_f1o = metric(forecast1, observation, dim=[])
+            metric_f2o = metric(forecast2, observation, dim=[])
         else:
             raise ValueError(
                 'observations must be provided when metric is provided', UserWarning
             )
+
     else:  # if metric=None, already evaluated
         if observation is not None:
             warnings.warn(
                 'Ignoring provided observation because no metric was provided',
                 UserWarning,
             )
-        if orientation == 'negative':
-            diff1 = forecast1
-            diff2 = forecast2
-        elif orientation == 'positive':
-            diff1 = -forecast1
-            diff2 = -forecast2
-        if orientation not in ['negative', 'positive']:
-            raise ValueError(
-                '`orientation` requires to be either "positive" or'
-                f'"negative"], found {orientation}.'
-            )
+        metric_f1o = forecast1
+        metric_f2o = forecast2
 
-    if categorical:  # ignores orientation and warns if metric provided
-        if metric:
-            warnings.warn('Ignoring provided metric because categorical=True')
-        if observation is not None:
-            diff1 = -1 * (forecast1 == observation)
-            diff2 = -1 * (forecast2 == observation)
-        else:
-            diff1 = ~forecast1
-            diff2 = ~forecast2
+    # Adjust for orientation of metric
+    if orientation == 'positive' and metric != _categorical_metric:
+        metric_f1o = -metric_f1o
+        metric_f2o = -metric_f2o
+    elif orientation not in ['negative', 'positive']:
+        raise ValueError(
+            '`orientation` requires to be either "positive" or'
+            f'"negative"], found {orientation}.'
+        )
 
-    sign_test = (1 * (diff1 < diff2) - 1 * (diff2 < diff1)).cumsum(dim)
+    sign_test = (1 * (metric_f1o < metric_f2o) - 1 * (metric_f2o < metric_f1o)).cumsum(
+        dim
+    )
 
     # Estimate 95% confidence interval -----
-    notnan = 1 * (diff1.notnull() & diff2.notnull())
+    notnan = 1 * (metric_f1o.notnull() & metric_f2o.notnull())
     N = notnan.cumsum(dim)
     # z_alpha is the value at which the standardized cumulative Gaussian distributed exceeds alpha
     confidence = st.norm.ppf(1 - alpha / 2) * xr.ufuncs.sqrt(N)
