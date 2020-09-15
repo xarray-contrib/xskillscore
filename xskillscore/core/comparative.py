@@ -105,8 +105,8 @@ def sign_test(
             )
         if observation is not None:
             # Compare the forecasts and observation using metric
-            metric_f1o = metric(forecast1, observation, dim=[])
-            metric_f2o = metric(forecast2, observation, dim=[])
+            metric_f1o = metric(observation, forecast1, dim=[])
+            metric_f2o = metric(observation, forecast2, dim=[])
         else:
             raise ValueError(
                 'observations must be provided when metric is provided', UserWarning
@@ -122,9 +122,13 @@ def sign_test(
         metric_f2o = forecast2
 
     # Adjust for orientation of metric
-    if orientation == 'positive' and metric != _categorical_metric:
-        metric_f1o = -metric_f1o
-        metric_f2o = -metric_f2o
+    if orientation == 'positive':
+        if metric == _categorical_metric:
+            metric_f1o = ~metric_f1o
+            metric_f2o = ~metric_f2o
+        else:
+            metric_f1o = -metric_f1o
+            metric_f2o = -metric_f2o
     elif orientation not in ['negative', 'positive']:
         raise ValueError(
             '`orientation` requires to be either "positive" or'
