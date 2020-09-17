@@ -9,6 +9,8 @@ xskillscore: Metrics for verifying forecasts
    :target: https://anaconda.org/conda-forge/xskillscore/
 .. image:: https://coveralls.io/repos/github/raybellwaves/xskillscore/badge.svg?branch=master
    :target: https://coveralls.io/github/raybellwaves/xskillscore?branch=master
+.. image:: https://img.shields.io/readthedocs/xskillscore/stable.svg?style=flat
+   :target: https://xskillscore.readthedocs.io/en/stable/?badge=stable
 .. image:: https://img.shields.io/badge/benchmarked%20by-asv-green.svg?style=flat
    :target: https://raybellwaves.github.io/xskillscore/
 .. image:: https://img.shields.io/conda/dn/conda-forge/xskillscore.svg
@@ -31,6 +33,10 @@ or
 or
 
 ``$ pip install git+https://github.com/raybellwaves/xskillscore``
+
+Documentation
+-------------
+Documentation can be found on `readthedocs <https://xskillscore.readthedocs.io/en/latest/>`_.
 
 See also
 --------

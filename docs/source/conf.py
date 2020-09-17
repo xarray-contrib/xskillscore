@@ -23,8 +23,7 @@ else:
     print('pip environment:')
     subprocess.run(['pip', 'list'])
 
-# TODO add back in after release
-# print("xskillscore: %s, %s" % (xskillscore.__version__, xskillscore.__file__))
+print('xskillscore: %s, %s' % (xskillscore.__version__, xskillscore.__file__))
 
 
 # -- General configuration ---------------------------------------------------
@@ -76,8 +75,7 @@ project = 'xskillscore'
 copyright = '2018-%s, xskillscore Developers' % datetime.datetime.now().year
 
 # The full version, including alpha/beta/rc tags
-# TODO add back in after release
-# version = xskillscore.__version__
+version = xskillscore.__version__
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:

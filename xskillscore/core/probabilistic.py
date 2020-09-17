@@ -237,13 +237,14 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
 
     References
     ----------
-    Gneiting, Tilmann, and Adrian E Raftery. “Strictly Proper Scoring Rules,
+    * Gneiting, Tilmann, and Adrian E Raftery. “Strictly Proper Scoring Rules,
       Prediction, and Estimation.” Journal of the American Statistical
       Association 102, no. 477 (March 1, 2007): 359–78.
       https://doi.org/10/c6758w.
-    Brier, Glenn W. "VERIFICATION OF FORECASTS EXPRESSED IN TERMS OF PROBABILITY."
+    * Brier, Glenn W. "VERIFICATION OF FORECASTS EXPRESSED IN TERMS OF PROBABILITY."
       Monthly Weather Review, 78(1): 1-3
       https://journals.ametsoc.org/doi/abs/10.1175/1520-0493%281950%29078%3C0001%3AVOFEIT%3E2.0.CO%3B2
+
     """
     res = xr.apply_ufunc(
         properscoring.brier_score,

@@ -131,20 +131,26 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
 @pytest.mark.parametrize('metrics', distance_metrics)
 @pytest.mark.parametrize('dim', AXES)
 @pytest.mark.parametrize('weight_bool', [True, False])
-def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics):
+@pytest.mark.parametrize('skipna', [True, False])
+@pytest.mark.parametrize('has_nan', [True, False])
+def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics, skipna, has_nan):
     """Test whether distance-based metric for xarray functions (from
      deterministic.py) give save numerical results as for numpy functions from
      np_deterministic.py)."""
     # unpack metrics
+    a = a.copy()
+    if has_nan:
+        a[0] = np.nan
+
     metric, _metric = metrics
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     weights = adjust_weights(dim, weight_bool, weights)
     # median absolute error has no weights argument
     if metric is median_absolute_error:
-        actual = metric(a, b, dim)
+        actual = metric(a, b, dim, skipna=skipna)
     else:
-        actual = metric(a, b, dim, weights=weights)
+        actual = metric(a, b, dim, weights=weights, skipna=skipna)
     assert actual.chunks is None
 
     dim, axis = _preprocess_dims(dim, a)
@@ -153,11 +159,11 @@ def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     _weights = _preprocess_weights(_a, dim, dim, weights)
     axis = tuple(a.dims.index(d) for d in dim)
     if metric is median_absolute_error:
-        res = _metric(_a.values, _b.values, axis, skipna=False)
+        res = _metric(_a.values, _b.values, axis, skipna=skipna)
     else:
         # ensure _weights.values or None
         _weights = None if _weights is None else _weights.values
-        res = _metric(_a.values, _b.values, _weights, axis, skipna=False)
+        res = _metric(_a.values, _b.values, _weights, axis, skipna=skipna)
     expected = actual.copy()
     expected.values = res
     assert_allclose(actual, expected)
@@ -204,12 +210,18 @@ def test_correlation_metrics_xr_dask(
 @pytest.mark.parametrize('metrics', distance_metrics)
 @pytest.mark.parametrize('dim', AXES)
 @pytest.mark.parametrize('weight_bool', [True, False])
+@pytest.mark.parametrize('skipna', [True, False])
+@pytest.mark.parametrize('has_nan', [True, False])
 def test_distance_metrics_xr_dask(
-    a_dask, b_dask, dim, weight_bool, weights_dask, metrics
+    a_dask, b_dask, dim, weight_bool, weights_dask, metrics, skipna, has_nan
 ):
     """Test whether distance metrics for xarray functions can be lazy when
      chunked by using dask and give same results."""
     a = a_dask.copy()
+    if has_nan:
+        a = a.load()
+        a[0] = np.nan
+        a = a.chunk()
     b = b_dask.copy()
     weights = weights_dask.copy()
     # unpack metrics
@@ -220,15 +232,15 @@ def test_distance_metrics_xr_dask(
     if _weights is not None:
         _weights = _weights.load()
     if metric is median_absolute_error:
-        actual = metric(a, b, dim)
+        actual = metric(a, b, dim, skipna=skipna)
     else:
-        actual = metric(a, b, dim, weights=_weights)
+        actual = metric(a, b, dim, weights=_weights, skipna=skipna)
     # check that chunks for chunk inputs
     assert actual.chunks is not None
     if metric is median_absolute_error:
-        expected = metric(a.load(), b.load(), dim)
+        expected = metric(a.load(), b.load(), dim, skipna=skipna)
     else:
-        expected = metric(a.load(), b.load(), dim, weights=_weights)
+        expected = metric(a.load(), b.load(), dim, weights=_weights, skipna=skipna)
     assert expected.chunks is None
     assert_allclose(actual.compute(), expected)
 
@@ -307,3 +319,17 @@ def test_dim_empty_list(a, b, metrics):
         metric, _metric = metrics
         res = metric(a, b, dim=[])
         assert len(res.dims) == len(a.dims), print(res.dims)
+
+
+@pytest.mark.parametrize('metrics', correlation_metrics + distance_metrics)
+def test_correlation_broadcasts(a, b, metrics):
+    """Test whether correlation metric broadcasts dimensions other than dim."""
+    # unpack metrics
+    metric, _metric = metrics
+    metric(a, b.isel(lat=0), dim='time')
+    metric(a, b.isel(lat=[0]), dim='time')
+    b_changed_coords = b.isel(lat=[0]).assign_coords(lat=[123])
+    print(metric.__name__)
+    with pytest.raises(ValueError) as e:
+        metric(a, b_changed_coords, dim='lat')
+    assert 'indexes along dimension' in str(e.value)
