@@ -90,6 +90,13 @@ documents. Some helpful guides are located
 
     The build documentation should be available in the ``docs/build/`` folder.
 
+To lint the reStructuredText files in the home folder run:
+
+.. code:: bash
+
+    $ cd ..
+    $ doc8 *.rst
+
 If you are adding new functions to the API, run ``sphinx-autogen -o api api.rst`` from the
 ``docs/source`` directory and add the functions to ``api.rst``.
 

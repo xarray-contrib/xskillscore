@@ -4,6 +4,7 @@ channels:
 dependencies:
   - python=3.6
   - bottleneck
+  - doc8
   - importlib_metadata
   - ipykernel
   - ipython
@@ -19,4 +20,4 @@ dependencies:
   - xarray
   - xhistogram
   - pip:
-    - -e ..
+      - -e ..
