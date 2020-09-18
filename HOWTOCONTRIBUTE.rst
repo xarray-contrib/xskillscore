@@ -27,7 +27,8 @@ Feature requests and feedback
 
 We are eager to hear about your requests for new features and any suggestions about the
 API, infrastructure, and so on. Feel free to submit these as
-`issues <https://github.com/raybellwaves/xskillscore/issues/new>`__ with the label "feature request."
+`issues <https://github.com/raybellwaves/xskillscore/issues/new?assignees=&labels=feature+request&template=ISSUE.md>`__
+with the label "feature request."
 
 Please make sure to explain in detail how the feature should work and keep the scope as
 narrow as possible. This will make it easier to implement in small PRs.
@@ -38,7 +39,8 @@ narrow as possible. This will make it easier to implement in small PRs.
 Report bugs
 -----------
 
-Report bugs for ``xskillscore`` in the `issue tracker <https://github.com/raybellwaves/xskillscore/issues>`_
+Report bugs for ``xskillscore`` in the
+`issue tracker <https://github.com/raybellwaves/xskillscore/issues/new?assignees=&labels=bug&template=ISSUE.md>`_
 with the label "bug".
 
 If you are reporting a bug, please include:
@@ -87,6 +89,13 @@ documents. Some helpful guides are located
         $ make html
 
     The build documentation should be available in the ``docs/build/`` folder.
+
+To lint the reStructuredText files in the home folder run:
+
+.. code:: bash
+
+    $ cd ..
+    $ doc8 *.rst
 
 If you are adding new functions to the API, run ``sphinx-autogen -o api api.rst`` from the
 ``docs/source`` directory and add the functions to ``api.rst``.
