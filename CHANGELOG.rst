@@ -2,6 +2,18 @@
 Changelog History
 =================
 
+xskillscore v0.0.18 (2020-xx-xx)
+--------------------------------
+
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Removed an unused variable in ``_rmse`` (:pr:`182`). `Andrew Huang`_.
+
+Documentation
+~~~~~~~~~~~~~
+- Added ``CONTRIBUTING.md`` (:pr:`181`) `mcsitter`_.
+
+
 xskillscore v0.0.17 (2020-09-06)
 --------------------------------
 
@@ -45,6 +57,7 @@ Internal Changes
   `Aaron Spring`_ and `Ray Bell`_
 - Removed ``test_np_deterministic`` covered by ``test_metric_results_accurate``.
   (:pr:`159`) `Aaron Spring`_
+
 
 xskillscore v0.0.16 (2020-07-18)
 --------------------------------
@@ -135,5 +148,6 @@ Testing
 .. _`Aaron Spring`: https://github.com/aaronspring
 .. _`Andrew Huang`: https://github.com/ahuang11
 .. _`Dougie Squire`: https://github.com/dougiesquire
+.. _`mcsitter`: https://github.com/mcsitter
 .. _`Riley X. Brady`: https://github.com/bradyrx
 .. _`Ray Bell`: https://github.com/raybellwaves
