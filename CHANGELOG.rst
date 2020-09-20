@@ -5,6 +5,10 @@ Changelog History
 xskillscore v0.0.18 (2020-xx-xx)
 --------------------------------
 
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Removed an unused variable in ``_rmse`` (:pr:`182`). `Andrew Huang`_.
+
 Documentation
 ~~~~~~~~~~~~~
 - Added ``CONTRIBUTING.md`` (:pr:`181`) `mcsitter`_.

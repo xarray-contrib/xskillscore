@@ -500,7 +500,7 @@ def _rmse(a, b, weights, axis, skipna):
             weights, axis=axis
         )
     else:
-        mean_squared_error = meanfunc(((a - b) ** 2), axis=axis)
+        mean_squared_error = meanfunc(squared_error, axis=axis)
     res = np.sqrt(mean_squared_error)
     return res
 
