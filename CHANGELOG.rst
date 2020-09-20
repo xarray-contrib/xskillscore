@@ -11,7 +11,7 @@ Features
   :py:func:`~xskillscore.sign_test`. (:issue:`133`, :pr:`176`)
   `Aaron Spring`_ and `Dougie Squire`_
   
- Documentation
+Documentation
 ~~~~~~~~~~~~~
 - Added ``CONTRIBUTING.md`` (:pr:`181`) `mcsitter`_.
 
