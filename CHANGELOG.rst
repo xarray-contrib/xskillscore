@@ -11,6 +11,10 @@ Features
   :py:func:`~xskillscore.sign_test`. (:issue:`133`, :pr:`176`)
   `Aaron Spring`_ and `Dougie Squire`_
   
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Removed an unused variable in ``_rmse`` (:pr:`182`). `Andrew Huang`_.
+
 Documentation
 ~~~~~~~~~~~~~
 - Added ``CONTRIBUTING.md`` (:pr:`181`) `mcsitter`_.
