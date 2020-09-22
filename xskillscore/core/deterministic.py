@@ -63,7 +63,7 @@ def _determine_input_core_dims(dim, weights):
         dim = [dim]
     # build input_core_dims depending on weights
     if weights is None:
-        input_core_dims = [dim, dim, [None]]
+        input_core_dims = [dim, dim, []]
     else:
         input_core_dims = [dim, dim, dim]
     return input_core_dims
