@@ -12,6 +12,7 @@ dependencies:
   - numpy
   - pip
   - properscoring
+  - matplotlib
   - scipy
   - sphinx
   - sphinx_rtd_theme
