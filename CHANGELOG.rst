@@ -10,10 +10,11 @@ Features
 - Added the sign test described in DelSole and Tippett 2016:
   :py:func:`~xskillscore.sign_test`. (:issue:`133`, :pr:`176`)
   `Aaron Spring`_ and `Dougie Squire`_
-  
+
 Internal Changes
 ~~~~~~~~~~~~~~~~
 - Removed an unused variable in ``_rmse`` (:pr:`182`). `Andrew Huang`_.
+- Require ``xarray=0.16.1`` (:issue:`183`, :pr:`184`) `Aaron Spring`_
 
 Documentation
 ~~~~~~~~~~~~~
