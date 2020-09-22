@@ -9,6 +9,7 @@ dependencies:
   - sphinx
   - sphinx_rtd_theme
   - sphinx-autosummary-accessors
+  - matplotlib
   # IDE
   - jupyterlab
   # Numerics
