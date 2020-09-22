@@ -184,3 +184,9 @@ def test_sign_test_dim(a, b):
 def test_sign_test_dim_fails(a_1d, a_1d_worse, b_1d):
     """Sign_test fails if no time_dim in dim."""
     sign_test(a_1d, a_1d_worse, b_1d, time_dim='time', dim='time')
+
+
+@pytest.mark.xfail()
+def test_sign_test_metric_correlation_fails(a_1d, a_1d_worse, b_1d):
+    """Sign_test fails for correlation metrics."""
+    sign_test(a_1d, a_1d_worse, b_1d, time_dim='time', dim='time', metric='pearson_r')

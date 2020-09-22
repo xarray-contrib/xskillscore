@@ -17,6 +17,17 @@ def sign_test(
     """
         Returns the Delsole and Tippett sign test over the given time dimension.
 
+        The sign test can be applied to a wide class of measures of forecast quality,
+        including ordered (ranked) categorical data. It is independent of
+        distributional assumptions about the forecast errors. This is different than
+        alternative measures like correlation and mean square error, which assume that
+        the metrics were computed from independent samples. However, skill metrics
+        computed over a common period with a common set of observations are not
+        independent. For example, different forecasts tend to bust for the same event.
+        This procedure is equivalent to testing whether a coin is fair based on the
+        frequency of heads. The null hypothesis is that the difference between the
+        median scores is zero.
+
         Parameters
         ----------
         forecast1 : xarray.Dataset or xarray.DataArray
@@ -38,7 +49,7 @@ def sign_test(
             Defaults to [].
         alpha : float
             significance level for random walk.
-        metric : callable, optional
+        metric : callable, str, optional
             metric to compare forecast# with observation if metric is not None. If
             metric is None, assume that forecast# have been compared observation before
             using ``sign_test``. Make sure to adjust ``orientation`` if metric is None.
@@ -82,6 +93,12 @@ def sign_test(
         """Returns True where forecasts exactly equals observations"""
         return observations == forecasts
 
+    if orientation not in ['negative', 'positive']:
+        raise ValueError(
+            '`orientation` requires to be either "positive" or'
+            f'"negative"], found {orientation}.'
+        )
+
     if metric is not None:
         # make sure metric is a callable
         if isinstance(metric, str):
@@ -109,9 +126,7 @@ def sign_test(
             metric_f1o = metric(observation, forecast1, dim=dim)
             metric_f2o = metric(observation, forecast2, dim=dim)
         else:
-            raise ValueError(
-                'observations must be provided when metric is provided', UserWarning
-            )
+            raise ValueError('observations must be provided when metric is provided')
 
     else:  # if metric=None, already evaluated
         if observation is not None:
@@ -130,11 +145,6 @@ def sign_test(
         else:
             metric_f1o = -metric_f1o
             metric_f2o = -metric_f2o
-    elif orientation not in ['negative', 'positive']:
-        raise ValueError(
-            '`orientation` requires to be either "positive" or'
-            f'"negative"], found {orientation}.'
-        )
 
     sign_test = (1 * (metric_f1o < metric_f2o) - 1 * (metric_f2o < metric_f1o)).cumsum(
         time_dim
