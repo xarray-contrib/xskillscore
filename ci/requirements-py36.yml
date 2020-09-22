@@ -20,7 +20,7 @@ dependencies:
   - properscoring
   - scikit-learn
   - scipy
-  - xarray
+  - xarray>=0.16.1
   - xhistogram
   # Package Management
   - asv
