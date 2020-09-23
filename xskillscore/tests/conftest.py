@@ -2,7 +2,9 @@ import numpy as np
 import pytest
 import xarray as xr
 
-PERIODS = 10  # effective_p_value produces nans for shorter periods
+PERIODS = 12  # effective_p_value produces nans for shorter periods
+
+np.random.seed(42)
 
 
 @pytest.fixture

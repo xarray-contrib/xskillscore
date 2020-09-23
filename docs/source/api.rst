@@ -108,3 +108,13 @@ Multi-Category Metrics
     Contingency.heidke_score
     Contingency.peirce_score
     Contingency.gerrity_score
+
+Comparative
+-----------
+
+Tests to compare whether one forecast is significantly better than another one.
+
+.. autosummary::
+    :toctree: api/
+
+    sign_test

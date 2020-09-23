@@ -13,7 +13,7 @@ echo "[black]"
 black --check --line-length=88 -S xskillscore
 
 echo "[isort]"
-isort --recursive --check-only xskillscore
+isort --check-only xskillscore
 
 echo "[doc8]"
 doc8 *.rst
