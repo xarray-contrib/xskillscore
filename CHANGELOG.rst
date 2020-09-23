@@ -2,7 +2,7 @@
 Changelog History
 =================
 
-xskillscore v0.0.18 (2020-xx-xx)
+xskillscore v0.0.18 (2020-09-23)
 --------------------------------
 
 Features
@@ -13,12 +13,19 @@ Features
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
-- Removed an unused variable in ``_rmse`` (:pr:`182`). `Andrew Huang`_.
+- Removed an unused variable in ``_rmse``, resulting in 2x speedup
+  (:pr:`182`). `Andrew Huang`_
 - Require ``xarray=0.16.1`` (:issue:`183`, :pr:`184`) `Aaron Spring`_
+
+Bug Fixes
+~~~~~~~~~
+- Fix incompatibility with ``xarray=0.16.1`` in ``apply_ufunc``
+  (:issue:`183`, :pr:`184`) `Aaron Spring`_
 
 Documentation
 ~~~~~~~~~~~~~
-- Added ``CONTRIBUTING.md`` (:pr:`181`) `mcsitter`_.
+- Added ``CONTRIBUTING.md`` to trigger built-in Github
+  contribution guide reference (:pr:`181`) `mcsitter`_.
 
 
 xskillscore v0.0.17 (2020-09-06)
