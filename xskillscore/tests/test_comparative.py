@@ -12,6 +12,11 @@ def a_1d_worse(a_1d):
     return a_1d + OFFSET
 
 
+@pytest.fixture
+def a_worse(a):
+    return a + OFFSET
+
+
 def logical(ds):
     return ds > 0.5
 
@@ -164,9 +169,8 @@ def test_sign_test_no_metric_but_observation_warns(a_1d, a_1d_worse, b_1d):
     assert (without_obs == with_obs).all()
 
 
-def test_sign_test_dim(a, b):
+def test_sign_test_dim(a, a_worse, b):
     """Sign_test with dim specified."""
-    a_worse = a + OFFSET
     actual = sign_test(
         a,
         a_worse,
@@ -183,10 +187,11 @@ def test_sign_test_dim(a, b):
 @pytest.mark.xfail()
 def test_sign_test_dim_fails(a_1d, a_1d_worse, b_1d):
     """Sign_test fails if no time_dim in dim."""
-    sign_test(a_1d, a_1d_worse, b_1d, time_dim='time', dim='time')
+    with pytest.raises(ValueError) as e:
+        sign_test(a_1d, a_1d_worse, b_1d, time_dim='time', dim='time')
+    assert '`dim` cannot contain `time_dim`' in str(e.value)
 
 
-@pytest.mark.xfail()
-def test_sign_test_metric_correlation_fails(a_1d, a_1d_worse, b_1d):
-    """Sign_test fails for correlation metrics."""
-    sign_test(a_1d, a_1d_worse, b_1d, time_dim='time', dim='time', metric='pearson_r')
+def test_sign_test_metric_correlation(a, a_worse, b):
+    """Sign_test work for correlation metrics over other dimensions that time_dim."""
+    sign_test(a, a_worse, b, time_dim='time', dim=['lon', 'lat'], metric='pearson_r')
