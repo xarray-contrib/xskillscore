@@ -125,7 +125,7 @@ Preparing Pull Requests
 
 #. Install dependencies into a new conda environment::
 
-    $ conda env update -f ci/requirements-py36.yml
+    $ conda env update -f ci/requirements.yml
     $ conda activate xskillscore-dev
 
 #. Make an editable install of xskillscore by running::

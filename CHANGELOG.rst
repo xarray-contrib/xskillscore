@@ -2,6 +2,15 @@
 Changelog History
 =================
 
+xskillscore v0.0.19 (2020-XX-XX)
+--------------------------------
+
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Added Python 3.7 and Python 3.8 to the CI. Use the latest version of Python 3
+  for development. (:issue:`21`, :pr:`189`). `Aaron Spring`_
+
+
 xskillscore v0.0.18 (2020-09-23)
 --------------------------------
 
