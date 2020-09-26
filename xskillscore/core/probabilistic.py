@@ -515,46 +515,46 @@ def discrimination(
        the histogram of forecasts likelihood when observations indicate an event has
        occurred and has not occurred.
 
-        Parameters
-        ----------
-        observations : xarray.Dataset or xarray.DataArray
-            The observations or set of observations of the event.
-            Data should be boolean or logical \
-            (True or 1 for event occurance, False or 0 for non-occurance).
-        forecasts : xarray.Dataset or xarray.DataArray
-            The forecast likelihoods of the event. Data should be between 0 and 1.
-        dim : str or list of str, optional
-            Dimension(s) over which to compute the histograms
-            Defaults to None meaning compute over all dimensions.
-        probability_bin_edges : array_like, optional
-            Probability bin edges used to compute the histograms.
-            Bins include the left most edge, \
-            but not the right. Defaults to 6 equally spaced edges between 0 and 1+1e-8
+    Parameters
+    ----------
+    observations : xarray.Dataset or xarray.DataArray
+        The observations or set of observations of the event.
+        Data should be boolean or logical \
+        (True or 1 for event occurance, False or 0 for non-occurance).
+    forecasts : xarray.Dataset or xarray.DataArray
+        The forecast likelihoods of the event. Data should be between 0 and 1.
+    dim : str or list of str, optional
+        Dimension(s) over which to compute the histograms
+        Defaults to None meaning compute over all dimensions.
+    probability_bin_edges : array_like, optional
+        Probability bin edges used to compute the histograms.
+        Bins include the left most edge, \
+        but not the right. Defaults to 6 equally spaced edges between 0 and 1+1e-8
 
-        Returns
-        -------
-        xarray.Dataset or xarray.DataArray
-            Array with added dimension "event" containing the histograms of
-            forecast probabilities when the event was observed and not observed
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray
+        Array with added dimension "event" containing the histograms of
+        forecast probabilities when the event was observed and not observed
 
-        Examples
-        --------
-        >>> observations = xr.DataArray(np.random.normal(size=(30,30)),
-        ...                             coords=[('x', np.arange(30)),
-        ...                                     ('y', np.arange(30))])
-        >>> forecasts = xr.DataArray(np.random.normal(size=(30,30,10)),
-        ...                          coords=[('x', np.arange(30)),
-        ...                                  ('y', np.arange(30)),
-        ...                                  ('member', np.arange(10))])
-        >>> forecast_event_likelihood = (forecasts > 0).mean('member')
-        >>> observed_event = observations > 0
-        >>> disc = discrimination(observed_event,
-        ...                       forecast_event_likelihood,
-        ...                       dim=['x','y'])
+    Examples
+    --------
+    >>> observations = xr.DataArray(np.random.normal(size=(30,30)),
+    ...                             coords=[('x', np.arange(30)),
+    ...                                     ('y', np.arange(30))])
+    >>> forecasts = xr.DataArray(np.random.normal(size=(30,30,10)),
+    ...                          coords=[('x', np.arange(30)),
+    ...                                  ('y', np.arange(30)),
+    ...                                  ('member', np.arange(10))])
+    >>> forecast_event_likelihood = (forecasts > 0).mean('member')
+    >>> observed_event = observations > 0
+    >>> disc = discrimination(observed_event,
+    ...                       forecast_event_likelihood,
+    ...                       dim=['x','y'])
 
-        References
-        ----------
-        http://www.cawcr.gov.au/projects/verification/
+    References
+    ----------
+    http://www.cawcr.gov.au/projects/verification/
     """
 
     _fail_if_dim_empty(dim)
