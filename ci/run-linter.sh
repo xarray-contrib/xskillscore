@@ -13,7 +13,7 @@ echo "[black]"
 black -S xskillscore
 
 echo "[flake8]"
-flake8 xskillscore --exclude=__init__.py
+flake8 xskillscore --exclude=__init__.py  --ignore=E203,E711,W503
 
 echo "[doc8]"
 doc8 *.rst
