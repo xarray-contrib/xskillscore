@@ -1,4 +1,4 @@
-xskillscore.threshold\_brier\_score
+﻿xskillscore.threshold\_brier\_score
 ===================================
 
 .. currentmodule:: xskillscore

@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-import xarray as xr
 
 from xskillscore.core.deterministic import (
     mae,
@@ -40,31 +39,31 @@ def mask_data(da):
     return da
 
 
-@pytest.mark.parametrize('metric', METRICS)
+@pytest.mark.parametrize("metric", METRICS)
 def test_single_grid_cell_matches_individual_time_series(a, b, metric):
     """Test that a single grid cell result from a gridded dataset matches the
     result for just passing through the individual time series"""
-    for x in range(a['lon'].size):
-        for y in range(a['lat'].size):
+    for x in range(a["lon"].size):
+        for y in range(a["lat"].size):
             ts_a = a.isel(lat=y, lon=x)
             ts_b = b.isel(lat=y, lon=x)
-            gridded_res = metric(a, b, 'time').isel(lat=y, lon=x)
-            ts_res = metric(ts_a, ts_b, 'time')
+            gridded_res = metric(a, b, "time").isel(lat=y, lon=x)
+            ts_res = metric(ts_a, ts_b, "time")
             assert np.allclose(gridded_res, ts_res)
 
 
-@pytest.mark.parametrize('metric', METRICS)
+@pytest.mark.parametrize("metric", METRICS)
 def test_single_grid_cell_matches_individual_time_series_nans(a, b, metric):
     """Test that a single grid cell result from a gridded dataset with nans matches the
     result for just passing through the individual time series"""
     a_masked = mask_data(a)
     b_masked = mask_data(b)
-    for x in range(a_masked['lon'].size):
-        for y in range(a_masked['lat'].size):
+    for x in range(a_masked["lon"].size):
+        for y in range(a_masked["lat"].size):
             ts_a_masked = a_masked.isel(lat=y, lon=x)
             ts_b_masked = b_masked.isel(lat=y, lon=x)
-            gridded_res = metric(a_masked, b_masked, 'time', skipna=True).isel(
+            gridded_res = metric(a_masked, b_masked, "time", skipna=True).isel(
                 lat=y, lon=x
             )
-            ts_res = metric(ts_a_masked, ts_b_masked, 'time', skipna=True)
+            ts_res = metric(ts_a_masked, ts_b_masked, "time", skipna=True)
             assert np.allclose(gridded_res, ts_res, equal_nan=True)

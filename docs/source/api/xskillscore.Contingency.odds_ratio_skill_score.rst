@@ -1,4 +1,4 @@
-xskillscore.Contingency.odds\_ratio\_skill\_score
+﻿xskillscore.Contingency.odds\_ratio\_skill\_score
 =================================================
 
 .. currentmodule:: xskillscore

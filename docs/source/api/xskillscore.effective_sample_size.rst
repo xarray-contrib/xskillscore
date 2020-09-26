@@ -1,4 +1,4 @@
-xskillscore.effective\_sample\_size
+﻿xskillscore.effective\_sample\_size
 ===================================
 
 .. currentmodule:: xskillscore

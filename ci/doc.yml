@@ -18,7 +18,7 @@ dependencies:
   - sphinx_rtd_theme
   - sphinx-autosummary-accessors
   - toolz
-  - xarray
+  - xarray>=0.16.1
   - xhistogram
   - pip:
       - -e ..

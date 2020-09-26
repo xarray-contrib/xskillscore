@@ -10,22 +10,22 @@ np.random.seed(42)
 @pytest.fixture
 def o():
     """Observation."""
-    times = xr.cftime_range(start='2000', periods=PERIODS, freq='D')
+    times = xr.cftime_range(start="2000", periods=PERIODS, freq="D")
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.rand(len(times), len(lats), len(lons))
     return xr.DataArray(
         data,
         coords=[times, lats, lons],
-        dims=['time', 'lat', 'lon'],
-        attrs={'source': 'test'},
+        dims=["time", "lat", "lon"],
+        attrs={"source": "test"},
     )
 
 
 @pytest.fixture
 def f_prob():
     """Probabilistic forecast containing also a member dimension."""
-    times = xr.cftime_range(start='2000', periods=PERIODS, freq='D')
+    times = xr.cftime_range(start="2000", periods=PERIODS, freq="D")
     members = np.arange(3)
     lats = np.arange(4)
     lons = np.arange(5)
@@ -33,8 +33,8 @@ def f_prob():
     return xr.DataArray(
         data,
         coords=[members, times, lats, lons],
-        dims=['member', 'time', 'lat', 'lon'],
-        attrs={'source': 'test'},
+        dims=["member", "time", "lat", "lon"],
+        attrs={"source": "test"},
     )
 
 
@@ -105,8 +105,8 @@ def b_1d(b):
 
 @pytest.fixture
 def a_1d_nan():
-    time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
-    return xr.DataArray([3, np.nan, 5], dims=['time'], coords=[time])
+    time = xr.cftime_range("2000-01-01", "2000-01-03", freq="D")
+    return xr.DataArray([3, np.nan, 5], dims=["time"], coords=[time])
 
 
 @pytest.fixture
@@ -132,8 +132,8 @@ def weights_lonlat(a):
 
 @pytest.fixture
 def weights_time():
-    time = xr.cftime_range('2000-01-01', '2000-01-03', freq='D')
-    return xr.DataArray([1, 2, 3], dims=['time'], coords=[time])
+    time = xr.cftime_range("2000-01-01", "2000-01-03", freq="D")
+    return xr.DataArray([1, 2, 3], dims=["time"], coords=[time])
 
 
 @pytest.fixture

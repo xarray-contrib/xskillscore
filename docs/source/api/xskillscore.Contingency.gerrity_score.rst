@@ -1,4 +1,4 @@
-xskillscore.Contingency.gerrity\_score
+﻿xskillscore.Contingency.gerrity\_score
 ======================================
 
 .. currentmodule:: xskillscore

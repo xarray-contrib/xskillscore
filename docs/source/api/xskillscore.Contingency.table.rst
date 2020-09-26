@@ -1,4 +1,4 @@
-xskillscore.Contingency.table
+﻿xskillscore.Contingency.table
 =============================
 
 .. currentmodule:: xskillscore

@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 import xarray as xr
 from xarray.tests import assert_allclose
@@ -46,15 +45,15 @@ distance_metrics = [
     smape,
 ]
 
-AXES = ('time', 'lat', 'lon', ['lat', 'lon'], ['time', 'lat', 'lon'])
+AXES = ("time", "lat", "lon", ["lat", "lon"], ["time", "lat", "lon"])
 
 
 def _ds(a, b, skipna_bool):
     ds = xr.Dataset()
-    ds['a'] = a
-    ds['b'] = b
+    ds["a"] = a
+    ds["b"] = b
     if skipna_bool is True:
-        ds['b'] = b.where(b < 0.5)
+        ds["b"] = b.where(b < 0.5)
     return ds
 
 
@@ -71,40 +70,40 @@ def adjust_weights(dim, weight_bool, weights):
         return None
 
 
-@pytest.mark.parametrize('outer_bool', [False, True])
-@pytest.mark.parametrize('metric', correlation_metrics + distance_metrics)
-@pytest.mark.parametrize('dim', AXES)
-@pytest.mark.parametrize('weight_bool', [False, True])
-@pytest.mark.parametrize('skipna_bool', [False, True])
+@pytest.mark.parametrize("outer_bool", [False, True])
+@pytest.mark.parametrize("metric", correlation_metrics + distance_metrics)
+@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize("weight_bool", [False, True])
+@pytest.mark.parametrize("skipna_bool", [False, True])
 def test_deterministic_metrics_accessor(
     a, b, dim, skipna_bool, weight_bool, weights, metric, outer_bool
 ):
 
     # Update dim to time if testing temporal only metrics
-    if (dim != 'time') and (metric in temporal_only_metrics):
-        dim = 'time'
+    if (dim != "time") and (metric in temporal_only_metrics):
+        dim = "time"
 
     _weights = adjust_weights(dim, weight_bool, weights)
     ds = _ds(a, b, skipna_bool)
-    b = ds['b']  # Update if populated with nans
+    b = ds["b"]  # Update if populated with nans
     if outer_bool:
-        ds = ds.drop_vars('b')
+        ds = ds.drop_vars("b")
 
     accessor_func = getattr(ds.xs, metric.__name__)
     if metric in temporal_only_metrics or metric == median_absolute_error:
         actual = metric(a, b, dim=dim, skipna=skipna_bool)
         if outer_bool:
-            expected = accessor_func('a', b, dim=dim, skipna=skipna_bool)
+            expected = accessor_func("a", b, dim=dim, skipna=skipna_bool)
         else:
-            expected = accessor_func('a', 'b', dim=dim, skipna=skipna_bool)
+            expected = accessor_func("a", "b", dim=dim, skipna=skipna_bool)
     else:
         actual = metric(a, b, dim=dim, weights=_weights, skipna=skipna_bool)
         if outer_bool:
             expected = accessor_func(
-                'a', b, dim=dim, weights=_weights, skipna=skipna_bool
+                "a", b, dim=dim, weights=_weights, skipna=skipna_bool
             )
         else:
             expected = accessor_func(
-                'a', 'b', dim=dim, weights=_weights, skipna=skipna_bool
+                "a", "b", dim=dim, weights=_weights, skipna=skipna_bool
             )
     assert_allclose(actual, expected)

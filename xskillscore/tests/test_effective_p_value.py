@@ -1,7 +1,3 @@
-import numpy as np
-import pytest
-import xarray as xr
-
 from xskillscore.core.deterministic import (
     effective_sample_size,
     pearson_r_eff_p_value,
@@ -10,7 +6,7 @@ from xskillscore.core.deterministic import (
     spearman_r_p_value,
 )
 
-DIM = 'time'
+DIM = "time"
 
 
 def test_eff_sample_size_smaller_than_n(a, b):
@@ -30,7 +26,7 @@ def test_eff_pearson_p_greater_or_equal_to_normal_p(a, b):
     print(b)
     normal_p = pearson_r_p_value(a, b, DIM)
     eff_p = pearson_r_eff_p_value(a, b, DIM)
-    print('\n' * 3)
+    print("\n" * 3)
     print(normal_p)
     print(eff_p)
     assert (eff_p >= normal_p).all()
