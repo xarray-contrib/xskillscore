@@ -1,4 +1,3 @@
-import numpy as np
 import xarray as xr
 
 from .deterministic import (
@@ -30,7 +29,7 @@ from .probabilistic import (
 )
 
 
-@xr.register_dataset_accessor('xs')
+@xr.register_dataset_accessor("xs")
 class XSkillScoreAccessor(object):
     def __init__(self, xarray_obj):
         self._obj = xarray_obj

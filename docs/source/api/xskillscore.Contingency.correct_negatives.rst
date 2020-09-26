@@ -1,4 +1,4 @@
-xskillscore.Contingency.correct\_negatives
+﻿xskillscore.Contingency.correct\_negatives
 ==========================================
 
 .. currentmodule:: xskillscore

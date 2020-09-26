@@ -2,7 +2,7 @@ name: xskillscore-docs
 channels:
   - conda-forge
 dependencies:
-  - python=3.6
+  - python=3.*
   - bottleneck
   - doc8
   - importlib_metadata

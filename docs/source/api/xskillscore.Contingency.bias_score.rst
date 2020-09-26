@@ -1,4 +1,4 @@
-xskillscore.Contingency.bias\_score
+﻿xskillscore.Contingency.bias\_score
 ===================================
 
 .. currentmodule:: xskillscore

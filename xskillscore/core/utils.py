@@ -2,7 +2,7 @@ import numpy as np
 import xarray as xr
 from xhistogram.xarray import histogram as xhist
 
-__all__ = ['histogram']
+__all__ = ["histogram"]
 
 
 def _preprocess_dims(dim, a):
@@ -23,8 +23,8 @@ def _preprocess_dims(dim, a):
 def _fail_if_dim_empty(dim):
     if dim == []:
         raise ValueError(
-            'metric must be applied along one dimension, therefore '
-            f'requires `dim` not being empty, found dim={dim}'
+            "metric must be applied along one dimension, therefore "
+            f"requires `dim` not being empty, found dim={dim}"
         )
 
 
@@ -54,7 +54,7 @@ def _stack_input_if_needed(a, b, dim, weights):
         Weights matching dimensions of ``dim`` to apply during the function.
     """
     if len(dim) > 1:
-        new_dim = '_'.join(dim)
+        new_dim = "_".join(dim)
         a = a.stack(**{new_dim: dim})
         b = b.stack(**{new_dim: dim})
         if weights is not None:
@@ -84,8 +84,8 @@ def _preprocess_weights(a, dim, new_dim, weights):
         # Throw error if there are negative weights.
         if weights.min() < 0:
             raise ValueError(
-                'Weights has a minimum below 0. Please submit a weights array '
-                'of positive numbers.'
+                "Weights has a minimum below 0. Please submit a weights array "
+                "of positive numbers."
             )
         # Scale weights to vary from 0 to 1.
         weights = weights / weights.max()
@@ -94,9 +94,9 @@ def _preprocess_weights(a, dim, new_dim, weights):
         drop_dims = {k: 0 for k in a.dims if k not in new_dim}
         if dict(weights.sizes) != dict(a.isel(drop_dims).sizes):
             raise ValueError(
-                f'weights dimension(s) {dim} of size {dict(weights.sizes)} '
+                f"weights dimension(s) {dim} of size {dict(weights.sizes)} "
                 f"does not match DataArray's size "
-                f'{dict(a.isel(drop_dims).sizes)}'
+                f"{dict(a.isel(drop_dims).sizes)}"
             )
         if dict(weights.sizes) != dict(a.sizes):
             # Broadcast weights to full size of main object.
@@ -106,35 +106,33 @@ def _preprocess_weights(a, dim, new_dim, weights):
 
 def _add_as_coord(ds1, ds2, coordinate_suffix):
     """Add ds2 as a coordinate of ds1.
-        Assumes that ds1 and ds2 are the same type of xarray object
+    Assumes that ds1 and ds2 are the same type of xarray object
     """
     if isinstance(ds1, xr.Dataset):
         for var in ds1.data_vars:
-            ds1 = ds1.assign_coords({f'{ds2[var].name}_{coordinate_suffix}': ds2[var]})
+            ds1 = ds1.assign_coords({f"{ds2[var].name}_{coordinate_suffix}": ds2[var]})
     elif isinstance(ds1, xr.DataArray):
         ds1 = ds1.assign_coords({coordinate_suffix: ds2})
     else:
-        raise ValueError('Inputs ds1 and ds2 must be xarray objects')
+        raise ValueError("Inputs ds1 and ds2 must be xarray objects")
     return ds1
 
 
 def _get_bin_centers(bin_edges):
-    """Return the arithmetic mean of the bin_edges
-        """
+    """Return the arithmetic mean of the bin_edges"""
     return 0.5 * (bin_edges[:-1] + bin_edges[1:])
 
 
 def histogram(*args, bins=None, bin_names=None, **kwargs):
-    """Wrapper on xhistogram to deal with Datasets appropriately
-    """
+    """Wrapper on xhistogram to deal with Datasets appropriately"""
     # xhistogram expects a list for the dim input
-    if 'dim' in kwargs:
-        if isinstance(kwargs['dim'], str):
-            kwargs['dim'] = [kwargs['dim']]
+    if "dim" in kwargs:
+        if isinstance(kwargs["dim"], str):
+            kwargs["dim"] = [kwargs["dim"]]
     for bin in bins:
         assert isinstance(
             bin, np.ndarray
-        ), f'all bins must be numpy arrays, found {type(bin)}'
+        ), f"all bins must be numpy arrays, found {type(bin)}"
 
     if isinstance(args[0], xr.Dataset):
         # Get list of variables that are shared across all Datasets
@@ -142,7 +140,7 @@ def histogram(*args, bins=None, bin_names=None, **kwargs):
         if overlapping_vars:
             # If bin_names not provided, use default ----
             if bin_names is None:
-                bin_names = ['ds_' + str(i + 1) for i in range(len(args))]
+                bin_names = ["ds_" + str(i + 1) for i in range(len(args))]
             return xr.merge(
                 [
                     xhist(
@@ -154,7 +152,7 @@ def histogram(*args, bins=None, bin_names=None, **kwargs):
                 ]
             )
         else:
-            raise ValueError('No common variables exist across input Datasets')
+            raise ValueError("No common variables exist across input Datasets")
     else:
         if bin_names:
             args = (arg.rename(bin_names[i]) for i, arg in enumerate(args))

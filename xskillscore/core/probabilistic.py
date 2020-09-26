@@ -14,18 +14,18 @@ from .utils import (
 )
 
 __all__ = [
-    'brier_score',
-    'crps_ensemble',
-    'crps_gaussian',
-    'crps_quadrature',
-    'threshold_brier_score',
-    'rank_histogram',
-    'discrimination',
-    'reliability',
-    'rps',
+    "brier_score",
+    "crps_ensemble",
+    "crps_gaussian",
+    "crps_quadrature",
+    "threshold_brier_score",
+    "rank_histogram",
+    "discrimination",
+    "reliability",
+    "rps",
 ]
 
-FORECAST_PROBABILITY_DIM = 'forecast_probability'
+FORECAST_PROBABILITY_DIM = "forecast_probability"
 
 
 def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=False):
@@ -43,7 +43,8 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
         Dimension over which to compute mean after computing ``crps_gaussian``.
         Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is applied.
+        Weights for `weighted.mean(dim)`.
+        Defaults to None, such that no weighting is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -73,7 +74,7 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
         mu,
         sig,
         input_core_dims=[[], [], []],
-        dask='parallelized',
+        dask="parallelized",
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -93,7 +94,8 @@ def crps_quadrature(
     weights=None,
     keep_attrs=False,
 ):
-    """Continuous Ranked Probability Score with numerical integration of the normal distribution.
+    """Continuous Ranked Probability Score with numerical integration
+    of the normal distribution.
 
     Parameters
     ----------
@@ -107,7 +109,8 @@ def crps_quadrature(
         Dimension over which to compute mean after computing ``crps_quadrature``.
         Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is applied.
+        Weights for `weighted.mean(dim)`.
+        Defaults to None, such that no weighting is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -130,7 +133,7 @@ def crps_quadrature(
         xmax,
         tol,
         input_core_dims=[[], [], [], [], []],
-        dask='parallelized',
+        dask="parallelized",
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -145,7 +148,7 @@ def crps_ensemble(
     forecasts,
     member_weights=None,
     issorted=False,
-    member_dim='member',
+    member_dim="member",
     dim=None,
     weights=None,
     keep_attrs=False,
@@ -172,7 +175,8 @@ def crps_ensemble(
         Dimension over which to compute mean after computing ``crps_ensemble``.
         Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is applied.
+        Weights for `weighted.mean(dim)`.
+        Defaults to None, such that no weighting is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -192,8 +196,8 @@ def crps_ensemble(
         observations,
         forecasts,
         input_core_dims=[[], [member_dim]],
-        kwargs={'axis': -1, 'issorted': issorted, 'weights': member_weights},
-        dask='parallelized',
+        kwargs={"axis": -1, "issorted": issorted, "weights": member_weights},
+        dask="parallelized",
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -212,7 +216,8 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
-        The observations or set of observations of the event. Data should be boolean or logical \
+        The observations or set of observations of the event.
+        Data should be boolean or logical \
         (True or 1 for event occurance, False or 0 for non-occurance).
     forecasts : xarray.Dataset or xarray.DataArray
         The forecast likelihoods of the event. Data should be between 0 and 1.
@@ -220,7 +225,8 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
         Dimension over which to compute mean after computing ``brier_score``.
         Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
-        Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is applied.
+        Weights for `weighted.mean(dim)`.
+        Defaults to None, such that no weighting is applied.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
         from the first input to the new one.
@@ -251,7 +257,7 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
         observations,
         forecasts,
         input_core_dims=[[], []],
-        dask='parallelized',
+        dask="parallelized",
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -266,7 +272,7 @@ def threshold_brier_score(
     forecasts,
     threshold,
     issorted=False,
-    member_dim='member',
+    member_dim="member",
     dim=None,
     weights=None,
     keep_attrs=False,
@@ -315,23 +321,24 @@ def threshold_brier_score(
     """
     if isinstance(threshold, list):
         threshold.sort()
-        threshold = xr.DataArray(threshold, dims='threshold')
-        threshold['threshold'] = np.arange(1, 1 + threshold.threshold.size)
+        threshold = xr.DataArray(threshold, dims="threshold")
+        threshold["threshold"] = np.arange(1, 1 + threshold.threshold.size)
 
     if isinstance(threshold, (xr.DataArray, xr.Dataset)):
-        if 'threshold' not in threshold.dims:
+        if "threshold" not in threshold.dims:
             raise ValueError(
-                'please provide threshold with threshold dim, found', threshold.dims,
+                "please provide threshold with threshold dim, found",
+                threshold.dims,
             )
-        input_core_dims = [[], [member_dim], ['threshold']]
-        output_core_dims = [['threshold']]
+        input_core_dims = [[], [member_dim], ["threshold"]]
+        output_core_dims = [["threshold"]]
     elif isinstance(threshold, (int, float)):
         input_core_dims = [[], [member_dim], []]
         output_core_dims = [[]]
     else:
         raise ValueError(
-            'Please provide threshold as list, int, float \
-            or xr.object with threshold dimension; found',
+            "Please provide threshold as list, int, float \
+            or xr.object with threshold dimension; found",
             type(threshold),
         )
     res = xr.apply_ufunc(
@@ -340,9 +347,9 @@ def threshold_brier_score(
         forecasts,
         threshold,
         input_core_dims=input_core_dims,
-        kwargs={'axis': -1, 'issorted': issorted},
+        kwargs={"axis": -1, "issorted": issorted},
         output_core_dims=output_core_dims,
-        dask='parallelized',
+        dask="parallelized",
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -359,12 +366,13 @@ def rps(
     dim=None,
     weights=None,
     keep_attrs=False,
-    member_dim='member',
+    member_dim="member",
 ):
     """Calculate Ranked Probability Score.
 
      .. math::
-        RPS(p, k) = 1/M \\sum_{m=1}^{M} [(\\sum_{k=1}^{m} p_k) - (\\sum_{k=1}^{m} o_k)]^{2}
+        RPS(p, k) = 1/M \\sum_{m=1}^{M}
+        [(\\sum_{k=1}^{m} p_k) - (\\sum_{k=1}^{m} o_k)]^{2}
 
     Parameters
     ----------
@@ -396,9 +404,10 @@ def rps(
     ----------
     https://www.cawcr.gov.au/projects/verification/verif_web_page.html#RPS
     """
-    bin_names = ['category']
-    bin_dim = f'{bin_names[0]}_bin'
-    # histogram(dim=[]) not allowed therefore add fake member dim to apply over when multi-dim observations
+    bin_names = ["category"]
+    bin_dim = f"{bin_names[0]}_bin"
+    # histogram(dim=[]) not allowed therefore add fake member dim
+    # to apply over when multi-dim observations
     if len(observations.dims) == 1:
         observations = histogram(
             observations, bins=[category_edges], bin_names=bin_names, dim=None
@@ -413,7 +422,9 @@ def rps(
     forecasts = histogram(
         forecasts, bins=[category_edges], bin_names=bin_names, dim=[member_dim]
     )
-    # normalize f.sum()=1  # can remove this once density=True https://github.com/xgcm/xhistogram/pull/17
+    # normalize f.sum()=1
+    # # can remove this once density=True
+    # https://github.com/xgcm/xhistogram/pull/17
     forecasts = forecasts / forecasts.sum(bin_dim)
     observations = observations / observations.sum(bin_dim)
     # rps formula
@@ -423,58 +434,59 @@ def rps(
     return res.mean(dim, keep_attrs=keep_attrs)
 
 
-def rank_histogram(observations, forecasts, dim=None, member_dim='member'):
+def rank_histogram(observations, forecasts, dim=None, member_dim="member"):
     """Returns the rank histogram (Talagrand diagram) along the specified dimensions.
 
-        Parameters
-        ----------
-        observations : xarray.Dataset or xarray.DataArray
-            The observations or set of observations.
-        forecasts : xarray.Dataset or xarray.DataArray
-            Forecast with required member dimension ``member_dim``.
-        dim : str or list of str, optional
-            Dimension(s) over which to compute the histogram of ranks.
-            Defaults to None meaning compute over all dimensions
-        member_dim : str, optional
-            Name of ensemble member dimension. By default, 'member'.
+    Parameters
+    ----------
+    observations : xarray.Dataset or xarray.DataArray
+        The observations or set of observations.
+    forecasts : xarray.Dataset or xarray.DataArray
+        Forecast with required member dimension ``member_dim``.
+    dim : str or list of str, optional
+        Dimension(s) over which to compute the histogram of ranks.
+        Defaults to None meaning compute over all dimensions
+    member_dim : str, optional
+        Name of ensemble member dimension. By default, 'member'.
 
-        Returns
-        -------
-        rank_histogram : xarray.Dataset or xarray.DataArray
-            New object containing the histogram of ranks
+    Returns
+    -------
+    rank_histogram : xarray.Dataset or xarray.DataArray
+        New object containing the histogram of ranks
 
-        Examples
-        --------
-        >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
-        ...                             coords=[('x', np.arange(3)),
-        ...                                     ('y', np.arange(3))])
-        >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
-        ...                          coords=[('x', np.arange(3)),
-        ...                                  ('y', np.arange(3)),
-        ...                                  ('member', np.arange(3))])
-        >>> rank_histogram(observations, forecasts, dim='x')
-        <xarray.DataArray 'histogram_rank' (y: 3, rank: 4)>
-        array([[0, 1, 1, 1],
-               [0, 1, 0, 2],
-               [1, 0, 1, 1]])
-        Coordinates:
-          * y        (y) int64 0 1 2
-          * rank     (rank) float64 1.0 2.0 3.0 4.0
+    Examples
+    --------
+    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    ...                             coords=[('x', np.arange(3)),
+    ...                                     ('y', np.arange(3))])
+    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+    ...                          coords=[('x', np.arange(3)),
+    ...                                  ('y', np.arange(3)),
+    ...                                  ('member', np.arange(3))])
+    >>> rank_histogram(observations, forecasts, dim='x')
+    <xarray.DataArray 'histogram_rank' (y: 3, rank: 4)>
+    array([[0, 1, 1, 1],
+           [0, 1, 0, 2],
+           [1, 0, 1, 1]])
+    Coordinates:
+      * y        (y) int64 0 1 2
+      * rank     (rank) float64 1.0 2.0 3.0 4.0
 
-        Notes
-        -----
-        See http://www.cawcr.gov.au/projects/verification/
+    Notes
+    -----
+    See http://www.cawcr.gov.au/projects/verification/
     """
 
     def _rank_first(x, y):
-        """ Concatenates x and y and returns the rank of the first element along the last axes """
+        """Concatenates x and y and returns the rank of the
+        first element along the last axes"""
         xy = np.concatenate((x[..., np.newaxis], y), axis=-1)
         return bn.nanrankdata(xy, axis=-1)[..., 0]
 
     if dim is not None:
         if len(dim) == 0:
             raise ValueError(
-                'At least one dimension must be supplied to compute rank histogram over'
+                "At least one dimension must be supplied to compute rank histogram over"
             )
         if member_dim in dim:
             raise ValueError(f'"{member_dim}" cannot be specified as an input to dim')
@@ -484,13 +496,13 @@ def rank_histogram(observations, forecasts, dim=None, member_dim='member'):
         observations,
         forecasts,
         input_core_dims=[[], [member_dim]],
-        dask='parallelized',
+        dask="parallelized",
         output_dtypes=[int],
     )
 
     bin_edges = np.arange(0.5, len(forecasts[member_dim]) + 2)
     return histogram(
-        ranks, bins=[bin_edges], bin_names=['rank'], dim=dim, bin_dim_suffix=''
+        ranks, bins=[bin_edges], bin_names=["rank"], dim=dim, bin_dim_suffix=""
     )
 
 
@@ -500,14 +512,15 @@ def discrimination(
     dim=None,
     probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
 ):
-    """Returns the data required to construct the discrimination diagram for an event; the \
-            histogram of forecasts likelihood when observations indicate an event has occurred \
-            and has not occurred.
+    """Returns the data required to construct the discrimination diagram for an event;
+       the histogram of forecasts likelihood when observations indicate an event has
+       occurred and has not occurred.
 
         Parameters
         ----------
         observations : xarray.Dataset or xarray.DataArray
-            The observations or set of observations of the event. Data should be boolean or logical \
+            The observations or set of observations of the event.
+            Data should be boolean or logical \
             (True or 1 for event occurance, False or 0 for non-occurance).
         forecasts : xarray.Dataset or xarray.DataArray
             The forecast likelihoods of the event. Data should be between 0 and 1.
@@ -515,14 +528,15 @@ def discrimination(
             Dimension(s) over which to compute the histograms
             Defaults to None meaning compute over all dimensions.
         probability_bin_edges : array_like, optional
-            Probability bin edges used to compute the histograms. Bins include the left most edge, \
+            Probability bin edges used to compute the histograms.
+            Bins include the left most edge, \
             but not the right. Defaults to 6 equally spaced edges between 0 and 1+1e-8
 
         Returns
         -------
         xarray.Dataset or xarray.DataArray
-            Array with added dimension "event" containing the histograms of forecast probabilities \
-            when the event was observed and not observed
+            Array with added dimension "event" containing the histograms of
+            forecast probabilities when the event was observed and not observed
 
         Examples
         --------
@@ -535,7 +549,9 @@ def discrimination(
         ...                                  ('member', np.arange(10))])
         >>> forecast_event_likelihood = (forecasts > 0).mean('member')
         >>> observed_event = observations > 0
-        >>> disc = discrimination(observed_event, forecast_event_likelihood, dim=['x','y'])
+        >>> disc = discrimination(observed_event,
+        ...                       forecast_event_likelihood,
+        ...                       dim=['x','y'])
 
         Notes
         -----
@@ -544,24 +560,30 @@ def discrimination(
 
     _fail_if_dim_empty(dim)
 
-    hist_event = histogram(
-        forecasts.where(observations),
-        bins=[probability_bin_edges],
-        bin_names=[FORECAST_PROBABILITY_DIM],
-        bin_dim_suffix='',
-        dim=dim,
-    ) / (observations).sum(dim=dim)
+    hist_event = (
+        histogram(
+            forecasts.where(observations),
+            bins=[probability_bin_edges],
+            bin_names=[FORECAST_PROBABILITY_DIM],
+            bin_dim_suffix="",
+            dim=dim,
+        )
+        / (observations).sum(dim=dim)
+    )
 
-    hist_no_event = histogram(
-        forecasts.where(np.logical_not(observations)),
-        bins=[probability_bin_edges],
-        bin_names=[FORECAST_PROBABILITY_DIM],
-        bin_dim_suffix='',
-        dim=dim,
-    ) / (np.logical_not(observations)).sum(dim=dim)
+    hist_no_event = (
+        histogram(
+            forecasts.where(np.logical_not(observations)),
+            bins=[probability_bin_edges],
+            bin_names=[FORECAST_PROBABILITY_DIM],
+            bin_dim_suffix="",
+            dim=dim,
+        )
+        / (np.logical_not(observations)).sum(dim=dim)
+    )
 
-    return xr.concat([hist_event, hist_no_event], dim='event').assign_coords(
-        {'event': [True, False]}
+    return xr.concat([hist_event, hist_no_event], dim="event").assign_coords(
+        {"event": [True, False]}
     )
 
 
@@ -572,13 +594,15 @@ def reliability(
     probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
     keep_attrs=False,
 ):
-    """Returns the data required to construct the reliability diagram for an event; the relative frequencies \
-            of occurrence of an event for a range of forecast probability bins
+    """Returns the data required to construct the reliability diagram for an event;
+        the relative frequencies of occurrence of an event
+        for a range of forecast probability bins
 
         Parameters
         ----------
         observations : xarray.Dataset or xarray.DataArray
-            The observations or set of observations of the event. Data should be boolean or logical \
+            The observations or set of observations of the event.
+            Data should be boolean or logical \
             (True or 1 for event occurance, False or 0 for non-occurance).
         forecasts : xarray.Dataset or xarray.DataArray
             The forecast likelihoods of the event. Data should be between 0 and 1.
@@ -586,10 +610,12 @@ def reliability(
             Dimension(s) over which to compute the histograms
             Defaults to None meaning compute over all dimensions.
         probability_bin_edges : array_like, optional
-            Probability bin edges used to compute the reliability. Bins include the left most edge, \
+            Probability bin edges used to compute the reliability.
+            Bins include the left most edge, \
             but not the right. Defaults to 6 equally spaced edges between 0 and 1+1e-8
         keep_attrs : bool, optional
-            If True, the attributes (attrs) will be copied from the first input to the new one.
+            If True, the attributes (attrs) will be copied from the first input to
+            the new one.
             If False (default), the new object will be returned without attributes.
 
         Returns
@@ -606,7 +632,9 @@ def reliability(
         >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
         ...                            coords=[('x', np.arange(3)),
         ...                                    ('y', np.arange(3))])
-        >>> rel = reliability(observations > 0.1, (forecasts > 0.1).mean('ensemble'), dim='x')
+        >>> rel = reliability(observations > 0.1,
+        ...                   (forecasts > 0.1).mean('ensemble'),
+        ...                   dim='x')
 
         Notes
         -----
@@ -614,9 +642,9 @@ def reliability(
     """
 
     def _reliability(o, f, bin_edges):
-        """Return the reliability and number of samples per bin
-        """
-        # I couldn't get dask='parallelized' working in this case so dealing with dask arrays explicitly
+        """Return the reliability and number of samples per bin"""
+        # I couldn't get dask='parallelized' working in this case
+        # so dealing with dask arrays explicitly
         is_dask_array = isinstance(o, darray.core.Array) | isinstance(
             f, darray.core.Array
         )
@@ -667,7 +695,7 @@ def reliability(
         forecasts,
         probability_bin_edges,
         input_core_dims=[[stack_dim], [stack_dim], []],
-        dask='allowed',
+        dask="allowed",
         output_core_dims=[[FORECAST_PROBABILITY_DIM], [FORECAST_PROBABILITY_DIM]],
         keep_attrs=keep_attrs,
     )
@@ -681,4 +709,4 @@ def reliability(
     )
 
     # Move samples to a coordinate
-    return _add_as_coord(rel, samp, coordinate_suffix='samples')
+    return _add_as_coord(rel, samp, coordinate_suffix="samples")

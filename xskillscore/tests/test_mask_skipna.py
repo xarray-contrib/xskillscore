@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-import xarray as xr
 
 from xskillscore.core.deterministic import (
     mae,
@@ -18,7 +17,7 @@ from xskillscore.core.deterministic import (
 
 # Should only have masking issues when pulling in masked
 # grid cells over space.
-AXES = ('time', 'lat', 'lon', ['lat', 'lon'], ['time', 'lat', 'lon'])
+AXES = ("time", "lat", "lon", ["lat", "lon"], ["time", "lat", "lon"])
 
 distance_metrics = [mae, mse, median_absolute_error, mape, smape, rmse]
 correlation_metrics = [
@@ -36,8 +35,8 @@ def mask_land_data(da):
     return da
 
 
-@pytest.mark.parametrize('metric', correlation_metrics + distance_metrics)
-@pytest.mark.parametrize('dim', AXES)
+@pytest.mark.parametrize("metric", correlation_metrics + distance_metrics)
+@pytest.mark.parametrize("dim", AXES)
 def test_metrics_masked(a, b, dim, metric):
     """Test for all distance-based metrics whether result of skipna does not
     contain any nans when applied along dim with nans."""
@@ -46,7 +45,7 @@ def test_metrics_masked(a, b, dim, metric):
     res_skipna = metric(a_masked, b_masked, dim, skipna=True)
     res_no_skipna = metric(a_masked, b_masked, dim, skipna=False)
 
-    if 'lon' in dim or 'lat' in dim:  # metric is applied along axis with nans
+    if "lon" in dim or "lat" in dim:  # metric is applied along axis with nans
         # res_skipna shouldnt have nans
         if metric not in [spearman_r_p_value, pearson_r_p_value]:
             assert not np.isnan(res_skipna).any()
