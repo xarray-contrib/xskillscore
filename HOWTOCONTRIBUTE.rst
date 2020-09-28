@@ -4,7 +4,7 @@ Contribution Guide
 
 Contributions are highly welcomed and appreciated.  Every little help counts,
 so do not hesitate! You can make a high impact on ``xskillscore`` just by using it and
-reporting `issues <https://github.com/raybellwaves/xskillscore/issues>`__.
+reporting `issues <https://github.com/xarray-contrib/xskillscore/issues>`__.
 
 The following sections cover some general guidelines
 regarding development in ``xskillscore`` for maintainers and contributors.
@@ -27,7 +27,7 @@ Feature requests and feedback
 
 We are eager to hear about your requests for new features and any suggestions about the
 API, infrastructure, and so on. Feel free to submit these as
-`issues <https://github.com/raybellwaves/xskillscore/issues/new?assignees=&labels=feature+request&template=ISSUE.md>`__
+`issues <https://github.com/xarray-contrib/xskillscore/issues/new?assignees=&labels=feature+request&template=ISSUE.md>`__
 with the label "feature request."
 
 Please make sure to explain in detail how the feature should work and keep the scope as
@@ -40,7 +40,7 @@ Report bugs
 -----------
 
 Report bugs for ``xskillscore`` in the
-`issue tracker <https://github.com/raybellwaves/xskillscore/issues/new?assignees=&labels=bug&template=ISSUE.md>`_
+`issue tracker <https://github.com/xarray-contrib/xskillscore/issues/new?assignees=&labels=bug&template=ISSUE.md>`_
 with the label "bug".
 
 If you are reporting a bug, please include:
@@ -59,7 +59,7 @@ that is a very useful commit to make as well, even if you cannot fix the bug its
 Fix bugs
 --------
 
-Look through the `GitHub issues for bugs <https://github.com/raybellwaves/xskillscore/labels/bug>`_.
+Look through the `GitHub issues for bugs <https://github.com/xarray-contrib/xskillscore/labels/bug>`_.
 
 Talk to developers to find out how you can fix specific bugs.
 
@@ -105,7 +105,7 @@ Preparing Pull Requests
 
 
 #. Fork the
-   `xskillscore GitHub repository <https://github.com/raybellwaves/xskillscore>`__.  It's
+   `xskillscore GitHub repository <https://github.com/xarray-contrib/xskillscore>`__.  It's
    fine to use ``xskillscore`` as your fork repository name because it will live
    under your user.
 
@@ -114,7 +114,7 @@ Preparing Pull Requests
 
     $ git clone git@github.com:YOUR_GITHUB_USERNAME/xskillscore.git
     $ cd xskillscore
-    $ git remote add upstream git@github.com:raybellwaves/xskillscore.git
+    $ git remote add upstream git@github.com:xarray-contrib/xskillscore.git
 
     # now, to fix a bug or add feature create your own branch off "master":
 

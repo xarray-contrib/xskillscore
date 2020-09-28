@@ -85,7 +85,7 @@ def test_skipna_broadcast_weights_assignment_destination(
     a_nan, b_nan, weights_lonlat, metric
 ):
     """Tests that 'assignment destination is read-only' is not raised
-    https://github.com/raybellwaves/xskillscore/issues/79"""
+    https://github.com/xarray-contrib/xskillscore/issues/79"""
     metric(a_nan, b_nan, ["lat", "lon"], weights=weights_lonlat, skipna=True)
 
 

@@ -1,14 +1,14 @@
 xskillscore: Metrics for verifying forecasts
 ============================================
 
-.. image:: https://travis-ci.org/raybellwaves/xskillscore.svg?branch=master
-   :target: https://travis-ci.org/raybellwaves/xskillscore
+.. image:: https://travis-ci.org/xarray-contrib/xskillscore.svg?branch=master
+   :target: https://travis-ci.org/xarray-contrib/xskillscore
 .. image:: https://img.shields.io/pypi/v/xskillscore.svg
    :target: https://pypi.python.org/pypi/xskillscore/
 .. image:: https://anaconda.org/conda-forge/xskillscore/badges/version.svg
    :target: https://anaconda.org/conda-forge/xskillscore/
-.. image:: https://coveralls.io/repos/github/raybellwaves/xskillscore/badge.svg?branch=master
-   :target: https://coveralls.io/github/raybellwaves/xskillscore?branch=master
+.. image:: https://coveralls.io/repos/github/xarray-contrib/xskillscore/badge.svg?branch=master
+   :target: https://coveralls.io/github/xarray-contrib/xskillscore?branch=master
 .. image:: https://img.shields.io/readthedocs/xskillscore/stable.svg?style=flat
    :target: https://xskillscore.readthedocs.io/en/stable/?badge=stable
 .. image:: https://img.shields.io/badge/benchmarked%20by-asv-green.svg?style=flat
@@ -32,7 +32,7 @@ or
 
 or
 
-``$ pip install git+https://github.com/raybellwaves/xskillscore``
+``$ pip install git+https://github.com/xarray-contrib/xskillscore``
 
 Documentation
 -------------
