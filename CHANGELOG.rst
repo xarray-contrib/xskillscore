@@ -5,6 +5,11 @@ Changelog History
 xskillscore v0.0.19 (2020-XX-XX)
 --------------------------------
 
+Bug Fixes
+~~~~~~~~~
+- :py:func:`~xskillscore.sign_test` now works for ``xr.Dataset`` inputs. ``confidence``
+  has only dimension ``time_dim``. (:issue:`198`, :pr:`199`) `Aaron Spring`_
+
 Internal Changes
 ~~~~~~~~~~~~~~~~
 - Added Python 3.7 and Python 3.8 to the CI. Use the latest version of Python 3

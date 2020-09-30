@@ -20,8 +20,14 @@ def logical(ds):
     return ds > 0.5
 
 
-def test_sign_test_raw(a_1d, a_1d_worse, b_1d):
+@pytest.mark.parametrize("input", ["Dataset", "DataArray"])
+def test_sign_test_raw(a_1d, a_1d_worse, b_1d, input):
     """Test sign_test where significance crossed (for np.random.seed(42) values)."""
+    if input == "Dataset":
+        name = "var"
+        a_1d = a_1d.to_dataset(name=name)
+        a_1d_worse = a_1d_worse.to_dataset(name=name)
+        b_1d = b_1d.to_dataset(name=name)
     actual = sign_test(
         a_1d, a_1d_worse, b_1d, time_dim="time", alpha=0.05, metric="mae"
     )
@@ -194,3 +200,9 @@ def test_sign_test_dim_fails(a_1d, a_1d_worse, b_1d):
 def test_sign_test_metric_correlation(a, a_worse, b):
     """Sign_test work for correlation metrics over other dimensions that time_dim."""
     sign_test(a, a_worse, b, time_dim="time", dim=["lon", "lat"], metric="pearson_r")
+
+
+def test_sign_test_confidence_only_time_dim(a, a_worse, b):
+    """Sign_test confidence only dimension time_dim and no other."""
+    actual = sign_test(a, a_worse, b, time_dim="time", metric="mse")
+    assert list(actual.confidence.dims) == ["time"]

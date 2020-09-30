@@ -79,8 +79,8 @@ def sign_test(
     ...      coords=[('time', np.arange(30))])
     >>> st = sign_test(f1, f2, o, time_dim'time', metric='mae', orientation='negative')
     >>> st.plot()
-    >>> st['confidence'].plot(c='gray')
-    >>> (-1*st['confidence']).plot(c='gray')
+    >>> st['confidence'].plot(color='gray')
+    >>> (-1*st['confidence']).plot(color='gray')
 
     References
     ----------
@@ -152,16 +152,20 @@ def sign_test(
             metric_f1o = -metric_f1o
             metric_f2o = -metric_f2o
 
-    sign_test = (1 * (metric_f1o < metric_f2o) - 1 * (metric_f2o < metric_f1o)).cumsum(
+    walk = (1 * (metric_f1o < metric_f2o) - 1 * (metric_f2o < metric_f1o)).cumsum(
         time_dim
     )
 
     # Estimate 95% confidence interval -----
     notnan = 1 * (metric_f1o.notnull() & metric_f2o.notnull())
+    # drop variables and dims other than time_dim
     N = notnan.cumsum(time_dim)
+    N = N.isel({d: 0 for d in N.dims if d != time_dim}, drop=True)
+    if isinstance(N, xr.Dataset):
+        N = N.to_array().squeeze(drop=True)
     # z_alpha is the value at which the standardized cumulative Gaussian distributed
     # exceeds alpha
     confidence = st.norm.ppf(1 - alpha / 2) * xr.ufuncs.sqrt(N)
-    sign_test.coords["alpha"] = alpha
-    sign_test.coords["confidence"] = confidence
-    return sign_test
+    walk.coords["alpha"] = alpha
+    walk = walk.assign_coords(confidence=(time_dim, confidence))
+    return walk
