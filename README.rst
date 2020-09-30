@@ -55,5 +55,3 @@ forecasts associated with the `SubX <https://journals.ametsoc.org/doi/pdf/10.117
 We are indebted to the **xarray** community for their
 `advice <https://groups.google.com/forum/#!searchin/xarray/xskillscore%7Csort:date/xarray/z8ue0G-BLc8/Cau-dY_ACAAJ>`_
 in getting this package started.
-
-TEST
