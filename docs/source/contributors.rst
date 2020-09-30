@@ -10,4 +10,4 @@ Contributors
 * Riley X. Brady (`github <https://github.com/bradyrx/>`__)
 
 For a list of all the contributions, see the github
-`contribution graph <https://github.com/raybellwaves/xskillscore/graphs/contributors>`__.
+`contribution graph <https://github.com/xarray-contrib/xskillscore/graphs/contributors>`__.
