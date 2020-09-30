@@ -34,6 +34,8 @@ def test_sign_test_raw(a_1d, a_1d_worse, b_1d, input):
     walk_larger_significance = actual > actual.confidence
     crossing_after_timesteps = walk_larger_significance.argmax(dim="time")
     # check timesteps after which sign_test larger confidence
+    if input == 'Dataset':
+        crossing_after_timesteps = crossing_after_timesteps.var
     assert crossing_after_timesteps == 3
 
 
