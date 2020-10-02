@@ -15,6 +15,7 @@ from xskillscore.core.deterministic import (
     pearson_r_eff_p_value,
     pearson_r_p_value,
     r2,
+    me,
     rmse,
     smape,
     spearman_r,
@@ -31,6 +32,7 @@ from xskillscore.core.np_deterministic import (
     _pearson_r_eff_p_value,
     _pearson_r_p_value,
     _r2,
+    _me,
     _rmse,
     _smape,
     _spearman_r,
@@ -50,6 +52,7 @@ correlation_metrics = [
 ]
 distance_metrics = [
     (mse, _mse),
+    (me, _rmse),
     (rmse, _rmse),
     (mae, _mae),
     (median_absolute_error, _median_absolute_error),

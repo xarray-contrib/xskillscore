@@ -10,6 +10,7 @@ from .deterministic import (
     pearson_r_eff_p_value,
     pearson_r_p_value,
     r2,
+    me,
     rmse,
     smape,
     spearman_r,
@@ -83,6 +84,11 @@ class XSkillScoreAccessor(object):
         a = self._in_ds(a)
         b = self._in_ds(b)
         return spearman_r_eff_p_value(a, b, *args, **kwargs)
+
+    def me(self, a, b, *args, **kwargs):
+        a = self._in_ds(a)
+        b = self._in_ds(b)
+        return me(a, b, *args, **kwargs)
 
     def rmse(self, a, b, *args, **kwargs):
         a = self._in_ds(a)

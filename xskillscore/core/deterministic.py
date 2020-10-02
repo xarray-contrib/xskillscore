@@ -12,6 +12,7 @@ from .np_deterministic import (
     _pearson_r_eff_p_value,
     _pearson_r_p_value,
     _r2,
+    _me,
     _rmse,
     _smape,
     _spearman_r,
@@ -29,6 +30,7 @@ __all__ = [
     "pearson_r",
     "pearson_r_p_value",
     "pearson_r_eff_p_value",
+    'me',
     "rmse",
     "mse",
     "mae",
@@ -712,6 +714,73 @@ def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
         b,
         input_core_dims=[[new_dim], [new_dim]],
         kwargs={"axis": -1, "skipna": skipna},
+        dask="parallelized",
+        output_dtypes=[float],
+        keep_attrs=keep_attrs,
+    )
+
+
+def me(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+    """Mean Error.
+
+    .. math::
+        \\mathrm{ME} = \\frac{1}{n}\\sum_{i=1}^{n}\\a - b
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to apply the rmse along. Note that this dimension will
+        be reduced as a result. Defaults to None reducing all dimensions.
+    weights : xarray.Dataset or xarray.DataArray or None
+        Weights matching dimensions of ``dim`` to apply during the function.
+    skipna : bool
+        If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
+
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray
+        Mean Error.
+
+    See Also
+    --------
+    sklearn.metrics.mean_squared_error
+
+    References
+    ----------
+    https://www.cawcr.gov.au/projects/verification/
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import xarray as xr
+    >>> from xskillscore import me
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> me(a, b, dim='time')
+    """
+    dim, axis = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
+    weights = _preprocess_weights(a, dim, dim, weights)
+    input_core_dims = _determine_input_core_dims(dim, weights)
+
+    return xr.apply_ufunc(
+        _me,
+        a,
+        b,
+        weights,
+        input_core_dims=input_core_dims,
+        kwargs={"axis": axis, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
         keep_attrs=keep_attrs,

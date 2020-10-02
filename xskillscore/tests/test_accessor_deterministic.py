@@ -12,6 +12,7 @@ from xskillscore.core.deterministic import (
     pearson_r_eff_p_value,
     pearson_r_p_value,
     r2,
+    me,
     rmse,
     smape,
     spearman_r,
@@ -37,6 +38,7 @@ temporal_only_metrics = [
 ]
 
 distance_metrics = [
+    me,
     mse,
     rmse,
     mae,

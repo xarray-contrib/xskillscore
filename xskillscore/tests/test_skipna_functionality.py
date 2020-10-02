@@ -10,6 +10,7 @@ from xskillscore.core.deterministic import (
     pearson_r,
     pearson_r_p_value,
     r2,
+    me,
     rmse,
     smape,
     spearman_r,
@@ -25,6 +26,7 @@ WEIGHTED_METRICS = [
     mse,
     mape,
     smape,
+    me,
     rmse,
     r2,
 ]
