@@ -475,7 +475,7 @@ def _me(a, b, weights, axis, skipna):
     b : ndarray
         Input array.
     axis : int
-        The axis to apply the rmse along.
+        The axis to apply the me along.
     weights : ndarray
         Input array of weights for a and b.
     skipna : bool
