@@ -733,7 +733,7 @@ def me(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the rmse along. Note that this dimension will
+        The dimension(s) to apply the me along. Note that this dimension will
         be reduced as a result. Defaults to None reducing all dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
