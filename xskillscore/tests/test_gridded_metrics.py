@@ -4,12 +4,12 @@ import pytest
 from xskillscore.core.deterministic import (
     mae,
     mape,
+    me,
     median_absolute_error,
     mse,
     pearson_r,
     pearson_r_p_value,
     r2,
-    me,
     rmse,
     smape,
     spearman_r,

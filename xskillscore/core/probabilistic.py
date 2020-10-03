@@ -327,7 +327,8 @@ def threshold_brier_score(
     if isinstance(threshold, (xr.DataArray, xr.Dataset)):
         if "threshold" not in threshold.dims:
             raise ValueError(
-                "please provide threshold with threshold dim, found", threshold.dims,
+                "please provide threshold with threshold dim, found",
+                threshold.dims,
             )
         input_core_dims = [[], [member_dim], ["threshold"]]
         output_core_dims = [["threshold"]]
@@ -559,21 +560,27 @@ def discrimination(
 
     _fail_if_dim_empty(dim)
 
-    hist_event = histogram(
-        forecasts.where(observations),
-        bins=[probability_bin_edges],
-        bin_names=[FORECAST_PROBABILITY_DIM],
-        bin_dim_suffix="",
-        dim=dim,
-    ) / (observations).sum(dim=dim)
+    hist_event = (
+        histogram(
+            forecasts.where(observations),
+            bins=[probability_bin_edges],
+            bin_names=[FORECAST_PROBABILITY_DIM],
+            bin_dim_suffix="",
+            dim=dim,
+        )
+        / (observations).sum(dim=dim)
+    )
 
-    hist_no_event = histogram(
-        forecasts.where(np.logical_not(observations)),
-        bins=[probability_bin_edges],
-        bin_names=[FORECAST_PROBABILITY_DIM],
-        bin_dim_suffix="",
-        dim=dim,
-    ) / (np.logical_not(observations)).sum(dim=dim)
+    hist_no_event = (
+        histogram(
+            forecasts.where(np.logical_not(observations)),
+            bins=[probability_bin_edges],
+            bin_names=[FORECAST_PROBABILITY_DIM],
+            bin_dim_suffix="",
+            dim=dim,
+        )
+        / (np.logical_not(observations)).sum(dim=dim)
+    )
 
     return xr.concat([hist_event, hist_no_event], dim="event").assign_coords(
         {"event": [True, False]}

@@ -491,11 +491,9 @@ def _me(a, b, weights, axis, skipna):
         a, b, weights = _match_nans(a, b, weights)
     weights = _check_weights(weights)
 
-    error = (a - b)
+    error = a - b
     if weights is not None:
-        mean_error = sumfunc(error * weights, axis=axis) / sumfunc(
-            weights, axis=axis
-        )
+        mean_error = sumfunc(error * weights, axis=axis) / sumfunc(weights, axis=axis)
     else:
         mean_error = meanfunc(error, axis=axis)
     return mean_error
