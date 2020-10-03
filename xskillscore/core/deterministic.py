@@ -23,6 +23,7 @@ from .utils import (
     _preprocess_dims,
     _preprocess_weights,
     _stack_input_if_needed,
+    _determine_input_core_dims,
 )
 
 __all__ = [
@@ -41,32 +42,6 @@ __all__ = [
     "effective_sample_size",
     "r2",
 ]
-
-
-def _determine_input_core_dims(dim, weights):
-    """
-    Determine input_core_dims based on type of dim and weights.
-
-    Parameters
-    ----------
-    dim : str, list
-        The dimension(s) to apply the metric along.
-    weights : xarray.Dataset or xarray.DataArray or None
-        Weights matching dimensions of ``dim`` to apply during the function.
-
-    Returns
-    -------
-    list of lists
-        input_core_dims used for xr.apply_ufunc.
-    """
-    if not isinstance(dim, list):
-        dim = [dim]
-    # build input_core_dims depending on weights
-    if weights is None:
-        input_core_dims = [dim, dim, []]
-    else:
-        input_core_dims = [dim, dim, dim]
-    return input_core_dims
 
 
 def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):

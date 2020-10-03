@@ -3,6 +3,13 @@ import warnings
 import scipy.stats as st
 import xarray as xr
 
+from .utils import (
+    _fail_if_dim_empty,
+    _preprocess_dims,
+    _stack_input_if_needed,
+    _determine_input_core_dims,
+)
+
 
 def sign_test(
     forecasts1,
@@ -165,3 +172,146 @@ def sign_test(
     sign_test.coords["alpha"] = alpha
     sign_test.coords["confidence"] = confidence
     return sign_test
+
+
+def ttest_ind(a, b, dim=None, skipna=False, keep_attrs=False, equal_var=True):
+    """Calculate the T-test for the means of two independent samples of scores.
+
+    This is a two-sided test for the null hypothesis that 2 independent samples
+    have identical average (expected) values. This test assumes that the
+    populations have identical variances by default.
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to apply the correlation along. Note that this dimension will
+        be reduced as a result. Defaults to None reducing all dimensions.
+    skipna : bool
+        If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
+    equal_var : bool
+        If True (default), perform a standard independent 2 sample test that
+        assumes equal population variances [1]. If False, perform Welch’s
+        t-test, which does not assume equal population variance [2].
+
+    Returns
+    -------
+    statistic (float or array): The calculated t-statistics.
+    pvalue (float or array): The two-tailed p-value.
+
+    See Also
+    --------
+    scipy.stats.ttest_ind
+
+    References
+    ----------
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import xarray as xr
+    >>> from xskillscore import ttest_ind
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> ttest_ind(a, b, dim='time')
+    """
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
+    a, b, new_dim, _ = _stack_input_if_needed(a, b, dim, None)
+    nan_policy = 'omit' if skipna else 'propagate'
+    # weights is index -1 so drop it since ttest_ind doesn't have weights
+    input_core_dims = _determine_input_core_dims(new_dim, None)[:-1]
+
+    return xr.apply_ufunc(
+        st.ttest_ind,
+        a,
+        b,
+        input_core_dims=input_core_dims,
+        output_core_dims=[[], []],
+        vectorize=True,
+        kwargs={"axis": -1, "nan_policy": nan_policy, "equal_var": equal_var},
+        dask='parallelized',
+        output_dtypes=[float, float],
+        keep_attrs=keep_attrs
+    )
+
+
+def ttest_rel(a, b, dim=None, skipna=False, keep_attrs=False):
+    """Calculate the t-test on TWO RELATED samples of scores, a and b.
+
+    This is a two-sided test for the null hypothesis that 2 related or
+    repeated samples have identical average (expected) values.
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to apply the correlation along. Note that this dimension will
+        be reduced as a result. Defaults to None reducing all dimensions.
+    skipna : bool
+        If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
+
+    Returns
+    -------
+    statistic (float or array): The calculated t-statistics.
+    pvalue (float or array): The two-tailed p-value.
+
+    See Also
+    --------
+    scipy.stats.ttest_rel
+
+    References
+    ----------
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_rel.html
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import xarray as xr
+    >>> from xskillscore import ttest_rel
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> ttest_rel(a, b, dim='time')
+    """
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
+    a, b, new_dim, _ = _stack_input_if_needed(a, b, dim, None)
+    nan_policy = 'omit' if skipna else 'propagate'
+    # weights is index -1 so drop it since ttest_rel doesn't have weights
+    input_core_dims = _determine_input_core_dims(new_dim, None)[:-1]
+
+    return xr.apply_ufunc(
+        st.ttest_rel,
+        a,
+        b,
+        input_core_dims=input_core_dims,
+        output_core_dims=[[], []],
+        vectorize=True,
+        kwargs={"axis": -1, "nan_policy": nan_policy},
+        dask='parallelized',
+        output_dtypes=[float, float],
+        keep_attrs=keep_attrs
+    )
