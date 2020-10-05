@@ -38,13 +38,8 @@ def test_sign_test_inputs(a_1d, a_1d_worse, b_1d, input, chunk):
     actual = sign_test(
         a_1d, a_1d_worse, b_1d, time_dim="time", alpha=0.05, metric="mae"
     )
-    walk_larger_significance = actual > actual.confidence
-    crossing_after_timesteps = walk_larger_significance.argmax(dim="time")
     # check dask collection preserved
     assert is_dask_collection(actual) if chunk else not is_dask_collection(actual)
-    if input == "DataArray" and chunk:
-        # check timesteps after which sign_test larger confidence
-        assert crossing_after_timesteps.values == 3
 
 
 def test_sign_test_raw(a_1d, a_1d_worse, b_1d):
