@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 from dask import is_dask_collection
 
@@ -211,7 +212,10 @@ def test_sign_test_metric_correlation(a, a_worse, b):
     sign_test(a, a_worse, b, time_dim="time", dim=["lon", "lat"], metric="pearson_r")
 
 
-def test_sign_test_confidence_only_time_dim(a, a_worse, b):
-    """Sign_test confidence only dimension time_dim and no other."""
+def test_sign_test_NaNs_confidence(a, a_worse, b):
+    """Sign_test confidence with NaNs."""
     actual = sign_test(a, a_worse, b, time_dim="time", metric="mse")
-    assert list(actual.confidence.dims) == ["time"]
+    a_nan = a.copy()
+    a_nan[1:3, 1:3, 1:3] = np.nan
+    actual_nan = sign_test(a_nan, a_worse, b, time_dim="time", metric="mse")
+    assert not (actual_nan.confidence == actual.confidence).all()

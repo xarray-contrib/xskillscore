@@ -156,11 +156,11 @@ def sign_test(
         time_dim
     )
 
-    # Estimate 95% confidence interval -----
+    # Estimate 1 - alpha confidence interval -----
     notnan = 1 * (metric_f1o.notnull() & metric_f2o.notnull())
     N = notnan.cumsum(time_dim)
     # drop variables and dims other than time_dim
-    N = N.isel({d: 0 for d in N.dims if d != time_dim}, drop=True)
+    # N = N.isel({d: 0 for d in N.dims if d != time_dim}, drop=True)
     # convert N to DataArray to use as coordinate
     if isinstance(N, xr.Dataset):
         N = N.to_array().squeeze(drop=True)
@@ -168,5 +168,5 @@ def sign_test(
     # exceeds alpha
     confidence = st.norm.ppf(1 - alpha / 2) * xr.ufuncs.sqrt(N)
     walk.coords["alpha"] = alpha
-    walk = walk.assign_coords(confidence=(time_dim, confidence))
+    walk.coords["confidence"] = confidence
     return walk
