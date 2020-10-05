@@ -1,4 +1,5 @@
 import pytest
+from dask import is_dask_collection
 
 import xskillscore as xs
 from xskillscore import sign_test
@@ -20,19 +21,26 @@ def logical(ds):
     return ds > 0.5
 
 
+@pytest.mark.parametrize("chunk", [True, False])
 @pytest.mark.parametrize("input", ["Dataset", "DataArray"])
-def test_sign_test_raw(a_1d, a_1d_worse, b_1d, input):
+def test_sign_test_raw(a_1d, a_1d_worse, b_1d, input, chunk):
     """Test sign_test where significance crossed (for np.random.seed(42) values)."""
     if input == "Dataset":
         name = "var"
         a_1d = a_1d.to_dataset(name=name)
         a_1d_worse = a_1d_worse.to_dataset(name=name)
         b_1d = b_1d.to_dataset(name=name)
+    if chunk:
+        a_1d = a_1d.chunk()
+        a_1d_worse = a_1d_worse.chunk()
+        b_1d = b_1d.chunk()
     actual = sign_test(
         a_1d, a_1d_worse, b_1d, time_dim="time", alpha=0.05, metric="mae"
     )
     walk_larger_significance = actual > actual.confidence
     crossing_after_timesteps = walk_larger_significance.argmax(dim="time")
+    # check dask collection preserved
+    assert is_dask_collection(actual) if chunk else not is_dask_collection(actual)
     if input == "DataArray":
         # check timesteps after which sign_test larger confidence
         assert crossing_after_timesteps.values == 3
