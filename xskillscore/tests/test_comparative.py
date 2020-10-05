@@ -22,17 +22,6 @@ def logical(ds):
     return ds > 0.5
 
 
-def test_sign_test_raw(a_1d, a_1d_worse, b_1d):
-    """Test sign_test where significance crossed (for np.random.seed(42) values)."""
-    actual = sign_test(
-        a_1d, a_1d_worse, b_1d, time_dim="time", alpha=0.05, metric="mae"
-    )
-    walk_larger_significance = actual > actual.confidence
-    crossing_after_timesteps = walk_larger_significance.argmax(dim="time")
-    # check timesteps after which sign_test larger confidence
-    assert crossing_after_timesteps.values == 3
-
-
 @pytest.mark.parametrize("chunk", [True, False])
 @pytest.mark.parametrize("input", ["Dataset", "DataArray"])
 def test_sign_test_inputs(a_1d, a_1d_worse, b_1d, input, chunk):

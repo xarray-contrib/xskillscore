@@ -159,8 +159,6 @@ def sign_test(
     # Estimate 1 - alpha confidence interval -----
     notnan = 1 * (metric_f1o.notnull() & metric_f2o.notnull())
     N = notnan.cumsum(time_dim)
-    # drop variables and dims other than time_dim
-    # N = N.isel({d: 0 for d in N.dims if d != time_dim}, drop=True)
     # convert N to DataArray to use as coordinate
     if isinstance(N, xr.Dataset):
         N = N.to_array().squeeze(drop=True)
