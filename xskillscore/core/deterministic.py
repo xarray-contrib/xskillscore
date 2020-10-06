@@ -750,14 +750,6 @@ def me(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     xarray.Dataset or xarray.DataArray
         Mean Error.
 
-    See Also
-    --------
-    sklearn.metrics.mean_squared_error
-
-    References
-    ----------
-    https://www.cawcr.gov.au/projects/verification/
-
     Examples
     --------
     >>> import numpy as np
