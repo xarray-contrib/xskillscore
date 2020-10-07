@@ -8,6 +8,7 @@ import xskillscore as xs
 from xskillscore.core.deterministic import (
     mae,
     mape,
+    me,
     mse,
     pearson_r,
     pearson_r_p_value,
@@ -34,6 +35,7 @@ xs_scipy_metrics = [
 
 xs_np_metrics = [
     (mape, lambda x, y: np.mean(np.abs((x - y) / x))),
+    (me, lambda x, y: np.mean(x - y)),
     (smape, lambda x, y: 1 / len(x) * np.sum(np.abs(y - x) / (np.abs(x) + np.abs(y)))),
 ]
 

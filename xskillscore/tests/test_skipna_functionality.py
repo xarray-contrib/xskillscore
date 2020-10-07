@@ -5,6 +5,7 @@ from xarray.tests import assert_allclose
 from xskillscore.core.deterministic import (
     mae,
     mape,
+    me,
     median_absolute_error,
     mse,
     pearson_r,
@@ -25,6 +26,7 @@ WEIGHTED_METRICS = [
     mse,
     mape,
     smape,
+    me,
     rmse,
     r2,
 ]

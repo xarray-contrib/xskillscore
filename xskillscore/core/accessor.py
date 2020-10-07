@@ -4,6 +4,7 @@ from .deterministic import (
     effective_sample_size,
     mae,
     mape,
+    me,
     median_absolute_error,
     mse,
     pearson_r,
@@ -83,6 +84,11 @@ class XSkillScoreAccessor(object):
         a = self._in_ds(a)
         b = self._in_ds(b)
         return spearman_r_eff_p_value(a, b, *args, **kwargs)
+
+    def me(self, a, b, *args, **kwargs):
+        a = self._in_ds(a)
+        b = self._in_ds(b)
+        return me(a, b, *args, **kwargs)
 
     def rmse(self, a, b, *args, **kwargs):
         a = self._in_ds(a)

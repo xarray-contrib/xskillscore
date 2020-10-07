@@ -6,6 +6,7 @@ from scipy.stats import distributions
 __all__ = [
     "_pearson_r",
     "_pearson_r_p_value",
+    "_me",
     "_rmse",
     "_mse",
     "_mae",
@@ -462,6 +463,40 @@ def _spearman_r_eff_p_value(a, b, axis, skipna):
     t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
     return p
+
+
+def _me(a, b, weights, axis, skipna):
+    """Mean Error.
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int
+        The axis to apply the me along.
+    weights : ndarray
+        Input array of weights for a and b.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    res : ndarray
+        Mean Error.
+    """
+    sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
+    weights = _check_weights(weights)
+
+    error = a - b
+    if weights is not None:
+        mean_error = sumfunc(error * weights, axis=axis) / sumfunc(weights, axis=axis)
+    else:
+        mean_error = meanfunc(error, axis=axis)
+    return mean_error
 
 
 def _rmse(a, b, weights, axis, skipna):

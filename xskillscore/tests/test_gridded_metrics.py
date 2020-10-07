@@ -4,6 +4,7 @@ import pytest
 from xskillscore.core.deterministic import (
     mae,
     mape,
+    me,
     median_absolute_error,
     mse,
     pearson_r,
@@ -21,6 +22,7 @@ METRICS = [
     median_absolute_error,
     mape,
     smape,
+    me,
     rmse,
     pearson_r,
     pearson_r_p_value,

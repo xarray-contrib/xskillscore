@@ -5,6 +5,12 @@ Changelog History
 xskillscore v0.0.19 (2020-XX-XX)
 --------------------------------
 
+Features
+~~~~~~~~
+- Added mean error
+  :py:func:`~xskillscore.me`. (:issue:`202`, :pr:`200`)
+  `Andrew Huang`_
+
 Internal Changes
 ~~~~~~~~~~~~~~~~
 - Added Python 3.7 and Python 3.8 to the CI. Use the latest version of Python 3

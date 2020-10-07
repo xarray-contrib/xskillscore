@@ -8,6 +8,7 @@ from .core.deterministic import (
     effective_sample_size,
     mae,
     mape,
+    me,
     median_absolute_error,
     mse,
     pearson_r,

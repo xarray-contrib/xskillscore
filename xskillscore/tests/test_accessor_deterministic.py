@@ -6,6 +6,7 @@ from xskillscore.core.deterministic import (
     effective_sample_size,
     mae,
     mape,
+    me,
     median_absolute_error,
     mse,
     pearson_r,
@@ -37,6 +38,7 @@ temporal_only_metrics = [
 ]
 
 distance_metrics = [
+    me,
     mse,
     rmse,
     mae,

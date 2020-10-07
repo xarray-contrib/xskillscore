@@ -31,6 +31,7 @@ Distance Metrics
 .. autosummary::
     :toctree: api/
 
+    me
     rmse
     mse
     mae
