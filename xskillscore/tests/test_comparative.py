@@ -1,4 +1,6 @@
+import numpy as np
 import pytest
+from dask import is_dask_collection
 
 import xskillscore as xs
 from xskillscore import sign_test
@@ -20,15 +22,31 @@ def logical(ds):
     return ds > 0.5
 
 
-def test_sign_test_raw(a_1d, a_1d_worse, b_1d):
-    """Test sign_test where significance crossed (for np.random.seed(42) values)."""
+@pytest.mark.parametrize("chunk", [True, False])
+@pytest.mark.parametrize("input", ["Dataset", "multidim Dataset", "DataArray", "mixed"])
+def test_sign_test_inputs(a_1d, a_1d_worse, b_1d, input, chunk):
+    """Test sign_test with xr inputs and chunked."""
+    if "Dataset" in input:
+        name = "var"
+        a_1d = a_1d.to_dataset(name=name)
+        a_1d_worse = a_1d_worse.to_dataset(name=name)
+        b_1d = b_1d.to_dataset(name=name)
+        if input == "multidim Dataset":
+            a_1d["var2"] = a_1d["var"] * 2
+            a_1d_worse["var2"] = a_1d_worse["var"] * 2
+            b_1d["var2"] = b_1d["var"] * 2
+    elif input == "mixed":
+        name = "var"
+        a_1d = a_1d.to_dataset(name=name)
+    if chunk:
+        a_1d = a_1d.chunk()
+        a_1d_worse = a_1d_worse.chunk()
+        b_1d = b_1d.chunk()
     actual = sign_test(
         a_1d, a_1d_worse, b_1d, time_dim="time", alpha=0.05, metric="mae"
     )
-    walk_larger_significance = actual > actual.confidence
-    crossing_after_timesteps = walk_larger_significance.argmax(dim="time")
-    # check timesteps after which sign_test larger confidence
-    assert crossing_after_timesteps == 3
+    # check dask collection preserved
+    assert is_dask_collection(actual) if chunk else not is_dask_collection(actual)
 
 
 @pytest.mark.parametrize("observation", [True, False])
@@ -183,7 +201,6 @@ def test_sign_test_dim(a, a_worse, b):
     assert len(actual.dims) == 1
 
 
-@pytest.mark.xfail()
 def test_sign_test_dim_fails(a_1d, a_1d_worse, b_1d):
     """Sign_test fails if no time_dim in dim."""
     with pytest.raises(ValueError) as e:
@@ -194,3 +211,12 @@ def test_sign_test_dim_fails(a_1d, a_1d_worse, b_1d):
 def test_sign_test_metric_correlation(a, a_worse, b):
     """Sign_test work for correlation metrics over other dimensions that time_dim."""
     sign_test(a, a_worse, b, time_dim="time", dim=["lon", "lat"], metric="pearson_r")
+
+
+def test_sign_test_NaNs_confidence(a, a_worse, b):
+    """Sign_test confidence with NaNs."""
+    actual = sign_test(a, a_worse, b, time_dim="time", metric="mse")
+    a_nan = a.copy()
+    a_nan[1:3, 1:3, 1:3] = np.nan
+    actual_nan = sign_test(a_nan, a_worse, b, time_dim="time", metric="mse")
+    assert not (actual_nan.confidence == actual.confidence).all()

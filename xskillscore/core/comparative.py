@@ -3,6 +3,8 @@ import warnings
 import scipy.stats as st
 import xarray as xr
 
+from .utils import _add_as_coord
+
 
 def sign_test(
     forecasts1,
@@ -79,8 +81,8 @@ def sign_test(
     ...      coords=[('time', np.arange(30))])
     >>> st = sign_test(f1, f2, o, time_dim'time', metric='mae', orientation='negative')
     >>> st.plot()
-    >>> st['confidence'].plot(c='gray')
-    >>> (-1*st['confidence']).plot(c='gray')
+    >>> st['confidence'].plot(color='gray')
+    >>> (-1*st['confidence']).plot(color='gray')
 
     References
     ----------
@@ -152,16 +154,16 @@ def sign_test(
             metric_f1o = -metric_f1o
             metric_f2o = -metric_f2o
 
-    sign_test = (1 * (metric_f1o < metric_f2o) - 1 * (metric_f2o < metric_f1o)).cumsum(
+    walk = (1 * (metric_f1o < metric_f2o) - 1 * (metric_f2o < metric_f1o)).cumsum(
         time_dim
     )
 
-    # Estimate 95% confidence interval -----
+    # Estimate 1 - alpha confidence interval -----
     notnan = 1 * (metric_f1o.notnull() & metric_f2o.notnull())
     N = notnan.cumsum(time_dim)
     # z_alpha is the value at which the standardized cumulative Gaussian distributed
     # exceeds alpha
     confidence = st.norm.ppf(1 - alpha / 2) * xr.ufuncs.sqrt(N)
-    sign_test.coords["alpha"] = alpha
-    sign_test.coords["confidence"] = confidence
-    return sign_test
+    walk.coords["alpha"] = alpha
+    walk = _add_as_coord(walk, confidence, "confidence")
+    return walk
