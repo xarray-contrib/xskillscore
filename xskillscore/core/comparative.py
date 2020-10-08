@@ -3,6 +3,8 @@ import warnings
 import scipy.stats as st
 import xarray as xr
 
+from .utils import _add_as_coord
+
 
 def sign_test(
     forecasts1,
@@ -159,12 +161,9 @@ def sign_test(
     # Estimate 1 - alpha confidence interval -----
     notnan = 1 * (metric_f1o.notnull() & metric_f2o.notnull())
     N = notnan.cumsum(time_dim)
-    # convert N to DataArray to use as coordinate
-    if isinstance(N, xr.Dataset):
-        N = N.to_array().squeeze(drop=True)
     # z_alpha is the value at which the standardized cumulative Gaussian distributed
     # exceeds alpha
     confidence = st.norm.ppf(1 - alpha / 2) * xr.ufuncs.sqrt(N)
     walk.coords["alpha"] = alpha
-    walk.coords["confidence"] = confidence
+    walk = _add_as_coord(walk, confidence, "confidence")
     return walk

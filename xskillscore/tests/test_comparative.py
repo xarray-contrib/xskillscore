@@ -23,14 +23,21 @@ def logical(ds):
 
 
 @pytest.mark.parametrize("chunk", [True, False])
-@pytest.mark.parametrize("input", ["Dataset", "DataArray"])
+@pytest.mark.parametrize("input", ["Dataset", "multidim Dataset", "DataArray", "mixed"])
 def test_sign_test_inputs(a_1d, a_1d_worse, b_1d, input, chunk):
     """Test sign_test with xr inputs and chunked."""
-    if input == "Dataset":
+    if "Dataset" in input:
         name = "var"
         a_1d = a_1d.to_dataset(name=name)
         a_1d_worse = a_1d_worse.to_dataset(name=name)
         b_1d = b_1d.to_dataset(name=name)
+        if input == "multidim Dataset":
+            a_1d["var2"] = a_1d["var"] * 2
+            a_1d_worse["var2"] = a_1d_worse["var"] * 2
+            b_1d["var2"] = b_1d["var"] * 2
+    elif input == "mixed":
+        name = "var"
+        a_1d = a_1d.to_dataset(name=name)
     if chunk:
         a_1d = a_1d.chunk()
         a_1d_worse = a_1d_worse.chunk()
