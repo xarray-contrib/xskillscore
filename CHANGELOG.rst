@@ -5,6 +5,12 @@ Changelog History
 xskillscore v0.0.19 (2020-XX-XX)
 --------------------------------
 
+Features
+~~~~~~~~
+- Added mean error
+  :py:func:`~xskillscore.me`. (:issue:`202`, :pr:`200`)
+  `Andrew Huang`_
+
 Bug Fixes
 ~~~~~~~~~
 - :py:func:`~xskillscore.sign_test` now works for ``xr.Dataset`` inputs.
@@ -128,7 +134,7 @@ xskillscore v0.0.13 (2020-03-17)
 
 Bug Fixes
 ~~~~~~~~~
-- Fixes https://github.com/raybellwaves/xskillscore/issues/79 `assignment destination is read-only`
+- Fixes https://github.com/xarray-contrib/xskillscore/issues/79 `assignment destination is read-only`
   error when ``skipna=True`` and weights are passed. `Andrew Huang`_
 
 

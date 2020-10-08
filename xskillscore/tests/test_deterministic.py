@@ -9,6 +9,7 @@ from xskillscore.core.deterministic import (
     effective_sample_size,
     mae,
     mape,
+    me,
     median_absolute_error,
     mse,
     pearson_r,
@@ -25,6 +26,7 @@ from xskillscore.core.np_deterministic import (
     _effective_sample_size,
     _mae,
     _mape,
+    _me,
     _median_absolute_error,
     _mse,
     _pearson_r,
@@ -50,6 +52,7 @@ correlation_metrics = [
 ]
 distance_metrics = [
     (mse, _mse),
+    (me, _me),
     (rmse, _rmse),
     (mae, _mae),
     (median_absolute_error, _median_absolute_error),
