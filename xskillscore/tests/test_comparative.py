@@ -201,7 +201,6 @@ def test_sign_test_dim(a, a_worse, b):
     assert len(actual.dims) == 1
 
 
-@pytest.mark.xfail()
 def test_sign_test_dim_fails(a_1d, a_1d_worse, b_1d):
     """Sign_test fails if no time_dim in dim."""
     with pytest.raises(ValueError) as e:
