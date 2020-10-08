@@ -1,4 +1,12 @@
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.2.3
+    hooks:
+      - id: no-commit-to-branch
+      - id: check-docstring-first
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+
   # isort should run before black as black sometimes tweaks the isort output
   - repo: https://github.com/PyCQA/isort
     rev: 5.5.3
