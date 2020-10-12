@@ -3,6 +3,7 @@ import numpy.testing as npt
 import properscoring
 import pytest
 import xarray as xr
+from dask import is_dask_collection
 from scipy.stats import norm
 from sklearn.calibration import calibration_curve
 from xarray.tests import assert_allclose, assert_identical
@@ -13,6 +14,7 @@ from xskillscore.core.probabilistic import (
     crps_gaussian,
     crps_quadrature,
     discrimination,
+    fair_brier_score,
     rank_histogram,
     reliability,
     rps,
@@ -258,6 +260,42 @@ def test_brier_score(o, f_prob, keep_attrs):
         assert actual.attrs == o.attrs
     else:
         assert actual.attrs == {}
+
+
+@pytest.mark.parametrize("keep_attrs", [True, False])
+def test_fair_brier_score(o, f_prob, keep_attrs):
+    actual = fair_brier_score(
+        (o > 0.5).assign_attrs(**o.attrs),
+        (f_prob > 0.5),
+        keep_attrs=keep_attrs,
+    )
+    assert actual.chunks is None or actual.chunks == ()
+    if keep_attrs:
+        assert actual.attrs == o.attrs
+    else:
+        assert actual.attrs == {}
+
+
+@pytest.mark.parametrize("dim", DIMS)
+def test_fair_brier_score_dim(o, f_prob, dim):
+    actual = fair_brier_score((o > 0.5), (f_prob > 0.5), dim=dim)
+    assert_only_dim_reduced(dim, actual, o)
+
+
+def test_brier_score_vs_fair_brier_score(o, f_prob):
+    dim = ["lon", "lat"]
+    fbs = fair_brier_score((o > 0.5), (f_prob > 0.5), dim=dim)
+    bs = brier_score((o > 0.5), (f_prob > 0.5).mean("member"), dim=dim)
+    print("fairBS", fbs, "\nBS", bs)
+    assert False
+
+
+def test_fair_brier_score_dask(o_dask, f_prob_dask):
+    actual = brier_score(
+        (o_dask > 0.5).assign_attrs(**o_dask.attrs),
+        (f_prob_dask > 0.5),
+    )
+    assert is_dask_collection(actual)
 
 
 @pytest.mark.parametrize("dim", DIMS)

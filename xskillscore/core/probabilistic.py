@@ -267,6 +267,63 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
         return res.mean(dim, keep_attrs=keep_attrs)
 
 
+def fair_brier_score(
+    observations,
+    forecasts,
+    dim=None,
+    weights=None,
+    keep_attrs=False,
+    member_dim="member",
+):
+    """Calculate the fair Brier score (FairBS).
+
+    .. math:
+        FairBS(p, k) = change(p_1 - k)^{2}
+
+    Parameters
+    ----------
+    observations : xarray.Dataset or xarray.DataArray
+        The observations or set of observations of the event.
+        Data should be boolean or logical \
+        (True or 1 for event occurance, False or 0 for non-occurance).
+    forecasts : xarray.Dataset or xarray.DataArray
+        The forecast likelihoods of the event. Data should be between 0 and 1.
+    dim : str or list of str, optional
+        Dimension over which to compute mean after computing ``brier_score``.
+        Defaults to None implying averaging over all dimensions.
+    weights : xr.DataArray with dimensions from dim, optional
+        Weights for `weighted.mean(dim)`.
+        Defaults to None, such that no weighting is applied.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
+
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray
+
+    References
+    ----------
+    * https://www-miklip.dkrz.de/about/problems/
+
+    """
+    if member_dim in forecasts.dims:
+        M = forecasts[member_dim].size
+        e = (forecasts == 1).sum(member_dim, keep_attrs=keep_attrs)
+    else:
+        raise ValueError("need forecast with member dim")
+    o = observations
+    with xr.set_options(keep_attrs=keep_attrs):
+        res = e / M - o ** 2 - e * (M - e) / (M ** 2 * (M - 1))
+    res.attrs = observations.attrs  # dirty fix
+    if weights is not None:
+        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
+    else:
+        return res.mean(dim, keep_attrs=keep_attrs)
+
+
 def threshold_brier_score(
     observations,
     forecasts,

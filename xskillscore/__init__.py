@@ -27,6 +27,7 @@ from .core.probabilistic import (
     crps_gaussian,
     crps_quadrature,
     discrimination,
+    fair_brier_score,
     rank_histogram,
     reliability,
     rps,
