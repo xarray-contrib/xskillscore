@@ -55,6 +55,19 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
     -------
     xarray.Dataset or xarray.DataArray reduced by dimension dim
 
+    Examples
+    --------
+    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    ...                             coords=[('x', np.arange(3)),
+    ...                                     ('y', np.arange(3))])
+    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+    ...                          coords=[('x', np.arange(3)),
+    ...                                  ('y', np.arange(3)),
+    ...                                  ('member', np.arange(3))])
+    >>> mu = forecasts.mean('member')
+    >>> sig = forecasts.std('member')
+    >>> crps_gaussian(observations, mu, sig)
+
     See Also
     --------
     properscoring.crps_gaussian
@@ -85,7 +98,7 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
 
 
 def crps_quadrature(
-    x,
+    observations,
     cdf_or_dist,
     xmin=None,
     xmax=None,
@@ -121,13 +134,21 @@ def crps_quadrature(
     -------
     xarray.Dataset or xarray.DataArray
 
+    Examples
+    --------
+    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    ...                             coords=[('x', np.arange(3)),
+    ...                                     ('y', np.arange(3))])
+    >>> from scipy.stats import norm
+    >>> crps_quadrature(observations, norm)
+
     See Also
     --------
     properscoring.crps_quadrature
     """
     res = xr.apply_ufunc(
         properscoring.crps_quadrature,
-        x,
+        observations,
         cdf_or_dist,
         xmin,
         xmax,
@@ -187,6 +208,17 @@ def crps_ensemble(
     -------
     xarray.Dataset or xarray.DataArray
 
+    Examples
+    --------
+    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    ...                             coords=[('x', np.arange(3)),
+    ...                                     ('y', np.arange(3))])
+    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+    ...                          coords=[('x', np.arange(3)),
+    ...                                  ('y', np.arange(3)),
+    ...                                  ('member', np.arange(3))])
+    >>> crps_ensemble(observations, forecasts)
+
     See Also
     --------
     properscoring.crps_ensemble
@@ -207,7 +239,14 @@ def crps_ensemble(
         return res.mean(dim, keep_attrs=keep_attrs)
 
 
-def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=False):
+def brier_score(
+    observations,
+    forecasts,
+    dim=None,
+    weights=None,
+    keep_attrs=False,
+    member_dim="member",
+):
     """Calculate Brier score (BS).
 
     .. math:
@@ -220,7 +259,8 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
         Data should be boolean or logical \
         (True or 1 for event occurance, False or 0 for non-occurance).
     forecasts : xarray.Dataset or xarray.DataArray
-        The forecast likelihoods of the event. Data should be between 0 and 1.
+        The forecast likelihoods of the event. Data should be between 0 and 1. If
+        forecasts still contain a member dimension tries to take ``.mean(member_dim)``.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``brier_score``.
         Defaults to None implying averaging over all dimensions.
@@ -232,10 +272,23 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
         from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
+    member_dim : str, optional
+        Name of ensemble member dimension. By default, 'member'.
 
     Returns
     -------
     xarray.Dataset or xarray.DataArray
+
+    Examples
+    --------
+    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    ...                             coords=[('x', np.arange(3)),
+    ...                                     ('y', np.arange(3))])
+    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+    ...                          coords=[('x', np.arange(3)),
+    ...                                  ('y', np.arange(3)),
+    ...                                  ('member', np.arange(3))])
+    >>> brier_score(observations > .5, (forecasts > .5).mean('member'))
 
     See Also
     --------
@@ -252,6 +305,8 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
       https://journals.ametsoc.org/doi/abs/10.1175/1520-0493%281950%29078%3C0001%3AVOFEIT%3E2.0.CO%3B2
 
     """
+    if member_dim in forecasts.dims:
+        forecasts = forecasts.mean(member_dim, keep_attrs=keep_attrs)
     res = xr.apply_ufunc(
         properscoring.brier_score,
         observations,
@@ -308,6 +363,18 @@ def threshold_brier_score(
         (If ``threshold`` is a scalar, the result will have the same shape as
         observations. Otherwise, it will have an additional final dimension
         corresponding to the threshold levels. Not implemented yet.)
+
+    Examples
+    --------
+    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    ...                             coords=[('x', np.arange(3)),
+    ...                                     ('y', np.arange(3))])
+    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+    ...                          coords=[('x', np.arange(3)),
+    ...                                  ('y', np.arange(3)),
+    ...                                  ('member', np.arange(3))])
+    >>> threshold = [.2, .5, .8]
+    >>> threshold_brier_score(observations, forecasts, threshold)
 
     See Also
     --------
@@ -399,6 +466,18 @@ def rps(
     -------
     xarray.Dataset or xarray.DataArray:
         ranked probability score
+
+    Examples
+    --------
+    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    ...                             coords=[('x', np.arange(3)),
+    ...                                     ('y', np.arange(3))])
+    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+    ...                          coords=[('x', np.arange(3)),
+    ...                                  ('y', np.arange(3)),
+    ...                                  ('member', np.arange(3))])
+    >>> category_edges = np.array([.2, .5, .8])
+    >>> rps(observations, forecasts, category_edges)
 
     References
     ----------
