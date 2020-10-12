@@ -1,9 +1,10 @@
 import numpy as np
 import pytest
 from dask import is_dask_collection
+from xarray.testing import assert_equal
 
 import xskillscore as xs
-from xskillscore import sign_test
+from xskillscore import mae, mae_test, pearson_r, sign_test
 
 OFFSET = -1
 
@@ -220,3 +221,90 @@ def test_sign_test_NaNs_confidence(a, a_worse, b):
     a_nan[1:3, 1:3, 1:3] = np.nan
     actual_nan = sign_test(a_nan, a_worse, b, time_dim="time", metric="mse")
     assert not (actual_nan.confidence == actual.confidence).all()
+
+
+@pytest.mark.parametrize("alpha", [0.05, "return_p"])
+@pytest.mark.parametrize("chunk", [True, False])
+@pytest.mark.parametrize("input", ["Dataset", "multidim Dataset", "DataArray", "mixed"])
+def test_mae_test_inputs(a_1d, a_1d_worse, b_1d, input, chunk, alpha):
+    """Test mae_test with xr inputs and chunked."""
+    if "Dataset" in input:
+        name = "var"
+        a_1d = a_1d.to_dataset(name=name)
+        a_1d_worse = a_1d_worse.to_dataset(name=name)
+        b_1d = b_1d.to_dataset(name=name)
+        if input == "multidim Dataset":
+            a_1d["var2"] = a_1d["var"] * 2
+            a_1d_worse["var2"] = a_1d_worse["var"] * 2
+            b_1d["var2"] = b_1d["var"] * 2
+    elif input == "mixed":
+        name = "var"
+        a_1d = a_1d.to_dataset(name=name)
+    if chunk:
+        a_1d = a_1d.chunk()
+        a_1d_worse = a_1d_worse.chunk()
+        b_1d = b_1d.chunk()
+    actual = mae_test(a_1d, a_1d_worse, b_1d, alpha=alpha)
+    # check dask collection preserved
+    assert is_dask_collection(actual) if chunk else not is_dask_collection(actual)
+
+
+@pytest.mark.parametrize("alpha", [0.0, 0, 1.0, 1.0, 5.0, 5])
+def test_mae_test_alpha(a_1d, a_1d_worse, b_1d, alpha):
+    """Test mae_test alpha error messages."""
+    with pytest.raises(ValueError) as e:
+        mae_test(a_1d, a_1d_worse, b_1d, alpha=alpha)
+    assert "`alpha` must be between 0 and 1 or `return_p`" in str(e.value)
+
+
+@pytest.mark.parametrize("alpha", [0.05, "return_p"])
+def test_mae_test(a_1d, b_1d, alpha):
+    """Test mae_test favors better forecast."""
+    a_1d_worse = a_1d.copy()
+    # make a_worse worse every second timestep
+    step = 3
+    a_1d_worse[::step] = a_1d_worse[::step] + OFFSET * 3
+    actual = mae_test(a_1d, a_1d_worse, b_1d, alpha=alpha)
+    if alpha != "return_p":
+        assert (actual.sel(results="diff") > actual.sel(results="hwci")).all(), print(
+            actual
+        )
+    else:
+        assert actual.sel(results="alpha") < 0.05
+
+
+def test_mae_test_climpred(a_1d, b_1d):
+    """Test mae_test as climpred would use it with observations=None."""
+    a_1d_worse = a_1d.copy()
+    # make a_worse worse every second timestep
+    a_1d_worse[::2] = a_1d_worse[::2] + OFFSET
+    # calc skill before as in climpred
+    dim = []
+    time_dim = "time"
+    mae_f1o = mae(a_1d, b_1d, dim=dim)
+    mae_f2o = mae(a_1d_worse, b_1d, dim=dim)
+    pearson_r_f1f2 = pearson_r(a_1d, a_1d_worse, dim=dim + [time_dim])
+
+    actual = mae_test(
+        mae_f1o,
+        mae_f2o,
+        observations=None,
+        pearson_r=pearson_r_f1f2,
+        dim=dim,
+        time_dim=time_dim,
+    )
+    expected = mae_test(a_1d, a_1d_worse, b_1d, dim=dim, time_dim=time_dim)
+    assert_equal(actual, expected)
+
+
+@pytest.mark.parametrize("dim", [[], ["lon", "lat"]])
+def test_mae_test_dim(a, b, dim):
+    """Test mae_test for different dim on ."""
+    a_worse = a.copy()
+    # make a_worse worse every second timestep
+    a_worse[::2, :, :] = a_worse[::2, :, :] + OFFSET
+    actual = mae_test(a, a_worse, b, dim=dim)
+    # difference larger than half width ci
+    assert (actual.sel(results="diff") > actual.sel(results="hwci")).mean() > 0.5
+    for d in dim:
+        assert d not in actual.dims, print(d, "found but shouldnt")
