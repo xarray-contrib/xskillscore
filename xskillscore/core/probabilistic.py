@@ -66,7 +66,11 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
     ...                                  ('member', np.arange(3))])
     >>> mu = forecasts.mean('member')
     >>> sig = forecasts.std('member')
-    >>> crps_gaussian(observations, mu, sig)
+    >>> crps_gaussian(observations, mu, sig, dim='x')
+    <xarray.DataArray (y: 3)>
+    array([1.0349773 , 0.36521376, 0.39017126])
+    Coordinates:
+      * y        (y) int64 0 1 2
 
     See Also
     --------
@@ -141,6 +145,10 @@ def crps_quadrature(
     ...                                     ('y', np.arange(3))])
     >>> from scipy.stats import norm
     >>> crps_quadrature(observations, norm)
+    <xarray.DataArray (y: 3)>
+    array([0.80280921, 0.31818197, 0.32364912])
+    Coordinates:
+      * y        (y) int64 0 1 2
 
     See Also
     --------
@@ -217,7 +225,11 @@ def crps_ensemble(
     ...                          coords=[('x', np.arange(3)),
     ...                                  ('y', np.arange(3)),
     ...                                  ('member', np.arange(3))])
-    >>> crps_ensemble(observations, forecasts)
+    >>> crps_ensemble(observations, forecasts, dim='x')
+    <xarray.DataArray (y: 3)>
+    array([1.04497153, 0.48997746, 0.47994095])
+    Coordinates:
+      * y        (y) int64 0 1 2
 
     See Also
     --------
@@ -289,6 +301,10 @@ def brier_score(
     ...                                  ('y', np.arange(3)),
     ...                                  ('member', np.arange(3))])
     >>> brier_score(observations > .5, (forecasts > .5).mean('member'))
+    <xarray.DataArray (y: 3)>
+    array([0.51851852, 0.14814815, 0.37037037])
+    Coordinates:
+      * y        (y) int64 0 1 2
 
     See Also
     --------
@@ -375,6 +391,13 @@ def threshold_brier_score(
     ...                                  ('member', np.arange(3))])
     >>> threshold = [.2, .5, .8]
     >>> threshold_brier_score(observations, forecasts, threshold)
+    <xarray.DataArray (y: 3, threshold: 3)>
+    array([[0.44444444, 0.51851852, 0.48148148],
+           [0.18518519, 0.14814815, 0.03703704],
+           [0.18518519, 0.37037037, 0.03703704]])
+    Coordinates:
+      * y          (y) int64 0 1 2
+      * threshold  (threshold) int64 1 2 3
 
     See Also
     --------
@@ -478,6 +501,10 @@ def rps(
     ...                                  ('member', np.arange(3))])
     >>> category_edges = np.array([.2, .5, .8])
     >>> rps(observations, forecasts, category_edges)
+    <xarray.DataArray 'histogram_category' (y: 3)>
+    array([1.        , 1.        , 0.33333333])
+    Coordinates:
+      * y        (y) int64 0 1 2
 
     References
     ----------
@@ -631,6 +658,14 @@ def discrimination(
     >>> disc = discrimination(observed_event,
     ...                       forecast_event_likelihood,
     ...                       dim=['x','y'])
+    <xarray.DataArray (event: 2, forecast_probability: 5)>
+    array([[0., 1., 0., 0., 0.],
+           [0., 1., 0., 0., 0.]])
+    Coordinates:
+      * forecast_probability  (forecast_probability) float64 0.1 0.3 0.5 0.7 0.9
+      * event                 (event) bool True False
+
+
 
     References
     ----------
@@ -712,8 +747,16 @@ def reliability(
         ...                            coords=[('x', np.arange(3)),
         ...                                    ('y', np.arange(3))])
         >>> rel = reliability(observations > 0.1,
-        ...                   (forecasts > 0.1).mean('ensemble'),
+        ...                   (forecasts > 0.1).mean('member'),
         ...                   dim='x')
+        <xarray.DataArray (y: 3, forecast_probability: 5)>
+        array([[       nan, 1.        ,        nan,        nan,        nan],
+               [0.        , 0.5       ,        nan,        nan,        nan],
+               [       nan, 0.33333333,        nan,        nan,        nan]])
+        Coordinates:
+          * y                     (y) int64 0 1 2
+          * forecast_probability  (forecast_probability) float64 0.1 0.3 0.5 0.7 0.9
+            samples               (y, forecast_probability) float64 0.0 3.0 ... 0.0 0.0
 
         Notes
         -----
