@@ -10,6 +10,9 @@ Features
 - Added mean error
   :py:func:`~xskillscore.me`. (:issue:`202`, :pr:`200`)
   `Andrew Huang`_
+- Added MAE significance test :py:func:`~xskillscore.mae_test` from Jolliffe and Ebert
+  https://www.cawcr.gov.au/projects/verification/CIdiff/FAQ-CIdiff.html
+  (:issue:`192`, :pr:`209`) `Aaron Spring`_
 
 Bug Fixes
 ~~~~~~~~~

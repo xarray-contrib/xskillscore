@@ -181,7 +181,7 @@ def mae_test(
     alpha=0.05,
 ):
     """
-    Returns the Joliffe and Ebert MAE significance test.
+    Returns the Jolliffe and Ebert MAE significance test.
 
     https://www.cawcr.gov.au/projects/verification/CIdiff/FAQ-CIdiff.html
 
@@ -283,6 +283,3 @@ def mae_test(
         ret = xr.concat([diff, alpha], "results")
         ret["results"] = ["diff", "alpha"]
         return ret
-
-    else:
-        raise ValueError("choose alpha between 0 and 1 or `return_p`.")
