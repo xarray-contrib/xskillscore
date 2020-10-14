@@ -175,7 +175,6 @@ def mae_test(
     forecasts1,
     forecasts2,
     observations=None,
-    pearson_r=None,
     dim=[],
     time_dim="time",
     alpha=0.05,
@@ -193,8 +192,6 @@ def mae_test(
         forecasts2 to be compared to observations
     observations : xarray.Dataset or xarray.DataArray or None
         observations to be compared to both forecasts. Defaults to None.
-    pearson_r : xarray.Dataset or xarray.DataArray or None
-        if observations is None use pearson_r.
     time_dim : str
         time dimension of dimension over which to compute the random walk.
         This dimension is not reduced, unlike in other xskillscore functions.
@@ -244,17 +241,15 @@ def mae_test(
     else:
         raise ValueError(msg)
 
-    if observations is not None and pearson_r is None:
+    if observations is not None:
         # Compare the forecasts and observations using metric
         mae_f1o = mae(observations, forecasts1, dim=dim)
         mae_f2o = mae(observations, forecasts2, dim=dim)
-        pearson_r_f1f2 = pearson_r_func(mae_f1o, mae_f2o, dim=time_dim)
-    elif observations is None and pearson_r is not None:
+    elif observations is None:
         mae_f1o = forecasts1
         mae_f2o = forecasts2
-        pearson_r_f1f2 = pearson_r
-    else:
-        raise ValueError("Either provide observations or pearson_r.")
+
+    pearson_r_f1f2 = pearson_r_func(mae_f1o, mae_f2o, dim=time_dim)
 
     # diff mae
     diff = np.abs(mae_f1o - mae_f2o).mean(time_dim)

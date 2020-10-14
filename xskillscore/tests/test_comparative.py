@@ -4,7 +4,7 @@ from dask import is_dask_collection
 from xarray.testing import assert_equal
 
 import xskillscore as xs
-from xskillscore import mae, mae_test, pearson_r, sign_test
+from xskillscore import mae, mae_test, sign_test
 
 OFFSET = -1
 
@@ -283,13 +283,11 @@ def test_mae_test_climpred(a_1d, b_1d):
     time_dim = "time"
     mae_f1o = mae(a_1d, b_1d, dim=dim)
     mae_f2o = mae(a_1d_worse, b_1d, dim=dim)
-    pearson_r_f1f2 = pearson_r(mae_f1o, mae_f2o, dim=time_dim)
 
     actual = mae_test(
         mae_f1o,
         mae_f2o,
         observations=None,
-        pearson_r=pearson_r_f1f2,
         dim=dim,
         time_dim=time_dim,
     )
