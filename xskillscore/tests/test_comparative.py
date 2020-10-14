@@ -283,7 +283,7 @@ def test_mae_test_climpred(a_1d, b_1d):
     time_dim = "time"
     mae_f1o = mae(a_1d, b_1d, dim=dim)
     mae_f2o = mae(a_1d_worse, b_1d, dim=dim)
-    pearson_r_f1f2 = pearson_r(a_1d, a_1d_worse, dim=dim + [time_dim])
+    pearson_r_f1f2 = pearson_r(mae_f1o, mae_f2o, dim=time_dim)
 
     actual = mae_test(
         mae_f1o,

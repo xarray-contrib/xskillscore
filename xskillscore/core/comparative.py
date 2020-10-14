@@ -248,7 +248,7 @@ def mae_test(
         # Compare the forecasts and observations using metric
         mae_f1o = mae(observations, forecasts1, dim=dim)
         mae_f2o = mae(observations, forecasts2, dim=dim)
-        pearson_r_f1f2 = pearson_r_func(forecasts1, forecasts2, dim=dim + [time_dim])
+        pearson_r_f1f2 = pearson_r_func(mae_f1o, mae_f2o, dim=time_dim)
     elif observations is None and pearson_r is not None:
         mae_f1o = forecasts1
         mae_f2o = forecasts2
@@ -261,7 +261,8 @@ def mae_test(
 
     notnan = 1 * (mae_f1o.notnull() & mae_f2o.notnull())
     N = notnan.sum(time_dim)
-    std = (mae_f1o.std(time_dim) + mae_f2o.std(time_dim)) / 2
+    # average variances and take square root instead of averaging standard deviations
+    std = ((mae_f1o.var(time_dim) + mae_f2o.var(time_dim)) / 2) ** 0.5
 
     if not isinstance(alpha, str):
         confidence = st.norm.ppf(1 - alpha / 2)
