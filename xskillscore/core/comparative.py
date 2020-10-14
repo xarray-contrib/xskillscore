@@ -4,7 +4,7 @@ import numpy as np
 import scipy.stats as st
 import xarray as xr
 
-from .deterministic import mae, pearson_r as pearson_r_func
+from .deterministic import mae, pearson_r
 from .utils import _add_as_coord
 
 
@@ -249,7 +249,7 @@ def mae_test(
         mae_f1o = forecasts1
         mae_f2o = forecasts2
 
-    pearson_r_f1f2 = pearson_r_func(mae_f1o, mae_f2o, dim=time_dim)
+    pearson_r_f1f2 = pearson_r(mae_f1o, mae_f2o, dim=time_dim)
 
     # diff mae
     diff = np.abs(mae_f1o - mae_f2o).mean(time_dim)
