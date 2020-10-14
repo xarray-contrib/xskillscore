@@ -11,15 +11,27 @@ OFFSET = -1
 
 @pytest.fixture
 def a_1d_worse(a_1d):
+    """a_1d worsened by constant offset."""
     return a_1d + OFFSET
 
 
 @pytest.fixture
+def a_1d_worse_less_corr(a_1d):
+    """similar but not perfectly correlated a_1d."""
+    a_1d_worse = a_1d.copy()
+    step = 3
+    a_1d_worse[::step] = a_1d[::step].values + 0.1
+    return a_1d_worse
+
+
+@pytest.fixture
 def a_worse(a):
+    """a worsened by constant offset."""
     return a + OFFSET
 
 
 def logical(ds):
+    """returns results from [0, 1]."""
     return ds > 0.5
 
 
@@ -226,45 +238,45 @@ def test_sign_test_NaNs_confidence(a, a_worse, b):
 @pytest.mark.parametrize("alpha", [0.05, "return_p"])
 @pytest.mark.parametrize("chunk", [True, False])
 @pytest.mark.parametrize("input", ["Dataset", "multidim Dataset", "DataArray", "mixed"])
-def test_mae_test_inputs(a_1d, a_1d_worse, b_1d, input, chunk, alpha):
+def test_mae_test_inputs(a_1d, a_1d_worse_less_corr, b_1d, input, chunk, alpha):
     """Test mae_test with xr inputs and chunked."""
     if "Dataset" in input:
         name = "var"
         a_1d = a_1d.to_dataset(name=name)
-        a_1d_worse = a_1d_worse.to_dataset(name=name)
+        a_1d_worse_less_corr = a_1d_worse_less_corr.to_dataset(name=name)
         b_1d = b_1d.to_dataset(name=name)
         if input == "multidim Dataset":
             a_1d["var2"] = a_1d["var"] * 2
-            a_1d_worse["var2"] = a_1d_worse["var"] * 2
+            a_1d_worse_less_corr["var2"] = a_1d_worse_less_corr["var"] * 2
             b_1d["var2"] = b_1d["var"] * 2
     elif input == "mixed":
         name = "var"
         a_1d = a_1d.to_dataset(name=name)
     if chunk:
         a_1d = a_1d.chunk()
-        a_1d_worse = a_1d_worse.chunk()
+        a_1d_worse_less_corr = a_1d_worse_less_corr.chunk()
         b_1d = b_1d.chunk()
-    actual = mae_test(a_1d, a_1d_worse, b_1d, alpha=alpha)
+    actual = mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=alpha)
     # check dask collection preserved
     assert is_dask_collection(actual) if chunk else not is_dask_collection(actual)
 
 
 @pytest.mark.parametrize("alpha", [0.0, 0, 1.0, 1.0, 5.0, 5])
-def test_mae_test_alpha(a_1d, a_1d_worse, b_1d, alpha):
+def test_mae_test_alpha(a_1d, a_1d_worse_less_corr, b_1d, alpha):
     """Test mae_test alpha error messages."""
     with pytest.raises(ValueError) as e:
-        mae_test(a_1d, a_1d_worse, b_1d, alpha=alpha)
+        mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=alpha)
     assert "`alpha` must be between 0 and 1 or `return_p`" in str(e.value)
 
 
 @pytest.mark.parametrize("alpha", [0.05, "return_p"])
-def test_mae_test(a_1d, b_1d, alpha):
+def test_mae_test_better_significant(a_1d, a_1d_worse_less_corr, b_1d, alpha):
     """Test mae_test favors better forecast."""
-    a_1d_worse = a_1d.copy()
+    a_1d_worse_less_corr = a_1d.copy()
     # make a_worse worse every second timestep
     step = 3
-    a_1d_worse[::step] = a_1d_worse[::step] + OFFSET * 3
-    actual = mae_test(a_1d, a_1d_worse, b_1d, alpha=alpha)
+    a_1d_worse_less_corr[::step] = a_1d_worse_less_corr[::step] + OFFSET * 3
+    actual = mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=alpha)
     if alpha != "return_p":
         assert (actual.sel(results="diff") > actual.sel(results="hwci")).all(), print(
             actual
@@ -275,14 +287,14 @@ def test_mae_test(a_1d, b_1d, alpha):
 
 def test_mae_test_climpred(a_1d, b_1d):
     """Test mae_test as climpred would use it with observations=None."""
-    a_1d_worse = a_1d.copy()
+    a_1d_worse_less_corr = a_1d.copy()
     # make a_worse worse every second timestep
-    a_1d_worse[::2] = a_1d_worse[::2] + OFFSET
+    a_1d_worse_less_corr[::2] = a_1d_worse_less_corr[::2] + OFFSET
     # calc skill before as in climpred
     dim = []
     time_dim = "time"
     mae_f1o = mae(a_1d, b_1d, dim=dim)
-    mae_f2o = mae(a_1d_worse, b_1d, dim=dim)
+    mae_f2o = mae(a_1d_worse_less_corr, b_1d, dim=dim)
 
     actual = mae_test(
         mae_f1o,
@@ -291,7 +303,7 @@ def test_mae_test_climpred(a_1d, b_1d):
         dim=dim,
         time_dim=time_dim,
     )
-    expected = mae_test(a_1d, a_1d_worse, b_1d, dim=dim, time_dim=time_dim)
+    expected = mae_test(a_1d, a_1d_worse_less_corr, b_1d, dim=dim, time_dim=time_dim)
     assert_equal(actual, expected)
 
 
@@ -306,3 +318,13 @@ def test_mae_test_dim(a, b, dim):
     assert (actual.sel(results="diff") > actual.sel(results="hwci")).mean() > 0.5
     for d in dim:
         assert d not in actual.dims, print(d, "found but shouldnt")
+
+
+def test_mae_test_alpha_hwci(a_1d, a_1d_worse_less_corr, b_1d):
+    """Test mae_test with larger alpha leads to smaller hwci."""
+    actual_large_alpha = mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=0.1)
+    actual_small_alpha = mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=0.01)
+
+    assert actual_large_alpha.sel(results="hwci") < actual_small_alpha.sel(
+        results="hwci"
+    ), print(actual_large_alpha, actual_small_alpha)

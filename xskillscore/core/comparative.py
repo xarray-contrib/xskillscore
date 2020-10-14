@@ -81,10 +81,18 @@ def sign_test(
     ...      coords=[('time', np.arange(30))])
     >>> o = xr.DataArray(np.random.normal(size=(30)),
     ...      coords=[('time', np.arange(30))])
-    >>> st = sign_test(f1, f2, o, time_dim'time', metric='mae', orientation='negative')
+    >>> st = sign_test(f1, f2, o, time_dim='time', metric='mae', orientation='negative')
     >>> st.plot()
     >>> st['confidence'].plot(color='gray')
     >>> (-1*st['confidence']).plot(color='gray')
+    >>> st
+    <xarray.DataArray (time: 30)>
+    array([-1, -2, -3, -2, -3, -4, -3, -4, -5, -4, -5, -4, -5, -4, -5, -6, -5,
+           -6, -5, -6, -7, -8, -7, -6, -5, -6, -5, -4, -5, -6])
+    Coordinates:
+      * time        (time) int64 0 1 2 3 4 5 6 7 8 9 ... 21 22 23 24 25 26 27 28 29
+        alpha       float64 0.05
+        confidence  (time) float64 1.96 2.772 3.395 3.92 ... 10.18 10.37 10.55 10.74
 
     References
     ----------
@@ -180,9 +188,19 @@ def mae_test(
     alpha=0.05,
 ):
     """
-    Returns the Jolliffe and Ebert MAE significance test.
-
+    Returns the Jolliffe and Ebert MAE significance test whether forecasts1 and
+    forecasts2 have different mean absolute error (MAE) at significance level alpha.
     https://www.cawcr.gov.au/projects/verification/CIdiff/FAQ-CIdiff.html
+
+
+    .. note::
+        ``alpha`` is the desired significance level and the maximum acceptable risk of
+        falsely rejecting the null-hypothesis. The smaller the value of α the greater
+        the strength of the test. The confidence level of the test is defined as
+        1 - alpha, and often expressed as a percentage. So for example a significance
+        level of 0.05, is equivalent to a 95% confidence level.
+        Source: NIST/SEMATECH e-Handbook of Statistical Methods.
+        https://www.itl.nist.gov/div898/handbook/prc/section1/prc14.htm
 
     Parameters
     ----------
@@ -191,24 +209,25 @@ def mae_test(
     forecasts2 : xarray.Dataset or xarray.DataArray
         forecasts2 to be compared to observations
     observations : xarray.Dataset or xarray.DataArray or None
-        observations to be compared to both forecasts. Defaults to None.
+        observations to be compared to both forecasts. if None, assumes that arguments
+        forecasts1 and forecasts2 are already MAEs. Defaults to None.
     time_dim : str
-        time dimension of dimension over which to compute the random walk.
-        This dimension is not reduced, unlike in other xskillscore functions.
+        time dimension of dimension over which to compute the temporal correlation.
         Defaults to ``'time'``.
     dim : str or list of str
-        dimensions to apply metric to if ``metric`` is provided. Cannot contain
-        ``time_dim``. Ignored if ``metric`` is None. Defaults to [].
+        dimensions to apply MAE to. Cannot contain ``time_dim``. Defaults to [].
     alpha : float or 'return_p'
-        significance level or return the p-value that forecast1 is not better than
-        forecast2.
+        significance level alpha or return the significance level / p-value that
+        forecast1 is different than forecast2.
 
     Returns
     -------
-    xarray.DataArray or xarray.Dataset : Difference in xs.mae and half-width of the
-        confidence interval at the level ``alpha`` if ``alpha`` is given or the p-value
-        that forecast1 is not better than forecast2 if ``alpha=return_p``.
-
+    xarray.DataArray or xarray.Dataset : Difference in xs.mae reduced by ``dim`` and
+        ``time_dim`` and:
+            * if ``alpha`` is float: half-width of the confidence interval at the
+             significance level ``alpha``.
+            * if ``alpha == 'return_p'``: the significance level that forecasts1 is
+             different than forecasts2.
 
     Examples
     --------
@@ -218,16 +237,30 @@ def mae_test(
     ...      coords=[('time', np.arange(30))])
     >>> o = xr.DataArray(np.random.normal(size=(30)),
     ...      coords=[('time', np.arange(30))])
-    >>> res = mae_test(f1, f2, o, time_dim='time', dim=[])
+    >>> mae_test(f1, f2, o, time_dim='time', dim=[], alpha=0.05)
+    <xarray.DataArray (results: 3)>
+    array([-0.09949737,  0.24421034,  0.        ])
+    Coordinates:
+        alpha    float64 0.05
+      * results  (results) <U11 'diff' 'hwci' 'significant'
+    >>> # absolute magnitude of difference is smaller than half-width of
+    >>> # confidence interval, therefore not significant at level alpha=0.05
+    >>> #
+    >>> mae_test(f1, f2, o, time_dim='time', dim=[], alpha='return_p')
+    <xarray.DataArray (results: 2)>
+    array([-0.09949737,  0.9226177])
+    Coordinates:
+      * results  (results) <U5 'diff' 'significance'
+    >>> # significance level of 0.92 much above commonly accepted level of 0.05
+
 
     References
     ----------
         * https://www.cawcr.gov.au/projects/verification/CIdiff/FAQ-CIdiff.html
-    """
 
+    """
     if isinstance(dim, str):
         dim = [dim]
-
     if time_dim in dim:
         raise ValueError("`dim` cannot contain `time_dim`")
 
@@ -252,7 +285,7 @@ def mae_test(
     pearson_r_f1f2 = pearson_r(mae_f1o, mae_f2o, dim=time_dim)
 
     # diff mae
-    diff = np.abs(mae_f1o - mae_f2o).mean(time_dim)
+    diff = (mae_f2o - mae_f1o).mean(time_dim)
 
     notnan = 1 * (mae_f1o.notnull() & mae_f2o.notnull())
     N = notnan.sum(time_dim)
@@ -263,9 +296,10 @@ def mae_test(
         confidence = st.norm.ppf(1 - alpha / 2)
         # half width of the confidence interval
         hwci = (2 * (1 - pearson_r_f1f2)) ** 0.5 * confidence * std / N ** 0.5
-        ret = xr.concat([diff, hwci], "results")
+        diff_greater_hwci = np.abs(diff) > hwci  # difference between MAEs significant?
+        ret = xr.concat([diff, hwci, diff_greater_hwci], "results")
         ret["alpha"] = alpha
-        ret["results"] = ["diff", "hwci"]
+        ret["results"] = ["diff", "hwci", "significant"]
         return ret
 
     elif alpha == "return_p":
@@ -273,9 +307,11 @@ def mae_test(
         def _cdf(ds):
             return xr.apply_ufunc(st.norm.cdf, ds, dask="parallelized")
 
+        # transforming hwci = diff to get alpha
         alpha = 2 * (
-            1 - _cdf(diff / (2 * (1 - pearson_r_f1f2)) ** 0.5 / std * N ** 0.5)
+            1
+            - _cdf(np.abs(diff) * N ** 0.5 / ((2 * (1 - pearson_r_f1f2)) ** 0.5 * std))
         )
         ret = xr.concat([diff, alpha], "results")
-        ret["results"] = ["diff", "alpha"]
+        ret["results"] = ["diff", "significance"]
         return ret
