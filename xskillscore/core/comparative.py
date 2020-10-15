@@ -269,7 +269,7 @@ def mae_test(
         if alpha != "return_p":
             raise ValueError(msg)
     elif isinstance(alpha, float):
-        if alpha >= 1 or alpha <= 0:
+        if not 0 < alpha < 1:
             raise ValueError(msg)
     else:
         raise ValueError(msg)
