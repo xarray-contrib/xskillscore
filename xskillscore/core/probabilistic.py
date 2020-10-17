@@ -116,7 +116,7 @@ def crps_quadrature(
 
     Parameters
     ----------
-    x : xarray.Dataset or xarray.DataArray
+    observations : xarray.Dataset or xarray.DataArray
         Observations associated with the forecast distribution ``cdf_or_dist``.
     cdf_or_dist : callable or scipy.stats.distribution
         Function which returns the cumulative density of the forecast
