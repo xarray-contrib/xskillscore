@@ -282,7 +282,7 @@ def test_mae_test_better_significant(a_1d, a_1d_worse_less_corr, b_1d, alpha):
             actual
         )
     else:
-        assert actual.sel(results="alpha") < 0.05
+        assert actual.sel(results="significance") < 0.05
 
 
 def test_mae_test_climpred(a_1d, b_1d):

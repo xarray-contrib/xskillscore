@@ -188,7 +188,9 @@ def mae_test(
     alpha=0.05,
 ):
     """
-    Returns the Jolliffe and Ebert MAE significance test whether forecasts1 and
+    Returns the Jolliffe and Ebert MAE significance test.
+
+    Tests whether forecasts1 and
     forecasts2 have different mean absolute error (MAE) at significance level alpha.
     https://www.cawcr.gov.au/projects/verification/CIdiff/FAQ-CIdiff.html
 
@@ -205,9 +207,9 @@ def mae_test(
     Parameters
     ----------
     forecasts1 : xarray.Dataset or xarray.DataArray
-        forecasts1 to be compared to observations
+        first forecast to be compared to the observations
     forecasts2 : xarray.Dataset or xarray.DataArray
-        forecasts2 to be compared to observations
+        second forecast to be compared to the observations
     observations : xarray.Dataset or xarray.DataArray or None
         observations to be compared to both forecasts. if None, assumes that arguments
         forecasts1 and forecasts2 are already MAEs. Defaults to None.
@@ -285,7 +287,7 @@ def mae_test(
     pearson_r_f1f2 = pearson_r(mae_f1o, mae_f2o, dim=time_dim)
 
     # diff mae
-    diff = (mae_f2o - mae_f1o).mean(time_dim)
+    diff = mae_f2o.mean(time_dim) - mae_f1o.mean(time_dim)
 
     notnan = 1 * (mae_f1o.notnull() & mae_f2o.notnull())
     N = notnan.sum(time_dim)
