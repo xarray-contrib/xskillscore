@@ -182,7 +182,7 @@ def crps_ensemble(
     weights=None,
     keep_attrs=False,
 ):
-    """Continuous Ranked Probability Score with the ensemble distribution
+    """Continuous Ranked Probability Score with the ensemble distribution.
 
     Parameters
     ----------
@@ -251,14 +251,7 @@ def crps_ensemble(
         return res.mean(dim, keep_attrs=keep_attrs)
 
 
-def brier_score(
-    observations,
-    forecasts,
-    dim=None,
-    weights=None,
-    keep_attrs=False,
-    member_dim="member",
-):
+def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=False):
     """Calculate Brier score (BS).
 
     .. math:
@@ -271,8 +264,7 @@ def brier_score(
         Data should be boolean or logical \
         (True or 1 for event occurance, False or 0 for non-occurance).
     forecasts : xarray.Dataset or xarray.DataArray
-        The forecast likelihoods of the event. Data should be between 0 and 1. If
-        forecasts still contain a member dimension tries to take ``.mean(member_dim)``.
+        The forecast likelihoods of the event. Data should be between 0 and 1.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``brier_score``.
         Defaults to None implying averaging over all dimensions.
@@ -284,8 +276,6 @@ def brier_score(
         from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
-    member_dim : str, optional
-        Name of ensemble member dimension. By default, 'member'.
 
     Returns
     -------
@@ -321,8 +311,6 @@ def brier_score(
       https://journals.ametsoc.org/doi/abs/10.1175/1520-0493%281950%29078%3C0001%3AVOFEIT%3E2.0.CO%3B2
 
     """
-    if member_dim in forecasts.dims:
-        forecasts = forecasts.mean(member_dim, keep_attrs=keep_attrs)
     res = xr.apply_ufunc(
         properscoring.brier_score,
         observations,
