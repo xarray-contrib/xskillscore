@@ -299,10 +299,8 @@ def mae_test(
         # half width of the confidence interval
         hwci = (2 * (1 - pearson_r_f1f2)) ** 0.5 * confidence * std / N ** 0.5
         diff_greater_hwci = np.abs(diff) > hwci  # difference between MAEs significant?
-        ret = xr.concat([diff, hwci, diff_greater_hwci], "results")
-        ret["alpha"] = alpha
-        ret["results"] = ["diff", "hwci", "significant"]
-        return ret
+        diff = _add_as_coord(diff, diff_greater_hwci, "significant")
+        return diff, hwci
 
     elif alpha == "return_p":
 
@@ -314,6 +312,4 @@ def mae_test(
             1
             - _cdf(np.abs(diff) * N ** 0.5 / ((2 * (1 - pearson_r_f1f2)) ** 0.5 * std))
         )
-        ret = xr.concat([diff, alpha], "results")
-        ret["results"] = ["diff", "significance"]
-        return ret
+        return diff, alpha

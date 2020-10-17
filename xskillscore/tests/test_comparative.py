@@ -256,9 +256,10 @@ def test_mae_test_inputs(a_1d, a_1d_worse_less_corr, b_1d, input, chunk, alpha):
         a_1d = a_1d.chunk()
         a_1d_worse_less_corr = a_1d_worse_less_corr.chunk()
         b_1d = b_1d.chunk()
-    actual = mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=alpha)
+    actual_diff, actual_alpha = mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=alpha)
     # check dask collection preserved
-    assert is_dask_collection(actual) if chunk else not is_dask_collection(actual)
+    for actual in [actual_diff, actual_alpha]:
+        assert is_dask_collection(actual) if chunk else not is_dask_collection(actual)
 
 
 @pytest.mark.parametrize("alpha", [0.0, 0, 1.0, 1.0, 5.0, 5])
@@ -276,13 +277,11 @@ def test_mae_test_better_significant(a_1d, a_1d_worse_less_corr, b_1d, alpha):
     # make a_worse worse every second timestep
     step = 3
     a_1d_worse_less_corr[::step] = a_1d_worse_less_corr[::step] + OFFSET * 3
-    actual = mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=alpha)
+    actual_diff, actual_alpha = mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=alpha)
     if alpha != "return_p":
-        assert (actual.sel(results="diff") > actual.sel(results="hwci")).all(), print(
-            actual
-        )
+        assert (actual_diff > actual_alpha).all()
     else:
-        assert actual.sel(results="significance") < 0.05
+        assert actual_alpha < 0.05
 
 
 def test_mae_test_climpred(a_1d, b_1d):
@@ -296,15 +295,18 @@ def test_mae_test_climpred(a_1d, b_1d):
     mae_f1o = mae(a_1d, b_1d, dim=dim)
     mae_f2o = mae(a_1d_worse_less_corr, b_1d, dim=dim)
 
-    actual = mae_test(
+    actual_diff, actual_alpha = mae_test(
         mae_f1o,
         mae_f2o,
         observations=None,
         dim=dim,
         time_dim=time_dim,
     )
-    expected = mae_test(a_1d, a_1d_worse_less_corr, b_1d, dim=dim, time_dim=time_dim)
-    assert_equal(actual, expected)
+    expected_diff, expected_alpha = mae_test(
+        a_1d, a_1d_worse_less_corr, b_1d, dim=dim, time_dim=time_dim
+    )
+    assert_equal(actual_diff, expected_diff)
+    assert_equal(actual_alpha, expected_alpha)
 
 
 @pytest.mark.parametrize("dim", [[], ["lon", "lat"]])
@@ -313,18 +315,19 @@ def test_mae_test_dim(a, b, dim):
     a_worse = a.copy()
     # make a_worse worse every second timestep
     a_worse[::2, :, :] = a_worse[::2, :, :] + OFFSET
-    actual = mae_test(a, a_worse, b, dim=dim)
+    actual_diff, actual_alpha = mae_test(a, a_worse, b, dim=dim)
     # difference larger than half width ci
-    assert (actual.sel(results="diff") > actual.sel(results="hwci")).mean() > 0.5
+    assert (actual_diff > actual_alpha).mean() > 0.5
     for d in dim:
-        assert d not in actual.dims, print(d, "found but shouldnt")
+        assert d not in actual_diff.dims, print(d, "found, but shouldnt")
 
 
 def test_mae_test_alpha_hwci(a_1d, a_1d_worse_less_corr, b_1d):
     """Test mae_test with larger alpha leads to smaller hwci."""
-    actual_large_alpha = mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=0.1)
-    actual_small_alpha = mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=0.01)
-
-    assert actual_large_alpha.sel(results="hwci") < actual_small_alpha.sel(
-        results="hwci"
-    ), print(actual_large_alpha, actual_small_alpha)
+    actual_large_alpha_diff, actual_large_alpha_alpha = mae_test(
+        a_1d, a_1d_worse_less_corr, b_1d, alpha=0.1
+    )
+    actual_small_alpha_diff, actual_small_alpha_alpha = mae_test(
+        a_1d, a_1d_worse_less_corr, b_1d, alpha=0.01
+    )
+    assert actual_large_alpha_alpha < actual_small_alpha_alpha
