@@ -10,9 +10,9 @@ xskillscore: Metrics for verifying forecasts
 .. image:: https://anaconda.org/conda-forge/xskillscore/badges/version.svg
    :target: https://anaconda.org/conda-forge/xskillscore/
 
-.. image:: https://coveralls.io/repos/github/xarray-contrib/xskillscore/badge.svg?branch=master
-   :target: https://coveralls.io/github/xarray-contrib/xskillscore?branch=master
-
+.. image:: https://codecov.io/gh/xarray-contrib/xskillscore/branch/master/graph/badge.svg?token=KB5FZNIO8W
+   :target: https://codecov.io/gh/xarray-contrib/xskillscore
+    
 .. image:: https://img.shields.io/badge/benchmarked%20by-asv-green.svg?style=flat
    :target: https://raybellwaves.github.io/xskillscore/
 
