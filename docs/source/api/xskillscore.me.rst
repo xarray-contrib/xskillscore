@@ -1,5 +1,5 @@
-xskillscore.me
-================
+﻿xskillscore.me
+==============
 
 .. currentmodule:: xskillscore
 
