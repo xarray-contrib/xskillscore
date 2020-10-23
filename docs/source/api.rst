@@ -119,3 +119,4 @@ Tests to compare whether one forecast is significantly better than another one.
     :toctree: api/
 
     sign_test
+    mae_test
