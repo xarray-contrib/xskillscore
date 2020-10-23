@@ -14,6 +14,13 @@ Features
   https://www.cawcr.gov.au/projects/verification/CIdiff/FAQ-CIdiff.html
   (:issue:`192`, :pr:`209`) `Aaron Spring`_
 
+Breaking changes
+~~~~~~~~~~~~~~~~
+- Aligned output of :py:func:`~xskillscore.sign_test` with
+  :py:func:`~xskillscore.mae_test`. Now tests from comparative.py return more than
+  one object including a boolean indicating ``signficance`` based on ``alpha``.
+  (:pr:`209`) `Aaron Spring`_
+
 Bug Fixes
 ~~~~~~~~~
 - :py:func:`~xskillscore.sign_test` now works for ``xr.Dataset`` inputs.

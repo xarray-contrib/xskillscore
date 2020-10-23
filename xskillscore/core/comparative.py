@@ -218,18 +218,17 @@ def mae_test(
         Defaults to ``'time'``.
     dim : str or list of str
         dimensions to apply MAE to. Cannot contain ``time_dim``. Defaults to [].
-    alpha : float or 'return_p'
-        significance level alpha or return the significance level / p-value that
-        forecast1 is different than forecast2.
+    alpha : float
+        significance level alpha that forecast1 is different than forecast2.
 
     Returns
     -------
-    xarray.DataArray or xarray.Dataset : Difference in xs.mae reduced by ``dim`` and
-        ``time_dim`` and:
-            * if ``alpha`` is float: half-width of the confidence interval at the
-             significance level ``alpha``.
-            * if ``alpha == 'return_p'``: the significance level that forecasts1 is
-             different than forecasts2.
+    xarray.DataArray or xarray.Dataset :
+        is the difference in MAE significant? boolean returns
+    xarray.DataArray or xarray.Dataset :
+        Difference in xs.mae reduced by ``dim`` and ``time_dim``
+    xarray.DataArray or xarray.Dataset :
+        half-width of the confidence interval at the significance level ``alpha``.
 
     Examples
     --------
@@ -247,13 +246,6 @@ def mae_test(
       * results  (results) <U11 'diff' 'hwci' 'significant'
     >>> # absolute magnitude of difference is smaller than half-width of
     >>> # confidence interval, therefore not significant at level alpha=0.05
-    >>> #
-    >>> mae_test(f1, f2, o, time_dim='time', dim=[], alpha='return_p')
-    <xarray.DataArray (results: 2)>
-    array([-0.09949737,  0.9226177])
-    Coordinates:
-      * results  (results) <U5 'diff' 'significance'
-    >>> # significance level of 0.92 much above commonly accepted level of 0.05
 
 
     References
@@ -294,22 +286,8 @@ def mae_test(
     # average variances and take square root instead of averaging standard deviations
     std = ((mae_f1o.var(time_dim) + mae_f2o.var(time_dim)) / 2) ** 0.5
 
-    if not isinstance(alpha, str):
-        confidence = st.norm.ppf(1 - alpha / 2)
-        # half width of the confidence interval
-        hwci = (2 * (1 - pearson_r_f1f2)) ** 0.5 * confidence * std / N ** 0.5
-        diff_greater_hwci = np.abs(diff) > hwci  # difference between MAEs significant?
-        diff = _add_as_coord(diff, diff_greater_hwci, "significant")
-        return diff, hwci
-
-    elif alpha == "return_p":
-
-        def _cdf(ds):
-            return xr.apply_ufunc(st.norm.cdf, ds, dask="parallelized")
-
-        # transforming hwci = diff to get alpha
-        alpha = 2 * (
-            1
-            - _cdf(np.abs(diff) * N ** 0.5 / ((2 * (1 - pearson_r_f1f2)) ** 0.5 * std))
-        )
-        return diff, alpha
+    confidence = st.norm.ppf(1 - alpha / 2)
+    # half width of the confidence interval
+    hwci = (2 * (1 - pearson_r_f1f2)) ** 0.5 * confidence * std / N ** 0.5
+    significantly_different = np.abs(diff) > hwci  # MAE difference significant?
+    return significantly_different, diff, hwci
