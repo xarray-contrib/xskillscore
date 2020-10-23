@@ -5,7 +5,6 @@ import scipy.stats as st
 import xarray as xr
 
 from .deterministic import mae, pearson_r
-from .utils import _add_as_coord
 
 
 def sign_test(
@@ -174,9 +173,9 @@ def sign_test(
     # z_alpha is the value at which the standardized cumulative Gaussian distributed
     # exceeds alpha
     confidence = st.norm.ppf(1 - alpha / 2) * xr.ufuncs.sqrt(N)
-    walk.coords["alpha"] = alpha
-    walk = _add_as_coord(walk, confidence, "confidence")
-    return walk
+    confidence.coords["alpha"] = alpha
+    significantly_different = np.abs(walk) > confidence
+    return significantly_different, walk, confidence
 
 
 def mae_test(

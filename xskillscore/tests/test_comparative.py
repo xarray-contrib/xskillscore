@@ -55,11 +55,12 @@ def test_sign_test_inputs(a_1d, a_1d_worse, b_1d, input, chunk):
         a_1d = a_1d.chunk()
         a_1d_worse = a_1d_worse.chunk()
         b_1d = b_1d.chunk()
-    actual = sign_test(
+    actual_significantly_different, actual_walk, actual_confidence = sign_test(
         a_1d, a_1d_worse, b_1d, time_dim="time", alpha=0.05, metric="mae"
     )
     # check dask collection preserved
-    assert is_dask_collection(actual) if chunk else not is_dask_collection(actual)
+    for actual in [actual_significantly_different, actual_walk, actual_confidence]:
+        assert is_dask_collection(actual) if chunk else not is_dask_collection(actual)
 
 
 @pytest.mark.parametrize("observation", [True, False])
@@ -84,25 +85,31 @@ def test_sign_test_identical(a_1d, a_1d_worse, b_1d, metric):
         a_1d = logical(a_1d)
         a_1d_worse = logical(a_1d_worse)
         b_1d = logical(b_1d)
-    actual = sign_test(a_1d, a_1d_worse, b_1d, time_dim="time", metric=metric)
+    actual_significantly_different, actual_walk, actual_confidence = sign_test(
+        a_1d, a_1d_worse, b_1d, time_dim="time", metric=metric
+    )
     # check flat
-    assert (actual.diff(dim="time").isel(time=[i - 1 for i in identicals]) == 0).all()
+    assert (
+        actual_walk.diff(dim="time").isel(time=[i - 1 for i in identicals]) == 0
+    ).all()
 
 
 def test_sign_test_alpha(a_1d, a_1d_worse, b_1d):
     """Test that larger alpha leads to small confidence bounds in sign_test."""
-    actual_large_alpha = sign_test(
-        a_1d, a_1d_worse, b_1d, time_dim="time", alpha=0.1, metric="mae"
-    )
-    actual_small_alpha = sign_test(
-        a_1d, a_1d_worse, b_1d, time_dim="time", alpha=0.01, metric="mae"
-    )
+    (
+        actual_significantly_different_large_alpha,
+        actual_walk_large_alpha,
+        actual_confidence_large_alpha,
+    ) = sign_test(a_1d, a_1d_worse, b_1d, time_dim="time", alpha=0.1, metric="mae")
+    (
+        actual_significantly_different_small_alpha,
+        actual_walk_small_alpha,
+        actual_confidence_small_alpha,
+    ) = sign_test(a_1d, a_1d_worse, b_1d, time_dim="time", alpha=0.01, metric="mae")
     # check difference in confidence
-    assert (actual_large_alpha.confidence < actual_small_alpha.confidence).all()
+    assert (actual_confidence_large_alpha < actual_confidence_small_alpha).all()
     # check identical sign_test
-    assert actual_large_alpha.drop(["alpha", "confidence"]).equals(
-        actual_small_alpha.drop(["alpha", "confidence"])
-    )
+    assert actual_walk_large_alpha.equals(actual_walk_small_alpha)
 
 
 def test_sign_test_user_function(a_1d, a_1d_worse, b_1d):
@@ -111,25 +118,25 @@ def test_sign_test_user_function(a_1d, a_1d_worse, b_1d):
     def mse(a, b, dim):
         return ((a - b) ** 2).mean(dim)
 
-    actual = sign_test(
+    actual_significantly_different, actual_walk, actual_confidence = sign_test(
         a_1d, a_1d_worse, b_1d, time_dim="time", orientation="negative", metric=mse
     )
-    assert actual.isel(time=-1) > 0
+    assert actual_walk.isel(time=-1) > 0
 
 
 @pytest.mark.parametrize("orientation", ["negative", "positive"])
 def test_sign_test_orientation(a_1d, a_1d_worse, b_1d, orientation):
     """Test sign_test orientation."""
-    actual = sign_test(
+    actual_significantly_different, actual_walk, actual_confidence = sign_test(
         a_1d, a_1d_worse, b_1d, time_dim="time", orientation=orientation, metric="mae"
     )
     if orientation == "negative":
         # a_1d wins
-        assert actual.isel(time=-1) > 0
+        assert actual_walk.isel(time=-1) > 0
     elif orientation == "positive":
         # a_1d_worse wins because of corrupted metric orientation
-        print(actual.isel(time=-1))
-        assert actual.isel(time=-1) < 0
+        print(actual_walk.isel(time=-1))
+        assert actual_walk.isel(time=-1) < 0
 
 
 @pytest.mark.parametrize("metric", ["mae", "rmse", "mse"])
@@ -140,10 +147,10 @@ def test_sign_test_already_compared_orientation_negative(
     negative orientation (smaller distances mean better forecast)."""
     a_b_diff = getattr(xs, metric)(a_1d, b_1d, dim=[])
     a_worse_b_diff = getattr(xs, metric)(a_1d_worse, b_1d, dim=[])
-    actual = sign_test(
+    actual_significantly_different, actual_walk, actual_confidence = sign_test(
         a_b_diff, a_worse_b_diff, None, time_dim="time", orientation="negative"
     )
-    assert actual.isel(time=-1) > 0
+    assert actual_walk.isel(time=-1) > 0
 
 
 def crpss(o, f_prob, dim=None):
@@ -162,10 +169,10 @@ def test_sign_test_already_compared_orientation_positive_probabilistic(
     f_prob_worse = f_prob + OFFSET
     f_o_diff = metric(o, f_prob, dim=[])
     f_worse_o_diff = metric(o, f_prob_worse, dim=[])
-    actual = sign_test(
+    actual_significantly_different, actual_walk, actual_confidence = sign_test(
         f_o_diff, f_worse_o_diff, None, time_dim="time", orientation="positive"
     )
-    assert actual.isel(time=-1) > 0
+    assert actual_walk.isel(time=-1) > 0
 
 
 @pytest.mark.parametrize("metric", ["no_valid_metric_string", (), 1])
@@ -194,14 +201,22 @@ def test_sign_test_invalid_orientation_fails(orientation, a_1d, a_1d_worse, b_1d
 @pytest.mark.filterwarnings("ignore:Ignoring provided observation")
 def test_sign_test_no_metric_but_observation_warns(a_1d, a_1d_worse, b_1d):
     """Sign_test warns if no metric but observation, ignores observation."""
-    with_obs = sign_test(a_1d, a_1d_worse, b_1d, orientation="positive", metric=None)
-    without_obs = sign_test(a_1d, a_1d_worse, None, orientation="positive", metric=None)
-    assert (without_obs == with_obs).all()
+    (
+        actual_significantly_different_with_obs,
+        actual_walk_with_obs,
+        actual_confidence_with_obs,
+    ) = sign_test(a_1d, a_1d_worse, b_1d, orientation="positive", metric=None)
+    (
+        actual_significantly_different_without_obs,
+        actual_walk_without_obs,
+        actual_confidence_without_obs,
+    ) = sign_test(a_1d, a_1d_worse, None, orientation="positive", metric=None)
+    assert (actual_walk_without_obs == actual_walk_with_obs).all()
 
 
 def test_sign_test_dim(a, a_worse, b):
     """Sign_test with dim specified."""
-    actual = sign_test(
+    actual_significantly_different, actual_walk, actual_confidence = sign_test(
         a,
         a_worse,
         b,
@@ -211,7 +226,7 @@ def test_sign_test_dim(a, a_worse, b):
         time_dim="time",
     )
     # check result reduced by dim
-    assert len(actual.dims) == 1
+    assert len(actual_walk.dims) == 1
 
 
 def test_sign_test_dim_fails(a_1d, a_1d_worse, b_1d):
@@ -228,11 +243,17 @@ def test_sign_test_metric_correlation(a, a_worse, b):
 
 def test_sign_test_NaNs_confidence(a, a_worse, b):
     """Sign_test confidence with NaNs."""
-    actual = sign_test(a, a_worse, b, time_dim="time", metric="mse")
+    actual_significantly_different, actual_walk, actual_confidence = sign_test(
+        a, a_worse, b, time_dim="time", metric="mse"
+    )
     a_nan = a.copy()
     a_nan[1:3, 1:3, 1:3] = np.nan
-    actual_nan = sign_test(a_nan, a_worse, b, time_dim="time", metric="mse")
-    assert not (actual_nan.confidence == actual.confidence).all()
+    (
+        actual_significantly_different_nan,
+        actual_walk_nan,
+        actual_confidence_nan,
+    ) = sign_test(a_nan, a_worse, b, time_dim="time", metric="mse")
+    assert not (actual_confidence_nan == actual_confidence).all()
 
 
 @pytest.mark.parametrize("alpha", [0.05])
