@@ -66,32 +66,44 @@ def sign_test(
 
     Returns
     -------
-    xarray.DataArray or xarray.Dataset : Positive (negative) sign_test values shows
+    xarray.DataArray or xarray.Dataset : boolean returns answering whether forecast1 is
+        significantly different to forecast2
+    xarray.DataArray or xarray.Dataset : Positive (negative) walk values shows
         how often ``forecast1`` is better (worse) than ``forecast2`` according to
-        metric computed over ``dim``. A coordinate, confidence, is included showing
-        the positive boundary for the random walk at significance level ``alpha``.
+        metric computed over ``dim``.
+    xarray.DataArray or xarray.Dataset : confidence shows the positive boundary for a
+        random walk at significance level ``alpha``.
 
 
     Examples
     --------
+    >>> np.random.seed(42)
     >>> f1 = xr.DataArray(np.random.normal(size=(30)),
     ...      coords=[('time', np.arange(30))])
     >>> f2 = xr.DataArray(np.random.normal(size=(30)),
-    ...      coords=[('time', np.arange(30))])
+    ...      coords=[('time', np.arange(30))]) + 2.
     >>> o = xr.DataArray(np.random.normal(size=(30)),
     ...      coords=[('time', np.arange(30))])
-    >>> st = sign_test(f1, f2, o, time_dim='time', metric='mae', orientation='negative')
-    >>> st.plot()
-    >>> st['confidence'].plot(color='gray')
-    >>> (-1*st['confidence']).plot(color='gray')
-    >>> st
+    >>> significantly_different, walk, confidence = sign_test(f1, f2, o,
+            time_dim='time', metric='mae', orientation='negative')
+    >>> walk.plot()
+    >>> confidence.plot(color='gray')
+    >>> (-1*confidence).plot(color='gray')
+    >>> walk
     <xarray.DataArray (time: 30)>
-    array([-1, -2, -3, -2, -3, -4, -3, -4, -5, -4, -5, -4, -5, -4, -5, -6, -5,
-           -6, -5, -6, -7, -8, -7, -6, -5, -6, -5, -4, -5, -6])
+    array([ 1,  2,  3,  2,  3,  2,  3,  4,  3,  4,  5,  4,  5,  4,  5,  4,  5,
+            6,  7,  8,  9, 10,  9, 10, 11, 12, 11, 12, 13, 14])
     Coordinates:
-      * time        (time) int64 0 1 2 3 4 5 6 7 8 9 ... 21 22 23 24 25 26 27 28 29
-        alpha       float64 0.05
-        confidence  (time) float64 1.96 2.772 3.395 3.92 ... 10.18 10.37 10.55 10.74
+      * time     (time) int64 0 1 2 3 4 5 6 7 8 9 ... 20 21 22 23 24 25 26 27 28 29
+    >>> significantly_different
+    <xarray.DataArray (time: 30)>
+    array([False, False, False, False, False, False, False, False, False,
+           False, False, False, False, False, False, False, False, False,
+           False, False,  True,  True, False,  True,  True,  True,  True,
+            True,  True,  True])
+    Coordinates:
+      * time     (time) int64 0 1 2 3 4 5 6 7 8 9 ... 20 21 22 23 24 25 26 27 28 29
+        alpha    float64 0.05
 
     References
     ----------
@@ -231,20 +243,32 @@ def mae_test(
 
     Examples
     --------
+    >>> np.random.seed(42)
     >>> f1 = xr.DataArray(np.random.normal(size=(30)),
     ...      coords=[('time', np.arange(30))])
     >>> f2 = xr.DataArray(np.random.normal(size=(30)),
     ...      coords=[('time', np.arange(30))])
     >>> o = xr.DataArray(np.random.normal(size=(30)),
     ...      coords=[('time', np.arange(30))])
-    >>> mae_test(f1, f2, o, time_dim='time', dim=[], alpha=0.05)
-    <xarray.DataArray (results: 3)>
-    array([-0.09949737,  0.24421034,  0.        ])
-    Coordinates:
-        alpha    float64 0.05
-      * results  (results) <U11 'diff' 'hwci' 'significant'
+    >>> significantly_different, diff, hwci = mae_test(f1, f2, o, time_dim='time',
+            dim=[], alpha=0.05)
+    >>> significantly_different
+    <xarray.DataArray ()>
+    array(False)
+    >>> diff
+    <xarray.DataArray ()>
+    array(-0.01919449)
+    >>> hwci
+    <xarray.DataArray ()>
+    array(0.38729387)
     >>> # absolute magnitude of difference is smaller than half-width of
     >>> # confidence interval, therefore not significant at level alpha=0.05
+    >>> # now comparing against an offset f2, the difference in MAE is significant
+    >>> significantly_different, diff, hwci = mae_test(f1, f2 + 2., o, time_dim='time',
+            dim=[], alpha=0.05)
+    >>> significantly_different
+    <xarray.DataArray ()>
+    array(True)
 
 
     References
