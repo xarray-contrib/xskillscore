@@ -31,7 +31,8 @@ Internal Changes
 - Added Python 3.7 and Python 3.8 to the CI. Use the latest version of Python 3
   for development. (:issue:`21`, :pr:`189`). `Aaron Spring`_
 - Lint with the latest black. (:issue:`179`, :pr:`191`). `Ray Bell`_
-
+- Slight optimization using dask="allowed" instead of dask="parallelized"
+  (:issue:`207`, :pr:`220`). `Andrew Huang`_
 
 xskillscore v0.0.18 (2020-09-23)
 --------------------------------
