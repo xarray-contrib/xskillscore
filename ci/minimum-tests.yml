@@ -1,7 +1,6 @@
 name: xskillscore-minimum-tests
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - bottleneck
   - cftime
