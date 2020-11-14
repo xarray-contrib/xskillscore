@@ -71,6 +71,11 @@ def _check_weights(weights):
     elif np.all(np.isnan(weights)):
         return None
     else:
+        if weights.min() < 0:
+            raise ValueError(
+                "Weights has a minimum below 0. Please submit a weights array "
+                "of positive numbers."
+            )
         return weights
 
 

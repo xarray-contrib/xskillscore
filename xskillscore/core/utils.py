@@ -81,12 +81,6 @@ def _preprocess_weights(a, dim, new_dim, weights):
     if weights is None:
         return None
     else:
-        # Throw error if there are negative weights.
-        if weights.min() < 0:
-            raise ValueError(
-                "Weights has a minimum below 0. Please submit a weights array "
-                "of positive numbers."
-            )
         # Scale weights to vary from 0 to 1.
         weights = weights / weights.max()
         # Check that the weights array has the same size
