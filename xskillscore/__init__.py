@@ -33,6 +33,7 @@ from .core.probabilistic import (
     threshold_brier_score,
 )
 from .versioning.print_versions import show_versions
+from .core.resampling import resample_iterations_idx, resample_iterations
 
 try:
     __version__ = get_distribution(__name__).version
