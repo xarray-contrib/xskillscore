@@ -1,16 +1,13 @@
 xskillscore: Metrics for verifying forecasts
 ============================================
 
-.. image:: https://travis-ci.org/xarray-contrib/xskillscore.svg?branch=master
-   :target: https://travis-ci.org/xarray-contrib/xskillscore
-
 .. image:: https://img.shields.io/pypi/v/xskillscore.svg
    :target: https://pypi.python.org/pypi/xskillscore/
 
 .. image:: https://anaconda.org/conda-forge/xskillscore/badges/version.svg
    :target: https://anaconda.org/conda-forge/xskillscore/
 
-.. image:: https://codecov.io/gh/xarray-contrib/xskillscore/branch/master/graph/badge.svg?token=KB5FZNIO8W
+.. image:: https://codecov.io/gh/xarray-contrib/xskillscore/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/xarray-contrib/xskillscore
 
 .. image:: https://img.shields.io/conda/dn/conda-forge/xskillscore.svg
