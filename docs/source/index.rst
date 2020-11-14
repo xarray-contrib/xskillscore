@@ -1,6 +1,9 @@
 xskillscore: Metrics for verifying forecasts
 ============================================
 
+.. image:: https://github.com/xarray-contrib/xskillscore/workflows/xskillscore%20testing/badge.svg
+   :target: https://github.com/xarray-contrib/xskillscore/workflows/xskillscore%20testing/
+
 .. image:: https://img.shields.io/pypi/v/xskillscore.svg
    :target: https://pypi.python.org/pypi/xskillscore/
 
