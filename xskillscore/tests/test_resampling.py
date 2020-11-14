@@ -100,6 +100,7 @@ def test_gen_idx_replace(f_prob, replace):
 @pytest.mark.skip(reason="this is a bug, test fails and should be resolved.")
 def test_resample_iterations_dix_no_squeeze(f_prob):
     """Test _resample_iteration_idx with singular dimension.
+
     Currently this fails for dimensions with just a single index as we use `squeeze` in
     the code and not using squeeze doesnt maintain functionality. This means that
     _resample_iteration_idx should not be called on singleton dimension inputs (which
