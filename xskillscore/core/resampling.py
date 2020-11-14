@@ -87,8 +87,7 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
     forecast_smp = []
     for i in np.arange(iterations):
         idx = idx_da.sel(iteration=i).data
-        forecast_smp2 = forecast.isel({dim: idx}).assign_coords({dim: new_dim})
-        forecast_smp.append(forecast_smp2)
+        forecast_smp.append(forecast.isel({dim: idx}).assign_coords({dim: new_dim}))
     forecast_smp = xr.concat(forecast_smp, dim="iteration", **CONCAT_KWARGS)
     forecast_smp["iteration"] = np.arange(iterations)
     return forecast_smp.transpose(..., "iteration")
@@ -142,11 +141,9 @@ def resample_iterations_idx(
       245–272. doi: 10/f4jjvf
 
     """
+    # equivalent to above
     select_dim_items = forecast[dim].size
     new_dim = forecast[dim]
-
-    if dask.is_dask_collection(forecast):
-        forecast = forecast.chunk({"lead": -1, "member": -1})  # needed?
 
     def select_bootstrap_indices_ufunc(x, idx):
         """Selects multi-level indices ``idx`` from xarray object ``x`` for all
@@ -165,7 +162,7 @@ def resample_iterations_idx(
     )
     # bug fix when only one iteration
     if iterations == 1:
-        return forecast.isel({dim: idx_da.isel(iteration=0, drop=True).values})
+        forecast_smp = forecast.isel({dim: idx_da.isel(iteration=0, drop=True).values})
     else:
         forecast_smp = xr.apply_ufunc(
             select_bootstrap_indices_ufunc,
@@ -174,6 +171,7 @@ def resample_iterations_idx(
             dask="parallelized",
             output_dtypes=[float],
         )
-        if dim_max is not None and dim_max <= forecast[dim].size:
-            forecast_smp = forecast_smp.isel({dim: slice(None, dim_max)})
-        return forecast_smp
+    # return only dim_max members
+    if dim_max is not None and dim_max <= forecast[dim].size:
+        forecast_smp = forecast_smp.isel({dim: slice(None, dim_max)})
+    return forecast_smp
