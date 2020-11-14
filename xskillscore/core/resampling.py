@@ -1,6 +1,5 @@
 import dask
 import numpy as np
-
 # import dask.array as da
 import xarray as xr
 
@@ -13,7 +12,7 @@ def _gen_idx(forecast, dim, iterations, select_dim_items, replace, new_dim):
     if replace:
         idx = np.random.randint(0, forecast[dim].size, (iterations, select_dim_items))
     elif not replace:
-        # create 2d np.arange()
+        # create 2d np.arange
         idx = np.linspace(
             (np.arange(select_dim_items)),
             (np.arange(select_dim_items)),

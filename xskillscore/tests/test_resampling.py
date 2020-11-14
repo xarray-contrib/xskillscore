@@ -10,7 +10,8 @@ from xskillscore.core.resampling import (
 
 
 def assert_dim_coords(a, b):
-    """check dim and coord size and entries."""
+    """check dim and coord entries and order."""
+    # check dim and coord size and entries
     for d in a.dims:
         assert a[d].size == b[d].size, print(a[d], "!=", b[d])
     for c in a.coords:
