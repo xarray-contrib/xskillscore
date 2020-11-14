@@ -120,3 +120,15 @@ Tests to compare whether one forecast is significantly better than another one.
 
     sign_test
     mae_test
+
+Resampling
+----------
+
+Resampling functions to create a new ``iteration`` dimension based on one dimension
+with or without replacement.
+
+.. autosummary::
+    :toctree: api/
+
+    resample_iterations
+    resample_iterations_idx
