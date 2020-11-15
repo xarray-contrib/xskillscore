@@ -9,6 +9,9 @@ from xskillscore.core.resampling import (
     resample_iterations_idx,
 )
 
+resample_iterations_funcs = [resample_iterations, resample_iterations_idx]
+ITERATIONS = 2
+
 
 def assert_dim_coords(a, b):
     """check dim and coord entries and order."""
@@ -25,9 +28,8 @@ def assert_dim_coords(a, b):
 def test_resampling_identical_dim(f_prob):
     """check that resampling functions have the same ordering of dims and coords."""
     da = f_prob
-    iterations = 3
-    r1 = resample_iterations(da, iterations=iterations)
-    r2 = resample_iterations_idx(da, iterations=iterations)
+    r1 = resample_iterations(da, iterations=ITERATIONS)
+    r2 = resample_iterations_idx(da, iterations=ITERATIONS)
     assert_dim_coords(r1, r2)
 
 
@@ -37,14 +39,13 @@ def test_resampling_roughly_identical_mean(f_prob):
     iterations = 1000
     r1 = resample_iterations(da, iterations=iterations, replace=True)
     r2 = resample_iterations_idx(da, iterations=iterations, replace=True)
-    print(r1.mean("iteration"), r2.mean("iteration"))
     xr.testing.assert_allclose(
         r1.mean("iteration"), r2.mean("iteration"), atol=0.03, rtol=0.03
     )
 
 
 @pytest.mark.parametrize("iterations", [1, 2])
-@pytest.mark.parametrize("func", [resample_iterations, resample_iterations_idx])
+@pytest.mark.parametrize("func", resample_iterations_funcs)
 def test_resampling_same_dim_coord_order_as_input(func, f_prob, iterations):
     """check whether resampling function maintain dim and coord order and add iteration
     dimension to the end."""
@@ -63,7 +64,7 @@ def test_resampling_same_dim_coord_order_as_input(func, f_prob, iterations):
 
 
 @pytest.mark.skip(reason="fails, dont know why and slow")
-@pytest.mark.parametrize("func", [resample_iterations, resample_iterations_idx])
+@pytest.mark.parametrize("func", resample_iterations_funcs)
 def test_resampling_replace_True_larger_std_than_replace_False(f_prob, func):
     """check that resampling functions result in allclose iteration mean."""
     da = f_prob.isel(lon=0, lat=0, member=0, drop=True)
@@ -106,31 +107,29 @@ def test_resample_iterations_dix_no_squeeze(f_prob):
 
     Currently this fails for dimensions with just a single index as we use `squeeze` in
     the code and not using squeeze doesnt maintain functionality. This means that
-    _resample_iteration_idx should not be called on singleton dimension inputs (which
-    is not critical and can be circumvented when using squeeze before climpred.).
+    ``_resample_iteration_idx`` should not be called on singleton dimension inputs
+    (which is not critical and can be circumvented when using squeeze before.).
     """
     da = f_prob.expand_dims("test_dim")
-    actual = resample_iterations_idx(da, iterations=2)
+    actual = resample_iterations_idx(da, iterations=ITERATIONS)
     assert "test_dim" in actual.dims
 
 
-@pytest.mark.parametrize("func", [resample_iterations, resample_iterations_idx])
+@pytest.mark.parametrize("func", resample_iterations_funcs)
 def test_resample_replace_False_once_same_mean(f_prob, func):
     """resample replace=False on one dimension once gets same mean as origin."""
     da = f_prob.isel(lon=0, lat=0, member=0, drop=True)
     once = func(da, dim="time", replace=False, iterations=1).squeeze(drop=True)
-    print(once.mean("time"), da.mean("time"))
     xr.testing.assert_allclose(once.mean("time"), da.mean("time"))
 
 
-@pytest.mark.parametrize("func", [resample_iterations, resample_iterations_idx])
+@pytest.mark.parametrize("func", resample_iterations_funcs)
 @pytest.mark.parametrize("dim_max", [None, 5])
 def test_resample_dim_max(f_prob, func, dim_max):
     """resample dim_max=x returns only x items in dim."""
     da = f_prob.isel(lon=0, lat=0, member=0, drop=True)
-    print(da)
     dim = "time"
-    actual = func(da, dim=dim, dim_max=dim_max, iterations=2)
+    actual = func(da, dim=dim, dim_max=dim_max, iterations=ITERATIONS)
     if dim_max:
         assert actual[dim].size == dim_max
     else:
@@ -140,10 +139,9 @@ def test_resample_dim_max(f_prob, func, dim_max):
 @pytest.mark.parametrize("replace", [True, False])
 @pytest.mark.parametrize("chunk", [True, False])
 @pytest.mark.parametrize("input", ["Dataset", "multidim Dataset", "DataArray"])
-@pytest.mark.parametrize("func", [resample_iterations, resample_iterations_idx])
+@pytest.mark.parametrize("func", resample_iterations_funcs)
 def test_resample_inputs(a_1d, func, input, chunk, replace):
     """Test sign_test with xr inputs and chunked."""
-    iterations = 2
     if "Dataset" in input:
         name = "var"
         a_1d = a_1d.to_dataset(name=name)
@@ -151,7 +149,7 @@ def test_resample_inputs(a_1d, func, input, chunk, replace):
             a_1d["var2"] = a_1d["var"] * 2
     if chunk:
         a_1d = a_1d.chunk()
-    actual = func(a_1d, iterations, dim="time")
+    actual = func(a_1d, ITERATIONS, dim="time")
     # check dask collection preserved
     assert is_dask_collection(actual) if chunk else not is_dask_collection(actual)
     # input type preserved

@@ -13,9 +13,9 @@ Features
 - Added MAE significance test :py:func:`~xskillscore.mae_test` from Jolliffe and Ebert
   https://www.cawcr.gov.au/projects/verification/CIdiff/FAQ-CIdiff.html
   (:issue:`192`, :pr:`209`) `Aaron Spring`_
-- :py:func:`~xskillscore.resample_iterations` and faster
-  :py:func:`~xskillscore.resample_iterations_idx` for resampling with and without
-  replacement. (:issue:`215`, :pr:`225`) `Aaron Spring`_
+- :py:func:`~xskillscore.resampling.resample_iterations` and faster
+  :py:func:`~xskillscore.resampling.resample_iterations_idx` for resampling with and
+  without replacement. (:issue:`215`, :pr:`225`) `Aaron Spring`_
 
 Breaking changes
 ~~~~~~~~~~~~~~~~

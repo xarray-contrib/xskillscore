@@ -33,10 +33,13 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
     """Resample over ``dim`` by index ``iterations`` times.
 
     .. note::
-        This gives the same result as `resample_iterations_idx`. When using ``dask``,
-        the number of tasks in ``resample_iterations` will scale with ``iterations`` but
-        constant chunksize, whereas the tasks in `resample_iterations_idx` will stay
-        constant with increasing chunksize.
+        This gives the same result as
+        :py:func:`~xskillscore.resampling.resample_iterations_idx` but slower.
+        When using ``dask``, the number of tasks in
+        :py:func:`~xskillscore.resampling.resample_iterations` will scale with
+        ``iterations`` but constant chunksize, whereas the tasks in
+        :py:func:`~xskillscore.resampling.resample_iterations_idx` will stay constant
+        with increasing chunksize.
 
     Parameters
     ----------
@@ -67,21 +70,25 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
     >>> resample_iterations(a, 500, 'time')
     <xarray.DataArray (time: 1000, x: 3, y: 3, iteration: 500)>
 
+    See also
+    --------
+    :py:func:`~xskillscore.resampling.resample_iterations_idx`
+
     References
     ----------
     * Mason, S. J., & Mimmack, G. M. (1992). The use of bootstrap confidence intervals
       for the correlation coefficient in climatology. Theoretical and Applied
-      Climatology, 45(4), 229–233. doi: 10/b6fnsv
+      Climatology, 45(4), 229–233. https://doi.org/10/b6fnsv
 
     * Mason, S. J. (2008). Understanding forecast verification statistics.
-      Meteorological Applications, 15(1), 31–40. doi: 10/bgvgnz
+      Meteorological Applications, 15(1), 31–40. https://doi.org/10/bgvgnz
 
     * Goddard, L., Kumar, A., Solomon, A., Smith, D., Boer, G., Gonzalez, P.,
       Kharin, V., Merryfield, W., Deser, C., Mason, S. J., Kirtman, B. P., Msadek, R.,
       Sutton, R., Hawkins, E., Fricker, T., Hegerl, G., Ferro, C. a. T.,
       Stephenson, D. B., Meehl, G. A., … Delworth, T. (2013). A verification framework
       for interannual-to-decadal predictions experiments. Climate Dynamics, 40(1–2),
-      245–272. doi: 10/f4jjvf
+      245–272. https://doi.org/10/f4jjvf
     """
     if dim_max is not None and dim_max <= forecast[dim].size:
         # select only dim_max items
@@ -109,11 +116,14 @@ def resample_iterations_idx(
     """Resample over ``dim`` by index ``iterations`` times.
 
     .. note::
-        This is a much faster way to bootstrap than resampling each iteration
-        individually and applying the function to it. However, this will create a
-        DataArray with dimension ``iteration`` of size ``iterations``. It is probably
-        best to do this out-of-memory with ``dask`` if you are doing a large number
-        of iterations or using spatial output (i.e., not time series data).
+        This is a much faster way to bootstrap/resample each iteration
+        individually and applying the function to it. This will create a
+        DataArray with dimension ``iteration`` of size ``iterations``.
+        When using ``dask``, the number of tasks in
+        :py:func:`~xskillscore.resampling.resample_iterations` will scale with
+        ``iterations`` but constant chunksize, whereas the tasks in
+        :py:func:`~xskillscore.resampling.resample_iterations_idx` will stay constant
+        with increasing chunksize.
 
     Parameters
     ----------
@@ -140,26 +150,29 @@ def resample_iterations_idx(
     >>> import xarray as xr
     >>> a = xr.DataArray(np.random.rand(1000, 3, 3),
                         dims=['time', 'x', 'y'])
-    >>> from xskillscore.resampling import resample_iterations
-    >>> resample_iterations(a, 500, 'time')
+    >>> from xskillscore.resampling import resample_iterations_idx
+    >>> resample_iterations_idx(a, 500, 'time')
     <xarray.DataArray (time: 1000, x: 3, y: 3, iteration: 500)>
 
+    See also
+    --------
+    :py:func:`~xskillscore.resampling.resample_iterations`
 
     References
     ----------
     * Mason, S. J., & Mimmack, G. M. (1992). The use of bootstrap confidence intervals
       for the correlation coefficient in climatology. Theoretical and Applied
-      Climatology, 45(4), 229–233. doi: 10/b6fnsv
+      Climatology, 45(4), 229–233. https://doi.org/10/b6fnsv
 
     * Mason, S. J. (2008). Understanding forecast verification statistics.
-      Meteorological Applications, 15(1), 31–40. doi: 10/bgvgnz
+      Meteorological Applications, 15(1), 31–40. https://doi.org/10/bgvgnz
 
     * Goddard, L., Kumar, A., Solomon, A., Smith, D., Boer, G., Gonzalez, P.,
       Kharin, V., Merryfield, W., Deser, C., Mason, S. J., Kirtman, B. P., Msadek, R.,
       Sutton, R., Hawkins, E., Fricker, T., Hegerl, G., Ferro, C. a. T.,
       Stephenson, D. B., Meehl, G. A., … Delworth, T. (2013). A verification framework
       for interannual-to-decadal predictions experiments. Climate Dynamics, 40(1–2),
-      245–272. doi: 10/f4jjvf
+      245–272. https://doi.org/10/f4jjvf
 
     """
     # equivalent to above
