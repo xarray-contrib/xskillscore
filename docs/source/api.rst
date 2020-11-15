@@ -127,6 +127,8 @@ Resampling
 Resampling functions to create a new ``iteration`` dimension based on one dimension
 with or without replacement.
 
+.. currentmodule:: xskillscore.resampling
+
 .. autosummary::
     :toctree: api/
 
