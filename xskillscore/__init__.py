@@ -1,6 +1,7 @@
 # flake8: noqa
 from pkg_resources import DistributionNotFound, get_distribution
 
+from .core import resampling
 from .core.accessor import XSkillScoreAccessor
 from .core.comparative import mae_test, sign_test
 from .core.contingency import Contingency
@@ -32,7 +33,6 @@ from .core.probabilistic import (
     rps,
     threshold_brier_score,
 )
-from .core.resampling import resample_iterations, resample_iterations_idx
 from .versioning.print_versions import show_versions
 
 try:

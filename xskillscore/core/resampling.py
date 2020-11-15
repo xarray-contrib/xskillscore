@@ -57,6 +57,16 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
         resampled data resample along dimension ``dim`` with additional
         ``dim='iteration'``.
 
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import xarray as xr
+    >>> a = xr.DataArray(np.random.rand(1000, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> from xskillscore.resampling import resample_iterations
+    >>> resample_iterations(a, 500, 'time')
+    <xarray.DataArray (time: 1000, x: 3, y: 3, iteration: 500)>
+
     References
     ----------
     * Mason, S. J., & Mimmack, G. M. (1992). The use of bootstrap confidence intervals
@@ -123,6 +133,17 @@ def resample_iterations_idx(
     forecast_smp : xr.DataArray, xr.Dataset
         resampled data resample along dimension ``dim`` with additional
         ``dim='iteration'``.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import xarray as xr
+    >>> a = xr.DataArray(np.random.rand(1000, 3, 3),
+                        dims=['time', 'x', 'y'])
+    >>> from xskillscore.resampling import resample_iterations
+    >>> resample_iterations(a, 500, 'time')
+    <xarray.DataArray (time: 1000, x: 3, y: 3, iteration: 500)>
+
 
     References
     ----------
