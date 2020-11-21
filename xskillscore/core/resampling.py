@@ -6,8 +6,13 @@ CONCAT_KWARGS = {"coords": "minimal", "compat": "override"}
 
 
 def _gen_idx(forecast, dim, iterations, select_dim_items, replace, new_dim):
-    """Generate indices to select from. replace decides whether resampling is with or
-    without replacement."""
+    """Generate indices to select from. Replace decides whether resampling is with or
+    without replacement.
+
+    Args: (selected)
+        select_dim_items(int) : number of new items in dim to select
+        new_dim (xr.DataArray) : new dimension of above
+    """
     if replace:
         idx = np.random.randint(0, forecast[dim].size, (iterations, select_dim_items))
     elif not replace:
@@ -43,12 +48,12 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
 
     Parameters
     ----------
-    forecast : xr.DataArray, xr.Dataset)
-        forecast.
-    iterations :int
+    forecast : xr.DataArray, xr.Dataset
+        Forecast.
+    iterations : int
         Number of resampling iterations.
     dim : str
-        Dimension name to resamplw over. Defaults to ``'member'``.
+        Dimension name to resample over. Defaults to ``'member'``.
     dim_max : int
         Number of items to select in `dim`.
     replace : bool
@@ -57,8 +62,7 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
     Returns
     -------
     forecast_smp : xr.DataArray, xr.Dataset
-        resampled data resample along dimension ``dim`` with additional
-        ``dim='iteration'``.
+        data resampled along dimension ``dim`` with additional ``dim='iteration'``.
 
     Examples
     --------
@@ -128,21 +132,20 @@ def resample_iterations_idx(
     Parameters
     ----------
         forecast : xr.DataArray, xr.Dataset
-            forecast.
+            Forecast.
         iterations : int
-            Number of resamling iterations.
+            Number of resampling iterations.
         dim : str
             Dimension name to resample over. Defaults to ``'member'``.
         replace : bool
             Resampling with or without replacement. Defaults to ``True``.
         dim_max : int
-            Number of indices from ``dim`` to return.
+            Number of item from ``dim`` to return.
 
     Returns
     -------
     forecast_smp : xr.DataArray, xr.Dataset
-        resampled data resample along dimension ``dim`` with additional
-        ``dim='iteration'``.
+        data resampled along dimension ``dim`` with additional ``dim='iteration'``.
 
     Examples
     --------

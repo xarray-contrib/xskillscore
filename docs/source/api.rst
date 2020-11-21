@@ -124,10 +124,11 @@ Tests to compare whether one forecast is significantly better than another one.
 Resampling
 ----------
 
-Resampling functions to create a new ``iteration`` dimension based on one dimension
-with or without replacement.
+Functions for resampling from a dataset with or without replacement that create a new
+``iteration`` dimension.
 
-.. currentmodule:: xskillscore.resampling
+
+.. currentmodule:: xskillscore.core.resampling
 
 .. autosummary::
     :toctree: api/
