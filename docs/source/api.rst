@@ -127,7 +127,6 @@ Resampling
 Functions for resampling from a dataset with or without replacement that create a new
 ``iteration`` dimension.
 
-
 .. currentmodule:: xskillscore.core.resampling
 
 .. autosummary::
