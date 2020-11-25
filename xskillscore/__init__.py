@@ -1,6 +1,7 @@
 # flake8: noqa
 from pkg_resources import DistributionNotFound, get_distribution
 
+from .core import resampling
 from .core.accessor import XSkillScoreAccessor
 from .core.comparative import mae_test, sign_test
 from .core.contingency import Contingency
