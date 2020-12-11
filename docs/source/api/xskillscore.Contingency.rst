@@ -5,14 +5,14 @@
 
 .. autoclass:: Contingency
 
-   
+
    .. automethod:: __init__
 
-   
+
    .. rubric:: Methods
 
    .. autosummary::
-   
+
       ~Contingency.__init__
       ~Contingency.accuracy
       ~Contingency.bias_score
@@ -31,20 +31,20 @@
       ~Contingency.peirce_score
       ~Contingency.success_ratio
       ~Contingency.threat_score
-   
-   
 
-   
-   
+
+
+
+
    .. rubric:: Attributes
 
    .. autosummary::
-   
+
       ~Contingency.dichotomous
       ~Contingency.forecast_category_edges
       ~Contingency.forecasts
       ~Contingency.observation_category_edges
       ~Contingency.observations
       ~Contingency.table
-   
-   
+
+
