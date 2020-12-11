@@ -91,7 +91,7 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
         mu,
         sig,
         input_core_dims=[[], [], []],
-        dask="allowed",
+        dask="parallelized",
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -162,7 +162,7 @@ def crps_quadrature(
         xmax,
         tol,
         input_core_dims=[[], [], [], [], []],
-        dask="allowed",
+        dask="parallelized",
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -241,7 +241,7 @@ def crps_ensemble(
         forecasts,
         input_core_dims=[[], [member_dim]],
         kwargs={"axis": -1, "issorted": issorted, "weights": member_weights},
-        dask="allowed",
+        dask="parallelized",
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -316,7 +316,7 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
         observations,
         forecasts,
         input_core_dims=[[], []],
-        dask="allowed",
+        dask="parallelized",
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -427,7 +427,7 @@ def threshold_brier_score(
         input_core_dims=input_core_dims,
         kwargs={"axis": -1, "issorted": issorted},
         output_core_dims=output_core_dims,
-        dask="allowed",
+        dask="parallelized",
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -590,7 +590,7 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member"):
         observations,
         forecasts,
         input_core_dims=[[], [member_dim]],
-        dask="allowed",
+        dask="parallelized",
         output_dtypes=[int],
     )
 
