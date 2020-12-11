@@ -54,8 +54,10 @@ class CountingScheduler:
 
 
 def raise_if_dask_computes(max_computes=0):
-    # return a dummy context manager so
-    # that this can be used for non-dask objects
+    """
+    Return a dummy context manager so
+    that this can be used for non-dask objects
+    """
     scheduler = CountingScheduler(max_computes)
     return dask.config.set(scheduler=scheduler)
 
