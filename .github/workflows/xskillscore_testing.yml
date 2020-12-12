@@ -1,12 +1,16 @@
 name: xskillscore testing
 
-on: pull_request_target
+on: pull_request
 
 jobs:
   test:  # Runs testing suite on various python versions.
     name: Test xskillscore, python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     strategy:
+      fail-fast: false
       matrix:
         python-version: [3.6, 3.7, 3.8]
     steps:
@@ -14,24 +18,24 @@ jobs:
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
-      - name: Install Conda environment
-        uses: conda-incubator/setup-miniconda@v1
+      - name: Set up conda
+        uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
+          channels: conda-forge
+          mamba-version: '*'
           activate-environment: xskillscore-minimum-tests
-          environment-file: ci/minimum-tests.yml
           python-version: ${{ matrix.python-version }}
+      - name: Set up conda environment
+        run: |
+          mamba env update -f ci/minimum-tests.yml
       - name: Conda info
-        shell: bash -l {0}
         run: conda info
       - name: Conda list
-        shell: bash -l {0}
         run: conda list
       - name: Run tests
-        shell: bash -l {0}
         run: |
-          conda activate xskillscore-minimum-tests
-          pytest --cov=xskillscore --cov-report=xml
+          pytest --cov=xskillscore --cov-report=xml --verbose
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v1.0.7
         with:
@@ -41,28 +45,32 @@ jobs:
 
   docs_notebooks:  # Checks that pre-compiled notebooks in docs still work.
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
       - uses: actions/checkout@v2
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
-      - name: Install Conda environment
-        uses: conda-incubator/setup-miniconda@v1
+      - name: Set up conda
+        uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
+          channels: conda-forge
+          mamba-version: '*'
           activate-environment: xskillscore-docs-notebooks
-          environment-file: ci/docs_notebooks.yml
           python-version: 3.6
+      - name: Set up conda environment
+        run: |
+          mamba env update -f ci/docs_notebooks.yml
       - name: Conda info
-        shell: bash -l {0}
         run: conda info
       - name: Conda list
-        shell: bash -l {0}
         run: conda list
       - name: Test notebooks in docs
-        shell: bash -l {0}
         run: |
           pushd docs
           nbstripout source/*.ipynb
-          make html
+          make -j4 html
           popd

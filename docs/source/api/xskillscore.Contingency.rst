@@ -47,4 +47,3 @@
       ~Contingency.observations
       ~Contingency.table
 
-

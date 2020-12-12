@@ -120,3 +120,17 @@ Tests to compare whether one forecast is significantly better than another one.
 
     sign_test
     mae_test
+
+Resampling
+----------
+
+Functions for resampling from a dataset with or without replacement that create a new
+``iteration`` dimension.
+
+.. currentmodule:: xskillscore.core.resampling
+
+.. autosummary::
+    :toctree: api/
+
+    resample_iterations
+    resample_iterations_idx
