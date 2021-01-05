@@ -74,10 +74,14 @@ def test_xs_same_as_skl_same_name(a_1d, b_1d, request):
     assert np.allclose(actual, expected)
 
 
-@pytest.mark.parametrize("a_1d", [a_1d, a_1d_with_zeros])
-def test_xs_same_as_skl_mape(a_1d, b_1d):
-    actual = mape(a_1d, b_1d, "time")
-    expected = mean_absolute_percentage_error(a_1d, b_1d)
+@pytest.fixture(params=["mean_absolute_percentage_error"])
+def test_xs_same_as_skl_with_zeros(a_1d_with_zeros, b_1d, request):
+    xs_metric, skl_metric = (
+        getattr(xs, request.param),
+        getattr(sklearn.metrics, request.param),
+    )
+    actual = xs_metric(a_1d_with_zeros, b_1d, "time")
+    expected = skl_metric(a_1d_with_zeros, b_1d)
     assert np.allclose(actual, expected)
 
 
