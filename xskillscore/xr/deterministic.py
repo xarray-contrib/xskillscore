@@ -36,7 +36,7 @@ def xr_rmse(a, b, dim=None, skipna=True, weights=None):
     return res
 
 
-def xr_pearson_r(a, b, dim=None):
+def xr_pearson_r(a, b, dim=None, **kwargs):
     return xr.corr(a, b, dim)
 
 
@@ -59,5 +59,5 @@ def _rankdata(o, dim):
         ).unstack("ndim")
 
 
-def xr_spearman_r(a, b, dim=None):
+def xr_spearman_r(a, b, dim=None, **kwargs):
     return xr.corr(_rankdata(a, dim), _rankdata(b, dim), dim)
