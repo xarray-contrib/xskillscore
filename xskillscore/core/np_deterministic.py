@@ -652,7 +652,7 @@ def _mape(a, b, weights, axis, skipna):
     .. math::
         \\mathrm{MAPE} = \\frac{1}{n} \\sum_{i=1}^{n}
                          \\frac{\\vert a_{i} - b_{i} \\vert}
-                               {\\vert a_{i} \\vert}
+                               {max(\epsilon, \\vert a_{i} \\vert)}
 
     Parameters
     ----------
@@ -678,6 +678,9 @@ def _mape(a, b, weights, axis, skipna):
 
     Percent error is reported as decimal percent. I.e., a value of
     1 is 100%.
+
+    \epsilon is an arbitrary small yet strictly positive number to avoid
+    undefined results when ``a`` is zero.
 
     See Also
     --------
