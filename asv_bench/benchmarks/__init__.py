@@ -1,10 +1,7 @@
 # https://github.com/pydata/xarray/blob/master/asv_bench/benchmarks/__init__.py
-import itertools
 
 import numpy as np
 import xarray as xr
-
-_counter = itertools.count()
 
 
 def parameterized(names, params):
@@ -48,11 +45,6 @@ def randint(low, high=None, size=None, frac_minus=None, seed=0):
         x.flat[inds] = -1
 
     return x
-
-
-large_lon_lat = 2000
-large_lon_lat_chunksize = large_lon_lat // 4
-nmember = 4
 
 
 class Generate:
