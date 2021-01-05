@@ -35,7 +35,7 @@ Internal Changes
   for development. (:issue:`21`, :pr:`189`). `Aaron Spring`_
 - Lint with the latest black. (:issue:`179`, :pr:`191`). `Ray Bell`_
 - Update mape algorithm from scikit-learn v0.24.0 and test against it.
-  (:issue:`160`, :pr:`228`) `Ray Bell`_
+  (:issue:`160`, :pr:`230`) `Ray Bell`_
 
 
 xskillscore v0.0.18 (2020-09-23)
