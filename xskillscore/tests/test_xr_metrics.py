@@ -32,11 +32,12 @@ def test_xr_metrics_equal_xs_metrics(metric, a, b, dim, weights, skipna, chunk):
     else:
         weights = None
     print(f"{metric}(a,b,dim={dim},skipna={skipna},weights={weights})")
-    if metric in ["pearson_r", "spearman_r"] and (weights is not None or skipna):
-        print(f"pass {metric}(a,b,dim={dim},skipna={skipna},weights={weights})")
-        print("raise NotImplementedError")
-        pass
-    else:
-        res = eval("xr_" + metric)(a, b, skipna=skipna, dim=dim, weights=weights)
-        xs_res = getattr(xs, metric)(a, b, skipna=skipna, dim=dim, weights=weights)
-        xr.testing.assert_allclose(res, xs_res)
+    if metric in ["pearson_r", "spearman_r"]:
+        if weights is not None or skipna:
+            print(f"pass {metric}(a,b,dim={dim},skipna={skipna},weights={weights})")
+            print("raise NotImplementedError")
+            return
+
+    res = eval("xr_" + metric)(a, b, skipna=skipna, dim=dim, weights=weights)
+    xs_res = getattr(xs, metric)(a, b, skipna=skipna, dim=dim, weights=weights)
+    xr.testing.assert_allclose(res, xs_res)

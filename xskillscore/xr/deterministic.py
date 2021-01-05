@@ -51,11 +51,16 @@ def _rankdata(o, dim):
             o,
             input_core_dims=[[]],
             kwargs={"axis": o.get_axis_num(dim[0])},
+            dask="allowed",
         )
     elif len(dim) > 1:
         # stack rank unstack
         return xr.apply_ufunc(
-            bn.nanrankdata, o.stack(ndim=dim), input_core_dims=[[]], kwargs={"axis": 0}
+            bn.nanrankdata,
+            o.stack(ndim=dim),
+            input_core_dims=[[]],
+            kwargs={"axis": -1},
+            dask="allowed",
         ).unstack("ndim")
 
 
