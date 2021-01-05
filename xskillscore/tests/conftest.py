@@ -68,6 +68,13 @@ def b_nan(b):
     return b.copy().where(b < 0.5)
 
 
+# with zeros
+@pytest.fixture
+def a_with_zeros(a):
+    """Zeros"""
+    return a.copy().where(a < 0.5, 0)
+
+
 # dask
 @pytest.fixture
 def a_dask(a):
@@ -114,6 +121,12 @@ def b_1d_nan(a_1d_nan):
     b = a_1d_nan.copy()
     b.values = [7, 2, np.nan]
     return b
+
+
+@pytest.fixture
+def a_1d_with_zeros(a_with_zeros):
+    """Timeseries of a with zeros"""
+    return a_with_zeros.isel(lon=0, lat=0, drop=True)
 
 
 # weights

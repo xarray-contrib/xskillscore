@@ -74,6 +74,13 @@ def test_xs_same_as_skl_same_name(a_1d, b_1d, request):
     assert np.allclose(actual, expected)
 
 
+@pytest.mark.parametrize("a_1d", [a_1d, a_1d_with_zeros])
+def test_xs_same_as_skl_mape(a_1d, b_1d):
+    actual = mape(a_1d, b_1d, "time")
+    expected = mean_absolute_percentage_error(a_1d, b_1d)
+    assert np.allclose(actual, expected)
+
+
 @pytest.mark.parametrize("xs_scipy_metrics", xs_scipy_metrics)
 def test_xs_same_as_scipy(a_1d, b_1d, xs_scipy_metrics):
     """Tests xskillscore metric is same as scipy metric."""
