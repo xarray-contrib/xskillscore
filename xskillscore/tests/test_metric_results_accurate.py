@@ -28,6 +28,7 @@ xs_skl_metrics = [
     (r2, r2_score),
     (mse, mean_squared_error),
     (mae, mean_absolute_error),
+    (mape, mean_absolute_percentage_error),
 ]
 
 xs_scipy_metrics = [
@@ -39,7 +40,6 @@ xs_scipy_metrics = [
 
 
 xs_np_metrics = [
-    (mape, lambda x, y: np.mean(np.abs((x - y) / x))),
     (me, lambda x, y: np.mean(x - y)),
     (smape, lambda x, y: 1 / len(x) * np.sum(np.abs(y - x) / (np.abs(x) + np.abs(y)))),
 ]
