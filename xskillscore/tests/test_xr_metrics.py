@@ -10,12 +10,16 @@ METRICS = ["mse", "mae", "rmse", "pearson_r", "spearman_r"]
 DIMS = [["lon", "lat"], ["time"]]
 
 
+@pytest.mark.parametrize("chunk", [True, False])
 @pytest.mark.parametrize("weights", [True, False])
 @pytest.mark.parametrize("skipna", [True, False])
 @pytest.mark.parametrize("dim", DIMS)
 @pytest.mark.parametrize("metric", METRICS)
-def test_xr_metrics_equal_xs_metrics(metric, a, b, dim, weights, skipna):
+def test_xr_metrics_equal_xs_metrics(metric, a, b, dim, weights, skipna, chunk):
     """Test that xr metrics yield same results as xs metrics"""
+    if chunk:
+        a = a.chunk()
+        b = b.chunk()
     if isinstance(dim, str):
         dim = list(dim)
     if weights:
