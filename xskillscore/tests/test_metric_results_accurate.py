@@ -31,6 +31,10 @@ xs_skl_metrics = [
     (mape, mean_absolute_percentage_error),
 ]
 
+xs_skl_metrics_with_zeros = [
+    (mape, mean_absolute_percentage_error),
+]
+
 xs_scipy_metrics = [
     (pearson_r, pearsonr, 0),
     (spearman_r, spearmanr, 0),
@@ -74,12 +78,10 @@ def test_xs_same_as_skl_same_name(a_1d, b_1d, request):
     assert np.allclose(actual, expected)
 
 
-@pytest.fixture(params=["mean_absolute_percentage_error"])
-def test_xs_same_as_skl_with_zeros(a_1d_with_zeros, b_1d, request):
-    xs_metric, skl_metric = (
-        getattr(xs, request.param),
-        getattr(sklearn.metrics, request.param),
-    )
+@pytest.mark.parametrize("xs_skl_metrics", xs_skl_metrics_with_zeros)
+def test_xs_same_as_skl_with_zeros(a_1d_with_zeros, b_1d, xs_skl_metrics):
+    """Tests xskillscore metric is same as scikit-learn metric."""
+    xs_metric, skl_metric = xs_skl_metrics
     actual = xs_metric(a_1d_with_zeros, b_1d, "time")
     expected = skl_metric(a_1d_with_zeros, b_1d)
     assert np.allclose(actual, expected)
