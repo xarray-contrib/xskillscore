@@ -60,7 +60,7 @@ jobs:
           channels: conda-forge
           mamba-version: '*'
           activate-environment: xskillscore-docs-notebooks
-          python-version: 3.6
+          python-version: 3.8
       - name: Set up conda environment
         run: |
           mamba env update -f ci/docs_notebooks.yml

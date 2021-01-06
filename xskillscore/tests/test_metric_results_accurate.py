@@ -2,7 +2,12 @@ import numpy as np
 import pytest
 import sklearn.metrics
 from scipy.stats import pearsonr, spearmanr
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import (
+    mean_absolute_error,
+    mean_absolute_percentage_error,
+    mean_squared_error,
+    r2_score,
+)
 
 import xskillscore as xs
 from xskillscore.core.deterministic import (
@@ -23,6 +28,11 @@ xs_skl_metrics = [
     (r2, r2_score),
     (mse, mean_squared_error),
     (mae, mean_absolute_error),
+    (mape, mean_absolute_percentage_error),
+]
+
+xs_skl_metrics_with_zeros = [
+    (mape, mean_absolute_percentage_error),
 ]
 
 xs_scipy_metrics = [
@@ -34,7 +44,6 @@ xs_scipy_metrics = [
 
 
 xs_np_metrics = [
-    (mape, lambda x, y: np.mean(np.abs((x - y) / x))),
     (me, lambda x, y: np.mean(x - y)),
     (smape, lambda x, y: 1 / len(x) * np.sum(np.abs(y - x) / (np.abs(x) + np.abs(y)))),
 ]
@@ -66,6 +75,15 @@ def test_xs_same_as_skl_same_name(a_1d, b_1d, request):
     )
     actual = xs_metric(a_1d, b_1d, "time")
     expected = skl_metric(a_1d, b_1d)
+    assert np.allclose(actual, expected)
+
+
+@pytest.mark.parametrize("xs_skl_metrics", xs_skl_metrics_with_zeros)
+def test_xs_same_as_skl_with_zeros(a_1d_with_zeros, b_1d, xs_skl_metrics):
+    """Tests xskillscore metric is same as scikit-learn metric."""
+    xs_metric, skl_metric = xs_skl_metrics
+    actual = xs_metric(a_1d_with_zeros, b_1d, "time")
+    expected = skl_metric(a_1d_with_zeros, b_1d)
     assert np.allclose(actual, expected)
 
 

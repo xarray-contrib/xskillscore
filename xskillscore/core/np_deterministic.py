@@ -652,7 +652,7 @@ def _mape(a, b, weights, axis, skipna):
     .. math::
         \\mathrm{MAPE} = \\frac{1}{n} \\sum_{i=1}^{n}
                          \\frac{\\vert a_{i} - b_{i} \\vert}
-                               {\\vert a_{i} \\vert}
+                               {max(\epsilon, \\vert a_{i} \\vert)}
 
     Parameters
     ----------
@@ -679,6 +679,13 @@ def _mape(a, b, weights, axis, skipna):
     Percent error is reported as decimal percent. I.e., a value of
     1 is 100%.
 
+    \epsilon is an arbitrary small yet strictly positive number to avoid
+    undefined results when ``a`` is zero.
+
+    See Also
+    --------
+    sklearn.metrics.mean_absolute_percentage_error
+
     References
     ----------
     https://en.wikipedia.org/wiki/Mean_absolute_percentage_error
@@ -687,8 +694,8 @@ def _mape(a, b, weights, axis, skipna):
     if skipna:
         a, b, weights = _match_nans(a, b, weights)
     weights = _check_weights(weights)
-    # replace divided by 0 with nan
-    mape = np.absolute(a - b) / np.absolute(np.where(a != 0, a, np.nan))
+    epsilon = np.finfo(np.float64).eps
+    mape = np.absolute(a - b) / np.maximum(np.absolute(a), epsilon)
     if weights is not None:
         return sumfunc(mape * weights, axis=axis) / sumfunc(weights, axis=axis)
     else:
