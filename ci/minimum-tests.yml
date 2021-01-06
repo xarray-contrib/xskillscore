@@ -5,7 +5,7 @@ dependencies:
   - bottleneck
   - cftime
   - dask
-  - numba
+  - numba==0.51.2
   - numpy
   - properscoring
   - scikit-learn
