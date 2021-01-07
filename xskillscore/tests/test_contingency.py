@@ -258,6 +258,6 @@ def test_roc_bin_edges_drop_intermediate(forecast_1d_long, observation_1d_long):
         fb, op, "continuous", drop_intermediate=False, return_results="all_as_tuple"
     )
 
-    np.testing.assert_equal(fxsarea, txsarea)
+    np.testing.assert_allclose(fxsarea, txsarea)
     assert len(fxsfpr) >= len(txsfpr)
     assert len(fxstpr) >= len(txstpr)
