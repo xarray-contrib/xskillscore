@@ -36,6 +36,7 @@ Internal Changes
 - Lint with the latest black. (:issue:`179`, :pr:`191`). `Ray Bell`_
 - Update mape algorithm from scikit-learn v0.24.0 and test against it.
   (:issue:`160`, :pr:`230`) `Ray Bell`_
+- Pin ``numba`` to ``>=0.52`` to fix CI (:issue:`233`, :pr:`234`) `Ray Bell`_
 
 
 xskillscore v0.0.18 (2020-09-23)
