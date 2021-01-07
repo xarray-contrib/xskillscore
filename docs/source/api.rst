@@ -70,6 +70,7 @@ individual methods to access metrics based on the table.
     :toctree: api/
 
     Contingency
+    roc
 
 Contingency table
 ~~~~~~~~~~~~~~~~~

@@ -16,6 +16,8 @@ Features
 - :py:func:`~xskillscore.resampling.resample_iterations` and faster
   :py:func:`~xskillscore.resampling.resample_iterations_idx` for resampling with and
   without replacement. (:issue:`215`, :pr:`225`) `Aaron Spring`_
+- Added receiver operating characteristic (ROC) :py:func:`~xskillscore.roc`.
+  (:issue:`114`, :pr:`236`) `Aaron Spring`_
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
