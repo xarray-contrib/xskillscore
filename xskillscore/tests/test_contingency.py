@@ -4,7 +4,7 @@ import pytest
 import xarray as xr
 from sklearn.metrics import confusion_matrix
 
-from xskillscore import Contingency
+from xskillscore import Contingency, roc
 
 DIMS = (["time"], ["lon"], ["lat"], "time", ["lon", "lat", "time"])
 CATEGORY_EDGES = [
@@ -122,3 +122,80 @@ def test_dichotomous_scores(dichotomous_Contingency, method, expected):
     """
     xs_score = getattr(dichotomous_Contingency, method)().item()
     npt.assert_almost_equal(xs_score, expected)
+
+
+@pytest.fixture
+def symmetric_edges():
+    """Category bin edges between 0 and 1."""
+    return np.linspace(-2, 2, 11)
+
+
+@pytest.fixture
+def forecast_1d_long():
+    """Forecasts normally distributed around 0."""
+    s = 100
+    return xr.DataArray(np.random.normal(size=(s)), coords=[("time", np.arange(s))])
+
+
+@pytest.fixture
+def observation_1d_long():
+    """Observations normally distributed around 0."""
+    s = 100
+    return xr.DataArray(np.random.normal(size=(s)), coords=[("time", np.arange(s))])
+
+
+@pytest.mark.parametrize(
+    "return_results", ["all_as_tuple", "area", "all_as_metric_dim"]
+)
+def test_roc_returns(
+    forecast_1d_long, observation_1d_long, symmetric_edges, return_results
+):
+    roc(
+        forecast_1d_long,
+        observation_1d_long,
+        symmetric_edges,
+        dim="time",
+        return_results=return_results,
+    )
+
+
+def test_roc_random_forecast(
+    forecast_1d_long, observation_1d_long, symmetric_edges, return_results="area"
+):
+    """Test that ROC around 0.5 for random forecast."""
+    area = roc(
+        forecast_1d_long,
+        observation_1d_long,
+        symmetric_edges,
+        dim="time",
+        return_results=return_results,
+    )
+    assert area < 0.6
+    assert area > 0.4
+
+
+@pytest.mark.xfail(reason="not yet implemented")
+def test_roc_perfect_forecast(forecast_1d_long, symmetric_edges, return_results="area"):
+    """Test that ROC equals 1 for perfect forecast."""
+    area = roc(
+        forecast_1d_long,
+        forecast_1d_long,
+        symmetric_edges,
+        dim="time",
+        return_results=return_results,
+    )
+    assert area == 1.0
+
+
+def test_roc_constant_forecast(
+    forecast_1d_long, symmetric_edges, return_results="area"
+):
+    """Test that ROC equals 0.5 for constant forecast."""
+    area = roc(
+        forecast_1d_long,
+        xr.ones_like(forecast_1d_long) * 10,
+        symmetric_edges,
+        dim="time",
+        return_results=return_results,
+    )
+    assert area == 0.5

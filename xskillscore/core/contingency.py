@@ -796,3 +796,129 @@ class Contingency:
             dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
             skipna=True,
         ) / self._sum_categories("total")
+
+
+def roc(o, f, bin_edges, dim=None, return_results="area"):
+    """Computes the relative operating characteristic of an event for a range of bin edges.
+
+    Parameters
+    ----------
+    observations : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    forecasts : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    bin_edges : array_like
+        Bin edges for categorising observations.
+        Bins include the left most edge, but not the right.
+    dim : str, list
+        The dimension(s) over which to compute the contingency table
+    return_results: str
+        Specify how return is structed:
+        - area (default): return only the area under the curve of ROC
+        - all_as_tuple: return hit and false alarm rate at each bin and area under the curve of ROC as tuple
+        - all_as_metric_dim: return hit and false alarm rate at each bin and area under the curve of ROC
+            concatinated into new `metric` dimension
+
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray : reduced by dimensions ``dim`` and specified by ``return_results``
+
+    Examples
+    --------
+    >>> f = xr.DataArray(
+    ...     np.random.normal(size=(1000)),
+            coords=[('time', np.arange(1000))]
+    ... )
+    >>> o = xr.DataArray(
+    ...    np.random.normal(size=(1000)),
+    ...    coords=[('time', np.arange(1000))]
+    ... )
+    >>> category_edges = np.linspace(-2,2,5)
+    >>> roc(a, b, category_edges, dim=['time'])
+    <xarray.DataArray 'histogram_observations_forecasts' ()>
+    array(0.46812223)
+
+    See also
+    --------
+    xskillscore.Contingency
+
+    References
+    ----------
+    http://www.cawcr.gov.au/projects/verification/
+    """
+    if dim is None:
+        dim = list(f.dims)
+    if isinstance(dim, str):
+        dim = [dim]
+
+    # loop over each bin_edge and get hit rate and false alarm rate from contingency
+    hr, far = [], []
+    for i in bin_edges:
+        dichotomous_category_edges = np.array(
+            [-np.inf, i, np.inf]
+        )  # "dichotomous" means two-category
+        dichotomous_contingency = Contingency(
+            o, f, dichotomous_category_edges, dichotomous_category_edges, dim=dim
+        )
+        far.append(dichotomous_contingency.false_alarm_rate())
+        hr.append(dichotomous_contingency.hit_rate())
+    hr = xr.concat(hr, "probability_bin")
+    far = xr.concat(far, "probability_bin")
+
+    easyfillna = True
+    if easyfillna:
+        far = far.fillna(1.0)
+        hr = hr.fillna(0.0)
+
+    # pad (0,0) and (1,1)
+    far = xr.concat(
+        [
+            xr.ones_like(far.isel(probability_bin=0, drop=True)),
+            far,
+            xr.zeros_like(far.isel(probability_bin=-1, drop=True)),
+        ],
+        "probability_bin",
+    )  # .sortby(far)
+    hr = xr.concat(
+        [
+            xr.ones_like(hr.isel(probability_bin=0, drop=True)),
+            hr,
+            xr.zeros_like(hr.isel(probability_bin=-1, drop=True)),
+        ],
+        "probability_bin",
+    )  # .sortby(hr)
+    # far=far.bfill('probability_bin').ffill('probability_bin')
+    # hr=hr.ffill('probability_bin').bfill('probability_bin')
+
+    def auc(hr, far, dim="probability_bin"):
+        """Get area under the curve with trapez method."""
+        area = xr.apply_ufunc(np.trapz, -hr, far, input_core_dims=[[dim], [dim]])
+        area = np.clip(area, 0, 1)  # allow only values between 0 and 1
+        return area
+
+    auc_values = auc(hr, far)
+
+    # mask always nan
+    def _keep_masked(new, ori, dim):
+        """Keep mask from `ori` deprived of dimensions from `dim` in input `new`."""
+        isel_dim = {d: 0 for d in f.dims if d in dim}
+        mask = ori.isel(isel_dim, drop=True)
+        new_masked = new.where(mask.notnull())
+        return new_masked
+
+    far = _keep_masked(far, f, dim=dim)
+    hr = _keep_masked(hr, f, dim=dim)
+    auc_values = _keep_masked(auc_values, f, dim=dim)
+
+    if return_results == "area":
+        return auc_values
+    elif return_results == "all_as_metric_dim":
+        results = xr.concat([far, hr, auc_values], "metric", coords="minimal")
+        results["metric"] = ["false alarm rate", "hit rate", "area under curve"]
+        return results
+    elif return_results == "all_as_tuple":
+        return far, hr, auc_values
+    else:
+        raise NotImplementedError(
+            f"expect `return_results` from [all_as_tuple, area, all_as_metric_dim], found {return_results}"
+        )
