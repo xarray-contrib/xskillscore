@@ -5,12 +5,12 @@ dependencies:
   - bottleneck
   - cftime
   - dask
-  - numba
+  - numba>=0.52
   - numpy
   - properscoring
   - scikit-learn
   - scipy
-  - xarray
+  - xarray>=0.16.1
   - xhistogram
   - coveralls
   - pytest
