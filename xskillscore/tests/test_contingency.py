@@ -219,7 +219,7 @@ def test_roc_constant_forecast(
         dim="time",
         return_results=return_results,
     )
-    assert area == 0.0  # unsure: should be 0.5?
+    assert float(area) in [0.0, 0.5]
 
 
 @pytest.mark.parametrize("drop_intermediate", [False, True])
