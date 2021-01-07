@@ -798,25 +798,33 @@ class Contingency:
         ) / self._sum_categories("total")
 
 
-def roc(o, f, bin_edges, dim=None, return_results="area"):
+def roc(o, f, bin_edges, dim=None, drop_intermediate=True, return_results="area"):
     """Computes the relative operating characteristic of an event for a range of bin edges.
 
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
+        If bin_edges=='continuous', observations are binary.
     forecasts : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
-    bin_edges : array_like
+        If bin_edges=='continuous', forecasts are probabilities.
+    bin_edges : array_like, str
         Bin edges for categorising observations.
         Bins include the left most edge, but not the right.
+         or
+        'continuous': to match sklearn.metrics.roc_curve(f_boolean, o, drop_intermediate=False)
     dim : str, list
         The dimension(s) over which to compute the contingency table
-    return_results: str
+    drop_intermediate : bool, default=True
+        Whether to drop some suboptimal thresholds which would not appear
+        on a plotted ROC curve. This is useful in order to create lighter
+        ROC curves.
+    return_results: str, default='area'
         Specify how return is structed:
-        - area (default): return only the area under the curve of ROC
-        - all_as_tuple: return hit and false alarm rate at each bin and area under the curve of ROC as tuple
-        - all_as_metric_dim: return hit and false alarm rate at each bin and area under the curve of ROC
+        - 'area': return only the area under the curve of ROC
+        - 'all_as_tuple': return hit and false alarm rate at each bin and area under the curve of ROC as tuple
+        - 'all_as_metric_dim': return hit and false alarm rate at each bin and area under the curve of ROC
             concatinated into new `metric` dimension
 
     Returns
@@ -846,10 +854,29 @@ def roc(o, f, bin_edges, dim=None, return_results="area"):
     ----------
     http://www.cawcr.gov.au/projects/verification/
     """
+
     if dim is None:
         dim = list(f.dims)
     if isinstance(dim, str):
         dim = [dim]
+
+    continuous = False
+    if isinstance(bin_edges, str):
+        if bin_edges == "continuous":
+            continuous = True
+            # check that o binary
+
+            # works only for 1var
+            if isinstance(f, xr.Dataset):
+                v = list(f.data_vars)[0]
+                f_bin = f[v]
+            else:
+                f_bin = f
+            f_bin = f_bin.stack(ndim=f.dims)
+            f_bin = f_bin.sortby(-f_bin)
+            bin_edges = np.append(f_bin[0] + 1, f_bin)
+            bin_edges = np.unique(bin_edges)[::-1]
+            # print(bin_edges)
 
     # loop over each bin_edge and get hit rate and false alarm rate from contingency
     hr, far = [], []
@@ -871,7 +898,7 @@ def roc(o, f, bin_edges, dim=None, return_results="area"):
         hr = hr.fillna(0.0)
 
     # pad (0,0) and (1,1)
-    far = xr.concat(
+    far_pad = xr.concat(
         [
             xr.ones_like(far.isel(probability_bin=0, drop=True)),
             far,
@@ -879,7 +906,7 @@ def roc(o, f, bin_edges, dim=None, return_results="area"):
         ],
         "probability_bin",
     )  # .sortby(far)
-    hr = xr.concat(
+    hr_pad = xr.concat(
         [
             xr.ones_like(hr.isel(probability_bin=0, drop=True)),
             hr,
@@ -890,13 +917,53 @@ def roc(o, f, bin_edges, dim=None, return_results="area"):
     # far=far.bfill('probability_bin').ffill('probability_bin')
     # hr=hr.ffill('probability_bin').bfill('probability_bin')
 
+    # https://github.com/scikit-learn/scikit-learn/blob/42aff4e2edd8e8887478f6ff1628f27de97be6a3/sklearn/metrics/_ranking.py#L916
+    # Attempt to drop thresholds corresponding to points in between and
+    # collinear with other points. These are always suboptimal and do not
+    # appear on a plotted ROC curve (and thus do not affect the AUC).
+    # Here np.diff(_, 2) is used as a "second derivative" to tell if there
+    # is a corner at the point. Both fps and tps must be tested to handle
+    # thresholds with multiple data points (which are combined in
+    # _binary_clf_curve). This keeps all cases where the point should be kept,
+    # but does not drop more complicated cases like fps = [1, 3, 7],
+    # tps = [1, 2, 4]; there is no harm in keeping too many thresholds.
+    if drop_intermediate and far.probability_bin.size > 2:
+        optimal_idxs = np.where(
+            np.r_[
+                True,
+                np.logical_or(
+                    far.diff("probability_bin", 2), hr.diff("probability_bin", 2)
+                ),
+                True,
+            ]
+        )[0]
+        print(optimal_idxs, len(optimal_idxs), far.probability_bin.size)
+        hr = hr.isel(probability_bin=optimal_idxs)
+        far = far.isel(probability_bin=optimal_idxs)
+
+        optimal_idxs = np.where(
+            np.r_[
+                True,
+                np.logical_or(
+                    far_pad.diff("probability_bin", 2),
+                    hr_pad.diff("probability_bin", 2),
+                ),
+                True,
+            ]
+        )[0]
+        print(optimal_idxs, len(optimal_idxs), far.probability_bin.size)
+        hr_pad = hr_pad.isel(probability_bin=optimal_idxs)
+        far_pad = far_pad.isel(probability_bin=optimal_idxs)
+
     def auc(hr, far, dim="probability_bin"):
         """Get area under the curve with trapez method."""
         area = xr.apply_ufunc(np.trapz, -hr, far, input_core_dims=[[dim], [dim]])
         area = np.clip(area, 0, 1)  # allow only values between 0 and 1
         return area
 
-    auc_values = auc(hr, far)
+    area = auc(hr_pad, far_pad)
+    if continuous:
+        area = 1 - area  # dirty fix
 
     # mask always nan
     def _keep_masked(new, ori, dim):
@@ -908,16 +975,16 @@ def roc(o, f, bin_edges, dim=None, return_results="area"):
 
     far = _keep_masked(far, f, dim=dim)
     hr = _keep_masked(hr, f, dim=dim)
-    auc_values = _keep_masked(auc_values, f, dim=dim)
+    area = _keep_masked(area, f, dim=dim)
 
     if return_results == "area":
-        return auc_values
+        return area
     elif return_results == "all_as_metric_dim":
-        results = xr.concat([far, hr, auc_values], "metric", coords="minimal")
+        results = xr.concat([far, hr, area], "metric", coords="minimal")
         results["metric"] = ["false alarm rate", "hit rate", "area under curve"]
         return results
     elif return_results == "all_as_tuple":
-        return far, hr, auc_values
+        return far, hr, area
     else:
         raise NotImplementedError(
             f"expect `return_results` from [all_as_tuple, area, all_as_metric_dim], found {return_results}"

@@ -130,6 +130,9 @@ def symmetric_edges():
     return np.linspace(-2, 2, 11)
 
 
+np.random.seed(42)
+
+
 @pytest.fixture
 def forecast_1d_long():
     """Forecasts normally distributed around 0."""
@@ -199,3 +202,47 @@ def test_roc_constant_forecast(
         return_results=return_results,
     )
     assert area == 0.5
+
+
+from sklearn.metrics import roc_auc_score, roc_curve
+
+
+@pytest.mark.parametrize("drop_intermediate", [False, True])
+def test_roc_bin_edges_continuous_against_sklearn(
+    forecast_1d_long, observation_1d_long, drop_intermediate
+):
+    """Test xs.roc against sklearn.metrics.roc_curve/auc_score."""
+    fb = forecast_1d_long > 0  # binary
+    op = np.clip(observation_1d_long, 0, 1)  # prob
+    # sklearn
+    fpr, tpr, thresholds = roc_curve(fb, op, drop_intermediate=drop_intermediate)
+    area = roc_auc_score(fb, op)
+    # xs
+    xsfpr, xstpr, xsarea = roc(
+        fb,
+        op,
+        "continuous",
+        drop_intermediate=drop_intermediate,
+        return_results="all_as_tuple",
+    )
+    np.testing.assert_allclose(xsarea, area)
+    if not drop_intermediate:
+        assert (xsfpr == fpr).all()
+        assert (xstpr == tpr).all()
+
+
+def test_roc_bin_edges_drop_intermediate(forecast_1d_long, observation_1d_long):
+    """Test that drop_intermediate reduces probability_bins in xs.roc ."""
+    fb = forecast_1d_long > 0  # binary
+    op = np.clip(observation_1d_long, 0, 1)  # prob
+    # xs
+    txsfpr, txstpr, txsarea = roc(
+        fb, op, "continuous", drop_intermediate=True, return_results="all_as_tuple"
+    )
+    fxsfpr, fxstpr, fxsarea = roc(
+        fb, op, "continuous", drop_intermediate=False, return_results="all_as_tuple"
+    )
+
+    np.testing.assert_equal(fxsarea, txsarea)
+    assert len(fxsfpr) >= len(txsfpr)
+    assert len(fxstpr) >= len(txstpr)
