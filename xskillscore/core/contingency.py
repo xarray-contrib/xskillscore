@@ -894,7 +894,6 @@ def roc(
             f_bin = f_bin.sortby(-f_bin)
             bin_edges = np.append(f_bin[0] + 1, f_bin)
             bin_edges = np.unique(bin_edges)[::-1]
-            # print(bin_edges)
 
     # loop over each bin_edge and get hit rate and false alarm rate from contingency
     hr, far = [], []
