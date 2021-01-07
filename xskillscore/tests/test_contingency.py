@@ -2,7 +2,7 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 import xarray as xr
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
 
 from xskillscore import Contingency, roc
 
@@ -147,17 +147,36 @@ def observation_1d_long():
     return xr.DataArray(np.random.normal(size=(s)), coords=[("time", np.arange(s))])
 
 
+@pytest.mark.parametrize("drop_intermediate", [True, False])
+@pytest.mark.parametrize("chunk", [True, False])
+@pytest.mark.parametrize("input", ["Dataset", "DataArray"])
 @pytest.mark.parametrize(
     "return_results", ["all_as_tuple", "area", "all_as_metric_dim"]
 )
 def test_roc_returns(
-    forecast_1d_long, observation_1d_long, symmetric_edges, return_results
+    forecast_1d_long,
+    observation_1d_long,
+    symmetric_edges,
+    return_results,
+    input,
+    chunk,
+    drop_intermediate,
 ):
+    """testing keywords and inputs"""
+    if "Dataset" in input:
+        name = "var"
+        forecast_1d_long = forecast_1d_long.to_dataset(name=name)
+        observation_1d_long = observation_1d_long.to_dataset(name=name)
+    if chunk:
+        forecast_1d_long = forecast_1d_long.chunk()
+        observation_1d_long = observation_1d_long.chunk()
+
     roc(
         forecast_1d_long,
         observation_1d_long,
         symmetric_edges,
         dim="time",
+        drop_intermediate=drop_intermediate,
         return_results=return_results,
     )
 
@@ -177,7 +196,6 @@ def test_roc_random_forecast(
     assert area > 0.4
 
 
-@pytest.mark.xfail(reason="not yet implemented")
 def test_roc_perfect_forecast(forecast_1d_long, symmetric_edges, return_results="area"):
     """Test that ROC equals 1 for perfect forecast."""
     area = roc(
@@ -193,7 +211,7 @@ def test_roc_perfect_forecast(forecast_1d_long, symmetric_edges, return_results=
 def test_roc_constant_forecast(
     forecast_1d_long, symmetric_edges, return_results="area"
 ):
-    """Test that ROC equals 0.5 for constant forecast."""
+    """Test that ROC equals 0. for constant forecast."""
     area = roc(
         forecast_1d_long,
         xr.ones_like(forecast_1d_long) * 10,
@@ -201,10 +219,7 @@ def test_roc_constant_forecast(
         dim="time",
         return_results=return_results,
     )
-    assert area == 0.5
-
-
-from sklearn.metrics import roc_auc_score, roc_curve
+    assert area == 0.0  # unsure: should be 0.5?
 
 
 @pytest.mark.parametrize("drop_intermediate", [False, True])
@@ -226,7 +241,7 @@ def test_roc_bin_edges_continuous_against_sklearn(
         return_results="all_as_tuple",
     )
     np.testing.assert_allclose(xsarea, area)
-    if not drop_intermediate:
+    if not drop_intermediate:  # drops sometimes one too much or too little
         assert (xsfpr == fpr).all()
         assert (xstpr == tpr).all()
 

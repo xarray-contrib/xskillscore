@@ -798,7 +798,14 @@ class Contingency:
         ) / self._sum_categories("total")
 
 
-def roc(o, f, bin_edges, dim=None, drop_intermediate=True, return_results="area"):
+def roc(
+    observations,
+    forecasts,
+    bin_edges,
+    dim=None,
+    drop_intermediate=True,
+    return_results="area",
+):
     """Computes the relative operating characteristic of an event for a range of bin edges.
 
     Parameters
@@ -813,7 +820,7 @@ def roc(o, f, bin_edges, dim=None, drop_intermediate=True, return_results="area"
         Bin edges for categorising observations.
         Bins include the left most edge, but not the right.
          or
-        'continuous': to match sklearn.metrics.roc_curve(f_boolean, o, drop_intermediate=False)
+        'continuous': to match sklearn.metrics.roc_curve(f_boolean, o_prob, drop_intermediate=False)
     dim : str, list
         The dimension(s) over which to compute the contingency table
     drop_intermediate : bool, default=True
@@ -856,7 +863,7 @@ def roc(o, f, bin_edges, dim=None, drop_intermediate=True, return_results="area"
     """
 
     if dim is None:
-        dim = list(f.dims)
+        dim = list(forecasts.dims)
     if isinstance(dim, str):
         dim = [dim]
 
@@ -865,14 +872,24 @@ def roc(o, f, bin_edges, dim=None, drop_intermediate=True, return_results="area"
         if bin_edges == "continuous":
             continuous = True
             # check that o binary
+            if isinstance(observations, xr.Dataset):
+                o_check = observations.to_array()
+            else:
+                o_check = observations
+            if str(o_check.dtype) != "bool":
+                if not ((o_check == 0) | (o_check == 1)).all():
+                    raise ValueError(
+                        'Input "observations" must represent logical (True/False) outcomes',
+                        o_check,
+                    )
 
             # works only for 1var
-            if isinstance(f, xr.Dataset):
-                v = list(f.data_vars)[0]
-                f_bin = f[v]
+            if isinstance(forecasts, xr.Dataset):
+                v = list(forecasts.data_vars)[0]
+                f_bin = forecasts[v]
             else:
-                f_bin = f
-            f_bin = f_bin.stack(ndim=f.dims)
+                f_bin = forecasts
+            f_bin = f_bin.stack(ndim=forecasts.dims)
             f_bin = f_bin.sortby(-f_bin)
             bin_edges = np.append(f_bin[0] + 1, f_bin)
             bin_edges = np.unique(bin_edges)[::-1]
@@ -885,7 +902,11 @@ def roc(o, f, bin_edges, dim=None, drop_intermediate=True, return_results="area"
             [-np.inf, i, np.inf]
         )  # "dichotomous" means two-category
         dichotomous_contingency = Contingency(
-            o, f, dichotomous_category_edges, dichotomous_category_edges, dim=dim
+            observations,
+            forecasts,
+            dichotomous_category_edges,
+            dichotomous_category_edges,
+            dim=dim,
         )
         far.append(dichotomous_contingency.false_alarm_rate())
         hr.append(dichotomous_contingency.hit_rate())
@@ -928,36 +949,42 @@ def roc(o, f, bin_edges, dim=None, drop_intermediate=True, return_results="area"
     # but does not drop more complicated cases like fps = [1, 3, 7],
     # tps = [1, 2, 4]; there is no harm in keeping too many thresholds.
     if drop_intermediate and far.probability_bin.size > 2:
-        optimal_idxs = np.where(
-            np.r_[
-                True,
-                np.logical_or(
-                    far.diff("probability_bin", 2), hr.diff("probability_bin", 2)
-                ),
-                True,
-            ]
-        )[0]
-        print(optimal_idxs, len(optimal_idxs), far.probability_bin.size)
-        hr = hr.isel(probability_bin=optimal_idxs)
-        far = far.isel(probability_bin=optimal_idxs)
 
-        optimal_idxs = np.where(
-            np.r_[
-                True,
-                np.logical_or(
-                    far_pad.diff("probability_bin", 2),
-                    hr_pad.diff("probability_bin", 2),
-                ),
-                True,
-            ]
-        )[0]
-        print(optimal_idxs, len(optimal_idxs), far.probability_bin.size)
-        hr_pad = hr_pad.isel(probability_bin=optimal_idxs)
-        far_pad = far_pad.isel(probability_bin=optimal_idxs)
+        def drop_interm(far, hr):
+            if isinstance(far, xr.Dataset):
+                if len(far.data_vars) == 1:
+                    v = list(far.data_vars)[0]
+                    hr_check = hr[v]
+                    far_check = far[v]
+                else:
+                    raise ValueError(
+                        "drop_intermediate=True only works for one variable xr.Dataset or xr.DataArray."
+                    )
+            else:
+                hr_check = hr
+                far_check = far
+            optimal_idxs = np.where(
+                np.r_[
+                    True,
+                    np.logical_or(
+                        far_check.diff("probability_bin", 2),
+                        hr_check.diff("probability_bin", 2),
+                    ),
+                    True,
+                ]
+            )[0]
+            hr = hr.isel(probability_bin=optimal_idxs)
+            far = far.isel(probability_bin=optimal_idxs)
+            return far, hr
+
+        far, hr = drop_interm(far, hr)
+        far_pad, hr_pad = drop_interm(far_pad, hr_pad)
 
     def auc(hr, far, dim="probability_bin"):
         """Get area under the curve with trapez method."""
-        area = xr.apply_ufunc(np.trapz, -hr, far, input_core_dims=[[dim], [dim]])
+        area = xr.apply_ufunc(
+            np.trapz, -hr, far, input_core_dims=[[dim], [dim]], dask="allowed"
+        )
         area = np.clip(area, 0, 1)  # allow only values between 0 and 1
         return area
 
@@ -968,14 +995,14 @@ def roc(o, f, bin_edges, dim=None, drop_intermediate=True, return_results="area"
     # mask always nan
     def _keep_masked(new, ori, dim):
         """Keep mask from `ori` deprived of dimensions from `dim` in input `new`."""
-        isel_dim = {d: 0 for d in f.dims if d in dim}
+        isel_dim = {d: 0 for d in forecasts.dims if d in dim}
         mask = ori.isel(isel_dim, drop=True)
         new_masked = new.where(mask.notnull())
         return new_masked
 
-    far = _keep_masked(far, f, dim=dim)
-    hr = _keep_masked(hr, f, dim=dim)
-    area = _keep_masked(area, f, dim=dim)
+    far = _keep_masked(far, forecasts, dim=dim)
+    hr = _keep_masked(hr, forecasts, dim=dim)
+    area = _keep_masked(area, forecasts, dim=dim)
 
     if return_results == "area":
         return area
