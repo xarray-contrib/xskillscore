@@ -806,7 +806,7 @@ def roc(
     drop_intermediate=True,
     return_results="area",
 ):
-    """Computes the relative operating characteristic of an event for a range of bin edges.
+    """Computes the relative operating characteristic for a range of thresholds.
 
     Parameters
     ----------
@@ -817,10 +817,10 @@ def roc(
         Labeled array(s) over which to apply the function.
         If bin_edges=='continuous', forecasts are probabilities.
     bin_edges : array_like, str
-        Bin edges for categorising observations.
+        Bin edges for categorising observations and forecasts.
         Bins include the left most edge, but not the right.
-         or
-        'continuous': to match sklearn.metrics.roc_curve(f_boolean, o_prob, drop_intermediate=False)
+        If bin_edges='continuous', calculate bin_edges from forecasts, equal to
+        sklearn.metrics.roc_curve(f_boolean, o_prob)
     dim : str, list
         The dimension(s) over which to compute the contingency table
     drop_intermediate : bool, default=True
@@ -829,10 +829,11 @@ def roc(
         ROC curves.
     return_results: str, default='area'
         Specify how return is structed:
-        - 'area': return only the area under the curve of ROC
-        - 'all_as_tuple': return hit and false alarm rate at each bin and area under the curve of ROC as tuple
-        - 'all_as_metric_dim': return hit and false alarm rate at each bin and area under the curve of ROC
-            concatinated into new `metric` dimension
+            * 'area': return only the area under the curve of ROC
+            * 'all_as_tuple': return hit and false alarm rate at each bin and area under
+                the curve of ROC as tuple
+            * 'all_as_metric_dim': return hit and false alarm rate at each bin and area
+                under the curve of ROC concatinated into new `metric` dimension
 
     Returns
     -------
