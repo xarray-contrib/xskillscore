@@ -181,43 +181,41 @@ def test_roc_returns(
     )
 
 
-def test_roc_random_forecast(
-    forecast_1d_long, observation_1d_long, symmetric_edges, return_results="area"
+def test_roc_auc_score_random_forecast(
+    forecast_1d_long, observation_1d_long, symmetric_edges
 ):
-    """Test that ROC around 0.5 for random forecast."""
+    """Test that ROC AUC around 0.5 for random forecast."""
     area = roc(
         forecast_1d_long,
         observation_1d_long,
         symmetric_edges,
         dim="time",
-        return_results=return_results,
+        return_results="area",
     )
     assert area < 0.6
     assert area > 0.4
 
 
-def test_roc_perfect_forecast(forecast_1d_long, symmetric_edges, return_results="area"):
-    """Test that ROC equals 1 for perfect forecast."""
+def test_roc_auc_score_perfect_forecast(forecast_1d_long, symmetric_edges):
+    """Test that ROC AUC equals 1 for perfect forecast."""
     area = roc(
         forecast_1d_long,
         forecast_1d_long,
         symmetric_edges,
         dim="time",
-        return_results=return_results,
+        return_results="area",
     )
     assert area == 1.0
 
 
-def test_roc_constant_forecast(
-    forecast_1d_long, symmetric_edges, return_results="area"
-):
-    """Test that ROC equals 0. for constant forecast."""
+def test_roc_auc_score_constant_forecast(forecast_1d_long, symmetric_edges):
+    """Test that ROC AUC equals 0 or 0.5. for constant forecast."""
     area = roc(
         forecast_1d_long,
         xr.ones_like(forecast_1d_long) * 10,
         symmetric_edges,
         dim="time",
-        return_results=return_results,
+        return_results="area",
     )
     assert float(area) in [0.0, 0.5]
 
@@ -230,20 +228,20 @@ def test_roc_bin_edges_continuous_against_sklearn(
     fb = forecast_1d_long > 0  # binary
     op = np.clip(observation_1d_long, 0, 1)  # prob
     # sklearn
-    fpr, tpr, thresholds = roc_curve(fb, op, drop_intermediate=drop_intermediate)
-    area = roc_auc_score(fb, op)
+    sk_fpr, sk_tpr, _ = roc_curve(fb, op, drop_intermediate=drop_intermediate)
+    sk_area = roc_auc_score(fb, op)
     # xs
-    xsfpr, xstpr, xsarea = roc(
+    xs_fpr, xs_tpr, xs_area = roc(
         fb,
         op,
         "continuous",
         drop_intermediate=drop_intermediate,
         return_results="all_as_tuple",
     )
-    np.testing.assert_allclose(xsarea, area)
+    np.testing.assert_allclose(xs_area, sk_area)
     if not drop_intermediate:  # drops sometimes one too much or too little
-        assert (xsfpr == fpr).all()
-        assert (xstpr == tpr).all()
+        assert (xs_fpr == sk_fpr).all()
+        assert (xs_tpr == sk_tpr).all()
 
 
 def test_roc_bin_edges_drop_intermediate(forecast_1d_long, observation_1d_long):
@@ -251,13 +249,14 @@ def test_roc_bin_edges_drop_intermediate(forecast_1d_long, observation_1d_long):
     fb = forecast_1d_long > 0  # binary
     op = np.clip(observation_1d_long, 0, 1)  # prob
     # xs
-    txsfpr, txstpr, txsarea = roc(
+    txs_fpr, txs_tpr, txs_area = roc(
         fb, op, "continuous", drop_intermediate=True, return_results="all_as_tuple"
     )
-    fxsfpr, fxstpr, fxsarea = roc(
+    fxs_fpr, fxs_tpr, fxs_area = roc(
         fb, op, "continuous", drop_intermediate=False, return_results="all_as_tuple"
     )
-
-    np.testing.assert_allclose(fxsarea, txsarea)
-    assert len(fxsfpr) >= len(txsfpr)
-    assert len(fxstpr) >= len(txstpr)
+    # same area
+    np.testing.assert_allclose(fxs_area, txs_area)
+    # same or less probability_bins
+    assert len(fxs_fpr) >= len(txs_fpr)
+    assert len(fxs_tpr) >= len(txs_tpr)

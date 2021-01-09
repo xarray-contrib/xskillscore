@@ -837,7 +837,9 @@ def roc(
 
     Returns
     -------
-    xarray.Dataset or xarray.DataArray : reduced by dimensions ``dim`` and specified by ``return_results``
+    xarray.Dataset or xarray.DataArray : reduced by dimensions ``dim``.
+        See ``return_results`` parameter.
+
 
     Examples
     --------
@@ -850,13 +852,14 @@ def roc(
     ...    coords=[('time', np.arange(1000))]
     ... )
     >>> category_edges = np.linspace(-2,2,5)
-    >>> roc(a, b, category_edges, dim=['time'])
+    >>> roc(o, f, category_edges, dim=['time'])
     <xarray.DataArray 'histogram_observations_forecasts' ()>
     array(0.46812223)
 
     See also
     --------
     xskillscore.Contingency
+    sklearn.metrics.roc_curve
 
     References
     ----------
@@ -896,7 +899,7 @@ def roc(
             bin_edges = np.unique(bin_edges)[::-1]
 
     # loop over each bin_edge and get hit rate and false alarm rate from contingency
-    hr, far = [], []
+    tpr, fpr = [], []
     for i in bin_edges:
         dichotomous_category_edges = np.array(
             [-np.inf, i, np.inf]
@@ -908,87 +911,83 @@ def roc(
             dichotomous_category_edges,
             dim=dim,
         )
-        far.append(dichotomous_contingency.false_alarm_rate())
-        hr.append(dichotomous_contingency.hit_rate())
-    hr = xr.concat(hr, "probability_bin")
-    far = xr.concat(far, "probability_bin")
+        fpr.append(dichotomous_contingency.false_alarm_rate())
+        tpr.append(dichotomous_contingency.hit_rate())
+    tpr = xr.concat(tpr, "probability_bin")
+    fpr = xr.concat(fpr, "probability_bin")
 
     easyfillna = True
     if easyfillna:
-        far = far.fillna(1.0)
-        hr = hr.fillna(0.0)
+        fpr = fpr.fillna(1.0)
+        tpr = tpr.fillna(0.0)
 
     # pad (0,0) and (1,1)
-    far_pad = xr.concat(
+    fpr_pad = xr.concat(
         [
-            xr.ones_like(far.isel(probability_bin=0, drop=True)),
-            far,
-            xr.zeros_like(far.isel(probability_bin=-1, drop=True)),
+            xr.ones_like(fpr.isel(probability_bin=0, drop=True)),
+            fpr,
+            xr.zeros_like(fpr.isel(probability_bin=-1, drop=True)),
         ],
         "probability_bin",
-    )  # .sortby(far)
-    hr_pad = xr.concat(
+    )
+    tpr_pad = xr.concat(
         [
-            xr.ones_like(hr.isel(probability_bin=0, drop=True)),
-            hr,
-            xr.zeros_like(hr.isel(probability_bin=-1, drop=True)),
+            xr.ones_like(tpr.isel(probability_bin=0, drop=True)),
+            tpr,
+            xr.zeros_like(tpr.isel(probability_bin=-1, drop=True)),
         ],
         "probability_bin",
-    )  # .sortby(hr)
-    # far=far.bfill('probability_bin').ffill('probability_bin')
-    # hr=hr.ffill('probability_bin').bfill('probability_bin')
+    )
 
     # https://github.com/scikit-learn/scikit-learn/blob/42aff4e2edd8e8887478f6ff1628f27de97be6a3/sklearn/metrics/_ranking.py#L916
     # Attempt to drop thresholds corresponding to points in between and
     # collinear with other points. These are always suboptimal and do not
     # appear on a plotted ROC curve (and thus do not affect the AUC).
     # Here np.diff(_, 2) is used as a "second derivative" to tell if there
-    # is a corner at the point. Both fps and tps must be tested to handle
-    # thresholds with multiple data points (which are combined in
-    # _binary_clf_curve). This keeps all cases where the point should be kept,
-    # but does not drop more complicated cases like fps = [1, 3, 7],
+    # is a corner at the point. (...) This keeps all cases where the point should be
+    # kept, but does not drop more complicated cases like fps = [1, 3, 7],
     # tps = [1, 2, 4]; there is no harm in keeping too many thresholds.
-    if drop_intermediate and far.probability_bin.size > 2:
+    if drop_intermediate and fpr.probability_bin.size > 2:
 
-        def drop_interm(far, hr):
-            if isinstance(far, xr.Dataset):
-                if len(far.data_vars) == 1:
-                    v = list(far.data_vars)[0]
-                    hr_check = hr[v]
-                    far_check = far[v]
+        def _drop_intermediate(fpr, tpr):
+            if isinstance(fpr, xr.Dataset):
+                if len(fpr.data_vars) == 1:
+                    v = list(fpr.data_vars)[0]
+                    tpr_check = tpr[v]
+                    fpr_check = fpr[v]
                 else:
                     raise ValueError(
                         "drop_intermediate=True only works for one variable xr.Dataset or xr.DataArray."
                     )
             else:
-                hr_check = hr
-                far_check = far
+                tpr_check = tpr
+                fpr_check = fpr
             optimal_idxs = np.where(
                 np.r_[
                     True,
                     np.logical_or(
-                        far_check.diff("probability_bin", 2),
-                        hr_check.diff("probability_bin", 2),
+                        fpr_check.diff("probability_bin", 2),
+                        tpr_check.diff("probability_bin", 2),
                     ),
                     True,
                 ]
             )[0]
-            hr = hr.isel(probability_bin=optimal_idxs)
-            far = far.isel(probability_bin=optimal_idxs)
-            return far, hr
+            tpr = tpr.isel(probability_bin=optimal_idxs)
+            fpr = fpr.isel(probability_bin=optimal_idxs)
+            return fpr, tpr
 
-        far, hr = drop_interm(far, hr)
-        far_pad, hr_pad = drop_interm(far_pad, hr_pad)
+        fpr, tpr = _drop_intermediate(fpr, tpr)
+        fpr_pad, tpr_pad = _drop_intermediate(fpr_pad, tpr_pad)
 
-    def auc(hr, far, dim="probability_bin"):
+    def auc(tpr, fpr, dim="probability_bin"):
         """Get area under the curve with trapez method."""
         area = xr.apply_ufunc(
-            np.trapz, -hr, far, input_core_dims=[[dim], [dim]], dask="allowed"
+            np.trapz, -tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
         )
         area = np.clip(area, 0, 1)  # allow only values between 0 and 1
         return area
 
-    area = auc(hr_pad, far_pad)
+    area = auc(tpr_pad, fpr_pad)
     if continuous:
         area = 1 - area  # dirty fix
 
@@ -1000,18 +999,18 @@ def roc(
         new_masked = new.where(mask.notnull())
         return new_masked
 
-    far = _keep_masked(far, forecasts, dim=dim)
-    hr = _keep_masked(hr, forecasts, dim=dim)
+    fpr = _keep_masked(fpr, forecasts, dim=dim)
+    tpr = _keep_masked(tpr, forecasts, dim=dim)
     area = _keep_masked(area, forecasts, dim=dim)
 
     if return_results == "area":
         return area
     elif return_results == "all_as_metric_dim":
-        results = xr.concat([far, hr, area], "metric", coords="minimal")
+        results = xr.concat([fpr, tpr, area], "metric", coords="minimal")
         results["metric"] = ["false alarm rate", "hit rate", "area under curve"]
         return results
     elif return_results == "all_as_tuple":
-        return far, hr, area
+        return fpr, tpr, area
     else:
         raise NotImplementedError(
             f"expect `return_results` from [all_as_tuple, area, all_as_metric_dim], found {return_results}"
