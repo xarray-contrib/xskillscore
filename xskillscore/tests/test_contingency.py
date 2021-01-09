@@ -13,56 +13,26 @@ CATEGORY_EDGES = [
 ]
 
 
-@pytest.fixture
-def forecast():
-    times = xr.cftime_range(start="2000", freq="D", periods=10)
-    lats = np.arange(4)
-    lons = np.arange(5)
-    data = np.random.randint(0, 10, size=(len(times), len(lats), len(lons)))
-    return xr.DataArray(data, coords=[times, lats, lons], dims=["time", "lat", "lon"])
-
-
-@pytest.fixture
-def observation(forecast):
-    b = forecast.copy()
-    b.values = np.random.randint(0, 10, size=(b.shape[0], b.shape[1], b.shape[2]))
-    return b
-
-
-@pytest.fixture
-def dichotomous_Contingency():
-    observations = xr.DataArray(
-        np.array(2 * [0] + 2 * [1] + 1 * [0] + 2 * [1]), coords=[("x", np.arange(7))]
-    )
-    forecasts = xr.DataArray(
-        np.array(2 * [0] + 2 * [0] + 1 * [1] + 2 * [1]), coords=[("x", np.arange(7))]
-    )
-    category_edges = np.array([-np.inf, 0.5, np.inf])
-    return Contingency(
-        observations, forecasts, category_edges, category_edges, dim=["x"]
-    )
-
-
 @pytest.mark.parametrize("type", ["da", "ds", "chunked_da", "chunked_ds"])
 @pytest.mark.parametrize("dim", DIMS)
 @pytest.mark.parametrize("category_edges", CATEGORY_EDGES)
-def test_Contingency_table(observation, forecast, category_edges, dim, type):
+def test_Contingency_table(observation_3d, forecast_3d, category_edges, dim, type):
     """Test that contingency table builds successfully"""
     if "ds" in type:
         name = "var"
-        observation = observation.to_dataset(name=name)
-        forecast = forecast.to_dataset(name=name)
+        observation_3d = observation_3d.to_dataset(name=name)
+        forecast_3d = forecast_3d.to_dataset(name=name)
     if "chunked" in type:
-        observation = observation.chunk()
-        forecast = forecast.chunk()
+        observation_3d = observation_3d.chunk()
+        forecast_3d = forecast_3d.chunk()
     cont_table = Contingency(
-        observation, forecast, category_edges, category_edges, dim=dim
+        observation_3d, forecast_3d, category_edges, category_edges, dim=dim
     )
     assert cont_table
 
 
 @pytest.mark.parametrize("category_edges", CATEGORY_EDGES)
-def test_Contingency_table_values(observation, forecast, category_edges):
+def test_Contingency_table_values(observation_3d, forecast_3d, category_edges):
     """Test contingency table values against sklearn.metrics.confusion_matrix
     for 1D data"""
 
@@ -77,12 +47,14 @@ def test_Contingency_table_values(observation, forecast, category_edges):
         return ds_out
 
     cont_table = Contingency(
-        observation, forecast, category_edges, category_edges, dim="time"
+        observation_3d, forecast_3d, category_edges, category_edges, dim="time"
     )
-    for lon in forecast.lon:
-        for lat in forecast.lat:
-            observation_1d = logical(observation.sel(lon=lon, lat=lat), category_edges)
-            forecast_1d = logical(forecast.sel(lon=lon, lat=lat), category_edges)
+    for lon in forecast_3d.lon:
+        for lat in forecast_3d.lat:
+            observation_1d = logical(
+                observation_3d.sel(lon=lon, lat=lat), category_edges
+            )
+            forecast_1d = logical(forecast_3d.sel(lon=lon, lat=lat), category_edges)
             sklearn_cont_table_1d = confusion_matrix(
                 observation_1d, forecast_1d, labels=range(len(category_edges) - 1)
             )
@@ -116,35 +88,12 @@ def test_Contingency_table_values(observation, forecast, category_edges):
         ("gerrity_score", (2 * (3 / 4) + 1 * -1 + 2 * -1 + 2 * (4 / 3)) / 7),
     ],
 )
-def test_dichotomous_scores(dichotomous_Contingency, method, expected):
+def test_dichotomous_scores(dichotomous_Contingency_1d, method, expected):
     """Test score for simple 2x2 contingency table against hand-computed values
     Scores are for H/TP: 2, M/FN: 2, FA/FP: 1, CN/TN: 2
     """
-    xs_score = getattr(dichotomous_Contingency, method)().item()
+    xs_score = getattr(dichotomous_Contingency_1d, method)().item()
     npt.assert_almost_equal(xs_score, expected)
-
-
-@pytest.fixture
-def symmetric_edges():
-    """Category bin edges between 0 and 1."""
-    return np.linspace(-2, 2, 11)
-
-
-np.random.seed(42)
-
-
-@pytest.fixture
-def forecast_1d_long():
-    """Forecasts normally distributed around 0."""
-    s = 100
-    return xr.DataArray(np.random.normal(size=(s)), coords=[("time", np.arange(s))])
-
-
-@pytest.fixture
-def observation_1d_long():
-    """Observations normally distributed around 0."""
-    s = 100
-    return xr.DataArray(np.random.normal(size=(s)), coords=[("time", np.arange(s))])
 
 
 @pytest.mark.parametrize("drop_intermediate", [True, False])
