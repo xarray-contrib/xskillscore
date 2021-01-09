@@ -2,6 +2,8 @@ import numpy as np
 import pytest
 import xarray as xr
 
+from xskillscore import Contingency
+
 PERIODS = 12  # effective_p_value produces nans for shorter periods
 
 np.random.seed(42)
@@ -161,3 +163,59 @@ def weights_dask(weights):
 def category_edges():
     """Category bin edges between 0 and 1."""
     return np.linspace(0, 1 + 1e-8, 6)
+
+
+@pytest.fixture
+def forecast_3d():
+    """Random 3D forecast used for testing Contingency."""
+    times = xr.cftime_range(start="2000", freq="D", periods=10)
+    lats = np.arange(4)
+    lons = np.arange(5)
+    data = np.random.randint(0, 10, size=(len(times), len(lats), len(lons)))
+    return xr.DataArray(data, coords=[times, lats, lons], dims=["time", "lat", "lon"])
+
+
+@pytest.fixture
+def observation_3d(forecast_3d):
+    """Random 3D observation used for testing Contingency."""
+    b = forecast_3d.copy()
+    b.values = np.random.randint(0, 10, size=(b.shape[0], b.shape[1], b.shape[2]))
+    return b
+
+
+@pytest.fixture
+def dichotomous_Contingency_1d():
+    """Contingency of fixed, dichotomous 1d forecast and observations."""
+    observations = xr.DataArray(
+        np.array(2 * [0] + 2 * [1] + 1 * [0] + 2 * [1]), coords=[("x", np.arange(7))]
+    )
+    forecasts = xr.DataArray(
+        np.array(2 * [0] + 2 * [0] + 1 * [1] + 2 * [1]), coords=[("x", np.arange(7))]
+    )
+    category_edges = np.array([-np.inf, 0.5, np.inf])
+    return Contingency(
+        observations, forecasts, category_edges, category_edges, dim=["x"]
+    )
+
+
+@pytest.fixture
+def symmetric_edges():
+    """Category bin edges between 0 and 1."""
+    return np.linspace(-2, 2, 11)
+
+
+np.random.seed(42)
+
+
+@pytest.fixture
+def forecast_1d_long():
+    """Forecasts normally distributed around 0."""
+    s = 100
+    return xr.DataArray(np.random.normal(size=(s)), coords=[("time", np.arange(s))])
+
+
+@pytest.fixture
+def observation_1d_long():
+    """Observations normally distributed around 0."""
+    s = 100
+    return xr.DataArray(np.random.normal(size=(s)), coords=[("time", np.arange(s))])
