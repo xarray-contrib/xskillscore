@@ -46,4 +46,3 @@
       ~Contingency.observation_category_edges
       ~Contingency.observations
       ~Contingency.table
-
