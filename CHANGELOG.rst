@@ -37,7 +37,7 @@ Internal Changes
 - Update mape algorithm from scikit-learn v0.24.0 and test against it.
   (:issue:`160`, :pr:`230`) `Ray Bell`_
 - Pin ``numba`` to ``>=0.52`` to fix CI (:issue:`233`, :pr:`234`) `Ray Bell`_
-- Implement some deterministic metrics only based on xarray functions. 
+- Implement some deterministic metrics only based on xarray functions.
   (:pr:`231`). `Aaron Spring`_
 - Refactor asv benchmarks and show that xarray-based metrics are slower than
   xskillscore metrics for large data. (:pr:`231`) `Aaron Spring`_
