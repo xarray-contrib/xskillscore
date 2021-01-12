@@ -1,9 +1,7 @@
 # https://github.com/pydata/xarray/blob/master/asv_bench/benchmarks/__init__.py
-import itertools
 
 import numpy as np
-
-_counter = itertools.count()
+import xarray as xr
 
 
 def parameterized(names, params):
@@ -47,3 +45,55 @@ def randint(low, high=None, size=None, frac_minus=None, seed=0):
         x.flat[inds] = -1
 
     return x
+
+
+class Generate:
+    """
+    Generate random xr.Dataset ds to be benckmarked.
+    """
+
+    timeout = 600
+    repeat = (2, 5, 20)
+
+    def make_ds(self, nmember, nx, ny, chunks=None):
+
+        # ds
+        self.ds = xr.Dataset()
+        self.nmember = nmember
+        self.nx = nx
+        self.ny = ny
+
+        frac_nan = 0.0
+
+        members = np.arange(1, 1 + self.nmember)
+
+        lons = xr.DataArray(
+            np.linspace(0, 360, self.nx),
+            dims=("lon",),
+            attrs={"units": "degrees east", "long_name": "longitude"},
+        )
+        lats = xr.DataArray(
+            np.linspace(-90, 90, self.ny),
+            dims=("lat",),
+            attrs={"units": "degrees north", "long_name": "latitude"},
+        )
+        self.ds["tos"] = xr.DataArray(
+            randn((self.nmember, self.nx, self.ny), frac_nan=frac_nan, chunks=chunks),
+            coords={"member": members, "lon": lons, "lat": lats},
+            dims=("member", "lon", "lat"),
+            name="tos",
+            attrs={"units": "foo units", "description": "a description"},
+        )
+        self.ds["sos"] = xr.DataArray(
+            randn((self.nmember, self.nx, self.ny), frac_nan=frac_nan, chunks=chunks),
+            coords={"member": members, "lon": lons, "lat": lats},
+            dims=("member", "lon", "lat"),
+            name="sos",
+            attrs={"units": "foo units", "description": "a description"},
+        )
+        self.ds.attrs = {"history": "created for xskillscore benchmarking"}
+
+        # set nans for land sea mask
+        self.ds = self.ds.where(
+            (abs(self.ds.lat) > 20) | (self.ds.lat < 100) | (self.ds.lat > 160)
+        )
