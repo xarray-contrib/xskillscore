@@ -39,7 +39,8 @@ Internal Changes
 - Update mape algorithm from scikit-learn v0.24.0 and test against it.
   (:issue:`160`, :pr:`230`) `Ray Bell`_
 - Pin ``numba`` to ``>=0.52`` to fix CI (:issue:`233`, :pr:`234`) `Ray Bell`_
-
+- Slight optimization using dask="allowed" instead of dask="parallelized"
+  (:issue:`207`, :pr:`220`). `Andrew Huang`_
 
 xskillscore v0.0.18 (2020-09-23)
 --------------------------------
