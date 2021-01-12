@@ -5,12 +5,12 @@ dependencies:
   - bottleneck
   - cftime
   - dask
-  - numba
+  - numba>=0.52
   - numpy
   - properscoring
   - scikit-learn
   - scipy
-  - xarray
+  - xarray>=0.16.1
   - xhistogram
   - importlib_metadata
   - jupyterlab
@@ -25,3 +25,4 @@ dependencies:
     - sphinx_autosummary_accessors
     # Install latest version of xskillscore.
     - -e ..
+
