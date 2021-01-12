@@ -36,4 +36,3 @@ dependencies:
   - pytest-cov
   - pytest-lazy-fixture
   - pytest-sugar
-  

@@ -25,4 +25,3 @@ dependencies:
     - sphinx_autosummary_accessors
     # Install latest version of xskillscore.
     - -e ..
-
