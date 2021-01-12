@@ -38,6 +38,6 @@ def test_xr_metrics_equal_xs_metrics(metric, a, b, dim, weights, skipna, chunk):
             print("raise NotImplementedError")
             return
 
-    res = eval("xr_" + metric)(a, b, skipna=skipna, dim=dim, weights=weights)
+    xr_res = eval("xr_" + metric)(a, b, skipna=skipna, dim=dim, weights=weights)
     xs_res = getattr(xs, metric)(a, b, skipna=skipna, dim=dim, weights=weights)
-    xr.testing.assert_allclose(res, xs_res)
+    xr.testing.assert_allclose(xr_res, xs_res)

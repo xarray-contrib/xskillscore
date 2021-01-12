@@ -1,3 +1,8 @@
+"""These metrics in xskillscore.xr.deterministic, entirely written in xarray functions,
+are identical to the well documented metrics in xskillscore.core.deterministic, which
+are based on numpy functions applied to xarray objects by xarray.apply_ufunc. As the xr
+metrics are only faster for small data, their use is not encouraged, as the numpy-based
+metrics are 20-40% faster on large data."""
 import bottleneck as bn
 import numpy as np
 import xarray as xr
