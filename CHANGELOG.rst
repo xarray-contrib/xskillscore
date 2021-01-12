@@ -28,6 +28,8 @@ Bug Fixes
 ~~~~~~~~~
 - :py:func:`~xskillscore.sign_test` now works for ``xr.Dataset`` inputs.
   (:issue:`198`, :pr:`199`) `Aaron Spring`_
+- Passing weights no longer triggers eager computation.
+  (:issue:`218`, :pr:`224`). `Andrew Huang`_
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
