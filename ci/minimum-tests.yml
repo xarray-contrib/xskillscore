@@ -1,5 +1,4 @@
-  
-name: xskillscore-minimum-tests
+  name: xskillscore-minimum-tests
 channels:
   - conda-forge
 dependencies:
