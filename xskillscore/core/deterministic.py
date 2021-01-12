@@ -44,6 +44,8 @@ __all__ = [
     "r2",
 ]
 
+UFUNC_DASK_KW = "allowed"
+
 
 def _determine_input_core_dims(dim, weights):
     """
@@ -137,7 +139,7 @@ def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         weights,
         input_core_dims=input_core_dims,
         kwargs={"axis": -1, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -227,7 +229,7 @@ def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         weights,
         input_core_dims=input_core_dims,
         kwargs={"axis": -1, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -289,7 +291,7 @@ def pearson_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fal
         weights,
         input_core_dims=input_core_dims,
         kwargs={"axis": -1, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -379,7 +381,7 @@ def effective_sample_size(a, b, dim="time", skipna=False, keep_attrs=False):
         b,
         input_core_dims=[[new_dim], [new_dim]],
         kwargs={"axis": -1, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -481,7 +483,7 @@ def pearson_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
         b,
         input_core_dims=[[new_dim], [new_dim]],
         kwargs={"axis": -1, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -548,7 +550,7 @@ def spearman_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         weights,
         input_core_dims=input_core_dims,
         kwargs={"axis": -1, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -610,7 +612,7 @@ def spearman_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fa
         weights,
         input_core_dims=input_core_dims,
         kwargs={"axis": -1, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -714,7 +716,7 @@ def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
         b,
         input_core_dims=[[new_dim], [new_dim]],
         kwargs={"axis": -1, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -773,7 +775,7 @@ def me(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         weights,
         input_core_dims=input_core_dims,
         kwargs={"axis": axis, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -840,7 +842,7 @@ def rmse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         weights,
         input_core_dims=input_core_dims,
         kwargs={"axis": axis, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -907,7 +909,7 @@ def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         weights,
         input_core_dims=input_core_dims,
         kwargs={"axis": axis, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -974,7 +976,7 @@ def mae(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         weights,
         input_core_dims=input_core_dims,
         kwargs={"axis": axis, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -1034,7 +1036,7 @@ def median_absolute_error(a, b, dim=None, skipna=False, keep_attrs=False):
         b,
         input_core_dims=[dim, dim],
         kwargs={"axis": axis, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -1110,7 +1112,7 @@ def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         weights,
         input_core_dims=input_core_dims,
         kwargs={"axis": axis, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
@@ -1180,7 +1182,7 @@ def smape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         weights,
         input_core_dims=input_core_dims,
         kwargs={"axis": axis, "skipna": skipna},
-        dask="allowed",
+        dask=UFUNC_DASK_KW,
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
