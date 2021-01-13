@@ -34,11 +34,12 @@ Bug Fixes
 Internal Changes
 ~~~~~~~~~~~~~~~~
 - Added Python 3.7 and Python 3.8 to the CI. Use the latest version of Python 3
-  for development. (:issue:`21`, :pr:`189`). `Aaron Spring`_
-- Lint with the latest black. (:issue:`179`, :pr:`191`). `Ray Bell`_
+  for development. (:issue:`21`, :pr:`189`) `Aaron Spring`_
+- Lint with the latest black. (:issue:`179`, :pr:`191`) `Ray Bell`_
 - Update mape algorithm from scikit-learn v0.24.0 and test against it.
   (:issue:`160`, :pr:`230`) `Ray Bell`_
 - Pin ``numba`` to ``>=0.52`` to fix CI (:issue:`233`, :pr:`234`) `Ray Bell`_
+- Refactor ``asv`` benchmarks. (:pr:`231`) `Aaron Spring`_
 - Slight optimization using dask="allowed" instead of dask="parallelized"
   (:issue:`207`, :pr:`220`). `Andrew Huang`_
 
