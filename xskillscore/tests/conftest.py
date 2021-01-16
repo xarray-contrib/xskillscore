@@ -8,11 +8,28 @@ np.random.seed(42)
 
 
 @pytest.fixture
-def o():
+def times():
+    return xr.cftime_range(start="2000", periods=PERIODS, freq="D")
+
+
+@pytest.fixture
+def lats():
+    return np.arange(2)
+
+
+@pytest.fixture
+def lons():
+    return np.arange(3)
+
+
+@pytest.fixture
+def members():
+    return np.arange(4)
+
+
+@pytest.fixture
+def o(times, lats, lons):
     """Observation."""
-    times = xr.cftime_range(start="2000", periods=PERIODS, freq="D")
-    lats = np.arange(4)
-    lons = np.arange(5)
     data = np.random.rand(len(times), len(lats), len(lons))
     return xr.DataArray(
         data,
@@ -23,12 +40,8 @@ def o():
 
 
 @pytest.fixture
-def f_prob():
+def f_prob(times, lats, lons, members):
     """Probabilistic forecast containing also a member dimension."""
-    times = xr.cftime_range(start="2000", periods=PERIODS, freq="D")
-    members = np.arange(3)
-    lats = np.arange(4)
-    lons = np.arange(5)
     data = np.random.rand(len(members), len(times), len(lats), len(lons))
     return xr.DataArray(
         data,
@@ -84,7 +97,20 @@ def a_dask(a):
 
 @pytest.fixture
 def b_dask(b):
+    """Chunked"""
     return b.chunk()
+
+
+@pytest.fixture
+def a_dask_nan(a_nan):
+    """Chunked"""
+    return a_nan.chunk()
+
+
+@pytest.fixture
+def b_dask_nan(b_nan):
+    """Chunked"""
+    return b_nan.chunk()
 
 
 @pytest.fixture

@@ -87,7 +87,7 @@ def adjust_weights(dim, weight_bool, weights):
 @pytest.mark.parametrize("weight_bool", [True, False])
 def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     """Test whether correlation metric for xarray functions (from
-    deterministic.py) give save numerical results as for numpy functions from
+    deterministic.py) give save numerical results as for numpy functions (from
     np_deterministic.py)."""
     # unpack metrics
     metric, _metric = metrics
@@ -97,6 +97,7 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
     _weights = adjust_weights(dim, weight_bool, weights)
+    # temporal only metrics have no weights argument
     if metric in temporal_only_metrics:
         actual = metric(a, b, dim)
     else:
@@ -130,20 +131,108 @@ def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     assert_allclose(actual, expected)
 
 
-@pytest.mark.parametrize("metrics", distance_metrics)
+@pytest.mark.parametrize("metrics", correlation_metrics)
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight_bool", [True, False])
 @pytest.mark.parametrize("skipna", [True, False])
-@pytest.mark.parametrize("has_nan", [True, False])
-def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics, skipna, has_nan):
+def test_correlation_metrics_xr_nan(
+    a_nan, b_nan, dim, weight_bool, weights, metrics, skipna
+):
+    """Test whether correlation metric for xarray functions (from
+    deterministic.py) give save numerical results as for numpy functions (from
+    np_deterministic.py) with nans."""
+    a = a_nan
+    b = b_nan
+    # unpack metrics
+    metric, _metric = metrics
+    # Only apply over time dimension for effective p value.
+    if (dim != "time") and (metric in temporal_only_metrics):
+        dim = "time"
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
+    _weights = adjust_weights(dim, weight_bool, weights)
+    #
+    if metric in temporal_only_metrics:
+        actual = metric(a, b, dim, skipna=skipna)
+    else:
+        actual = metric(a, b, dim, weights=_weights, skipna=skipna)
+    # check that no chunks for no chunk inputs
+    assert actual.chunks is None
+
+    dim, _ = _preprocess_dims(dim, a)
+    if len(dim) > 1:
+        new_dim = "_".join(dim)
+        _a = a.stack(**{new_dim: dim})
+        _b = b.stack(**{new_dim: dim})
+        if weight_bool:
+            _weights = _weights.stack(**{new_dim: dim})
+    else:
+        new_dim = dim[0]
+        _a = a
+        _b = b
+    _weights = _preprocess_weights(_a, dim, new_dim, _weights)
+
+    # ensure _weights.values or None
+    _weights = None if _weights is None else _weights.values
+
+    axis = _a.dims.index(new_dim)
+    if metric in temporal_only_metrics:
+        res = _metric(_a.values, _b.values, axis, skipna=skipna)
+    else:
+        res = _metric(_a.values, _b.values, _weights, axis, skipna=skipna)
+    expected = actual.copy()
+    expected.values = res
+    assert_allclose(actual, expected)
+
+
+@pytest.mark.parametrize("metrics", distance_metrics)
+@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize("weight_bool", [True, False])
+def test_distance_metrics_xr(a, b, dim, weight_bool, weights, metrics):
     """Test whether distance-based metric for xarray functions (from
     deterministic.py) give save numerical results as for numpy functions from
     np_deterministic.py)."""
     # unpack metrics
-    a = a.copy()
-    if has_nan:
-        a[0] = np.nan
+    metric, _metric = metrics
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
+    weights = adjust_weights(dim, weight_bool, weights)
+    # median absolute error has no weights argument
+    if metric is median_absolute_error:
+        actual = metric(a, b, dim)
+    else:
+        actual = metric(a, b, dim, weights=weights)
+    assert actual.chunks is None
 
+    dim, axis = _preprocess_dims(dim, a)
+    _a = a
+    _b = b
+    _weights = _preprocess_weights(_a, dim, dim, weights)
+    axis = tuple(a.dims.index(d) for d in dim)
+    if metric is median_absolute_error:
+        res = _metric(_a.values, _b.values, axis, skipna=False)
+    else:
+        # ensure _weights.values or None
+        _weights = None if _weights is None else _weights.values
+        res = _metric(_a.values, _b.values, _weights, axis, skipna=False)
+    expected = actual.copy()
+    expected.values = res
+    assert_allclose(actual, expected)
+
+
+@pytest.mark.parametrize("metrics", distance_metrics)
+@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize("weight_bool", [True, False])
+@pytest.mark.parametrize("skipna", [True, False])
+def test_distance_metrics_xr_nan(
+    a_nan, b_nan, dim, weight_bool, weights, metrics, skipna
+):
+    """Test whether distance-based metric for xarray functions (from
+    deterministic.py) give save numerical results as for numpy functions from
+    np_deterministic.py) with nans."""
+    a = a_nan
+    b = b_nan
+    # unpack metrics
     metric, _metric = metrics
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
@@ -178,7 +267,7 @@ def test_correlation_metrics_xr_dask(
     a_dask, b_dask, dim, weight_bool, weights_dask, metrics
 ):
     """Test whether correlation metric for xarray functions can be lazy when
-    chunked by using dask and give same results."""
+    chunked by using dask and give same results as np array."""
     a = a_dask
     b = b_dask
     weights = weights_dask
@@ -212,19 +301,87 @@ def test_correlation_metrics_xr_dask(
 @pytest.mark.parametrize("metrics", distance_metrics)
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight_bool", [True, False])
-@pytest.mark.parametrize("skipna", [True, False])
-@pytest.mark.parametrize("has_nan", [True, False])
 def test_distance_metrics_xr_dask(
-    a_dask, b_dask, dim, weight_bool, weights_dask, metrics, skipna, has_nan
+    a_dask, b_dask, dim, weight_bool, weights_dask, metrics
 ):
     """Test whether distance metrics for xarray functions can be lazy when
-    chunked by using dask and give same results."""
+    chunked by using dask and give same results as np array."""
     a = a_dask.copy()
-    if has_nan:
-        a = a.load()
-        a[0] = np.nan
-        a = a.chunk()
     b = b_dask.copy()
+    weights = weights_dask.copy()
+    # unpack metrics
+    metric, _metric = metrics
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
+    _weights = adjust_weights(dim, weight_bool, weights)
+    if _weights is not None:
+        _weights = _weights.load()
+    if metric is median_absolute_error:
+        actual = metric(a, b, dim)
+    else:
+        actual = metric(a, b, dim, weights=_weights)
+    # check that chunks for chunk inputs
+    assert actual.chunks is not None
+    if metric is median_absolute_error:
+        expected = metric(a.load(), b.load(), dim)
+    else:
+        expected = metric(a.load(), b.load(), dim, weights=_weights)
+    assert expected.chunks is None
+    assert_allclose(actual.compute(), expected)
+
+
+@pytest.mark.parametrize("metrics", correlation_metrics)
+@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize("weight_bool", [True, False])
+@pytest.mark.parametrize("skipna", [True, False])
+@pytest.mark.parametrize("has_nan", [True])
+def test_correlation_metrics_xr_dask_nan(
+    a_dask_nan, b_dask_nan, dim, weight_bool, weights_dask, metrics, skipna, has_nan
+):
+    """Test whether correlation metric for xarray functions can be lazy when
+    chunked by using dask and give same results as np array with nans."""
+    a = a_dask_nan
+    b = b_dask_nan
+    weights = weights_dask
+    # unpack metrics
+    metric, _metric = metrics
+    # Only apply over time dimension for effective p value.
+    if (dim != "time") and (metric in temporal_only_metrics):
+        dim = "time"
+    # Generates subsetted weights to pass in as arg to main function and for
+    # the numpy testing.
+    _weights = adjust_weights(dim, weight_bool, weights)
+
+    if metric in temporal_only_metrics:
+        actual = metric(a, b, dim, skipna=skipna)
+    else:
+        actual = metric(a, b, dim, weights=_weights, skipna=skipna)
+    # check that chunks for chunk inputs
+    assert actual.chunks is not None
+
+    if _weights is not None:
+        _weights = _weights.load()
+
+    if metric in temporal_only_metrics:
+        expected = metric(a.load(), b.load(), dim, skipna=skipna)
+    else:
+        expected = metric(a.load(), b.load(), dim, _weights, skipna=skipna)
+    assert expected.chunks is None
+    assert_allclose(actual.compute(), expected)
+
+
+@pytest.mark.parametrize("metrics", distance_metrics)
+@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize("weight_bool", [True, False])
+@pytest.mark.parametrize("skipna", [True, False])
+@pytest.mark.parametrize("has_nan", [True])
+def test_distance_metrics_xr_dask_nan(
+    a_dask_nan, b_dask_nan, dim, weight_bool, weights_dask, metrics, skipna, has_nan
+):
+    """Test whether distance metrics for xarray functions can be lazy when
+    chunked by using dask and give same results as np array with nans."""
+    a = a_dask_nan.copy()
+    b = b_dask_nan.copy()
     weights = weights_dask.copy()
     # unpack metrics
     metric, _metric = metrics

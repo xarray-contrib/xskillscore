@@ -40,6 +40,7 @@ Internal Changes
   (:issue:`160`, :pr:`230`) `Ray Bell`_
 - Pin ``numba`` to ``>=0.52`` to fix CI (:issue:`233`, :pr:`234`) `Ray Bell`_
 - Refactor ``asv`` benchmarks. (:pr:`231`) `Aaron Spring`_
+- Added tests for nans in correlation metrics (:issue:`246`, :pr:`XXX`) `Ray Bell`_
 
 
 xskillscore v0.0.18 (2020-09-23)
