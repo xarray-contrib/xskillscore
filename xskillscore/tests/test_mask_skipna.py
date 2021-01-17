@@ -29,21 +29,15 @@ correlation_metrics = [
 ]
 
 
-def mask_land_data(da):
-    """Masks sample data arbitrarily like a block of land."""
-    da.data[:, 1:3, 1:3] = np.nan
-    return da
-
-
 @pytest.mark.parametrize("metric", correlation_metrics + distance_metrics)
 @pytest.mark.parametrize("dim", AXES)
-def test_metrics_masked(a, b, dim, metric):
+def test_metrics_masked(a_nan_land, b_nan_land, dim, metric):
     """Test for all distance-based metrics whether result of skipna does not
     contain any nans when applied along dim with nans."""
-    a_masked = mask_land_data(a)
-    b_masked = mask_land_data(b)
-    res_skipna = metric(a_masked, b_masked, dim, skipna=True)
-    res_no_skipna = metric(a_masked, b_masked, dim, skipna=False)
+    a = a_nan_land
+    b = b_nan_land
+    res_skipna = metric(a, b, dim, skipna=True)
+    res_no_skipna = metric(a, b, dim, skipna=False)
 
     if "lon" in dim or "lat" in dim:  # metric is applied along axis with nans
         # res_skipna shouldnt have nans

@@ -14,17 +14,17 @@ def times():
 
 @pytest.fixture
 def lats():
-    return np.arange(2)
+    return np.arange(4)
 
 
 @pytest.fixture
 def lons():
-    return np.arange(3)
+    return np.arange(5)
 
 
 @pytest.fixture
 def members():
-    return np.arange(4)
+    return np.arange(3)
 
 
 @pytest.fixture
@@ -72,20 +72,34 @@ def b(f):
 @pytest.fixture
 def a_nan(a):
     """Masked"""
-    return a.copy().where(a < 0.5)
+    return a.where(a < 0.5)
 
 
 @pytest.fixture
 def b_nan(b):
     """Masked"""
-    return b.copy().where(b < 0.5)
+    return b.where(b < 0.5)
+
+
+@pytest.fixture
+def a_nan_land(a):
+    """Masked block"""
+    a.data[:, 1:3, 1:3] = np.nan
+    return a
+
+
+@pytest.fixture
+def b_nan_land(b):
+    """Masked block"""
+    b.data[:, 1:3, 1:3] = np.nan
+    return b
 
 
 # with zeros
 @pytest.fixture
 def a_with_zeros(a):
     """Zeros"""
-    return a.copy().where(a < 0.5, 0)
+    return a.where(a < 0.5, 0)
 
 
 # dask
