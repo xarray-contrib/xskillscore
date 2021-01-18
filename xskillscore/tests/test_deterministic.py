@@ -141,7 +141,7 @@ def test_correlation_metrics_ufunc_same_np(
 @pytest.mark.parametrize("weight_bool", [True, False])
 @pytest.mark.parametrize("skipna", [True, False])
 @pytest.mark.parametrize("has_nan", [True, False])
-def test_correlation_metrics_ufunc_dask_same_da(
+def test_correlation_metrics_daskda_same_npda(
     a_dask, b_dask, dim, weight_bool, weights_dask, metrics, skipna, has_nan
 ):
     """Test whether correlation metric for xarray functions can be lazy when
@@ -218,7 +218,7 @@ def test_distance_metrics_ufunc_same_np(
 @pytest.mark.parametrize("weight_bool", [True, False])
 @pytest.mark.parametrize("skipna", [True, False])
 @pytest.mark.parametrize("has_nan", [True, False])
-def test_distance_metrics_ufunc_dask_same_da(
+def test_distance_metrics_daskda_same_npda(
     a_dask, b_dask, dim, weight_bool, weights_dask, metrics, skipna, has_nan
 ):
     """Test whether distance metric for xarray functions can be lazy when
