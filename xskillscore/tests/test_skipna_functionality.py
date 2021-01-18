@@ -115,12 +115,14 @@ def test_skipna_returns_nan_when_false(a_1d_nan, b_1d_nan, metric):
 
 @pytest.mark.parametrize("metric", WEIGHTED_METRICS)
 def test_skipna_broadcast_weights_assignment_destination(
-    a_nan, b_nan, weights_lonlat, metric
+    a_rand_nan, b_rand_nan, weights_lonlat, metric
 ):
     """Tests that 'assignment destination is read-only' is not raised
     https://github.com/xarray-contrib/xskillscore/issues/79"""
     with raise_if_dask_computes():
-        metric(a_nan, b_nan, ["lat", "lon"], weights=weights_lonlat, skipna=True)
+        metric(
+            a_rand_nan, b_rand_nan, ["lat", "lon"], weights=weights_lonlat, skipna=True
+        )
 
 
 def test_nan_skipna(a, b):

@@ -31,11 +31,11 @@ correlation_metrics = [
 
 @pytest.mark.parametrize("metric", correlation_metrics + distance_metrics)
 @pytest.mark.parametrize("dim", AXES)
-def test_metrics_masked(a_nan_land, b_nan_land, dim, metric):
+def test_metrics_masked(a_fixed_nan, b_fixed_nan, dim, metric):
     """Test for all distance-based metrics whether result of skipna does not
     contain any nans when applied along dim with nans."""
-    a = a_nan_land
-    b = b_nan_land
+    a = a_fixed_nan
+    b = b_fixed_nan
     res_skipna = metric(a, b, dim, skipna=True)
     res_no_skipna = metric(a, b, dim, skipna=False)
 

@@ -70,26 +70,26 @@ def b(f):
 
 # nan
 @pytest.fixture
-def a_nan(a):
+def a_rand_nan(a):
     """Masked"""
     return a.where(a < 0.5)
 
 
 @pytest.fixture
-def b_nan(b):
+def b_rand_nan(b):
     """Masked"""
     return b.where(b < 0.5)
 
 
 @pytest.fixture
-def a_nan_land(a):
+def a_fixed_nan(a):
     """Masked block"""
     a.data[:, 1:3, 1:3] = np.nan
     return a
 
 
 @pytest.fixture
-def b_nan_land(b):
+def b_fixed_nan(b):
     """Masked block"""
     b.data[:, 1:3, 1:3] = np.nan
     return b
@@ -116,15 +116,15 @@ def b_dask(b):
 
 
 @pytest.fixture
-def a_dask_nan(a_nan):
+def a_rand_nan_dask(a_rand_nan):
     """Chunked"""
-    return a_nan.chunk()
+    return a_rand_nan.chunk()
 
 
 @pytest.fixture
-def b_dask_nan(b_nan):
+def b_rand_nan_dask(b_rand_nan):
     """Chunked"""
-    return b_nan.chunk()
+    return b_rand_nan.chunk()
 
 
 @pytest.fixture
