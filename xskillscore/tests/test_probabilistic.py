@@ -59,9 +59,11 @@ def test_crps_ensemble_dim(o, f_prob, dim):
 
 
 @pytest.mark.parametrize("keep_attrs", [True, False])
-def test_crps_ensemble_weighted(o, f_prob, weights, keep_attrs):
+def test_crps_ensemble_weighted(o, f_prob, weights_cos_lat, keep_attrs):
     dim = ["lon", "lat"]
-    actual = crps_ensemble(o, f_prob, dim=dim, weights=weights, keep_attrs=keep_attrs)
+    actual = crps_ensemble(
+        o, f_prob, dim=dim, weights=weights_cos_lat, keep_attrs=keep_attrs
+    )
     assert_only_dim_reduced(dim, actual, o)
 
 

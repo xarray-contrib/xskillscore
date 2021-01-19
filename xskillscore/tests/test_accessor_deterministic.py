@@ -78,14 +78,14 @@ def adjust_weights(dim, weight_bool, weights):
 @pytest.mark.parametrize("weight_bool", [False, True])
 @pytest.mark.parametrize("skipna_bool", [False, True])
 def test_deterministic_metrics_accessor(
-    a, b, dim, skipna_bool, weight_bool, weights, metric, outer_bool
+    a, b, dim, skipna_bool, weight_bool, weights_cos_lat, metric, outer_bool
 ):
 
     # Update dim to time if testing temporal only metrics
     if (dim != "time") and (metric in temporal_only_metrics):
         dim = "time"
 
-    _weights = adjust_weights(dim, weight_bool, weights)
+    _weights = adjust_weights(dim, weight_bool, weights_cos_lat)
     ds = _ds(a, b, skipna_bool)
     b = ds["b"]  # Update if populated with nans
     if outer_bool:
