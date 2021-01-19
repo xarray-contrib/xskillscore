@@ -75,28 +75,30 @@ def drop_nans(a, b, weights=None, dim="time"):
 
 
 @pytest.mark.parametrize("metric", WEIGHTED_METRICS + NON_WEIGHTED_METRICS)
-def test_skipna_returns_same_value_as_dropped_pairwise_nans(a_1d_nan, b_1d_nan, metric):
+def test_skipna_returns_same_value_as_dropped_pairwise_nans(
+    a_1d_fixed_nan, b_1d_fixed_nan, metric
+):
     """Tests that DataArrays with pairwise nans return the same result
     as the same two with those nans dropped."""
-    a_dropped, b_dropped, _ = drop_nans(a_1d_nan, b_1d_nan)
+    a_dropped, b_dropped, _ = drop_nans(a_1d_fixed_nan, b_1d_fixed_nan)
     with raise_if_dask_computes():
-        res_with_nans = metric(a_1d_nan, b_1d_nan, "time", skipna=True)
+        res_with_nans = metric(a_1d_fixed_nan, b_1d_fixed_nan, "time", skipna=True)
         res_dropped_nans = metric(a_dropped, b_dropped, "time")
     assert_allclose(res_with_nans, res_dropped_nans)
 
 
 @pytest.mark.parametrize("metric", WEIGHTED_METRICS)
 def test_skipna_returns_same_value_as_dropped_pairwise_nans_with_weights(
-    a_1d_nan, b_1d_nan, weights_time, metric
+    a_1d_fixed_nan, b_1d_fixed_nan, weights_time, metric
 ):
     """Tests that DataArrays with pairwise nans return the same result
     as the same two with those nans dropped."""
     a_dropped, b_dropped, weights_time_dropped = drop_nans(
-        a_1d_nan, b_1d_nan, weights_time
+        a_1d_fixed_nan, b_1d_fixed_nan, weights_time
     )
     with raise_if_dask_computes():
         res_with_nans = metric(
-            a_1d_nan, b_1d_nan, "time", skipna=True, weights=weights_time
+            a_1d_fixed_nan, b_1d_fixed_nan, "time", skipna=True, weights=weights_time
         )
         res_dropped_nans = metric(
             a_dropped, b_dropped, "time", weights=weights_time_dropped
@@ -105,11 +107,11 @@ def test_skipna_returns_same_value_as_dropped_pairwise_nans_with_weights(
 
 
 @pytest.mark.parametrize("metric", WEIGHTED_METRICS + NON_WEIGHTED_METRICS)
-def test_skipna_returns_nan_when_false(a_1d_nan, b_1d_nan, metric):
+def test_skipna_returns_nan_when_false(a_1d_fixed_nan, b_1d_fixed_nan, metric):
     """Tests that nan is returned if there's any nans in the time series
     and skipna is False."""
     with raise_if_dask_computes():
-        res = metric(a_1d_nan, b_1d_nan, "time", skipna=False)
+        res = metric(a_1d_fixed_nan, b_1d_fixed_nan, "time", skipna=False)
     assert np.isnan(res).all()
 
 

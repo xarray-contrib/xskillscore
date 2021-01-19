@@ -88,7 +88,7 @@ def adjust_weights(dim, weight_bool, weights):
 @pytest.mark.parametrize("skipna", [True, False])
 @pytest.mark.parametrize("has_nan", [True, False])
 def test_correlation_metrics_ufunc_same_np(
-    a, b, dim, weight_bool, weights, metrics, skipna, has_nan
+    a, b, dim, weight_bool, weights_cos_lat, metrics, skipna, has_nan
 ):
     """Test whether correlation metric for xarray functions (from
     deterministic.py) give save numerical results as for numpy functions (from
@@ -102,7 +102,7 @@ def test_correlation_metrics_ufunc_same_np(
         dim = "time"
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
-    _weights = adjust_weights(dim, weight_bool, weights)
+    _weights = adjust_weights(dim, weight_bool, weights_cos_lat)
     if metric in temporal_only_metrics:
         actual = metric(a, b, dim, skipna=skipna)
     else:
@@ -142,13 +142,13 @@ def test_correlation_metrics_ufunc_same_np(
 @pytest.mark.parametrize("skipna", [True, False])
 @pytest.mark.parametrize("has_nan", [True, False])
 def test_correlation_metrics_daskda_same_npda(
-    a_dask, b_dask, dim, weight_bool, weights_dask, metrics, skipna, has_nan
+    a_dask, b_dask, dim, weight_bool, weights_cos_lat_dask, metrics, skipna, has_nan
 ):
     """Test whether correlation metric for xarray functions can be lazy when
     chunked by using dask and give same results as DataArray with numpy array."""
     a = a_dask.copy()
     b = b_dask.copy()
-    weights = weights_dask.copy()
+    weights = weights_cos_lat_dask.copy()
     metric, _ = metrics
     if has_nan:
         a = a.load()
@@ -178,7 +178,7 @@ def test_correlation_metrics_daskda_same_npda(
 @pytest.mark.parametrize("skipna", [True, False])
 @pytest.mark.parametrize("has_nan", [True, False])
 def test_distance_metrics_ufunc_same_np(
-    a, b, dim, weight_bool, weights, metrics, skipna, has_nan
+    a, b, dim, weight_bool, weights_cos_lat, metrics, skipna, has_nan
 ):
     """Test whether distance-based metric for xarray functions (from
     deterministic.py) give save numerical results as for numpy functions (from
@@ -189,7 +189,7 @@ def test_distance_metrics_ufunc_same_np(
     metric, _metric = metrics
     # Generates subsetted weights to pass in as arg to main function and for
     # the numpy testing.
-    weights = adjust_weights(dim, weight_bool, weights)
+    weights = adjust_weights(dim, weight_bool, weights_cos_lat)
     # median absolute error has no weights argument
     if metric is median_absolute_error:
         actual = metric(a, b, dim, skipna=skipna)
@@ -219,13 +219,13 @@ def test_distance_metrics_ufunc_same_np(
 @pytest.mark.parametrize("skipna", [True, False])
 @pytest.mark.parametrize("has_nan", [True, False])
 def test_distance_metrics_daskda_same_npda(
-    a_dask, b_dask, dim, weight_bool, weights_dask, metrics, skipna, has_nan
+    a_dask, b_dask, dim, weight_bool, weights_cos_lat_dask, metrics, skipna, has_nan
 ):
     """Test whether distance metric for xarray functions can be lazy when
     chunked by using dask and give same results as DataArray with numpy array."""
     a = a_dask.copy()
     b = b_dask.copy()
-    weights = weights_dask.copy()
+    weights = weights_cos_lat_dask.copy()
     metric, _ = metrics
     if has_nan:
         a = a.load()

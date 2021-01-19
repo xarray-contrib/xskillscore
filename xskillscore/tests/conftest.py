@@ -27,6 +27,7 @@ def members():
     return np.arange(3)
 
 
+# o vs. f in probabilistic
 @pytest.fixture
 def o(times, lats, lons):
     """Observation."""
@@ -57,7 +58,7 @@ def f(f_prob):
     return f_prob.isel(member=0, drop=True)
 
 
-# a vs. b in deterministic, o vs. f in probabilistic
+# a vs. b in deterministic
 @pytest.fixture
 def a(o):
     return o
@@ -151,14 +152,14 @@ def b_1d(b):
 
 
 @pytest.fixture
-def a_1d_nan():
+def a_1d_fixed_nan():
     time = xr.cftime_range("2000-01-01", "2000-01-03", freq="D")
     return xr.DataArray([3, np.nan, 5], dims=["time"], coords=[time])
 
 
 @pytest.fixture
-def b_1d_nan(a_1d_nan):
-    b = a_1d_nan.copy()
+def b_1d_fixed_nan(a_1d_fixed_nan):
+    b = a_1d_fixed_nan.copy()
     b.values = [7, 2, np.nan]
     return b
 
@@ -171,7 +172,7 @@ def a_1d_with_zeros(a_with_zeros):
 
 # weights
 @pytest.fixture
-def weights(a):
+def weights_cos_lat(a):
     """Weighting array by cosine of the latitude."""
     return xr.ones_like(a) * np.abs(np.cos(a.lat))
 
@@ -190,11 +191,11 @@ def weights_time():
 
 
 @pytest.fixture
-def weights_dask(weights):
+def weights_cos_lat_dask(weights_cos_lat):
     """
     Weighting array by cosine of the latitude.
     """
-    return weights.chunk()
+    return weights_cos_lat.chunk()
 
 
 @pytest.fixture
