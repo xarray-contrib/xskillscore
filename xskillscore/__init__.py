@@ -4,7 +4,7 @@ from pkg_resources import DistributionNotFound, get_distribution
 from .core import resampling
 from .core.accessor import XSkillScoreAccessor
 from .core.comparative import mae_test, sign_test
-from .core.contingency import Contingency, roc
+from .core.contingency import Contingency
 from .core.deterministic import (
     effective_sample_size,
     mae,
@@ -30,6 +30,7 @@ from .core.probabilistic import (
     discrimination,
     rank_histogram,
     reliability,
+    roc,
     rps,
     threshold_brier_score,
 )
