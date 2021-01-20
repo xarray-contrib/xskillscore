@@ -17,4 +17,5 @@ dependencies:
   - pytest-cov
   - pip
   - pip:
+    - pytest-lazy-fixture
     - -e ..
