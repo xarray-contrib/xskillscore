@@ -827,7 +827,7 @@ def reliability(
 def roc(
     observations,
     forecasts,
-    bin_edges,
+    bin_edges="continuous",
     dim=None,
     drop_intermediate=False,
     return_results="area",
@@ -842,7 +842,7 @@ def roc(
     forecasts : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
         If ``bin_edges=='continuous'``, forecasts are probabilities.
-    bin_edges : array_like, str
+    bin_edges : array_like, str, default='continuous'
         Bin edges for categorising observations and forecasts.
         Bins include the left most edge, but not the right.
         If ``bin_edges='continuous'``, calculate bin_edges from forecasts, equal to

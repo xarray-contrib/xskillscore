@@ -82,13 +82,28 @@ def adjust_weights(dim, weight_bool, weights):
         return None
 
 
+@pytest.mark.parametrize(
+    "a2, b2",
+    [
+        (
+            pytest.lazy_fixture("a_dask"),
+            pytest.lazy_fixture("b_dask"),
+        ),
+        (
+            pytest.lazy_fixture("a"),
+            pytest.lazy_fixture("b"),
+        ),
+    ],
+)
 @pytest.mark.parametrize("metrics", correlation_metrics)
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight_bool", [True, False])
-def test_correlation_metrics_xr(a, b, dim, weight_bool, weights, metrics):
+def test_correlation_metrics_xr(a2, b2, dim, weight_bool, weights, metrics):
     """Test whether correlation metric for xarray functions (from
     deterministic.py) give save numerical results as for numpy functions from
     np_deterministic.py)."""
+    a = a2
+    b = b2
     # unpack metrics
     metric, _metric = metrics
     # Only apply over time dimension for effective p value.
