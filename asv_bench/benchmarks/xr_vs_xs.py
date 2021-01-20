@@ -2,105 +2,114 @@
 # See "Writing benchmarks" in the asv docs for more information.
 
 
+import os
+import shutil
+
+import bottleneck as bn
 import numpy as np
 import pandas as pd
 import xarray as xr
 
-from xskillscore import mse as xs_mse, pearson_r as xs_pearson_r
+from xskillscore import (
+    mae as xs_mae,
+    mse as xs_mse,
+    pearson_r as xs_pearson_r,
+    rmse as xs_rmse,
+    spearman_r as xs_spearman_r,
+)
 
-from . import parameterized, randn, requires_dask
+from . import Generate, parameterized, requires_dask
 
-
-def xr_mse(a, b, dim):
-    """mse implementation using xarray only."""
-    return ((a - b) ** 2).mean(dim)
-
-
-def covariance_gufunc(x, y):
-    return (
-        (x - x.mean(axis=-1, keepdims=True)) * (y - y.mean(axis=-1, keepdims=True))
-    ).mean(axis=-1)
-
-
-def pearson_correlation_gufunc(x, y):
-    return covariance_gufunc(x, y) / (x.std(axis=-1) * y.std(axis=-1))
+# These metrics in xskillscore.xr.deterministic, entirely written in xarray functions,
+# are identical to the well documented metrics in xskillscore.core.deterministic, which
+# are based on numpy functions applied to xarray objects by xarray.apply_ufunc. As the
+# xr metrics are only faster for small data, their use is not encouraged, as the
+# numpy-based metrics are 20-40% faster on large data."""
 
 
-def xr_pearson_r(x, y, dim):
-    """pearson_r implementation using xarray and minimal numpy only."""
-    return xr.apply_ufunc(
-        pearson_correlation_gufunc,
-        x,
-        y,
-        input_core_dims=[[dim], [dim]],
-        dask="parallelized",
-        output_dtypes=[float],
-    )
+def xr_mse(a, b, dim=None, skipna=True, weights=None):
+    res = (a - b) ** 2
+    if weights is not None:
+        res = res.weighted(weights)
+    res = res.mean(dim=dim, skipna=skipna)
+    return res
 
 
-METRICS = [xs_mse, xr_mse, xs_pearson_r, xr_pearson_r]
+def xr_mae(a, b, dim=None, skipna=True, weights=None):
+    res = np.abs(a - b)
+    if weights is not None:
+        res = res.weighted(weights)
+    res = res.mean(dim=dim, skipna=skipna)
+    return res
+
+
+def xr_me(a, b, dim=None, skipna=True, weights=None):
+    res = a - b
+    if weights is not None:
+        res = res.weighted(weights)
+    res = res.mean(dim=dim, skipna=skipna)
+    return res
+
+
+def xr_rmse(a, b, dim=None, skipna=True, weights=None):
+    res = (a - b) ** 2
+    if weights is not None:
+        res = res.weighted(weights)
+    res = res.mean(dim=dim, skipna=skipna)
+    res = np.sqrt(res)
+    return res
+
+
+def xr_pearson_r(a, b, dim=None, **kwargs):
+    return xr.corr(a, b, dim)
+
+
+def _rankdata(o, dim):
+    if isinstance(dim, str):
+        dim = [dim]
+    elif dim is None:
+        dim = list(o.dims)
+    if len(dim) == 1:
+        return xr.apply_ufunc(
+            bn.nanrankdata,
+            o,
+            input_core_dims=[[]],
+            kwargs={"axis": o.get_axis_num(dim[0])},
+            dask="allowed",
+        )
+    elif len(dim) > 1:
+        # stack rank unstack
+        return xr.apply_ufunc(
+            bn.nanrankdata,
+            o.stack(ndim=dim),
+            input_core_dims=[[]],
+            kwargs={"axis": -1},
+            dask="allowed",
+        ).unstack("ndim")
+
+
+def xr_spearman_r(a, b, dim=None, **kwargs):
+    return xr.corr(_rankdata(a, dim), _rankdata(b, dim), dim)
+
+
+METRICS = [
+    xs_mse,
+    xr_mse,
+    xs_rmse,
+    xr_rmse,
+    xs_mae,
+    xr_mae,
+    xs_pearson_r,
+    xr_pearson_r,
+    xs_spearman_r,
+    xr_spearman_r,
+]
+
+DIMS = ["member", ["lon", "lat"]]
 
 large_lon_lat = 2000
 large_lon_lat_chunksize = large_lon_lat // 4
-ntime = 4
-
-
-class Generate:
-    """
-    Generate random ds to be benckmarked.
-    """
-
-    timeout = 600
-    repeat = (2, 5, 20)
-
-    def make_ds(self, ntime, nx, ny):
-
-        # ds
-        self.ds = xr.Dataset()
-        self.ntime = ntime
-        self.nx = nx  # 4 deg
-        self.ny = ny  # 4 deg
-
-        frac_nan = 0.0
-
-        times = pd.date_range(
-            start="1/1/2000",
-            periods=ntime,
-            freq="D",
-        )
-
-        lons = xr.DataArray(
-            np.linspace(0, 360, self.nx),
-            dims=("lon",),
-            attrs={"units": "degrees east", "long_name": "longitude"},
-        )
-        lats = xr.DataArray(
-            np.linspace(-90, 90, self.ny),
-            dims=("lat",),
-            attrs={"units": "degrees north", "long_name": "latitude"},
-        )
-        self.ds["tos"] = xr.DataArray(
-            randn((self.ntime, self.nx, self.ny), frac_nan=frac_nan),
-            coords={"time": times, "lon": lons, "lat": lats},
-            dims=("time", "lon", "lat"),
-            name="tos",
-            encoding=None,
-            attrs={"units": "foo units", "description": "a description"},
-        )
-        self.ds["sos"] = xr.DataArray(
-            randn((self.ntime, self.nx, self.ny), frac_nan=frac_nan),
-            coords={"time": times, "lon": lons, "lat": lats},
-            dims=("time", "lon", "lat"),
-            name="sos",
-            encoding=None,
-            attrs={"units": "foo units", "description": "a description"},
-        )
-        self.ds.attrs = {"history": "created for xarray benchmarking"}
-
-        # set nans for land sea mask
-        self.ds = self.ds.where(
-            (abs(self.ds.lat) > 20) | (self.ds.lat < 100) | (self.ds.lat > 160)
-        )
+ntime = 24
 
 
 class Compute_small(Generate):
@@ -108,65 +117,33 @@ class Compute_small(Generate):
     A benchmark xskillscore.metric for small xr.DataArrays"""
 
     def setup(self, *args, **kwargs):
-        self.make_ds(ntime, 90, 45)  # 4 degree grid
+        self.make_ds(ntime, 1, 1)  # no grid
 
-    @parameterized("metric", METRICS)
-    def time_xskillscore_metric_small(self, metric):
+    @parameterized(["metric", "dim"], (METRICS, DIMS))
+    def time_xskillscore_metric(self, metric, dim):
         """Take time for xskillscore.metric."""
-        dim = "time"
-        metric(self.ds["tos"], self.ds["sos"], dim=dim)
+        metric(self.ds["tos"], self.ds["sos"], dim=dim).compute()
 
-    @parameterized("metric", METRICS)
-    def peakmem_xskillscore_metric_small(self, metric):
-        dim = "time"
+    @parameterized(["metric", "dim"], (METRICS, DIMS))
+    def peakmem_xskillscore_metric(self, metric, dim):
         """Take memory peak for xskillscore.metric."""
-        metric(self.ds["tos"], self.ds["sos"], dim=dim)
+        metric(self.ds["tos"], self.ds["sos"], dim=dim).compute()
 
 
-class Compute_large(Generate):
+class Compute_large(Compute_small):
     """
     A benchmark xskillscore.metric for large xr.DataArrays"""
 
-    def setup_cache(self, *args, **kwargs):
-        self.make_ds(ntime, large_lon_lat, large_lon_lat)
-        self.ds.to_netcdf("large.nc")
-
     def setup(self, *args, **kwargs):
-        self.ds = xr.open_dataset("large.nc")
-
-    @parameterized("metric", METRICS)
-    def time_xskillscore_metric_large(self, metric):
-        """Take time for xskillscore.metric."""
-        dim = "time"
-        metric(self.ds["tos"], self.ds["sos"], dim=dim)
-
-    @parameterized("metric", METRICS)
-    def peakmem_xskillscore_metric_large(self, metric):
-        dim = "time"
-        """Take memory peak for xskillscore.metric."""
-        metric(self.ds["tos"], self.ds["sos"], dim=dim)
+        self.make_ds(ntime, large_lon_lat, large_lon_lat)
 
 
-class Compute_large_dask(Generate):
+class Compute_large_dask(Compute_small):
     """
     A benchmark xskillscore.metric for large xr.DataArrays with dask."""
 
-    def setup_cache(self, *args, **kwargs):
-        requires_dask()
-        self.make_ds(ntime, large_lon_lat, large_lon_lat)
-        self.ds.to_netcdf("large.nc")
-
     def setup(self, *args, **kwargs):
-        self.ds = xr.open_dataset("large.nc", chunks={"lon": large_lon_lat_chunksize})
-
-    @parameterized("metric", METRICS)
-    def time_xskillscore_metric_large_dask(self, metric):
-        """Take time for xskillscore.metric."""
-        dim = "time"
-        metric(self.ds["tos"], self.ds["sos"], dim=dim).compute()
-
-    @parameterized("metric", METRICS)
-    def peakmem_xskillscore_metric_large_dask(self, metric):
-        dim = "time"
-        """Take memory peak for xskillscore.metric."""
-        metric(self.ds["tos"], self.ds["sos"], dim=dim).compute()
+        requires_dask()
+        self.make_ds(
+            ntime, large_lon_lat, large_lon_lat, chunks={"lon": large_lon_lat_chunksize}
+        )
