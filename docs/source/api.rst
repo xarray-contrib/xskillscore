@@ -59,6 +59,7 @@ Currently, most of our probabilistic metrics are ported over from
     rank_histogram
     discrimination
     reliability
+    roc
 
 Contingency-based Metrics
 -------------------------
@@ -70,7 +71,6 @@ individual methods to access metrics based on the table.
     :toctree: api/
 
     Contingency
-    roc
 
 Contingency table
 ~~~~~~~~~~~~~~~~~
