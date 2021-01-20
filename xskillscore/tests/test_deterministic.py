@@ -82,19 +82,6 @@ def adjust_weights(dim, weight_bool, weights):
         return None
 
 
-@pytest.mark.parametrize(
-    "a2, b2",
-    [
-        (
-            pytest.lazy_fixture("a_dask"),
-            pytest.lazy_fixture("b_dask"),
-        ),
-        (
-            pytest.lazy_fixture("a"),
-            pytest.lazy_fixture("b"),
-        ),
-    ],
-)
 @pytest.mark.parametrize("metrics", correlation_metrics)
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight_bool", [True, False])
