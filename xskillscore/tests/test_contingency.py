@@ -96,6 +96,20 @@ def test_dichotomous_scores(dichotomous_Contingency_1d, method, expected):
     npt.assert_almost_equal(xs_score, expected)
 
 
+@pytest.mark.parametrize(
+    "forecast, observation",
+    [
+        (
+            pytest.lazy_fixture("forecast_1d_long"),
+            pytest.lazy_fixture("observation_1d_long"),
+        ),
+        (
+            pytest.lazy_fixture("forecast_3d"),
+            pytest.lazy_fixture("observation_3d"),
+        ),
+    ],
+)
+@pytest.mark.parametrize("dim", ["time", None])
 @pytest.mark.parametrize("drop_intermediate", [True, False])
 @pytest.mark.parametrize("chunk", [True, False])
 @pytest.mark.parametrize("input", ["Dataset", "DataArray"])
@@ -103,9 +117,10 @@ def test_dichotomous_scores(dichotomous_Contingency_1d, method, expected):
     "return_results", ["all_as_tuple", "area", "all_as_metric_dim"]
 )
 def test_roc_returns(
-    forecast_1d_long,
-    observation_1d_long,
+    forecast,
+    observation,
     symmetric_edges,
+    dim,
     return_results,
     input,
     chunk,
@@ -114,17 +129,17 @@ def test_roc_returns(
     """testing keywords and inputs"""
     if "Dataset" in input:
         name = "var"
-        forecast_1d_long = forecast_1d_long.to_dataset(name=name)
-        observation_1d_long = observation_1d_long.to_dataset(name=name)
+        forecast = forecast.to_dataset(name=name)
+        observation = observation.to_dataset(name=name)
     if chunk:
-        forecast_1d_long = forecast_1d_long.chunk()
-        observation_1d_long = observation_1d_long.chunk()
+        forecast = forecast.chunk()
+        observation = observation.chunk()
 
     roc(
-        forecast_1d_long,
-        observation_1d_long,
+        forecast,
+        observation,
         symmetric_edges,
-        dim="time",
+        dim=dim,
         drop_intermediate=drop_intermediate,
         return_results=return_results,
     )
@@ -209,3 +224,7 @@ def test_roc_bin_edges_drop_intermediate(forecast_1d_long, observation_1d_long):
     # same or less probability_bins
     assert len(fxs_fpr) >= len(txs_fpr)
     assert len(fxs_tpr) >= len(txs_tpr)
+
+
+def test_roc_multi_dim(forecast_3d, observation_3d):
+    roc(forecast_3d, observation_3d, bin_edges=np.linspace(0, 10 + 1e-8, 6))

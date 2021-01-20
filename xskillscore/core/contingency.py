@@ -803,7 +803,7 @@ def roc(
     forecasts,
     bin_edges,
     dim=None,
-    drop_intermediate=True,
+    drop_intermediate=False,
     return_results="area",
 ):
     """Computes the relative operating characteristic for a range of thresholds.
@@ -823,7 +823,7 @@ def roc(
         sklearn.metrics.roc_curve(f_boolean, o_prob)
     dim : str, list
         The dimension(s) over which to compute the contingency table
-    drop_intermediate : bool, default=True
+    drop_intermediate : bool, default=False
         Whether to drop some suboptimal thresholds which would not appear
         on a plotted ROC curve. This is useful in order to create lighter
         ROC curves.
@@ -889,7 +889,13 @@ def roc(
 
             # works only for 1var
             if isinstance(forecasts, xr.Dataset):
-                v = list(forecasts.data_vars)[0]
+                varlist = list(forecasts.data_vars)
+                if len(varlist) == 1:
+                    v = varlist[0]
+                else:
+                    raise ValueError(
+                        f"Only works for xr.Dataset with one variable, found {forecasts.data_vars}. Considering looping over data_vars."
+                    )
                 f_bin = forecasts[v]
             else:
                 f_bin = forecasts
@@ -897,6 +903,8 @@ def roc(
             f_bin = f_bin.sortby(-f_bin)
             bin_edges = np.append(f_bin[0] + 1, f_bin)
             bin_edges = np.unique(bin_edges)[::-1]
+        else:
+            raise ValueError("If bin_edges is str, it can only be continuous.")
 
     # loop over each bin_edge and get hit rate and false alarm rate from contingency
     tpr, fpr = [], []
@@ -916,10 +924,8 @@ def roc(
     tpr = xr.concat(tpr, "probability_bin")
     fpr = xr.concat(fpr, "probability_bin")
 
-    easyfillna = True
-    if easyfillna:
-        fpr = fpr.fillna(1.0)
-        tpr = tpr.fillna(0.0)
+    fpr = fpr.fillna(1.0)
+    tpr = tpr.fillna(0.0)
 
     # pad (0,0) and (1,1)
     fpr_pad = xr.concat(
@@ -950,30 +956,22 @@ def roc(
     if drop_intermediate and fpr.probability_bin.size > 2:
 
         def _drop_intermediate(fpr, tpr):
-            if isinstance(fpr, xr.Dataset):
-                if len(fpr.data_vars) == 1:
-                    v = list(fpr.data_vars)[0]
-                    tpr_check = tpr[v]
-                    fpr_check = fpr[v]
-                else:
-                    raise ValueError(
-                        "drop_intermediate=True only works for one variable xr.Dataset or xr.DataArray."
-                    )
-            else:
-                tpr_check = tpr
-                fpr_check = fpr
-            optimal_idxs = np.where(
-                np.r_[
-                    True,
+            optimal_idxs = xr.concat(
+                [
+                    fpr.isel(probability_bin=0, drop=True).astype("bool"),
                     np.logical_or(
-                        fpr_check.diff("probability_bin", 2),
-                        tpr_check.diff("probability_bin", 2),
+                        fpr.diff("probability_bin", 2), tpr.diff("probability_bin", 2)
                     ),
-                    True,
-                ]
-            )[0]
-            tpr = tpr.isel(probability_bin=optimal_idxs)
-            fpr = fpr.isel(probability_bin=optimal_idxs)
+                    fpr.isel(probability_bin=0, drop=True).astype("bool"),
+                ],
+                "probability_bin",
+            )
+            optimal_idxs["probability_bin"] = np.arange(
+                optimal_idxs.probability_bin.size
+            )
+            optimal_idxs = optimal_idxs.where(optimal_idxs, drop=True).probability_bin
+            tpr = tpr.sel(probability_bin=optimal_idxs)
+            fpr = fpr.sel(probability_bin=optimal_idxs)
             return fpr, tpr
 
         fpr, tpr = _drop_intermediate(fpr, tpr)
@@ -982,12 +980,12 @@ def roc(
     def auc(tpr, fpr, dim="probability_bin"):
         """Get area under the curve with trapez method."""
         area = xr.apply_ufunc(
-            np.trapz, -tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
+            np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
         )
         area = np.clip(area, 0, 1)  # allow only values between 0 and 1
         return area
 
-    area = auc(tpr_pad, fpr_pad)
+    area = auc(-tpr_pad, fpr_pad)
     if continuous:
         area = 1 - area  # dirty fix
 
