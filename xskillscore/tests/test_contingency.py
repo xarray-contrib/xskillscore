@@ -16,23 +16,25 @@ CATEGORY_EDGES = [
 @pytest.mark.parametrize("type", ["da", "ds", "chunked_da", "chunked_ds"])
 @pytest.mark.parametrize("dim", DIMS)
 @pytest.mark.parametrize("category_edges", CATEGORY_EDGES)
-def test_Contingency_table(observation_3d, forecast_3d, category_edges, dim, type):
+def test_Contingency_table(
+    observation_3d_int, forecast_3d_int, category_edges, dim, type
+):
     """Test that contingency table builds successfully"""
     if "ds" in type:
         name = "var"
-        observation_3d = observation_3d.to_dataset(name=name)
-        forecast_3d = forecast_3d.to_dataset(name=name)
+        observation_3d_int = observation_3d_int.to_dataset(name=name)
+        forecast_3d_int = forecast_3d_int.to_dataset(name=name)
     if "chunked" in type:
-        observation_3d = observation_3d.chunk()
-        forecast_3d = forecast_3d.chunk()
+        observation_3d_int = observation_3d_int.chunk()
+        forecast_3d_int = forecast_3d_int.chunk()
     cont_table = Contingency(
-        observation_3d, forecast_3d, category_edges, category_edges, dim=dim
+        observation_3d_int, forecast_3d_int, category_edges, category_edges, dim=dim
     )
     assert cont_table
 
 
 @pytest.mark.parametrize("category_edges", CATEGORY_EDGES)
-def test_Contingency_table_values(observation_3d, forecast_3d, category_edges):
+def test_Contingency_table_values(observation_3d_int, forecast_3d_int, category_edges):
     """Test contingency table values against sklearn.metrics.confusion_matrix
     for 1D data"""
 
@@ -47,14 +49,14 @@ def test_Contingency_table_values(observation_3d, forecast_3d, category_edges):
         return ds_out
 
     cont_table = Contingency(
-        observation_3d, forecast_3d, category_edges, category_edges, dim="time"
+        observation_3d_int, forecast_3d_int, category_edges, category_edges, dim="time"
     )
-    for lon in forecast_3d.lon:
-        for lat in forecast_3d.lat:
+    for lon in forecast_3d_int.lon:
+        for lat in forecast_3d_int.lat:
             observation_1d = logical(
-                observation_3d.sel(lon=lon, lat=lat), category_edges
+                observation_3d_int.sel(lon=lon, lat=lat), category_edges
             )
-            forecast_1d = logical(forecast_3d.sel(lon=lon, lat=lat), category_edges)
+            forecast_1d = logical(forecast_3d_int.sel(lon=lon, lat=lat), category_edges)
             sklearn_cont_table_1d = confusion_matrix(
                 observation_1d, forecast_1d, labels=range(len(category_edges) - 1)
             )

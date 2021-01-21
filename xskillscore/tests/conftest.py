@@ -207,8 +207,8 @@ def category_edges():
 
 
 @pytest.fixture
-def forecast_3d():
-    """Random 3D forecast used for testing Contingency."""
+def forecast_3d_int():
+    """Random integer 3D forecast used for testing Contingency."""
     times = xr.cftime_range(start="2000", freq="D", periods=10)
     lats = np.arange(4)
     lons = np.arange(5)
@@ -217,10 +217,28 @@ def forecast_3d():
 
 
 @pytest.fixture
+def observation_3d_int(forecast_3d_int):
+    """Random integer 3D observation used for testing Contingency."""
+    b = forecast_3d_int.copy()
+    b.values = np.random.randint(0, 10, size=(b.shape[0], b.shape[1], b.shape[2]))
+    return b
+
+
+@pytest.fixture
+def forecast_3d():
+    """Random 3D forecast used for testing Contingency."""
+    times = xr.cftime_range(start="2000", freq="D", periods=10)
+    lats = np.arange(4)
+    lons = np.arange(5)
+    data = np.random.normal(0, 1, size=(len(times), len(lats), len(lons)))
+    return xr.DataArray(data, coords=[times, lats, lons], dims=["time", "lat", "lon"])
+
+
+@pytest.fixture
 def observation_3d(forecast_3d):
     """Random 3D observation used for testing Contingency."""
     b = forecast_3d.copy()
-    b.values = np.random.randint(0, 10, size=(b.shape[0], b.shape[1], b.shape[2]))
+    b.values = np.random.normal(0, 1, size=(b.shape[0], b.shape[1], b.shape[2]))
     return b
 
 
@@ -242,10 +260,7 @@ def dichotomous_Contingency_1d():
 @pytest.fixture
 def symmetric_edges():
     """Category bin edges between 0 and 1."""
-    return np.linspace(-2, 2, 11)
-
-
-np.random.seed(42)
+    return np.linspace(-3, 3, 11)
 
 
 @pytest.fixture

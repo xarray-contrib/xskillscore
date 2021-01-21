@@ -845,26 +845,27 @@ def roc(
     bin_edges : array_like, str, default='continuous'
         Bin edges for categorising observations and forecasts.
         Bins include the left most edge, but not the right.
-        If ``bin_edges='continuous'``, calculate bin_edges from forecasts, equal to
-        sklearn.metrics.roc_curve(f_boolean, o_prob)
+        If ``bin_edges=='continuous'``, calculate bin_edges from forecasts, equal to
+        ``sklearn.metrics.roc_curve(f_boolean, o_prob)``.
     dim : str, list
         The dimension(s) over which to compute the contingency table
     drop_intermediate : bool, default=True
-        Whether to drop some suboptimal thresholds which would not appear
-        on a plotted ROC curve. This is useful in order to create lighter
-        ROC curves.
+        Whether to drop some suboptimal thresholds which would not appear on a plotted
+        ROC curve. This is useful in order to create lighter ROC curves.
     return_results: str, default='area'
         Specify how return is structed:
+
             * 'area': return only the area under the curve of ROC
-            * 'all_as_tuple': return true positive rate and false positive rate at each bin and area under
-                the curve of ROC as tuple
-            * 'all_as_metric_dim': return true positive rate and false positive rate at each bin and area
-                under the curve of ROC concatinated into new `metric` dimension
+            * 'all_as_tuple': return true positive rate and false positive rate at each
+                bin and area under the curve of ROC as tuple
+            * 'all_as_metric_dim': return true positive rate and false positive rate at
+               each bin and area under the curve of ROC concatinated into new ``metric``
+               dimension
 
     Returns
     -------
-    xarray.Dataset or xarray.DataArray : reduced by dimensions ``dim``.
-        See ``return_results`` parameter.
+    xarray.Dataset or xarray.DataArray : reduced by dimensions ``dim``. See
+    ``return_results`` parameter.
 
 
     Examples
@@ -928,7 +929,7 @@ def roc(
             f_bin = f_bin.stack(ndim=forecasts.dims)
             f_bin = f_bin.sortby(-f_bin)
             bin_edges = np.append(f_bin[0] + 1, f_bin)
-            bin_edges = np.unique(bin_edges)[::-1]
+            bin_edges = np.unique(bin_edges)
         else:
             raise ValueError("If bin_edges is str, it can only be continuous.")
 
@@ -949,6 +950,8 @@ def roc(
         tpr.append(dichotomous_contingency.hit_rate())
     tpr = xr.concat(tpr, "probability_bin")
     fpr = xr.concat(fpr, "probability_bin")
+    tpr["probability_bin"] = bin_edges
+    fpr["probability_bin"] = bin_edges
 
     fpr = fpr.fillna(1.0)
     tpr = tpr.fillna(0.0)
@@ -956,17 +959,17 @@ def roc(
     # pad (0,0) and (1,1)
     fpr_pad = xr.concat(
         [
-            xr.ones_like(fpr.isel(probability_bin=0, drop=True)),
+            xr.ones_like(fpr.isel(probability_bin=0, drop=False)),
             fpr,
-            xr.zeros_like(fpr.isel(probability_bin=-1, drop=True)),
+            xr.zeros_like(fpr.isel(probability_bin=-1, drop=False)),
         ],
         "probability_bin",
     )
     tpr_pad = xr.concat(
         [
-            xr.ones_like(tpr.isel(probability_bin=0, drop=True)),
+            xr.ones_like(tpr.isel(probability_bin=0, drop=False)),
             tpr,
-            xr.zeros_like(tpr.isel(probability_bin=-1, drop=True)),
+            xr.zeros_like(tpr.isel(probability_bin=-1, drop=False)),
         ],
         "probability_bin",
     )
@@ -984,36 +987,45 @@ def roc(
         def _drop_intermediate(fpr, tpr):
             optimal_idxs = xr.concat(
                 [
-                    fpr.isel(probability_bin=0, drop=True).astype("bool"),
+                    fpr.isel(probability_bin=0, drop=False).astype("bool"),
                     np.logical_or(
                         fpr.diff("probability_bin", 2), tpr.diff("probability_bin", 2)
                     ),
-                    fpr.isel(probability_bin=0, drop=True).astype("bool"),
+                    fpr.isel(probability_bin=0, drop=False).astype("bool"),
                 ],
                 "probability_bin",
             )
             optimal_idxs["probability_bin"] = np.arange(
                 optimal_idxs.probability_bin.size
             )
-            optimal_idxs = optimal_idxs.where(optimal_idxs, drop=True).probability_bin
-            tpr = tpr.sel(probability_bin=optimal_idxs)
-            fpr = fpr.sel(probability_bin=optimal_idxs)
+            if isinstance(optimal_idxs, xr.Dataset):
+                optimal_idxs = optimal_idxs.to_array()
+            optimal_idxs = optimal_idxs.where(
+                optimal_idxs, drop=True
+            ).probability_bin.values
+            tpr = tpr.isel(probability_bin=optimal_idxs)
+            fpr = fpr.isel(probability_bin=optimal_idxs)
             return fpr, tpr
 
         fpr, tpr = _drop_intermediate(fpr, tpr)
         fpr_pad, tpr_pad = _drop_intermediate(fpr_pad, tpr_pad)
 
-    def auc(tpr, fpr, dim="probability_bin"):
+    def auc(fpr, tpr, dim="probability_bin"):
         """Get area under the curve with trapez method."""
+        # reverse tpr, fpr to fpr, tpr, see numpy.trapz(y, x=None)
         area = xr.apply_ufunc(
             np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
         )
-        area = np.clip(area, 0, 1)  # allow only values between 0 and 1
+        if ((area > 1) | (area < 0)).any():
+            area = np.clip(area, 0, 1)  # allow only values between 0 and 1
         return area
 
-    area = auc(-tpr_pad, fpr_pad)
+    area = auc(fpr_pad, -tpr_pad)
+
     if continuous:
-        area = 1 - area  # dirty fix
+        # sklearn returns in reversed order
+        fpr = fpr.sortby(-fpr.probability_bin)
+        tpr = tpr.sortby(-fpr.probability_bin)
 
     # mask always nan
     def _keep_masked(new, ori, dim):
