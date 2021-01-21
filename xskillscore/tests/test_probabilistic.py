@@ -606,6 +606,23 @@ def test_roc_auc_score_out_of_range_edges(
 
 
 @pytest.mark.parametrize("drop_intermediate", [False, True])
+def test_roc_auc_score_constant_forecast(
+    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate
+):
+    """Test that ROC AUC equals 0.5 for constant forecast."""
+    xs_area = roc(
+        observation_1d_long > 0,
+        forecast_1d_long * 0,
+        symmetric_edges,
+        drop_intermediate=drop_intermediate,
+        dim="time",
+        return_results="area",
+    )
+    sk_area = roc_auc_score(observation_1d_long > 0, forecast_1d_long * 0)
+    np.testing.assert_allclose(xs_area, sk_area)
+
+
+@pytest.mark.parametrize("drop_intermediate", [False, True])
 def test_roc_bin_edges_continuous_against_sklearn(
     forecast_1d_long, observation_1d_long, drop_intermediate
 ):
