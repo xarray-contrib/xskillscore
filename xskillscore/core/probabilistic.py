@@ -844,8 +844,9 @@ def roc(
         If ``bin_edges=='continuous'``, forecasts are probabilities.
     bin_edges : array_like, str, default='continuous'
         Bin edges for categorising observations and forecasts.
-        Bins include the left most edge, but not the right.
-        If ``bin_edges=='continuous'``, calculate bin_edges from forecasts, equal to
+        Bins include the left most edge, but not the right. ``bin_edges`` will be
+        sorted in ascending order. If ``bin_edges=='continuous'``, calculate
+        ``bin_edges`` from forecasts, equal to
         ``sklearn.metrics.roc_curve(f_boolean, o_prob)``.
     dim : str, list
         The dimension(s) over which to compute the contingency table
@@ -855,17 +856,17 @@ def roc(
     return_results: str, default='area'
         Specify how return is structed:
 
-            * 'area': return only the area under the curve of ROC
-            * 'all_as_tuple': return true positive rate and false positive rate at each
+            * 'area': return only the ``area under curve`` of ROC
+            * 'all_as_tuple': return ``true positive rate`` and ``false positive rate`` at each
                 bin and area under the curve of ROC as tuple
-            * 'all_as_metric_dim': return true positive rate and false positive rate at
-               each bin and area under the curve of ROC concatinated into new ``metric``
+            * 'all_as_metric_dim': return ``true positive rate`` and ``false positive rate`` at
+               each bin and ``area under curve`` of ROC concatinated into new ``metric``
                dimension
 
     Returns
     -------
     xarray.Dataset or xarray.DataArray : reduced by dimensions ``dim``. See
-    ``return_results`` parameter.
+    ``return_results`` parameter. ``true positive rate`` and ``false positive rate`` contain ``probability_bin`` dimension with ascending ``bin_edges`` as coordinates.
 
 
     Examples
@@ -929,9 +930,11 @@ def roc(
             f_bin = f_bin.stack(ndim=forecasts.dims)
             f_bin = f_bin.sortby(-f_bin)
             bin_edges = np.append(f_bin[0] + 1, f_bin)
-            bin_edges = np.unique(bin_edges)
+            bin_edges = np.unique(bin_edges)  # ensure that in ascending order
         else:
             raise ValueError("If bin_edges is str, it can only be continuous.")
+    else:
+        bin_edges = np.sort(bin_edges)  # ensure that in ascending order
 
     # loop over each bin_edge and get true positive rate and false positive rate from contingency
     tpr, fpr = [], []

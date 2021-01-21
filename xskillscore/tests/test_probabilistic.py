@@ -677,3 +677,26 @@ def test_roc_keeps_probability_bin_as_coord(
     )
     assert (tpr.probability_bin == symmetric_edges).all()
     assert (fpr.probability_bin == symmetric_edges).all()
+
+
+def test_roc_bin_edges_symmetric(
+    observation_1d_long, forecast_1d_long, symmetric_edges
+):
+    """Test that roc bin_edges works increasing or decreasing order."""
+    fpr, tpr, area = roc(
+        observation_1d_long,
+        forecast_1d_long,
+        symmetric_edges,
+        drop_intermediate=False,
+        return_results="all_as_tuple",
+    )
+    fpr2, tpr2, area2 = roc(
+        observation_1d_long,
+        forecast_1d_long,
+        symmetric_edges[::-1],
+        drop_intermediate=False,
+        return_results="all_as_tuple",
+    )
+    assert_identical(fpr, fpr2.sortby(fpr.probability_bin))
+    assert_identical(tpr, tpr2.sortby(tpr.probability_bin))
+    assert_identical(area, area2)
