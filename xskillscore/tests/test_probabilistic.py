@@ -494,7 +494,7 @@ def test_rps_dask(o_dask, f_prob_dask, category_edges):
     ],
 )
 @pytest.mark.parametrize("dim", ["time", None])
-@pytest.mark.parametrize("drop_intermediate", [True, False])
+@pytest.mark.parametrize("drop_intermediate_bool", [True, False])
 @pytest.mark.parametrize("chunk", [True, False])
 @pytest.mark.parametrize("input", ["Dataset", "DataArray"])
 @pytest.mark.parametrize(
@@ -508,7 +508,7 @@ def test_roc_returns(
     return_results,
     input,
     chunk,
-    drop_intermediate,
+    drop_intermediate_bool,
 ):
     """testing keywords and inputs pass"""
     if "Dataset" in input:
@@ -524,7 +524,7 @@ def test_roc_returns(
         forecast,
         symmetric_edges,
         dim=dim,
-        drop_intermediate=drop_intermediate,
+        drop_intermediate=drop_intermediate_bool,
         return_results=return_results,
     )
 
@@ -557,64 +557,64 @@ def test_roc_auc_score_perfect_forecast(forecast_1d_long, symmetric_edges):
     assert area == 1.0
 
 
-@pytest.mark.parametrize("drop_intermediate", [False, True])
+@pytest.mark.parametrize("drop_intermediate_bool", [False, True])
 def test_roc_auc_score_out_of_range_forecast(
-    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate
+    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate_bool
 ):
-    """Test that ROC AUC equals 0.0 or 0.5 for out of range forecast."""
+    """Test that ROC AUC equals 0.0 for out of range forecast."""
     area = roc(
         observation_1d_long,
         xr.ones_like(forecast_1d_long) + 100,
         symmetric_edges,
-        drop_intermediate=drop_intermediate,
+        drop_intermediate=drop_intermediate_bool,
         dim="time",
         return_results="area",
     )
-    assert float(area) in [0.5, 0.0]
+    assert float(area) in [0.0]
 
 
-@pytest.mark.parametrize("drop_intermediate", [False, True])
+@pytest.mark.parametrize("drop_intermediate_bool", [False, True])
 def test_roc_auc_score_out_of_range_observation(
-    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate
+    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate_bool
 ):
     """Test that ROC AUC equals 0.0 for out of range observation."""
     area = roc(
         xr.ones_like(observation_1d_long) + 100,
         forecast_1d_long,
         symmetric_edges,
-        drop_intermediate=drop_intermediate,
+        drop_intermediate=drop_intermediate_bool,
         dim="time",
         return_results="area",
     )
     np.testing.assert_almost_equal(area, 0.0, decimal=2)
 
 
-@pytest.mark.parametrize("drop_intermediate", [False, True])
+@pytest.mark.parametrize("drop_intermediate_bool", [False, True])
 def test_roc_auc_score_out_of_range_edges(
-    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate
+    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate_bool
 ):
-    """Test that ROC AUC equals 0.5 or 0.0 for out of range edges."""
+    """Test that ROC AUC equals 0.5 for out of range edges."""
     area = roc(
         observation_1d_long,
         forecast_1d_long,
         symmetric_edges + 100,
-        drop_intermediate=drop_intermediate,
+        drop_intermediate=drop_intermediate_bool,
         dim="time",
         return_results="area",
     )
-    assert float(area) in [0.5, 0.0]
+    assert float(area) in [0.5]
 
 
-@pytest.mark.parametrize("drop_intermediate", [False, True])
+@pytest.mark.parametrize("drop_intermediate_bool", [False, True])
 def test_roc_auc_score_constant_forecast(
-    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate
+    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate_bool
 ):
     """Test that ROC AUC equals 0.5 for constant forecast."""
     xs_area = roc(
         observation_1d_long > 0,
         forecast_1d_long * 0,
         symmetric_edges,
-        drop_intermediate=drop_intermediate,
+        drop_intermediate=drop_intermediate_bool,
         dim="time",
         return_results="area",
     )
@@ -622,26 +622,26 @@ def test_roc_auc_score_constant_forecast(
     np.testing.assert_allclose(xs_area, sk_area)
 
 
-@pytest.mark.parametrize("drop_intermediate", [False, True])
+@pytest.mark.parametrize("drop_intermediate_bool", [False, True])
 def test_roc_bin_edges_continuous_against_sklearn(
-    forecast_1d_long, observation_1d_long, drop_intermediate
+    forecast_1d_long, observation_1d_long, drop_intermediate_bool
 ):
     """Test xs.roc against sklearn.metrics.roc_curve/auc_score."""
     fp = np.clip(forecast_1d_long, 0, 1)  # prob
     ob = observation_1d_long > 0  # binary
     # sklearn
-    sk_fpr, sk_tpr, _ = roc_curve(ob, fp, drop_intermediate=drop_intermediate)
+    sk_fpr, sk_tpr, _ = roc_curve(ob, fp, drop_intermediate=drop_intermediate_bool)
     sk_area = roc_auc_score(ob, fp)
     # xs
     xs_fpr, xs_tpr, xs_area = roc(
         ob,
         fp,
         "continuous",
-        drop_intermediate=drop_intermediate,
+        drop_intermediate=drop_intermediate_bool,
         return_results="all_as_tuple",
     )
     np.testing.assert_allclose(xs_area, sk_area)
-    if not drop_intermediate:  # drops sometimes one too much or too little
+    if not drop_intermediate_bool:  # drops sometimes one too much or too little
         assert (xs_fpr == sk_fpr).all()
         assert (xs_tpr == sk_tpr).all()
 
