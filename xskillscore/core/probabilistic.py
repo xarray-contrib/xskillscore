@@ -850,18 +850,21 @@ def roc(
         ``sklearn.metrics.roc_curve(f_boolean, o_prob)``.
     dim : str, list
         The dimension(s) over which to compute the contingency table
-    drop_intermediate : bool, default=False (True in `sklearn.metrics.roc_curve`)
+    drop_intermediate : bool, default=False
         Whether to drop some suboptimal thresholds which would not appear on a plotted
         ROC curve. This is useful in order to create lighter ROC curves.
+        Defaults to ``True`` in ``sklearn.metrics.roc_curve``.
     return_results: str, default='area'
         Specify how return is structed:
 
-            * 'area': return only the ``area under curve`` of ROC
-            * 'all_as_tuple': return ``true positive rate`` and ``false positive rate`` at each
-                bin and area under the curve of ROC as tuple
-            * 'all_as_metric_dim': return ``true positive rate`` and ``false positive rate`` at
-               each bin and ``area under curve`` of ROC concatinated into new ``metric``
-               dimension
+            - 'area': return only the ``area under curve`` of ROC
+
+            - 'all_as_tuple': return ``true positive rate`` and ``false positive rate``
+              at each bin and area under the curve of ROC as tuple
+
+            - 'all_as_metric_dim': return ``true positive rate`` and
+              ``false positive rate`` at each bin and ``area under curve`` of ROC
+              concatinated into new ``metric`` dimension
 
     Returns
     -------
