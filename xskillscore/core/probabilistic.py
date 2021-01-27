@@ -868,10 +868,10 @@ def roc(
 
     Returns
     -------
-        xarray.Dataset or xarray.DataArray : reduced by dimensions ``dim``.
-        See ``return_results`` parameter. ``true positive rate`` and
-        ``false positive rate`` contain ``probability_bin`` dimension with ascending
-        ``bin_edges`` as coordinates.
+    xarray.Dataset or xarray.DataArray :
+        reduced by dimensions ``dim``, see ``return_results`` parameter.
+        ``true positive rate`` and ``false positive rate`` contain
+        ``probability_bin`` dimension with ascending ``bin_edges`` as coordinates.
 
 
     Examples
