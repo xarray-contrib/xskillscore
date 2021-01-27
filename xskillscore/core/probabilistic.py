@@ -850,7 +850,7 @@ def roc(
         ``sklearn.metrics.roc_curve(f_boolean, o_prob)``.
     dim : str, list
         The dimension(s) over which to compute the contingency table
-    drop_intermediate : bool, default=True
+    drop_intermediate : bool, default=False (True in `sklearn.metrics.roc_curve`)
         Whether to drop some suboptimal thresholds which would not appear on a plotted
         ROC curve. This is useful in order to create lighter ROC curves.
     return_results: str, default='area'
@@ -865,8 +865,10 @@ def roc(
 
     Returns
     -------
-    xarray.Dataset or xarray.DataArray : reduced by dimensions ``dim``. See
-    ``return_results`` parameter. ``true positive rate`` and ``false positive rate`` contain ``probability_bin`` dimension with ascending ``bin_edges`` as coordinates.
+    xarray.Dataset or xarray.DataArray : reduced by dimensions ``dim``.
+    See ``return_results`` parameter.
+    ``true positive rate`` and ``false positive rate`` contain
+    ``probability_bin`` dimension with ascending ``bin_edges`` as coordinates.
 
 
     Examples

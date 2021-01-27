@@ -679,7 +679,7 @@ def test_roc_keeps_probability_bin_as_coord(
     assert (fpr.probability_bin == symmetric_edges).all()
 
 
-def test_roc_bin_edges_symmetric(
+def test_roc_bin_edges_symmetric_asc_or_desc(
     observation_1d_long, forecast_1d_long, symmetric_edges
 ):
     """Test that roc bin_edges works increasing or decreasing order."""
