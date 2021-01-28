@@ -884,7 +884,7 @@ def roc(
     ...    np.random.normal(size=(1000)),
     ...    coords=[('time', np.arange(1000))]
     ... )
-    >>> category_edges = np.linspace(-2,2,5)
+    >>> category_edges = np.linspace(-2, 2, 5)
     >>> roc(o, f, category_edges, dim=['time'])
     <xarray.DataArray 'histogram_observations_forecasts' ()>
     array(0.46812223)
