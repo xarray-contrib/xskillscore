@@ -316,7 +316,7 @@ def fair_brier_score(
         raise ValueError("need forecast with member dim")
     o = observations
     with xr.set_options(keep_attrs=keep_attrs):
-        res = e / M - o ** 2 - e * (M - e) / (M ** 2 * (M - 1))
+        res = (e / M - o) ** 2 - e * (M - e) / (M ** 2 * (M - 1))
     res.attrs = observations.attrs  # dirty fix
     if weights is not None:
         return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
