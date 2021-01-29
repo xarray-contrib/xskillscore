@@ -570,7 +570,7 @@ def test_roc_auc_score_out_of_range_forecast(
         dim="time",
         return_results="area",
     )
-    assert float(area) in [0.0]
+    assert float(area) == 0.0
 
 
 @pytest.mark.parametrize("drop_intermediate_bool", [False, True])
@@ -602,7 +602,7 @@ def test_roc_auc_score_out_of_range_edges(
         dim="time",
         return_results="area",
     )
-    assert float(area) in [0.5]
+    assert float(area) == 0.5
 
 
 @pytest.mark.parametrize("drop_intermediate_bool", [False, True])
