@@ -287,7 +287,7 @@ def test_brier_score_vs_fair_brier_score(o, f_prob):
     fbs = fair_brier_score((o > 0.5), (f_prob > 0.5), dim=dim)
     bs = brier_score((o > 0.5), (f_prob > 0.5).mean("member"), dim=dim)
     print("fairBS", fbs, "\nBS", bs)
-    assert False
+    assert (fbs <= bs).all()
 
 
 def test_fair_brier_score_dask(o_dask, f_prob_dask):
