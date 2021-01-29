@@ -824,6 +824,47 @@ def reliability(
     return _add_as_coord(rel, samp, coordinate_suffix="samples")
 
 
+def _drop_intermediate(fpr, tpr):
+    """Attempt to drop thresholds corresponding to points in between and
+    collinear with other points. These are always suboptimal and do not
+    appear on a plotted ROC curve (and thus do not affect the AUC).
+    Here xr.diff(_, 2) is used as a "second derivative" to tell if there is a
+    corner at the point. (...) This keeps all cases where the point should be
+    kept, but does not drop more complicated cases like fps = [1, 3, 7],
+    # tps = [1, 2, 4]; there is no harm in keeping too many thresholds.
+    https://github.com/scikit-learn/scikit-learn/blob/42aff4e2edd8e8887478f6ff1628f27de97be6a3/sklearn/metrics/_ranking.py#L916
+    """
+    optimal_idxs = xr.concat(
+        [
+            fpr.isel(probability_bin=0, drop=False).astype("bool"),
+            np.logical_or(
+                fpr.diff("probability_bin", 2), tpr.diff("probability_bin", 2)
+            ),
+            fpr.isel(probability_bin=0, drop=False).astype("bool"),
+        ],
+        "probability_bin",
+    )
+    optimal_idxs["probability_bin"] = np.arange(optimal_idxs.probability_bin.size)
+    if isinstance(optimal_idxs, xr.Dataset):
+        optimal_idxs = optimal_idxs.to_array()
+    optimal_idxs = optimal_idxs.where(optimal_idxs, drop=True).probability_bin.values
+    tpr = tpr.isel(probability_bin=optimal_idxs)
+    fpr = fpr.isel(probability_bin=optimal_idxs)
+    return fpr, tpr
+
+
+def _auc(fpr, tpr, dim="probability_bin"):
+    """Get area under the curve with trapez method."""
+    # reverse tpr, fpr to fpr, tpr, see numpy.trapz(y, x=None)
+    area = xr.apply_ufunc(
+        np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
+    )
+    area = np.abs(area)
+    if ((area > 1)).any():
+        area = np.clip(area, 0, 1)  # allow only values between 0 and 1
+    return area
+
+
 def roc(
     observations,
     forecasts,
@@ -941,7 +982,8 @@ def roc(
     else:
         bin_edges = np.sort(bin_edges)  # ensure that in ascending order
 
-    # loop over each bin_edge and get true positive rate and false positive rate from contingency
+    # loop over each bin_edge and get true positive rate and false positive rate
+    # from contingency
     tpr, fpr = [], []
     for i in bin_edges:
         dichotomous_category_edges = np.array(
@@ -982,54 +1024,12 @@ def roc(
         "probability_bin",
     )
 
-    # https://github.com/scikit-learn/scikit-learn/blob/42aff4e2edd8e8887478f6ff1628f27de97be6a3/sklearn/metrics/_ranking.py#L916
-    # Attempt to drop thresholds corresponding to points in between and
-    # collinear with other points. These are always suboptimal and do not
-    # appear on a plotted ROC curve (and thus do not affect the AUC).
-    # Here xr.diff(_, 2) is used as a "second derivative" to tell if there
-    # is a corner at the point. (...) This keeps all cases where the point should be
-    # kept, but does not drop more complicated cases like fps = [1, 3, 7],
-    # tps = [1, 2, 4]; there is no harm in keeping too many thresholds.
     if drop_intermediate and fpr.probability_bin.size > 2:
-
-        def _drop_intermediate(fpr, tpr):
-            optimal_idxs = xr.concat(
-                [
-                    fpr.isel(probability_bin=0, drop=False).astype("bool"),
-                    np.logical_or(
-                        fpr.diff("probability_bin", 2), tpr.diff("probability_bin", 2)
-                    ),
-                    fpr.isel(probability_bin=0, drop=False).astype("bool"),
-                ],
-                "probability_bin",
-            )
-            optimal_idxs["probability_bin"] = np.arange(
-                optimal_idxs.probability_bin.size
-            )
-            if isinstance(optimal_idxs, xr.Dataset):
-                optimal_idxs = optimal_idxs.to_array()
-            optimal_idxs = optimal_idxs.where(
-                optimal_idxs, drop=True
-            ).probability_bin.values
-            tpr = tpr.isel(probability_bin=optimal_idxs)
-            fpr = fpr.isel(probability_bin=optimal_idxs)
-            return fpr, tpr
 
         fpr, tpr = _drop_intermediate(fpr, tpr)
         fpr_pad, tpr_pad = _drop_intermediate(fpr_pad, tpr_pad)
 
-    def auc(fpr, tpr, dim="probability_bin"):
-        """Get area under the curve with trapez method."""
-        # reverse tpr, fpr to fpr, tpr, see numpy.trapz(y, x=None)
-        area = xr.apply_ufunc(
-            np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
-        )
-        area = np.abs(area)
-        if ((area > 1) | (area < 0)).any():
-            area = np.clip(area, 0, 1)  # allow only values between 0 and 1
-        return area
-
-    area = auc(fpr_pad, tpr_pad)
+    area = _auc(fpr_pad, tpr_pad)
 
     if continuous:
         # sklearn returns in reversed order
