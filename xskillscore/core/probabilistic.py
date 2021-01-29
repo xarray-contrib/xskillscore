@@ -4,6 +4,7 @@ import numpy as np
 import properscoring
 import xarray as xr
 
+from .contingency import Contingency
 from .utils import (
     _add_as_coord,
     _fail_if_dim_empty,
@@ -23,6 +24,7 @@ __all__ = [
     "discrimination",
     "reliability",
     "rps",
+    "roc",
 ]
 
 FORECAST_PROBABILITY_DIM = "forecast_probability"
@@ -820,3 +822,245 @@ def reliability(
 
     # Move samples to a coordinate
     return _add_as_coord(rel, samp, coordinate_suffix="samples")
+
+
+def _drop_intermediate(fpr, tpr):
+    """Attempt to drop thresholds corresponding to points in between and
+    collinear with other points. These are always suboptimal and do not
+    appear on a plotted ROC curve (and thus do not affect the AUC).
+    Here xr.diff(_, 2) is used as a "second derivative" to tell if there is a
+    corner at the point. (...) This keeps all cases where the point should be
+    kept, but does not drop more complicated cases like fps = [1, 3, 7],
+    # tps = [1, 2, 4]; there is no harm in keeping too many thresholds.
+    https://github.com/scikit-learn/scikit-learn/blob/42aff4e2edd8e8887478f6ff1628f27de97be6a3/sklearn/metrics/_ranking.py#L916
+    """
+    optimal_idxs = xr.concat(
+        [
+            fpr.isel(probability_bin=0, drop=False).astype("bool"),
+            np.logical_or(
+                fpr.diff("probability_bin", 2), tpr.diff("probability_bin", 2)
+            ),
+            fpr.isel(probability_bin=0, drop=False).astype("bool"),
+        ],
+        "probability_bin",
+    )
+    optimal_idxs["probability_bin"] = np.arange(optimal_idxs.probability_bin.size)
+    if isinstance(optimal_idxs, xr.Dataset):
+        optimal_idxs = optimal_idxs.to_array()
+    optimal_idxs = optimal_idxs.where(optimal_idxs, drop=True).probability_bin.values
+    tpr = tpr.isel(probability_bin=optimal_idxs)
+    fpr = fpr.isel(probability_bin=optimal_idxs)
+    return fpr, tpr
+
+
+def _auc(fpr, tpr, dim="probability_bin"):
+    """Get area under the curve with trapez method."""
+    # reverse tpr, fpr to fpr, tpr, see numpy.trapz(y, x=None)
+    area = xr.apply_ufunc(
+        np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
+    )
+    area = np.abs(area)
+    if ((area > 1)).any():
+        area = np.clip(area, 0, 1)  # allow only values between 0 and 1
+    return area
+
+
+def roc(
+    observations,
+    forecasts,
+    bin_edges="continuous",
+    dim=None,
+    drop_intermediate=False,
+    return_results="area",
+):
+    """Computes the relative operating characteristic for a range of thresholds.
+
+    Parameters
+    ----------
+    observations : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+        If ``bin_edges=='continuous'``, observations are binary.
+    forecasts : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+        If ``bin_edges=='continuous'``, forecasts are probabilities.
+    bin_edges : array_like, str, default='continuous'
+        Bin edges for categorising observations and forecasts.
+        Bins include the left most edge, but not the right. ``bin_edges`` will be
+        sorted in ascending order. If ``bin_edges=='continuous'``, calculate
+        ``bin_edges`` from forecasts, equal to
+        ``sklearn.metrics.roc_curve(f_boolean, o_prob)``.
+    dim : str, list
+        The dimension(s) over which to compute the contingency table
+    drop_intermediate : bool, default=False
+        Whether to drop some suboptimal thresholds which would not appear on a plotted
+        ROC curve. This is useful in order to create lighter ROC curves.
+        Defaults to ``True`` in ``sklearn.metrics.roc_curve``.
+    return_results: str, default='area'
+        Specify how return is structed:
+
+            - 'area': return only the ``area under curve`` of ROC
+
+            - 'all_as_tuple': return ``true positive rate`` and ``false positive rate``
+              at each bin and area under the curve of ROC as tuple
+
+            - 'all_as_metric_dim': return ``true positive rate`` and
+              ``false positive rate`` at each bin and ``area under curve`` of ROC
+              concatinated into new ``metric`` dimension
+
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray :
+        reduced by dimensions ``dim``, see ``return_results`` parameter.
+        ``true positive rate`` and ``false positive rate`` contain
+        ``probability_bin`` dimension with ascending ``bin_edges`` as coordinates.
+
+
+    Examples
+    --------
+    >>> f = xr.DataArray(
+    ...     np.random.normal(size=(1000)),
+            coords=[('time', np.arange(1000))]
+    ... )
+    >>> o = xr.DataArray(
+    ...    np.random.normal(size=(1000)),
+    ...    coords=[('time', np.arange(1000))]
+    ... )
+    >>> category_edges = np.linspace(-2, 2, 5)
+    >>> roc(o, f, category_edges, dim=['time'])
+    <xarray.DataArray 'histogram_observations_forecasts' ()>
+    array(0.46812223)
+
+    See also
+    --------
+    xskillscore.Contingency
+    sklearn.metrics.roc_curve
+
+    References
+    ----------
+    http://www.cawcr.gov.au/projects/verification/
+    """
+
+    if dim is None:
+        dim = list(forecasts.dims)
+    if isinstance(dim, str):
+        dim = [dim]
+
+    continuous = False
+    if isinstance(bin_edges, str):
+        if bin_edges == "continuous":
+            continuous = True
+            # check that o binary
+            if isinstance(observations, xr.Dataset):
+                o_check = observations.to_array()
+            else:
+                o_check = observations
+            if str(o_check.dtype) != "bool":
+                if not ((o_check == 0) | (o_check == 1)).all():
+                    raise ValueError(
+                        'Input "observations" must represent logical (True/False) outcomes',
+                        o_check,
+                    )
+
+            # works only for 1var
+            if isinstance(forecasts, xr.Dataset):
+                varlist = list(forecasts.data_vars)
+                if len(varlist) == 1:
+                    v = varlist[0]
+                else:
+                    raise ValueError(
+                        f"Only works for `xr.Dataset` with one variable, found {forecasts.data_vars}. Considering looping over `data_vars` or `.to_array()`."
+                    )
+                f_bin = forecasts[v]
+            else:
+                f_bin = forecasts
+            f_bin = f_bin.stack(ndim=forecasts.dims)
+            f_bin = f_bin.sortby(-f_bin)
+            bin_edges = np.append(f_bin[0] + 1, f_bin)
+            bin_edges = np.unique(bin_edges)  # ensure that in ascending order
+        else:
+            raise ValueError("If bin_edges is str, it can only be continuous.")
+    else:
+        bin_edges = np.sort(bin_edges)  # ensure that in ascending order
+
+    # loop over each bin_edge and get true positive rate and false positive rate
+    # from contingency
+    tpr, fpr = [], []
+    for i in bin_edges:
+        dichotomous_category_edges = np.array(
+            [-np.inf, i, np.inf]
+        )  # "dichotomous" means two-category
+        dichotomous_contingency = Contingency(
+            observations,
+            forecasts,
+            dichotomous_category_edges,
+            dichotomous_category_edges,
+            dim=dim,
+        )
+        fpr.append(dichotomous_contingency.false_alarm_rate())
+        tpr.append(dichotomous_contingency.hit_rate())
+    tpr = xr.concat(tpr, "probability_bin")
+    fpr = xr.concat(fpr, "probability_bin")
+    tpr["probability_bin"] = bin_edges
+    fpr["probability_bin"] = bin_edges
+
+    fpr = fpr.fillna(1.0)
+    tpr = tpr.fillna(0.0)
+
+    # pad (0,0) and (1,1)
+    fpr_pad = xr.concat(
+        [
+            xr.ones_like(fpr.isel(probability_bin=0, drop=False)),
+            fpr,
+            xr.zeros_like(fpr.isel(probability_bin=-1, drop=False)),
+        ],
+        "probability_bin",
+    )
+    tpr_pad = xr.concat(
+        [
+            xr.ones_like(tpr.isel(probability_bin=0, drop=False)),
+            tpr,
+            xr.zeros_like(tpr.isel(probability_bin=-1, drop=False)),
+        ],
+        "probability_bin",
+    )
+
+    if drop_intermediate and fpr.probability_bin.size > 2:
+
+        fpr, tpr = _drop_intermediate(fpr, tpr)
+        fpr_pad, tpr_pad = _drop_intermediate(fpr_pad, tpr_pad)
+
+    area = _auc(fpr_pad, tpr_pad)
+
+    if continuous:
+        # sklearn returns in reversed order
+        fpr = fpr.sortby(-fpr.probability_bin)
+        tpr = tpr.sortby(-fpr.probability_bin)
+
+    # mask always nan
+    def _keep_masked(new, ori, dim):
+        """Keep mask from `ori` deprived of dimensions from `dim` in input `new`."""
+        isel_dim = {d: 0 for d in forecasts.dims if d in dim}
+        mask = ori.isel(isel_dim, drop=True)
+        new_masked = new.where(mask.notnull())
+        return new_masked
+
+    fpr = _keep_masked(fpr, forecasts, dim=dim)
+    tpr = _keep_masked(tpr, forecasts, dim=dim)
+    area = _keep_masked(area, forecasts, dim=dim)
+
+    if return_results == "area":
+        return area
+    elif return_results == "all_as_metric_dim":
+        results = xr.concat([fpr, tpr, area], "metric", coords="minimal")
+        results["metric"] = [
+            "false positive rate",
+            "true positive rate",
+            "area under curve",
+        ]
+        return results
+    elif return_results == "all_as_tuple":
+        return fpr, tpr, area
+    else:
+        raise NotImplementedError(
+            f"expect `return_results` from [all_as_tuple, area, all_as_metric_dim], found {return_results}"
+        )

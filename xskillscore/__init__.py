@@ -30,6 +30,7 @@ from .core.probabilistic import (
     discrimination,
     rank_histogram,
     reliability,
+    roc,
     rps,
     threshold_brier_score,
 )

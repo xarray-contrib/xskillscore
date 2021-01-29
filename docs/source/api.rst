@@ -59,6 +59,7 @@ Currently, most of our probabilistic metrics are ported over from
     rank_histogram
     discrimination
     reliability
+    roc
 
 Contingency-based Metrics
 -------------------------
@@ -109,6 +110,7 @@ Multi-Category Metrics
     Contingency.heidke_score
     Contingency.peirce_score
     Contingency.gerrity_score
+    roc
 
 Comparative
 -----------
