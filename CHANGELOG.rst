@@ -21,6 +21,8 @@ Bug Fixes
 ~~~~~~~~~
 - :py:func:`~xskillscore.sign_test` now works for ``xr.Dataset`` inputs.
   (:issue:`198`, :pr:`199`) `Aaron Spring`_
+- :py:func:`~xskillscore.threshold_brier_score` does not average over thresholds when
+  ``dim==None``. (:pr:`211`) `Aaron Spring`_
 
 Internal Changes
 ~~~~~~~~~~~~~~~~

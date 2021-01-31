@@ -159,7 +159,7 @@ def test_threshold_brier_score_dask(o_dask, f_prob_dask, keep_attrs):
         o_dask, f_prob_dask, threshold, axis=0
     )
     expected = xr.DataArray(expected, coords=o_dask.coords).mean()
-    expected['threshold']=threshold
+    expected["threshold"] = threshold
     # test for numerical identity of xskillscore threshold and properscorin threshold
     assert_identical(actual, expected.assign_attrs(**actual.attrs))
     # test that xskillscore crps_ensemble returns chunks
@@ -187,35 +187,29 @@ def test_crps_gaussian_dask_b_int(o_dask, keep_attrs):
 def test_threshold_brier_score_b_float(o, f_prob):
     """Test that threshold_brier_score accepts float as threshold."""
     threshold = 0.5
-    actual = threshold_brier_score(
-        o, f_prob, threshold
-    )
-    #assert actual.threshold == threshold
+    actual = threshold_brier_score(o, f_prob, threshold)
+    assert actual.threshold.values == threshold
 
 
 def test_threshold_brier_score_b_int(o, f_prob):
     """Test that threshold_brier_score accepts int as threshold."""
     threshold = 0
-    actual = threshold_brier_score(
-        o, f_prob, threshold
-    )
-    #assert actual.threshold == threshold
+    actual = threshold_brier_score(o, f_prob, threshold)
+    assert actual.threshold.values == threshold
 
 
 def test_threshold_brier_score_multiple_thresholds_list(o, f_prob):
-    """Test that threshold_brier_score accepts lists for threshold."""
+    """Test that threshold_brier_score accepts lists for threshold from list."""
     threshold = [0.1, 0.3, 0.5]
     actual = threshold_brier_score(o, f_prob, threshold)
-    #assert actual.threshold.values == threshold
+    assert (actual.threshold.values == threshold).all()
 
 
-
-
-def test_threshold_brier_score_multiple_thresholds(o, f_prob):
-    """Test that threshold_brier_score carries attributes."""
+def test_threshold_brier_score_multiple_thresholds_xr_da(o, f_prob):
+    """Test that threshold_brier_score carries attributes from xarray.DataArray."""
     threshold = xr.DataArray([0.1, 0.3, 0.5], dims="threshold")
     actual = threshold_brier_score(o, f_prob, threshold)
-    #assert actual.threshold.values == threshold
+    assert (actual.threshold == threshold).all()
 
 
 @pytest.mark.parametrize("fair_bool", [True, False])
@@ -223,8 +217,8 @@ def test_threshold_brier_score_multiple_thresholds(o, f_prob):
 def test_brier_score(o, f_prob, keep_attrs, fair_bool):
     f_prob > 0.5
     if not fair_bool:
-        f_prob=f_prob.mean("member")
-    o=(o>.5).assign_attrs(**o.attrs)
+        f_prob = f_prob.mean("member")
+    o = (o > 0.5).assign_attrs(**o.attrs)
     actual = brier_score(
         o,
         f_prob,
@@ -267,13 +261,10 @@ def test_threshold_brier_score_dask_threshold(o_dask, f_prob_dask, threshold):
 def test_brier_score_dim(o, f_prob, dim, fair_bool):
     f_prob > 0.5
     if not fair_bool:
-        f_prob=f_prob.mean("member")
-    o=o>.5
-    actual = brier_score(
-        o, f_prob , dim=dim, fair=fair_bool
-    )
+        f_prob = f_prob.mean("member")
+    o = o > 0.5
+    actual = brier_score(o, f_prob, dim=dim, fair=fair_bool)
     assert_only_dim_reduced(dim, actual, o)
-
 
 
 @pytest.mark.parametrize("keep_attrs", [True, False])
