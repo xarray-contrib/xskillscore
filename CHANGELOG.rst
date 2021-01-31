@@ -14,15 +14,14 @@ Features
   keyword ``fair`` to account for ensemble-size adjustments, but defaults to ``False``.
   Adjustment not implemented yet for :py:func:`~xskillscore.crps_ensemble`. PR welcome.
   (:issue:`162`, :pr:`211`) `Aaron Spring`_
-- output of :py:func:`~xskillscore.threshold_brier_score` carries threshold as a
-  coordinate. (:pr:`211`) `Aaron Spring`_
 
 Bug Fixes
 ~~~~~~~~~
 - :py:func:`~xskillscore.sign_test` now works for ``xr.Dataset`` inputs.
   (:issue:`198`, :pr:`199`) `Aaron Spring`_
 - :py:func:`~xskillscore.threshold_brier_score` does not average over thresholds when
-  ``dim==None``. (:pr:`211`) `Aaron Spring`_
+  ``dim==None``. Now also carries ``threshold`` as coordinate.
+  (:issue:`255`, :pr:`211`) `Aaron Spring`_
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
