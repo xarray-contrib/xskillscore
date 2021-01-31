@@ -207,7 +207,15 @@ def crps_ensemble(
         return res.mean(dim, keep_attrs=keep_attrs)
 
 
-def brier_score(observations, forecasts, dim=None, fair=False, weights=None, keep_attrs=False, member_dim='member'):
+def brier_score(
+    observations,
+    forecasts,
+    dim=None,
+    fair=False,
+    weights=None,
+    keep_attrs=False,
+    member_dim="member",
+):
     """Calculate Brier score (BS).
 
     .. math:
@@ -225,7 +233,8 @@ def brier_score(observations, forecasts, dim=None, fair=False, weights=None, kee
         Dimension over which to compute mean after computing ``brier_score``.
         Defaults to None implying averaging over all dimensions.
     fair: boolean
-        Apply ensemble member-size adjustment for unbiased, fair metric; see Ferro (2013). Defaults to False.
+        Apply ensemble member-size adjustment for unbiased, fair metric;
+        see Ferro (2013). Defaults to False.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`.
         Defaults to None, such that no weighting is applied.
@@ -258,7 +267,9 @@ def brier_score(observations, forecasts, dim=None, fair=False, weights=None, kee
     """
     if fair:
         if member_dim not in forecasts.dims:
-            raise ValueError("need forecast with member dim") # TODO: check that brier_score always get member in forecast
+            raise ValueError(
+                "need forecast with member dim"
+            )  # TODO: check that brier_score always get member in forecast
         else:
             M = forecasts[member_dim].size
             e = (forecasts == 1).sum(member_dim, keep_attrs=keep_attrs)
@@ -268,14 +279,14 @@ def brier_score(observations, forecasts, dim=None, fair=False, weights=None, kee
         res.attrs = observations.attrs  # dirty fix
     else:
         res = xr.apply_ufunc(
-        properscoring.brier_score,
-        observations,
-        forecasts,
-        input_core_dims=[[], []],
-        dask="parallelized",
-        output_dtypes=[float],
-        keep_attrs=keep_attrs,
-    )
+            properscoring.brier_score,
+            observations,
+            forecasts,
+            input_core_dims=[[], []],
+            dask="parallelized",
+            output_dtypes=[float],
+            keep_attrs=keep_attrs,
+        )
     if weights is not None:
         return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
@@ -368,6 +379,7 @@ def threshold_brier_score(
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
+    res=res.assign_coords(threshold=threshold)
     if weights is not None:
         return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
@@ -403,7 +415,8 @@ def rps(
         Dimension over which to compute mean after computing ``rps``.
         Defaults to None implying averaging over all dimensions.
     fair: boolean
-        Apply ensemble member-size adjustment for unbiased, fair metric; see Ferro (2013). Defaults to False.
+        Apply ensemble member-size adjustment for unbiased, fair metric;
+        see Ferro (2013). Defaults to False.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is
         applied.
@@ -443,7 +456,10 @@ def rps(
         )
 
     forecasts = histogram(
-        forecasts, bins=[category_edges], bin_names=bin_names, dim=[member_dim]#,density=True
+        forecasts,
+        bins=[category_edges],
+        bin_names=bin_names,
+        dim=[member_dim],  # ,density=True
     )
     if fair:
         e = forecasts
@@ -460,12 +476,12 @@ def rps(
 
     if fair:
         Ec = e.cumsum(bin_dim)
-        res = (((Ec/M) - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
+        res = (((Ec / M) - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
     else:
         res = ((Fc - Oc) ** 2).sum(bin_dim)
     if weights is not None:
         res = res.weighted(weights)
-    res = xr.apply_ufunc(np.clip,res,0,1,dask='allowed') # dirty fix
+    res = xr.apply_ufunc(np.clip, res, 0, 1, dask="allowed")  # dirty fix
     return res.mean(dim, keep_attrs=keep_attrs)
 
 

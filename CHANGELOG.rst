@@ -14,6 +14,8 @@ Features
   keyword ``fair`` to account for ensemble-size adjustments, but defaults to ``False``.
   Adjustment not implemented yet for :py:func:`~xskillscore.crps_ensemble`. PR welcome.
   (:issue:`162`, :pr:`211`) `Aaron Spring`_
+- output of :py:func:`~xskillscore.threshold_brier_score` carries threshold as a
+  coordinate. (:pr:`211`) `Aaron Spring`_
 
 Bug Fixes
 ~~~~~~~~~

@@ -3,7 +3,6 @@ import numpy.testing as npt
 import properscoring
 import pytest
 import xarray as xr
-from dask import is_dask_collection
 from scipy.stats import norm
 from sklearn.calibration import calibration_curve
 from xarray.tests import assert_allclose, assert_identical
@@ -160,6 +159,7 @@ def test_threshold_brier_score_dask(o_dask, f_prob_dask, keep_attrs):
         o_dask, f_prob_dask, threshold, axis=0
     )
     expected = xr.DataArray(expected, coords=o_dask.coords).mean()
+    expected['threshold']=threshold
     # test for numerical identity of xskillscore threshold and properscorin threshold
     assert_identical(actual, expected.assign_attrs(**actual.attrs))
     # test that xskillscore crps_ensemble returns chunks
@@ -184,77 +184,52 @@ def test_crps_gaussian_dask_b_int(o_dask, keep_attrs):
         assert actual.attrs == {}
 
 
-@pytest.mark.parametrize("keep_attrs", [True, False])
-def test_threshold_brier_score_dask_b_float(o_dask, f_prob_dask, keep_attrs):
+def test_threshold_brier_score_b_float(o, f_prob):
+    """Test that threshold_brier_score accepts float as threshold."""
     threshold = 0.5
     actual = threshold_brier_score(
-        o_dask, f_prob_dask, threshold, keep_attrs=keep_attrs
+        o, f_prob, threshold
     )
-    assert actual is not None
-    if keep_attrs:
-        assert actual.attrs == o_dask.attrs
-    else:
-        assert actual.attrs == {}
+    #assert actual.threshold == threshold
 
 
-@pytest.mark.parametrize("keep_attrs", [True, False])
-def test_threshold_brier_score_dask_b_int(o_dask, f_prob_dask, keep_attrs):
+def test_threshold_brier_score_b_int(o, f_prob):
+    """Test that threshold_brier_score accepts int as threshold."""
     threshold = 0
     actual = threshold_brier_score(
-        o_dask, f_prob_dask, threshold, keep_attrs=keep_attrs
+        o, f_prob, threshold
     )
-    assert actual is not None
-    if keep_attrs:
-        assert actual.attrs == o_dask.attrs
-    else:
-        assert actual.attrs == {}
+    #assert actual.threshold == threshold
 
 
-@pytest.mark.parametrize("keep_attrs", [True, False])
-def test_threshold_brier_score_multiple_thresholds_list(o, f_prob, keep_attrs):
+def test_threshold_brier_score_multiple_thresholds_list(o, f_prob):
+    """Test that threshold_brier_score accepts lists for threshold."""
     threshold = [0.1, 0.3, 0.5]
-    actual = threshold_brier_score(o, f_prob, threshold, keep_attrs=keep_attrs)
-    assert actual.chunks is None or actual.chunks == ()
-    if keep_attrs:
-        assert actual.attrs == o.attrs
-    else:
-        assert actual.attrs == {}
+    actual = threshold_brier_score(o, f_prob, threshold)
+    #assert actual.threshold.values == threshold
 
 
-@pytest.mark.parametrize("keep_attrs", [True, False])
-def test_threshold_brier_score_multiple_thresholds_xr(o, f_prob, keep_attrs):
+
+
+def test_threshold_brier_score_multiple_thresholds(o, f_prob):
+    """Test that threshold_brier_score carries attributes."""
     threshold = xr.DataArray([0.1, 0.3, 0.5], dims="threshold")
-    actual = threshold_brier_score(o, f_prob, threshold, keep_attrs=keep_attrs)
-    assert actual.chunks is None or actual.chunks == ()
-    if keep_attrs:
-        assert actual.attrs == o.attrs
-    else:
-        assert actual.attrs == {}
-
-
-@pytest.mark.parametrize("keep_attrs", [True, False])
-def test_threshold_brier_score_multiple_thresholds_dask(
-    o_dask, f_prob_dask, keep_attrs
-):
-    threshold = xr.DataArray([0.1, 0.3, 0.5, 0.7], dims="threshold").chunk()
-    actual = threshold_brier_score(
-        o_dask, f_prob_dask, threshold, keep_attrs=keep_attrs
-    )
-    assert actual.chunks is not None
-    if keep_attrs:
-        assert actual.attrs == o_dask.attrs
-    else:
-        assert actual.attrs == {}
+    actual = threshold_brier_score(o, f_prob, threshold)
+    #assert actual.threshold.values == threshold
 
 
 @pytest.mark.parametrize("fair_bool", [True, False])
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_brier_score(o, f_prob, keep_attrs, fair_bool):
+    f_prob > 0.5
+    if not fair_bool:
+        f_prob=f_prob.mean("member")
+    o=(o>.5).assign_attrs(**o.attrs)
     actual = brier_score(
-        (o > 0.5).assign_attrs(**o.attrs),
-        (f_prob > 0.5).mean("member"),
+        o,
+        f_prob,
         keep_attrs=keep_attrs,
-        fair=fair_bool
+        fair=fair_bool,
     )
     assert actual.chunks is None or actual.chunks == ()
     if keep_attrs:
@@ -263,16 +238,14 @@ def test_brier_score(o, f_prob, keep_attrs, fair_bool):
         assert actual.attrs == {}
 
 
-
 @pytest.mark.parametrize("dim", DIMS)
-def test_brier_score_vs_fair_brier_score(o, f_prob,dim):
+def test_brier_score_vs_fair_brier_score(o, f_prob, dim):
     """Test that brier_score scores lower for limited ensemble than bias brier_score."""
     fbs = brier_score((o > 0.5), (f_prob > 0.5), dim=dim, fair=True)
     bs = brier_score((o > 0.5), (f_prob > 0.5).mean("member"), dim=dim, fair=False)
-    assert (fbs <= bs).all(),print("fairBS", fbs, "\nBS", bs)
-    #assert (fbs <= 1).all()
-    #assert (fbs >= 0).all()
-
+    assert (fbs <= bs).all(), print("fairBS", fbs, "\nBS", bs)
+    # assert (fbs <= 1).all()
+    # assert (fbs >= 0).all()
 
 
 @pytest.mark.parametrize("dim", DIMS)
@@ -291,19 +264,24 @@ def test_threshold_brier_score_dask_threshold(o_dask, f_prob_dask, threshold):
 
 @pytest.mark.parametrize("fair_bool", [True, False])
 @pytest.mark.parametrize("dim", DIMS)
-def test_brier_score_dim(o, f_prob, dim,fair_bool):
-    actual = brier_score((o > 0.5), (f_prob > 0.5).mean("member"), dim=dim,fair=fair_bool)
+def test_brier_score_dim(o, f_prob, dim, fair_bool):
+    f_prob > 0.5
+    if not fair_bool:
+        f_prob=f_prob.mean("member")
+    o=o>.5
+    actual = brier_score(
+        o, f_prob , dim=dim, fair=fair_bool
+    )
     assert_only_dim_reduced(dim, actual, o)
 
 
-@pytest.mark.parametrize("fair_bool", [True, False])
+
 @pytest.mark.parametrize("keep_attrs", [True, False])
-def test_brier_score_dask(o_dask, f_prob_dask, keep_attrs,fair_bool):
+def test_brier_score_dask(o_dask, f_prob_dask, keep_attrs):
     actual = brier_score(
         (o_dask > 0.5).assign_attrs(**o_dask.attrs),
         (f_prob_dask > 0.5).mean("member"),
         keep_attrs=keep_attrs,
-        fair=fair_bool
     )
     assert actual.chunks is not None
     expected = properscoring.brier_score(
@@ -456,9 +434,9 @@ def test_reliability_dask(o_dask, f_prob_dask):
 @pytest.mark.parametrize("fair_bool", [True, False])
 @pytest.mark.parametrize("dim", DIMS)
 @pytest.mark.parametrize("obj", ["da", "ds", "chunked_da", "chunked_ds"])
-def test_rps_reduce_dim(o, f_prob, category_edges, dim, obj,fair_bool):
+def test_rps_reduce_dim(o, f_prob, category_edges, dim, obj, fair_bool):
     """Test that rps reduced dim and works for (chunked) ds and da"""
-    actual = rps(o, f_prob, category_edges=category_edges, dim=dim,fair=fair_bool)
+    actual = rps(o, f_prob, category_edges=category_edges, dim=dim, fair=fair_bool)
     assert_only_dim_reduced(dim, actual, o)
 
 
@@ -484,30 +462,33 @@ def test_2_category_rps_equals_brier_score(o, f_prob):
 
 
 @pytest.mark.parametrize("fair_bool", [True, False])
-def test_rps_perfect_values(o, category_edges,fair_bool):
+def test_rps_perfect_values(o, category_edges, fair_bool):
     """Test values for perfect forecast"""
     f = xr.concat(10 * [o], dim="member")
-    res = rps(o, f, category_edges=category_edges,fair=fair_bool)
+    res = rps(o, f, category_edges=category_edges, fair=fair_bool)
     assert (res == 0).all()
 
 
-#@pytest.mark.skip(reason='np.clip needs to be fixed')
+# @pytest.mark.skip(reason='np.clip needs to be fixed')
 @pytest.mark.parametrize("fair_bool", [True, False])
-def test_rps_dask(o_dask, f_prob_dask, category_edges,fair_bool):
+def test_rps_dask(o_dask, f_prob_dask, category_edges, fair_bool):
     """Test that rps returns dask array if provided dask array"""
-    assert rps(o_dask, f_prob_dask, category_edges=category_edges,fair=fair_bool).chunks is not None
+    assert (
+        rps(o_dask, f_prob_dask, category_edges=category_edges, fair=fair_bool).chunks
+        is not None
+    )
 
 
 @pytest.mark.parametrize("dim", DIMS)
-def test_rps_vs_fair_rps(o, f_prob, category_edges,dim):
-    frps = rps(o, f_prob, dim=dim,fair=True,category_edges=category_edges)
-    ufrps = rps(o, f_prob, dim=dim, fair=False,category_edges=category_edges)
+def test_rps_vs_fair_rps(o, f_prob, category_edges, dim):
+    frps = rps(o, f_prob, dim=dim, fair=True, category_edges=category_edges)
+    ufrps = rps(o, f_prob, dim=dim, fair=False, category_edges=category_edges)
     assert (frps <= ufrps).all(), print("fairrps", frps, "\nufrps", ufrps)
 
 
 @pytest.mark.parametrize("dim", DIMS)
 @pytest.mark.parametrize("fair_bool", [True, False])
-def test_rps_limits(o, f_prob, category_edges, fair_bool,dim):
-    res = rps(o, f_prob, dim=dim,fair=fair_bool,category_edges=category_edges)
-    assert (res <= 1.).all(), print(res.max())
+def test_rps_limits(o, f_prob, category_edges, fair_bool, dim):
+    res = rps(o, f_prob, dim=dim, fair=fair_bool, category_edges=category_edges)
+    assert (res <= 1.0).all(), print(res.max())
     assert (res >= 0).all(), print(res.min())
