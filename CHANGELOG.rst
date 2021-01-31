@@ -10,6 +10,10 @@ Features
 - Added mean error
   :py:func:`~xskillscore.me`. (:issue:`202`, :pr:`200`)
   `Andrew Huang`_
+- :py:func:`~xskillscore.brier_score` and :py:func:`~xskillscore.rps` now contain
+  keyword ``fair`` to account for ensemble-size adjustments, but defaults to ``False``.
+  Adjustment not implemented yet for :py:func:`~xskillscore.crps_ensemble`. PR welcome.
+  (:issue:`162`, :pr:`211`) `Aaron Spring`_
 
 Bug Fixes
 ~~~~~~~~~
