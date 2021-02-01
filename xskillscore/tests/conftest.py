@@ -182,8 +182,8 @@ def weights_cos_lat(a):
 @pytest.fixture
 def weights_linear_time(a):
     """Weighting array by linear (1 -> 0) of the time."""
-    weights = xr.DataArray(np.linspace(1, 0, num=len(a.time)), dims="time")
-    return xr.ones_like(a) * weights
+    weights = np.linspace(1, 0, num=len(a.time))
+    return xr.ones_like(a) * xr.DataArray(weights, dims="time")
 
 
 @pytest.fixture
