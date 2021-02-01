@@ -240,7 +240,6 @@ def test_threshold_brier_score_dim(o, f_prob, dim):
     assert_only_dim_reduced(dim, actual, o)
 
 
-# TODO: what if threshold is xr.Dataset?
 @pytest.mark.parametrize(
     "threshold",
     [0, 0.5, [0.1, 0.3, 0.5], xr.DataArray([0.1, 0.3, 0.5], dims="threshold")],
@@ -325,26 +324,28 @@ def test_brier_score_vs_fair_brier_score(o, f_prob, dim):
     assert (fbs <= bs).all(), print("fairBS", fbs, "\nBS", bs)
 
 
+@pytest.mark.parametrize("chunk_bool", [True, False])
+@pytest.mark.parametrize("input_type", ["DataArray", "Dataset", "multidim Dataset"])
 @pytest.mark.parametrize("dim", DIMS)
-@pytest.mark.parametrize("obj", ["da", "ds", "chunked_da", "chunked_ds"])
-def test_rank_histogram_sum(o, f_prob, dim, obj):
+def test_rank_histogram_sum(o, f_prob, dim, chunk_bool, input_type):
     """Test that the number of samples in the rank histogram is correct"""
-    if "ds" in obj:
-        name = "var"
-        o = o.to_dataset(name=name)
-        f_prob = f_prob.to_dataset(name=name)
-    if "chunked" in obj:
-        o = o.chunk()
-        f_prob = f_prob.chunk()
+    o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
     if dim == []:
         with pytest.raises(ValueError):
             rank_histogram(o, f_prob, dim=dim)
     else:
         rank_hist = rank_histogram(o, f_prob, dim=dim)
-        if "ds" in obj:
-            rank_hist = rank_hist[name]
-            o = o[name]
+        if "Dataset" in input_type:
+            rank_hist = rank_hist[list(o.data_vars)[0]]
+            o = o[list(o.data_vars)[0]]
+            assert_allclose(rank_hist.sum(), o.count())
         assert_allclose(rank_hist.sum(), o.count())
+        # test that returns chunks
+        assert_chunk(rank_hist, chunk_bool)
+        # test that attributes are kept # TODO: add
+        # assert_keep_attrs(rank_hist, o, keep_attrs)
+        # test that input types equal output types
+        assign_type_input_output(rank_hist, o)
 
 
 def test_rank_histogram_values(o, f_prob):
@@ -354,30 +355,21 @@ def test_rank_histogram_values(o, f_prob):
     assert rank_histogram((f_prob.max() + 1) + 0 * o, f_prob)[-1] == o.size
 
 
-def test_rank_histogram_dask(o_dask, f_prob_dask):
-    """Test that rank_histogram returns dask array if provided dask array"""
-    actual = rank_histogram(o_dask, f_prob_dask)
-    assert actual.chunks is not None
-
-
 @pytest.mark.parametrize("dim", DIMS)
-@pytest.mark.parametrize("obj", ["da", "ds", "chunked_da", "chunked_ds"])
-def test_discrimination_sum(o, f_prob, dim, obj):
+@pytest.mark.parametrize("chunk_bool", [True, False])
+@pytest.mark.parametrize("input_type", ["DataArray", "Dataset", "multidim Dataset"])
+def test_discrimination_sum(o, f_prob, dim, chunk_bool, input_type):
     """Test that the probabilities sum to 1"""
-    if "ds" in obj:
-        name = "var"
-        o = o.to_dataset(name=name)
-        f_prob = f_prob.to_dataset(name=name)
-    if "chunked" in obj:
-        o = o.chunk()
-        f_prob = f_prob.chunk()
+    o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
     if dim == []:
         with pytest.raises(ValueError):
             discrimination(o > 0.5, (f_prob > 0.5).mean("member"), dim=dim)
     else:
         disc = discrimination(o > 0.5, (f_prob > 0.5).mean("member"), dim=dim)
-        if "ds" in obj:
-            disc = disc[name]
+        # test that input types equal output types
+        assign_type_input_output(disc, o)
+        if "Dataset" in input_type:
+            disc = disc[list(o.data_vars)[0]]
         hist_event_sum = (
             disc.sel(event=True).sum("forecast_probability", skipna=False).values
         )
@@ -387,6 +379,11 @@ def test_discrimination_sum(o, f_prob, dim, obj):
         # Note, xarray's assert_allclose is already imported but won't compare to scalar
         assert np.allclose(hist_event_sum[~np.isnan(hist_event_sum)], 1)
         assert np.allclose(hist_no_event_sum[~np.isnan(hist_no_event_sum)], 1)
+
+        # test that returns chunks
+        assert_chunk(disc, chunk_bool)
+        # test that attributes are kept # TODO: add
+        # assert_keep_attrs(disc, o, keep_attrs)
 
 
 def test_discrimination_perfect_values(o):
@@ -399,28 +396,23 @@ def test_discrimination_perfect_values(o):
     assert np.allclose(disc.sel(event=False)[1:], 0)
 
 
-def test_discrimination_dask(o_dask, f_prob_dask):
-    """Test that discrimination returns dask array if provided dask array"""
-    disc = discrimination(o_dask > 0.5, (f_prob_dask > 0.5).mean("member"))
-    assert disc.chunks is not None
-
-
 @pytest.mark.parametrize("dim", DIMS)
-@pytest.mark.parametrize("obj", ["da", "ds", "chunked_da", "chunked_ds"])
-def test_reliability(o, f_prob, dim, obj):
-    """Test that reliability object can be generated"""
-    if "ds" in obj:
-        name = "var"
-        o = o.to_dataset(name=name)
-        f_prob = f_prob.to_dataset(name=name)
-    if "chunked" in obj:
-        o = o.chunk()
-        f_prob = f_prob.chunk()
+@pytest.mark.parametrize("chunk_bool", [True, False])
+@pytest.mark.parametrize("input_type", ["DataArray", "Dataset", "multidim Dataset"])
+def test_reliability_api_and_inputs(o, f_prob, dim, chunk_bool, input_type):
+    """Test that reliability keeps chunking and input types."""
+    o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
     if dim == []:
         with pytest.raises(ValueError):
             reliability(o > 0.5, (f_prob > 0.5).mean("member"), dim)
     else:
-        reliability(o > 0.5, (f_prob > 0.5).mean("member"), dim=dim)
+        actual = reliability(o > 0.5, (f_prob > 0.5).mean("member"), dim=dim)
+        # test that returns chunks
+        assert_chunk(actual, chunk_bool)
+        # test that attributes are kept
+        # assert_keep_attrs(actual, o, keep_attrs) # TODO: implement
+        # test that input types equal output types
+        assign_type_input_output(actual, o)
 
 
 def test_reliability_values(o, f_prob):
@@ -450,16 +442,9 @@ def test_reliability_perfect_values(o):
     assert np.allclose(actual["samples"].sum(), o.size)
 
 
-def test_reliability_dask(o_dask, f_prob_dask):
-    """Test that reliability returns dask array if provided dask array"""
-    actual = reliability(o_dask > 0.5, (f_prob_dask > 0.5).mean("member"))
-    assert actual.chunks is not None
-
-
 @pytest.mark.parametrize("fair_bool", [True, False])
 @pytest.mark.parametrize("dim", DIMS)
-@pytest.mark.parametrize("obj", ["da", "ds", "chunked_da", "chunked_ds"])
-def test_rps_reduce_dim(o, f_prob, category_edges, dim, obj, fair_bool):
+def test_rps_reduce_dim(o, f_prob, category_edges, dim, fair_bool):
     """Test that rps reduced dim and works for (chunked) ds and da"""
     actual = rps(o, f_prob, category_edges=category_edges, dim=dim, fair=fair_bool)
     assert_only_dim_reduced(dim, actual, o)
