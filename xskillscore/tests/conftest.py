@@ -180,6 +180,19 @@ def weights_cos_lat(a):
 
 
 @pytest.fixture
+def weights_linear_time(a):
+    """Weighting array by linear (1 -> 0) of the time."""
+    weights = xr.DataArray(np.linspace(1, 0, num=len(a.time)), dims="time")
+    return xr.ones_like(a) * weights
+
+
+@pytest.fixture
+def weights_linear_time_1d(weights_linear_time):
+    """Timeseries of weights_linear_time"""
+    return weights_linear_time.isel(lon=0, lat=0, drop=True)
+
+
+@pytest.fixture
 def weights_lonlat(a):
     weights = np.cos(np.deg2rad(a.lat))
     _, weights = xr.broadcast(a, weights)
