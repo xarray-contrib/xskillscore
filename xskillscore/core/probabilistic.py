@@ -353,8 +353,8 @@ def threshold_brier_score(
     if isinstance(threshold, (xr.DataArray, xr.Dataset)):
         if "threshold" not in threshold.dims:
             raise ValueError(
-                "please provide threshold with threshold dim, found",
-                threshold.dims,
+                "please provide threshold as xr.DataArray with threshold dim, found",
+                f"dim = {threshold.dims}, type = {type(threshold)}",
             )
         input_core_dims = [[], [member_dim], ["threshold"]]
         output_core_dims = [["threshold"]]
