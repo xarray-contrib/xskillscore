@@ -561,7 +561,7 @@ def test_roc_auc_score_perfect_forecast(forecast_1d_long, symmetric_edges):
 def test_roc_auc_score_out_of_range_forecast(
     forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate_bool
 ):
-    """Test that ROC AUC equals 0.0 for out of range forecast."""
+    """Test that ROC AUC equals 0.0 (or 0.5) for out of range forecast."""
     area = roc(
         observation_1d_long,
         xr.ones_like(forecast_1d_long) + 100,
@@ -570,7 +570,7 @@ def test_roc_auc_score_out_of_range_forecast(
         dim="time",
         return_results="area",
     )
-    assert float(area) == 0.0
+    assert float(area) == [.0, .5]
 
 
 @pytest.mark.parametrize("drop_intermediate_bool", [False, True])
