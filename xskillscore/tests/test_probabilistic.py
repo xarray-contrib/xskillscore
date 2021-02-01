@@ -98,14 +98,15 @@ def test_crps_ensemble_api_and_inputs(o, f_prob, keep_attrs, input_type, chunk_b
 def test_crps_ensemble_dim(o, f_prob, dim):
     """Check that crps_ensemble reduces only dim."""
     actual = crps_ensemble(o, f_prob, dim=dim)
-
-    
-def test_crps_ensemble_weighted(o, f_prob, weights_cos_lat, keep_attrs):
-    dim = ["lon", "lat"]
-    actual = crps_ensemble(
-        o, f_prob, dim=dim, weights=weights_cos_lat, keep_attrs=keep_attrs
-    )
     assert_only_dim_reduced(dim, actual, o)
+
+
+def test_crps_ensemble_weighted(o, f_prob, weights_cos_lat):
+    """Test that weighted changes results of crps_ensemble."""
+    dim = ["lon", "lat"]
+    actual = crps_ensemble(o, f_prob, dim=dim, weights=weights_cos_lat)
+    actual_no_weights = crps_ensemble(o, f_prob, dim=dim)
+    assert not (actual_no_weights == actual).all()
 
 
 @pytest.mark.parametrize("chunk_bool", [True, False])
@@ -513,7 +514,6 @@ def test_rps_limits(o, f_prob, category_edges, fair_bool, dim):
     res = rps(o, f_prob, dim=dim, fair=fair_bool, category_edges=category_edges)
     assert (res <= 1.0).all(), print(res.max())
     assert (res >= 0).all(), print(res.min())
-
 
 
 @pytest.mark.parametrize(
