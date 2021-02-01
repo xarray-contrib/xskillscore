@@ -576,8 +576,8 @@ def test_roc_auc_score_random_forecast(
         dim="time",
         return_results="area",
     )
-    assert area < 0.6
-    assert area > 0.4
+    assert area < 0.65
+    assert area > 0.35
 
 
 def test_roc_auc_score_perfect_forecast(forecast_1d_long, symmetric_edges):
