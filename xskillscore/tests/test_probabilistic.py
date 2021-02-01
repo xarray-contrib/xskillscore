@@ -6,6 +6,7 @@ import xarray as xr
 from dask import is_dask_collection
 from scipy.stats import norm
 from sklearn.calibration import calibration_curve
+from sklearn.metrics import roc_auc_score, roc_curve
 from xarray.tests import assert_allclose, assert_identical
 
 from xskillscore.core.probabilistic import (
@@ -16,6 +17,7 @@ from xskillscore.core.probabilistic import (
     discrimination,
     rank_histogram,
     reliability,
+    roc,
     rps,
     threshold_brier_score,
 )
@@ -96,6 +98,13 @@ def test_crps_ensemble_api_and_inputs(o, f_prob, keep_attrs, input_type, chunk_b
 def test_crps_ensemble_dim(o, f_prob, dim):
     """Check that crps_ensemble reduces only dim."""
     actual = crps_ensemble(o, f_prob, dim=dim)
+
+    
+def test_crps_ensemble_weighted(o, f_prob, weights_cos_lat, keep_attrs):
+    dim = ["lon", "lat"]
+    actual = crps_ensemble(
+        o, f_prob, dim=dim, weights=weights_cos_lat, keep_attrs=keep_attrs
+    )
     assert_only_dim_reduced(dim, actual, o)
 
 
@@ -504,3 +513,226 @@ def test_rps_limits(o, f_prob, category_edges, fair_bool, dim):
     res = rps(o, f_prob, dim=dim, fair=fair_bool, category_edges=category_edges)
     assert (res <= 1.0).all(), print(res.max())
     assert (res >= 0).all(), print(res.min())
+
+
+
+@pytest.mark.parametrize(
+    "observation,forecast",
+    [
+        (
+            pytest.lazy_fixture("observation_1d_long"),
+            pytest.lazy_fixture("forecast_1d_long"),
+        ),
+        (
+            pytest.lazy_fixture("observation_3d"),
+            pytest.lazy_fixture("forecast_3d"),
+        ),
+    ],
+)
+@pytest.mark.parametrize("dim", ["time", None])
+@pytest.mark.parametrize("drop_intermediate_bool", [True, False])
+@pytest.mark.parametrize("chunk", [True, False])
+@pytest.mark.parametrize("input", ["Dataset", "DataArray"])
+@pytest.mark.parametrize(
+    "return_results", ["all_as_tuple", "area", "all_as_metric_dim"]
+)
+def test_roc_returns(
+    observation,
+    forecast,
+    symmetric_edges,
+    dim,
+    return_results,
+    input,
+    chunk,
+    drop_intermediate_bool,
+):
+    """testing keywords and inputs pass"""
+    if "Dataset" in input:
+        name = "var"
+        forecast = forecast.to_dataset(name=name)
+        observation = observation.to_dataset(name=name)
+    if chunk:
+        forecast = forecast.chunk()
+        observation = observation.chunk()
+
+    roc(
+        observation,
+        forecast,
+        symmetric_edges,
+        dim=dim,
+        drop_intermediate=drop_intermediate_bool,
+        return_results=return_results,
+    )
+
+
+def test_roc_auc_score_random_forecast(
+    forecast_1d_long, observation_1d_long, symmetric_edges
+):
+    """Test that ROC AUC around 0.5 for random forecast."""
+    area = roc(
+        observation_1d_long,
+        forecast_1d_long,
+        symmetric_edges,
+        dim="time",
+        return_results="area",
+    )
+    assert area < 0.6
+    assert area > 0.4
+
+
+def test_roc_auc_score_perfect_forecast(forecast_1d_long, symmetric_edges):
+    """Test that ROC AUC equals 1 for perfect forecast."""
+    area = roc(
+        forecast_1d_long,
+        forecast_1d_long,
+        symmetric_edges,
+        drop_intermediate=False,
+        dim="time",
+        return_results="area",
+    )
+    assert area == 1.0
+
+
+@pytest.mark.parametrize("drop_intermediate_bool", [False, True])
+def test_roc_auc_score_out_of_range_forecast(
+    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate_bool
+):
+    """Test that ROC AUC equals 0.0 for out of range forecast."""
+    area = roc(
+        observation_1d_long,
+        xr.ones_like(forecast_1d_long) + 100,
+        symmetric_edges,
+        drop_intermediate=drop_intermediate_bool,
+        dim="time",
+        return_results="area",
+    )
+    assert float(area) == 0.0
+
+
+@pytest.mark.parametrize("drop_intermediate_bool", [False, True])
+def test_roc_auc_score_out_of_range_observation(
+    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate_bool
+):
+    """Test that ROC AUC equals 0.0 for out of range observation."""
+    area = roc(
+        xr.ones_like(observation_1d_long) + 100,
+        forecast_1d_long,
+        symmetric_edges,
+        drop_intermediate=drop_intermediate_bool,
+        dim="time",
+        return_results="area",
+    )
+    np.testing.assert_almost_equal(area, 0.0, decimal=2)
+
+
+@pytest.mark.parametrize("drop_intermediate_bool", [False, True])
+def test_roc_auc_score_out_of_range_edges(
+    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate_bool
+):
+    """Test that ROC AUC equals 0.5 for out of range edges."""
+    area = roc(
+        observation_1d_long,
+        forecast_1d_long,
+        symmetric_edges + 100,
+        drop_intermediate=drop_intermediate_bool,
+        dim="time",
+        return_results="area",
+    )
+    assert float(area) == 0.5
+
+
+@pytest.mark.parametrize("drop_intermediate_bool", [False, True])
+def test_roc_auc_score_constant_forecast(
+    forecast_1d_long, observation_1d_long, symmetric_edges, drop_intermediate_bool
+):
+    """Test that ROC AUC equals 0.5 for constant forecast."""
+    xs_area = roc(
+        observation_1d_long > 0,
+        forecast_1d_long * 0,
+        symmetric_edges,
+        drop_intermediate=drop_intermediate_bool,
+        dim="time",
+        return_results="area",
+    )
+    sk_area = roc_auc_score(observation_1d_long > 0, forecast_1d_long * 0)
+    np.testing.assert_allclose(xs_area, sk_area)
+
+
+@pytest.mark.parametrize("drop_intermediate_bool", [False, True])
+def test_roc_bin_edges_continuous_against_sklearn(
+    forecast_1d_long, observation_1d_long, drop_intermediate_bool
+):
+    """Test xs.roc against sklearn.metrics.roc_curve/auc_score."""
+    fp = np.clip(forecast_1d_long, 0, 1)  # prob
+    ob = observation_1d_long > 0  # binary
+    # sklearn
+    sk_fpr, sk_tpr, _ = roc_curve(ob, fp, drop_intermediate=drop_intermediate_bool)
+    sk_area = roc_auc_score(ob, fp)
+    # xs
+    xs_fpr, xs_tpr, xs_area = roc(
+        ob,
+        fp,
+        "continuous",
+        drop_intermediate=drop_intermediate_bool,
+        return_results="all_as_tuple",
+    )
+    np.testing.assert_allclose(xs_area, sk_area)
+    if not drop_intermediate_bool:  # drops sometimes one too much or too little
+        assert (xs_fpr == sk_fpr).all()
+        assert (xs_tpr == sk_tpr).all()
+
+
+def test_roc_bin_edges_drop_intermediate(forecast_1d_long, observation_1d_long):
+    """Test that drop_intermediate reduces probability_bins in xs.roc ."""
+    fp = np.clip(forecast_1d_long, 0, 1)  # prob
+    ob = observation_1d_long > 0  # binary
+    # xs
+    txs_fpr, txs_tpr, txs_area = roc(
+        ob, fp, "continuous", drop_intermediate=True, return_results="all_as_tuple"
+    )
+    fxs_fpr, fxs_tpr, fxs_area = roc(
+        ob, fp, "continuous", drop_intermediate=False, return_results="all_as_tuple"
+    )
+    # same area
+    np.testing.assert_allclose(fxs_area, txs_area)
+    # same or less probability_bins
+    assert len(fxs_fpr) >= len(txs_fpr)
+    assert len(fxs_tpr) >= len(txs_tpr)
+
+
+def test_roc_keeps_probability_bin_as_coord(
+    observation_1d_long, forecast_1d_long, symmetric_edges
+):
+    """Test that roc keeps probability_bin as coords."""
+    fpr, tpr, area = roc(
+        observation_1d_long,
+        forecast_1d_long,
+        symmetric_edges,
+        drop_intermediate=False,
+        return_results="all_as_tuple",
+    )
+    assert (tpr.probability_bin == symmetric_edges).all()
+    assert (fpr.probability_bin == symmetric_edges).all()
+
+
+def test_roc_bin_edges_symmetric_asc_or_desc(
+    observation_1d_long, forecast_1d_long, symmetric_edges
+):
+    """Test that roc bin_edges works increasing or decreasing order."""
+    fpr, tpr, area = roc(
+        observation_1d_long,
+        forecast_1d_long,
+        symmetric_edges,
+        drop_intermediate=False,
+        return_results="all_as_tuple",
+    )
+    fpr2, tpr2, area2 = roc(
+        observation_1d_long,
+        forecast_1d_long,
+        symmetric_edges[::-1],
+        drop_intermediate=False,
+        return_results="all_as_tuple",
+    )
+    assert_identical(fpr, fpr2.sortby(fpr.probability_bin))
+    assert_identical(tpr, tpr2.sortby(tpr.probability_bin))
+    assert_identical(area, area2)

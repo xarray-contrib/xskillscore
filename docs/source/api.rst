@@ -59,6 +59,7 @@ Currently, most of our probabilistic metrics are ported over from
     rank_histogram
     discrimination
     reliability
+    roc
 
 Contingency-based Metrics
 -------------------------
@@ -109,6 +110,7 @@ Multi-Category Metrics
     Contingency.heidke_score
     Contingency.peirce_score
     Contingency.gerrity_score
+    roc
 
 Comparative
 -----------
@@ -119,3 +121,18 @@ Tests to compare whether one forecast is significantly better than another one.
     :toctree: api/
 
     sign_test
+    mae_test
+
+Resampling
+----------
+
+Functions for resampling from a dataset with or without replacement that create a new
+``iteration`` dimension.
+
+.. currentmodule:: xskillscore.core.resampling
+
+.. autosummary::
+    :toctree: api/
+
+    resample_iterations
+    resample_iterations_idx

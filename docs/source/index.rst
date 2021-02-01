@@ -1,8 +1,8 @@
 xskillscore: Metrics for verifying forecasts
 ============================================
 
-.. image:: https://travis-ci.org/xarray-contrib/xskillscore.svg?branch=master
-   :target: https://travis-ci.org/xarray-contrib/xskillscore
+.. image:: https://github.com/xarray-contrib/xskillscore/workflows/xskillscore%20testing/badge.svg
+   :target: https://github.com/xarray-contrib/xskillscore/workflows/xskillscore%20testing/
 
 .. image:: https://img.shields.io/pypi/v/xskillscore.svg
    :target: https://pypi.python.org/pypi/xskillscore/
@@ -10,11 +10,8 @@ xskillscore: Metrics for verifying forecasts
 .. image:: https://anaconda.org/conda-forge/xskillscore/badges/version.svg
    :target: https://anaconda.org/conda-forge/xskillscore/
 
-.. image:: https://coveralls.io/repos/github/xarray-contrib/xskillscore/badge.svg?branch=master
-   :target: https://coveralls.io/github/xarray-contrib/xskillscore?branch=master
-
-.. image:: https://img.shields.io/badge/benchmarked%20by-asv-green.svg?style=flat
-   :target: https://raybellwaves.github.io/xskillscore/
+.. image:: https://codecov.io/gh/xarray-contrib/xskillscore/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/xarray-contrib/xskillscore
 
 .. image:: https://img.shields.io/conda/dn/conda-forge/xskillscore.svg
    :target: https://anaconda.org/conda-forge/xskillscore

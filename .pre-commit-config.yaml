@@ -1,28 +1,28 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.2.3
+    rev: v3.3.0
     hooks:
+      - id: trailing-whitespace
       - id: no-commit-to-branch
       - id: check-docstring-first
       - id: end-of-file-fixer
       - id: check-merge-conflict
-
-  # isort should run before black as black sometimes tweaks the isort output
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.5.3
-    hooks:
-      - id: isort
+      - id: check-yaml
 
   - repo: https://github.com/psf/black
     rev: stable
     hooks:
-      - id: black
+    - id: black
 
   - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.3
+    rev: 3.8.4
     hooks:
-      - id: flake8
-        args: ["--ignore=E203,E711,W503"]
+    - id: flake8
+
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.6.4
+    hooks:
+    - id: isort
 
   - repo: https://github.com/PyCQA/doc8
     rev: 0.8.1rc2

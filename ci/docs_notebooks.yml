@@ -1,0 +1,27 @@
+name: xskillscore-docs-notebooks
+channels:
+  - conda-forge
+dependencies:
+  - bottleneck
+  - cftime
+  - dask
+  - numba>=0.52
+  - numpy
+  - properscoring
+  - scikit-learn
+  - scipy
+  - xarray>=0.16.1
+  - xhistogram
+  - importlib_metadata
+  - jupyterlab
+  - matplotlib
+  - nbsphinx
+  - nbstripout
+  - sphinx
+  - sphinxcontrib-napoleon
+  - sphinx_rtd_theme
+  - pip
+  - pip:
+    - sphinx_autosummary_accessors
+    # Install latest version of xskillscore.
+    - -e ..

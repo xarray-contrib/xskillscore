@@ -14,6 +14,21 @@ Features
   keyword ``fair`` to account for ensemble-size adjustments, but defaults to ``False``.
   Adjustment not implemented yet for :py:func:`~xskillscore.crps_ensemble`. PR welcome.
   (:issue:`162`, :pr:`211`) `Aaron Spring`_
+- Added MAE significance test :py:func:`~xskillscore.mae_test` from Jolliffe and Ebert
+  https://www.cawcr.gov.au/projects/verification/CIdiff/FAQ-CIdiff.html
+  (:issue:`192`, :pr:`209`) `Aaron Spring`_
+- :py:func:`~xskillscore.resampling.resample_iterations` and faster
+  :py:func:`~xskillscore.resampling.resample_iterations_idx` for resampling with and
+  without replacement. (:issue:`215`, :pr:`225`) `Aaron Spring`_
+- Added receiver operating characteristic (ROC) :py:func:`~xskillscore.roc`.
+  (:issue:`114`, :pr:`236`) `Aaron Spring`_
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+- Aligned output of :py:func:`~xskillscore.sign_test` with
+  :py:func:`~xskillscore.mae_test`. Now tests from comparative.py return more than
+  one object including a boolean indicating ``signficance`` based on ``alpha``.
+  (:pr:`209`) `Aaron Spring`_
 
 Bug Fixes
 ~~~~~~~~~
@@ -22,12 +37,20 @@ Bug Fixes
 - :py:func:`~xskillscore.threshold_brier_score` does not average over thresholds when
   ``dim==None``. Now also carries ``threshold`` as coordinate.
   (:issue:`255`, :pr:`211`) `Aaron Spring`_
+- Passing weights no longer triggers eager computation.
+  (:issue:`218`, :pr:`224`). `Andrew Huang`_
+
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
 - Added Python 3.7 and Python 3.8 to the CI. Use the latest version of Python 3
-  for development. (:issue:`21`, :pr:`189`). `Aaron Spring`_
-- Lint with the latest black. (:issue:`179`, :pr:`191`). `Ray Bell`_
+  for development. (:issue:`21`, :pr:`189`) `Aaron Spring`_
+- Lint with the latest black. (:issue:`179`, :pr:`191`) `Ray Bell`_
+- Update mape algorithm from scikit-learn v0.24.0 and test against it.
+  (:issue:`160`, :pr:`230`) `Ray Bell`_
+- Pin ``numba`` to ``>=0.52`` to fix CI (:issue:`233`, :pr:`234`) `Ray Bell`_
+- Refactor ``asv`` benchmarks. (:pr:`231`) `Aaron Spring`_
+- Added tests for nans in correlation metrics (:issue:`246`, :pr:`247`) `Ray Bell`_
 
 
 xskillscore v0.0.18 (2020-09-23)

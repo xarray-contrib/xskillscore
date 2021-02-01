@@ -1046,12 +1046,13 @@ def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     .. math::
         \\mathrm{MAPE} = \\frac{1}{n} \\sum_{i=1}^{n}
                          \\frac{\\vert a_{i} - b_{i} \\vert}
-                               {\\vert a_{i} \\vert}
+                               {max(\epsilon, \\vert a_{i} \\vert)}
 
     .. note::
         The percent error is calculated in reference to ``a``. Percent
         error is reported as decimal percent. I.e., a value of 1 is
-        100%.
+        100%. :math:`\epsilon` is an arbitrary small yet strictly positive
+        number to avoid undefined results when ``a`` is zero.
 
     Parameters
     ----------
@@ -1077,6 +1078,10 @@ def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     -------
     xarray.Dataset or xarray.DataArray
         Mean Absolute Percentage Error.
+
+    See Also
+    --------
+    sklearn.metrics.mean_absolute_percentage_error
 
     References
     ----------
