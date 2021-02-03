@@ -276,18 +276,6 @@ def test_threshold_brier_score_threshold_dataset(o_dask, f_prob_dask):
     # assert (actual.threshold == threshold).all()
 
 
-def test_threshold_brier_score_dataset(o, f_prob):
-    """Test that threshold_brier_score accepts xr.Datasets."""
-    threshold = xr.DataArray([0.1, 0.3, 0.5], dims="threshold")
-    o = o.to_dataset(name="var")
-    o["var2"] = o["var"] ** 2
-    f_prob = f_prob.to_dataset(name="var")
-    f_prob["var2"] = f_prob["var"] ** 2
-    actual = threshold_brier_score(o, f_prob, threshold)
-    assert (actual.threshold == threshold).all()
-    assert list(actual.data_vars) == list(o.data_vars)
-
-
 @pytest.mark.parametrize("chunk_bool", [True, False])
 @pytest.mark.parametrize("input_type", ["Dataset", "multidim Dataset", "DataArray"])
 @pytest.mark.parametrize("fair_bool", [True, False])
@@ -325,6 +313,14 @@ def test_brier_score_dim(o, f_prob, dim, fair_bool):
     o = o > 0.5
     actual = brier_score(o, f_prob, dim=dim, fair=fair_bool)
     assert_only_dim_reduced(dim, actual, o)
+
+
+def test_brier_score_forecast_member_dim(o, f_prob):
+    """Check that brier_score allows forecasts with member dim and binary/boolean
+    data."""
+    f_prob > 0.5
+    o = o > 0.5
+    assert_identical(brier_score(o, f_prob), brier_score(o, f_prob.mean("member")))
 
 
 @pytest.mark.parametrize("dim", DIMS)
