@@ -256,11 +256,11 @@ def crps_ensemble(
 def brier_score(
     observations,
     forecasts,
-    dim=None,
+    member_dim="member",
     fair=False,
+    dim=None,
     weights=None,
     keep_attrs=False,
-    member_dim="member",
 ):
     """Calculate Brier score (BS).
 
@@ -274,13 +274,20 @@ def brier_score(
         Data should be boolean or logical \
         (True or 1 for event occurance, False or 0 for non-occurance).
     forecasts : xarray.Dataset or xarray.DataArray
-        The forecast likelihoods of the event. Data should be between 0 and 1.
-    dim : str or list of str, optional
-        Dimension over which to compute mean after computing ``brier_score``.
-        Defaults to None implying averaging over all dimensions.
+        The forecast likelihoods of the event.
+        If ``fair==False``, forecasts should be between 0 and 1 without a dimension
+        ``member_dim`` or should be boolean (True,False) or binary (0, 1) containing a
+        member dimension (probabilities will be internally calculated by
+        ``.mean(member_dim))``. If ``fair==True``, forecasts must be boolean
+        (True,False) or binary (0, 1) containing dimension ``member_dim``.
+    member_dim : str, optional
+        Name of ensemble member dimension. By default, 'member'.
     fair: boolean
         Apply ensemble member-size adjustment for unbiased, fair metric;
         see Ferro (2013). Defaults to False.
+    dim : str or list of str, optional
+        Dimension over which to compute mean after computing ``brier_score``.
+        Defaults to None implying averaging over all dimensions.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`.
         Defaults to None, such that no weighting is applied.
@@ -326,32 +333,31 @@ def brier_score(
       1917–1923, 2013. doi: 10.1002/qj.2270.
     * https://www-miklip.dkrz.de/about/problems/
     """
-    if fair:
-        if member_dim not in forecasts.dims:
-            raise ValueError(
-                "need forecast with member dim"
-            )  # TODO: check that brier_score always get member in forecast
+    with xr.set_options(keep_attrs=keep_attrs):
+        if fair:
+            if member_dim not in forecasts.dims:
+                raise ValueError("need forecast with member dim")
+            else:
+                M = forecasts[member_dim].size
+                e = (forecasts == 1).sum(member_dim)
+                o = observations
+                res = (e / M - o) ** 2 - e * (M - e) / (M ** 2 * (M - 1))
         else:
-            M = forecasts[member_dim].size
-            e = (forecasts == 1).sum(member_dim, keep_attrs=keep_attrs)
-            o = observations
-        with xr.set_options(keep_attrs=keep_attrs):
-            res = (e / M - o) ** 2 - e * (M - e) / (M ** 2 * (M - 1))
-        res.attrs = observations.attrs  # dirty fix
-    else:
-        res = xr.apply_ufunc(
-            properscoring.brier_score,
-            observations,
-            forecasts,
-            input_core_dims=[[], []],
-            dask="parallelized",
-            output_dtypes=[float],
-            keep_attrs=keep_attrs,
-        )
-    if weights is not None:
-        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
-    else:
-        return res.mean(dim, keep_attrs=keep_attrs)
+            if member_dim in forecasts.dims:
+                forecasts = forecasts.mean(member_dim)
+            res = xr.apply_ufunc(
+                properscoring.brier_score,
+                observations,
+                forecasts,
+                input_core_dims=[[], []],
+                dask="parallelized",
+                output_dtypes=[float],
+                keep_attrs=keep_attrs,
+            )
+        if weights is not None:
+            return res.weighted(weights).mean(dim)
+        else:
+            return res.mean(dim)
 
 
 def threshold_brier_score(
@@ -557,7 +563,7 @@ def rps(
         forecasts,
         bins=[category_edges],
         bin_names=bin_names,
-        dim=[member_dim],  # ,density=True
+        dim=[member_dim],
     )
     if fair:
         e = forecasts

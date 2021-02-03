@@ -12,8 +12,8 @@ Features
   `Andrew Huang`_
 - :py:func:`~xskillscore.brier_score` and :py:func:`~xskillscore.rps` now contain
   keyword ``fair`` to account for ensemble-size adjustments, but defaults to ``False``.
-  Adjustment not implemented yet for :py:func:`~xskillscore.crps_ensemble`. PR welcome.
-  (:issue:`162`, :pr:`211`) `Aaron Spring`_
+  :py:func:`~xskillscore.brier_score` also accepts binary or boolean forecasts when a
+  ``member_dim`` dimension is present. (:issue:`162`, :pr:`211`) `Aaron Spring`_
 - Added MAE significance test :py:func:`~xskillscore.mae_test` from Jolliffe and Ebert
   https://www.cawcr.gov.au/projects/verification/CIdiff/FAQ-CIdiff.html
   (:issue:`192`, :pr:`209`) `Aaron Spring`_
@@ -39,7 +39,6 @@ Bug Fixes
   (:issue:`255`, :pr:`211`) `Aaron Spring`_
 - Passing weights no longer triggers eager computation.
   (:issue:`218`, :pr:`224`). `Andrew Huang`_
-
 
 Internal Changes
 ~~~~~~~~~~~~~~~~

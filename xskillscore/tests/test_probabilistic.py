@@ -276,15 +276,16 @@ def test_threshold_brier_score_threshold_dataset(o_dask, f_prob_dask):
     # assert (actual.threshold == threshold).all()
 
 
-def test_threshold_brier_score_dataset(o_dask, f_prob_dask):
+def test_threshold_brier_score_dataset(o, f_prob):
     """Test that threshold_brier_score accepts xr.Datasets."""
     threshold = xr.DataArray([0.1, 0.3, 0.5], dims="threshold")
-    o_dask = o_dask.to_dataset(name="var")
-    o_dask["var2"] = o_dask["var"] ** 2
-    f_prob_dask = f_prob_dask.to_dataset(name="var")
-    f_prob_dask["var2"] = f_prob_dask["var"] ** 2
-    actual = threshold_brier_score(o_dask, f_prob_dask, threshold)
+    o = o.to_dataset(name="var")
+    o["var2"] = o["var"] ** 2
+    f_prob = f_prob.to_dataset(name="var")
+    f_prob["var2"] = f_prob["var"] ** 2
+    actual = threshold_brier_score(o, f_prob, threshold)
     assert (actual.threshold == threshold).all()
+    assert list(actual.data_vars) == list(o.data_vars)
 
 
 @pytest.mark.parametrize("chunk_bool", [True, False])
