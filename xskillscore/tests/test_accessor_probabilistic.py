@@ -12,6 +12,7 @@ from xskillscore.core.probabilistic import (
     discrimination,
     rank_histogram,
     reliability,
+    roc,
     rps,
     threshold_brier_score,
 )
@@ -150,4 +151,20 @@ def test_rps_accessor(o, f_prob, outer_bool):
         expected = ds.xs.rps("o", f_prob, category_edges=category_edges)
     else:
         expected = ds.xs.rps("o", "f_prob", category_edges=category_edges)
+    assert_allclose(actual, expected)
+
+
+@pytest.mark.parametrize("outer_bool", [False, True])
+def test_roc_accessor(o, f_prob, outer_bool):
+    bin_edges = np.linspace(0, 1 + 1e-8, 6)
+    actual = roc(o, f_prob, bin_edges=bin_edges)
+
+    ds = xr.Dataset()
+    ds["o"] = o
+    ds["f_prob"] = f_prob
+    if outer_bool:
+        ds = ds.drop_vars("f_prob")
+        expected = ds.xs.roc("o", f_prob, bin_edges=bin_edges)
+    else:
+        expected = ds.xs.roc("o", "f_prob", bin_edges=bin_edges)
     assert_allclose(actual, expected)
