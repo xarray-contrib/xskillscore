@@ -58,20 +58,18 @@ def test_xs_same_as_skl(a_1d, b_1d, xs_skl_metrics):
     assert np.allclose(actual, expected)
 
 
-@pytest.mark.parametrize("squared", [False])
-def test_xs_same_as_skl_rmse(a_1d, b_1d, squared):
+def test_xs_same_as_skl_rmse(a_1d, b_1d):
     actual = rmse(a_1d, b_1d, "time")
-    expected = mean_squared_error(a_1d, b_1d, squared=squared)
+    expected = mean_squared_error(a_1d, b_1d, squared=False)
     assert np.allclose(actual, expected)
 
 
-@pytest.fixture(params=["median_absolute_error"])
-def test_xs_same_as_skl_same_name(a_1d, b_1d, request):
+def test_xs_same_as_skl_same_name(a_1d, b_1d):
     """Tests xskillscore metric is same as scikit-learn metric
     for metrics with same name."""
     xs_metric, skl_metric = (
-        getattr(xs, request.param),
-        getattr(sklearn.metrics, request.param),
+        getattr(xs, "median_absolute_error"),
+        getattr(sklearn.metrics, "median_absolute_error"),
     )
     actual = xs_metric(a_1d, b_1d, "time")
     expected = skl_metric(a_1d, b_1d)
