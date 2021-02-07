@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 import sklearn.metrics
-import xarray as xr
 from scipy.stats import pearsonr, spearmanr
 from sklearn.metrics import (
     mean_absolute_error,
