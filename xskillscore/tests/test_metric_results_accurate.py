@@ -45,7 +45,7 @@ xs_scipy_metrics = [
 
 xs_np_metrics = [
     (me, lambda x, y: np.mean(x - y)),
-    (smape, lambda x, y: 1 / len(x) * np.sum(np.abs(y - x) / (np.abs(x) + np.abs(y)))),
+    (smape, lambda x, y: np.mean(np.abs(x - y) / (np.abs(x) + np.abs(y)))),
 ]
 
 
@@ -95,7 +95,7 @@ def test_xs_same_as_scipy(a_1d, b_1d, xs_scipy_metrics):
 
 
 @pytest.mark.parametrize("xs_np_metrics", xs_np_metrics)
-def test_mape_same_as_numpy(a_1d, b_1d, xs_np_metrics):
+def test_xs_same_as_numpy(a_1d, b_1d, xs_np_metrics):
     """Tests xskillscore metric is same as metric using numpy."""
     xs_metric, np_metric = xs_np_metrics
     actual = xs_metric(a_1d, b_1d, "time")
