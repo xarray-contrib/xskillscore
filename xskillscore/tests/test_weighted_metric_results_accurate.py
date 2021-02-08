@@ -44,13 +44,7 @@ def weighted_pearsonr(x, y, w):
     return r_num / r_den
 
 
-def weighted_spearmanr(x, y, w):
-    x = rankdata(x)
-    y = rankdata(y)
-    return weighted_pearsonr(x, y, w)
-
-
-xs_scipy_metrics = [(pearson_r, weighted_pearsonr), (spearman_r, weighted_spearmanr)]
+xs_scipy_metrics = [(pearson_r, weighted_pearsonr)]
 
 
 xs_np_metrics = [
