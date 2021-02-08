@@ -44,8 +44,11 @@ xs_scipy_metrics = [
 
 
 xs_np_metrics = [
-    (me, lambda x, y: np.mean(x - y)),
-    (smape, lambda x, y: 1 / len(x) * np.sum(np.abs(y - x) / (np.abs(x) + np.abs(y)))),
+    (me, lambda x, y, w: np.sum((x - y) * w) / np.sum(w)),
+    (
+        smape,
+        lambda x, y, w: np.sum(np.abs(x - y) / (np.abs(x) + np.abs(y)) * w) / np.sum(w),
+    ),
 ]
 
 
@@ -67,11 +70,20 @@ def test_xs_same_as_skl_rmse_weighted(a_1d, b_1d, weights_linear_time_1d):
 
 
 @pytest.mark.parametrize("xs_skl_metrics", xs_skl_metrics_with_zeros)
-def test_xs_same_as_skl_with_zeros(
+def test_xs_same_as_skl_with_zeros_weighted(
     a_1d_with_zeros, b_1d, xs_skl_metrics, weights_linear_time_1d
 ):
-    """Tests xskillscore metric is same as scikit-learn metric."""
+    """Tests weighted xskillscore metric is same as weighted scikit-learn metric."""
     xs_metric, skl_metric = xs_skl_metrics
     actual = xs_metric(a_1d_with_zeros, b_1d, "time", weights_linear_time_1d)
     expected = skl_metric(a_1d_with_zeros, b_1d, sample_weight=weights_linear_time_1d)
+    assert np.allclose(actual, expected)
+
+
+@pytest.mark.parametrize("xs_np_metrics", xs_np_metrics)
+def test_xs_same_as_numpy_weighted(a_1d, b_1d, xs_np_metrics, weights_linear_time_1d):
+    """Tests weighted xskillscore metric is same as weighted metric using numpy."""
+    xs_metric, np_metric = xs_np_metrics
+    actual = xs_metric(a_1d, b_1d, "time", weights_linear_time_1d)
+    expected = np_metric(a_1d, b_1d, weights_linear_time_1d)
     assert np.allclose(actual, expected)
