@@ -378,9 +378,8 @@ def _spearman_r(a, b, weights, axis, skipna):
     """
     if skipna:
         a, b, weights = _match_nans(a, b, weights)
-    rankfunc = bn.nanrankdata
-    _a = rankfunc(a, axis=axis)
-    _b = rankfunc(b, axis=axis)
+    _a = bn.nanrankdata(a, axis=axis)
+    _b = bn.nanrankdata(b, axis=axis)
     return _pearson_r(_a, _b, weights, axis, skipna)
 
 

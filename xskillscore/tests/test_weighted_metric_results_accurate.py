@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 import sklearn.metrics
-from scipy.stats import pearsonr, spearmanr
+from scipy.stats import pearsonr, rankdata, spearmanr
 from sklearn.metrics import (
     mean_absolute_error,
     mean_absolute_percentage_error,
@@ -35,12 +35,22 @@ xs_skl_metrics_with_zeros = [
     (mape, mean_absolute_percentage_error),
 ]
 
-xs_scipy_metrics = [
-    (pearson_r, pearsonr, 0),
-    (spearman_r, spearmanr, 0),
-    (pearson_r_p_value, pearsonr, 1),
-    (spearman_r_p_value, spearmanr, 1),
-]
+
+def weighted_pearsonr(x, y, w):
+    xm = x - (np.sum(x * w) / np.sum(w))
+    ym = y - (np.sum(y * w) / np.sum(w))
+    r_num = np.sum(w * xm * ym)
+    r_den = np.sqrt(np.sum(w * xm * xm) * np.sum(w * ym * ym))
+    return r_num / r_den
+
+
+def weighted_spearmanr(x, y, w):
+    x = rankdata(x)
+    y = rankdata(y)
+    return weighted_pearsonr(x, y, w)
+
+
+xs_scipy_metrics = [(pearson_r, weighted_pearsonr), (spearman_r, weighted_spearmanr)]
 
 
 xs_np_metrics = [
@@ -77,6 +87,15 @@ def test_xs_same_as_skl_with_zeros_weighted(
     xs_metric, skl_metric = xs_skl_metrics
     actual = xs_metric(a_1d_with_zeros, b_1d, "time", weights_linear_time_1d)
     expected = skl_metric(a_1d_with_zeros, b_1d, sample_weight=weights_linear_time_1d)
+    assert np.allclose(actual, expected)
+
+
+@pytest.mark.parametrize("xs_scipy_metrics", xs_scipy_metrics)
+def test_xs_same_as_scipy(a_1d, b_1d, xs_scipy_metrics, weights_linear_time_1d):
+    """Tests weighted xskillscore metric is same as weighted scipy metric."""
+    xs_metric, scipy_metric = xs_scipy_metrics
+    actual = xs_metric(a_1d, b_1d, "time", weights_linear_time_1d)
+    expected = scipy_metric(a_1d.values, b_1d.values, weights_linear_time_1d.values)
     assert np.allclose(actual, expected)
 
 
