@@ -73,7 +73,7 @@ def test_xs_same_as_skl_rmse_weighted(a_1d, b_1d, weights_linear_time_1d):
 def test_xs_same_as_skl_with_zeros_weighted(
     a_1d_with_zeros, b_1d, xs_skl_metrics, weights_linear_time_1d
 ):
-    """Tests weighed xskillscore metric is same as weighted scikit-learn metric."""
+    """Tests weighted xskillscore metric is same as weighted scikit-learn metric."""
     xs_metric, skl_metric = xs_skl_metrics
     actual = xs_metric(a_1d_with_zeros, b_1d, "time", weights_linear_time_1d)
     expected = skl_metric(a_1d_with_zeros, b_1d, sample_weight=weights_linear_time_1d)
@@ -82,7 +82,7 @@ def test_xs_same_as_skl_with_zeros_weighted(
 
 @pytest.mark.parametrize("xs_np_metrics", xs_np_metrics)
 def test_xs_same_as_numpy_weighted(a_1d, b_1d, xs_np_metrics, weights_linear_time_1d):
-    """Tests xskillscore metric is same as metric using numpy."""
+    """Tests weighted xskillscore metric is same as weighted metric using numpy."""
     xs_metric, np_metric = xs_np_metrics
     actual = xs_metric(a_1d, b_1d, "time", weights_linear_time_1d)
     expected = np_metric(a_1d, b_1d, weights_linear_time_1d)
