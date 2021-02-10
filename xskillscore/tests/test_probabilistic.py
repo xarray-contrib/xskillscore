@@ -469,7 +469,7 @@ def test_rps_wilks_example():
     np.testing.assert_allclose(rps(Obs, F1, category_edges), 0.73)
 
 
-def test_2_category_rps_equals_brier_score(o, f_prob, input):
+def test_2_category_rps_equals_brier_score(o, f_prob):
     """Test that RPS for two categories equals the Brier Score."""
     category_edges = np.array([0.0, 0.5, 1.0])
     assert_allclose(
@@ -481,8 +481,7 @@ def test_2_category_rps_equals_brier_score(o, f_prob, input):
 @pytest.mark.parametrize("fair_bool", [True, False])
 def test_rps_perfect_values(o, category_edges, fair_bool):
     """Test values for perfect forecast"""
-    f = xr.concat(10 * [o], dim="member") > 0.5
-    o = o > 0.5
+    f = xr.concat(10 * [o], dim="member")
     res = rps(o, f, category_edges=category_edges, fair=fair_bool)
     assert (res == 0).all()
 
@@ -500,8 +499,6 @@ def test_rps_dask(o_dask, f_prob_dask, category_edges, fair_bool):
 def test_rps_vs_fair_rps(o, f_prob, category_edges, dim):
     """Test that fair rps is smaller or equal than rps due to ensemble-size
     adjustment."""
-    o = o > 0.5
-    f_prob = f_prob > 0.5
     frps = rps(o, f_prob, dim=dim, fair=True, category_edges=category_edges)
     ufrps = rps(o, f_prob, dim=dim, fair=False, category_edges=category_edges)
     assert (frps <= ufrps).all(), print("fairrps", frps, "\nufrps", ufrps)
@@ -511,8 +508,6 @@ def test_rps_vs_fair_rps(o, f_prob, category_edges, dim):
 @pytest.mark.parametrize("fair_bool", [True, False])
 def test_rps_limits(o, f_prob, category_edges, fair_bool, dim):
     """Test rps between 0 and 1. Note: this only works because np.clip(rps,0,1)"""
-    o = o > 0.5
-    f_prob = f_prob > 0.5
     res = rps(o, f_prob, dim=dim, fair=fair_bool, category_edges=category_edges)
     assert (res <= 1.0).all(), print(res.max())
     assert (res >= 0).all(), print(res.min())
