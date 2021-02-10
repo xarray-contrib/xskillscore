@@ -330,7 +330,6 @@ def test_correlation_broadcasts(a, b, metrics):
     metric(a, b.isel(lat=0), dim="time")
     metric(a, b.isel(lat=[0]), dim="time")
     b_changed_coords = b.isel(lat=[0]).assign_coords(lat=[123])
-    print(metric.__name__)
     with pytest.raises(ValueError) as e:
         metric(a, b_changed_coords, dim="lat")
     assert "indexes along dimension" in str(e.value)
