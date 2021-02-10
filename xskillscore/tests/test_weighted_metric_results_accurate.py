@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 import sklearn.metrics
-from scipy.stats import pearsonr, rankdata, spearmanr
+from scipy.stats import pearsonr
 from sklearn.metrics import (
     mean_absolute_error,
     mean_absolute_percentage_error,
