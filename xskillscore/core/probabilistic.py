@@ -494,8 +494,15 @@ def rps(
     ----------
     observations : xarray.Dataset or xarray.DataArray
         The observations or set of observations of the event.
+        Data should be boolean or logical \
+        (True or 1 for event occurance, False or 0 for non-occurance).
     forecasts : xarray.Dataset or xarray.DataArray
-        The forecasts for the event.
+        The forecast likelihoods of the event.
+        If ``fair==False``, forecasts should be between 0 and 1 without a dimension
+        ``member_dim`` or should be boolean (True,False) or binary (0, 1) containing a
+        member dimension (probabilities will be internally calculated by
+        ``.mean(member_dim))``. If ``fair==True``, forecasts must be boolean
+        (True,False) or binary (0, 1) containing dimension ``member_dim``.
     category_edges : array_like
         Category bin edges used to compute the CDFs. Bins include the left most edge, \
         but not the right.
@@ -529,7 +536,7 @@ def rps(
     ...                                  ('y', np.arange(3)),
     ...                                  ('member', np.arange(3))])
     >>> category_edges = np.array([.2, .5, .8])
-    >>> rps(observations, forecasts, category_edges)
+    >>> rps(observations > 0.5, (forecasts > 0.5).mean('member'), category_edges)
     <xarray.DataArray 'histogram_category' (y: 3)>
     array([1.        , 1.        , 0.33333333])
     Coordinates:
@@ -569,8 +576,6 @@ def rps(
         e = forecasts
 
     # normalize f.sum()=1
-    # # can remove this once density=True
-    # https://github.com/xgcm/xhistogram/pull/17
     forecasts = forecasts / forecasts.sum(bin_dim)
     observations = observations / observations.sum(bin_dim)
 
