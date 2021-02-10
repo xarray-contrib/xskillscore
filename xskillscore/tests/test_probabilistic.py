@@ -469,13 +469,9 @@ def test_rps_wilks_example():
     np.testing.assert_allclose(rps(Obs, F1, category_edges), 0.73)
 
 
-@pytest.mark.parametrize("input", ["binary", "numerical"])
-def test_2_category_rps_equals_brier_score(o, f_prob):
+def test_2_category_rps_equals_brier_score(o, f_prob, input):
     """Test that RPS for two categories equals the Brier Score."""
     category_edges = np.array([0.0, 0.5, 1.0])
-    if "input" == "binary":
-        o = o > 0.5
-        f_prob = f_prob > 0.5
     assert_allclose(
         rps(o, f_prob, category_edges=category_edges, dim=None),
         brier_score(o > 0.5, (f_prob > 0.5).mean("member"), dim=None),
