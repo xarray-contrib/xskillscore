@@ -579,7 +579,6 @@ def rps(
     forecasts = forecasts / forecasts.sum(bin_dim)
     observations = observations / observations.sum(bin_dim)
 
-    # rps formula
     Fc = forecasts.cumsum(bin_dim)
     Oc = observations.cumsum(bin_dim)
 
