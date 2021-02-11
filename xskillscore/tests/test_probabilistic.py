@@ -459,14 +459,19 @@ def test_rps_reduce_dim(o, f_prob, category_edges, dim, fair_bool):
 
 def test_rps_wilks_example():
     """Test with values from Wilks, D. S. (2006). Statistical methods in the
-    atmospheric sciences (2nd ed, Vol. 91). Amsterdam ; Boston: Academic Press. p.301
+    atmospheric sciences (2nd ed, Vol. 91). Amsterdam ; Boston: Academic Press. p.301.
     """
     category_edges = np.array([-0.01, 0.01, 0.24, 10])
-    Obs = xr.DataArray([0.0001])
+    # first example
+    Obs = xr.DataArray([0.0001])  # no precip
     F1 = xr.DataArray([0] * 2 + [0.1] * 5 + [0.3] * 3, dims="member")
     F2 = xr.DataArray([0] * 2 + [0.1] * 3 + [0.3] * 5, dims="member")
-    np.testing.assert_allclose(rps(Obs, F2, category_edges), 0.89)
     np.testing.assert_allclose(rps(Obs, F1, category_edges), 0.73)
+    np.testing.assert_allclose(rps(Obs, F2, category_edges), 0.89)
+    # second example
+    Obs = xr.DataArray([0.3])  # larger than 0.25
+    np.testing.assert_allclose(rps(Obs, F1, category_edges), 0.53)
+    np.testing.assert_allclose(rps(Obs, F2, category_edges), 0.29)
 
 
 def test_2_category_rps_equals_brier_score(o, f_prob):
