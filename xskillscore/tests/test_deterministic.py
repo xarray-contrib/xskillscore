@@ -50,6 +50,16 @@ correlation_metrics = [
     (spearman_r_eff_p_value, _spearman_r_eff_p_value),
     (effective_sample_size, _effective_sample_size),
 ]
+correlation_metrics_names = [
+    "pearson_r",
+    "r2",
+    "pearson_r_p_value",
+    "pearson_r_eff_p_value",
+    "spearman_r",
+    "spearman_r_p_value",
+    "spearman_r_eff_p_value",
+    "effective_sample_size",
+]
 distance_metrics = [
     (mse, _mse),
     (me, _me),
@@ -58,6 +68,15 @@ distance_metrics = [
     (median_absolute_error, _median_absolute_error),
     (mape, _mape),
     (smape, _smape),
+]
+distance_metrics_names = [
+    "mse",
+    "me",
+    "rmse",
+    "mae",
+    "median_absolute_error",
+    "mape",
+    "smape",
 ]
 
 AXES = ("time", "lat", "lon", ["lat", "lon"], ["time", "lat", "lon"])
@@ -82,7 +101,7 @@ def adjust_weights(dim, weight_bool, weights):
         return None
 
 
-@pytest.mark.parametrize("metrics", correlation_metrics)
+@pytest.mark.parametrize("metrics", correlation_metrics, ids=correlation_metrics_names)
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight_bool", [True, False])
 @pytest.mark.parametrize("skipna", [True, False])
@@ -136,7 +155,7 @@ def test_correlation_metrics_ufunc_same_np(
     assert_allclose(actual, expected)
 
 
-@pytest.mark.parametrize("metrics", correlation_metrics)
+@pytest.mark.parametrize("metrics", correlation_metrics, ids=correlation_metrics_names)
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight_bool", [True, False])
 @pytest.mark.parametrize("skipna", [True, False])
@@ -172,7 +191,7 @@ def test_correlation_metrics_daskda_same_npda(
     assert_allclose(actual, expected)
 
 
-@pytest.mark.parametrize("metrics", distance_metrics)
+@pytest.mark.parametrize("metrics", distance_metrics, ids=distance_metrics_names)
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight_bool", [True, False])
 @pytest.mark.parametrize("skipna", [True, False])
@@ -213,7 +232,7 @@ def test_distance_metrics_ufunc_same_np(
     assert_allclose(actual, expected)
 
 
-@pytest.mark.parametrize("metrics", distance_metrics)
+@pytest.mark.parametrize("metrics", distance_metrics, ids=distance_metrics_names)
 @pytest.mark.parametrize("dim", AXES)
 @pytest.mark.parametrize("weight_bool", [True, False])
 @pytest.mark.parametrize("skipna", [True, False])
@@ -247,7 +266,7 @@ def test_distance_metrics_daskda_same_npda(
 
 
 @pytest.mark.parametrize("dim", AXES)
-@pytest.mark.parametrize("metric", [smape])
+@pytest.mark.parametrize("metric", [smape], ids=["smape"])
 def test_percentage_metric_in_interval_0_1(a, b, dim, metric):
     """Test smape to be within bounds."""
     res = metric(a, b, dim)
@@ -274,7 +293,11 @@ def test_pearson_r_integer():
     assert pearson_r(da, da, dim="time") == 1
 
 
-@pytest.mark.parametrize("metrics", correlation_metrics + distance_metrics)
+@pytest.mark.parametrize(
+    "metrics",
+    correlation_metrics + distance_metrics,
+    ids=correlation_metrics_names + distance_metrics_names,
+)
 @pytest.mark.parametrize("keep_attrs", [True, False])
 def test_keep_attrs(a, b, metrics, keep_attrs):
     """Test keep_attrs for all metrics."""
@@ -289,7 +312,11 @@ def test_keep_attrs(a, b, metrics, keep_attrs):
     assert pearson_r(da, da, dim="time") == 1
 
 
-@pytest.mark.parametrize("metrics", correlation_metrics + distance_metrics)
+@pytest.mark.parametrize(
+    "metrics",
+    correlation_metrics + distance_metrics,
+    ids=correlation_metrics_names + distance_metrics_names,
+)
 def test_dim_None(a, b, metrics):
     """Test that `dim=None` reduces all dimensions as xr.mean(dim=None) and fails for
     effective metrics."""
@@ -307,7 +334,11 @@ def test_dim_None(a, b, metrics):
         assert len(res.dims) == 0, print(res.dims)
 
 
-@pytest.mark.parametrize("metrics", correlation_metrics + distance_metrics)
+@pytest.mark.parametrize(
+    "metrics",
+    correlation_metrics + distance_metrics,
+    ids=correlation_metrics_names + distance_metrics_names,
+)
 def test_dim_empty_list(a, b, metrics):
     """Test that `dim=[]` reduces no dimensions as xr.mean(dim=[]) and fails for
     correlation metrics."""
@@ -322,7 +353,11 @@ def test_dim_empty_list(a, b, metrics):
         assert len(res.dims) == len(a.dims), print(res.dims)
 
 
-@pytest.mark.parametrize("metrics", correlation_metrics + distance_metrics)
+@pytest.mark.parametrize(
+    "metrics",
+    correlation_metrics + distance_metrics,
+    ids=correlation_metrics_names + distance_metrics_names,
+)
 def test_correlation_broadcasts(a, b, metrics):
     """Test whether correlation metric broadcasts dimensions other than dim."""
     # unpack metrics

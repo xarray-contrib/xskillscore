@@ -86,15 +86,16 @@ def __compute_anomalies(a, b, weights, axis, skipna):
     # Only do weighted sums if there are weights. Cannot have a
     # single generic function with weights of all ones, because
     # the denominator gets inflated when there are masked regions.
-    with suppress_warnings("Mean of empty slice"):
-        if weights is not None:
+    if weights is not None:
+        with suppress_warnings("invalid value encountered in true_divide"):
             ma = sumfunc(a * weights, axis=axis) / sumfunc(weights, axis=axis)
             mb = sumfunc(b * weights, axis=axis) / sumfunc(weights, axis=axis)
-        else:
+    else:
+        with suppress_warnings("Mean of empty slice"):
             ma = meanfunc(a, axis=axis)
             mb = meanfunc(b, axis=axis)
-        am, bm = a - ma, b - mb
-        return am, bm
+    am, bm = a - ma, b - mb
+    return am, bm
 
 
 def _effective_sample_size(a, b, axis, skipna):
@@ -194,7 +195,8 @@ def _pearson_r(a, b, weights, axis, skipna):
         r_num = sumfunc(am * bm, axis=0)
         r_den = np.sqrt(sumfunc(am * am, axis=0) * sumfunc(bm * bm, axis=0))
 
-    r = r_num / r_den
+    with suppress_warnings("invalid value encountered in true_divide"):
+        r = r_num / r_den
     res = np.clip(r, -1.0, 1.0)
     return res
 
@@ -247,7 +249,8 @@ def _r2(a, b, weights, axis, skipna):
         am_squared = am ** 2
     num = sumfunc(squared_error, axis=0)
     den = sumfunc(am_squared, axis=0)
-    r2 = 1 - (num / den)
+    with suppress_warnings("invalid value encountered in true_divide"):
+        r2 = 1 - (num / den)
     return r2
 
 
@@ -295,6 +298,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         _b = 0.5
         res = special.betainc(_a, _b, _x)
         # reset masked values to nan
+        # raises  <__array_function__ internals>:5: DeprecationWarning: Calling nonzero on 0d arrays is deprecated, as it behaves surprisingly. Use `atleast_1d(cond).nonzero()` if the old behavior was intended. If the context of this warning is of the form `arr[nonzero(cond)]`, just use `arr[cond]`.
         nan_locs = np.where(np.isnan(r))
         if len(nan_locs[0]) > 0:
             res[nan_locs] = np.nan
@@ -422,7 +426,9 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
     b = np.rollaxis(b, axis)
     # count non-nans
     dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
-    t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
+    with suppress_warnings("invalid value encountered in true_divide"):
+        with suppress_warnings("divide by zero encountered in true_divide"):
+            t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
     return p
 
@@ -467,7 +473,8 @@ def _spearman_r_eff_p_value(a, b, axis, skipna):
         a, b, _ = _match_nans(a, b, None)
     rs = _spearman_r(a, b, None, axis, skipna)
     dof = _effective_sample_size(a, b, axis, skipna) - 2
-    t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
+    with suppress_warnings("invalid value encountered in true_divide"):
+        t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
     return p
 
