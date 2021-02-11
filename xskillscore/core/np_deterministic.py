@@ -3,6 +3,8 @@ import numpy as np
 from scipy import special
 from scipy.stats import distributions
 
+from .utils import suppress_warnings
+
 __all__ = [
     "_pearson_r",
     "_pearson_r_p_value",
@@ -84,14 +86,15 @@ def __compute_anomalies(a, b, weights, axis, skipna):
     # Only do weighted sums if there are weights. Cannot have a
     # single generic function with weights of all ones, because
     # the denominator gets inflated when there are masked regions.
-    if weights is not None:
-        ma = sumfunc(a * weights, axis=axis) / sumfunc(weights, axis=axis)
-        mb = sumfunc(b * weights, axis=axis) / sumfunc(weights, axis=axis)
-    else:
-        ma = meanfunc(a, axis=axis)
-        mb = meanfunc(b, axis=axis)
-    am, bm = a - ma, b - mb
-    return am, bm
+    with suppress_warnings("Mean of empty slice"):
+        if weights is not None:
+            ma = sumfunc(a * weights, axis=axis) / sumfunc(weights, axis=axis)
+            mb = sumfunc(b * weights, axis=axis) / sumfunc(weights, axis=axis)
+        else:
+            ma = meanfunc(a, axis=axis)
+            mb = meanfunc(b, axis=axis)
+        am, bm = a - ma, b - mb
+        return am, bm
 
 
 def _effective_sample_size(a, b, axis, skipna):
@@ -497,9 +500,13 @@ def _me(a, b, weights, axis, skipna):
 
     error = a - b
     if weights is not None:
-        mean_error = sumfunc(error * weights, axis=axis) / sumfunc(weights, axis=axis)
+        with suppress_warnings("invalid value encountered in true_divide"):
+            mean_error = sumfunc(error * weights, axis=axis) / sumfunc(
+                weights, axis=axis
+            )
     else:
-        mean_error = meanfunc(error, axis=axis)
+        with suppress_warnings("Mean of empty slice"):
+            mean_error = meanfunc(error, axis=axis)
     return mean_error
 
 
@@ -535,11 +542,13 @@ def _rmse(a, b, weights, axis, skipna):
 
     squared_error = (a - b) ** 2
     if weights is not None:
-        mean_squared_error = sumfunc(squared_error * weights, axis=axis) / sumfunc(
-            weights, axis=axis
-        )
+        with suppress_warnings("invalid value encountered in true_divide"):
+            mean_squared_error = sumfunc(squared_error * weights, axis=axis) / sumfunc(
+                weights, axis=axis
+            )
     else:
-        mean_squared_error = meanfunc(squared_error, axis=axis)
+        with suppress_warnings("Mean of empty slice"):
+            mean_squared_error = meanfunc(squared_error, axis=axis)
     res = np.sqrt(mean_squared_error)
     return res
 
@@ -576,9 +585,13 @@ def _mse(a, b, weights, axis, skipna):
 
     squared_error = (a - b) ** 2
     if weights is not None:
-        return sumfunc(squared_error * weights, axis=axis) / sumfunc(weights, axis=axis)
+        with suppress_warnings("invalid value encountered in true_divide"):
+            return sumfunc(squared_error * weights, axis=axis) / sumfunc(
+                weights, axis=axis
+            )
     else:
-        return meanfunc(squared_error, axis=axis)
+        with suppress_warnings("Mean of empty slice"):
+            return meanfunc(squared_error, axis=axis)
 
 
 def _mae(a, b, weights, axis, skipna):
@@ -613,11 +626,13 @@ def _mae(a, b, weights, axis, skipna):
 
     absolute_error = np.absolute(a - b)
     if weights is not None:
-        return sumfunc(absolute_error * weights, axis=axis) / sumfunc(
-            weights, axis=axis
-        )
+        with suppress_warnings("invalid value encountered in true_divide"):
+            return sumfunc(absolute_error * weights, axis=axis) / sumfunc(
+                weights, axis=axis
+            )
     else:
-        return meanfunc(absolute_error, axis=axis)
+        with suppress_warnings("Mean of empty slice"):
+            return meanfunc(absolute_error, axis=axis)
 
 
 def _median_absolute_error(a, b, axis, skipna):
@@ -647,7 +662,8 @@ def _median_absolute_error(a, b, axis, skipna):
     if skipna:
         a, b, _ = _match_nans(a, b, None)
     absolute_error = np.absolute(a - b)
-    return medianfunc(absolute_error, axis=axis)
+    with suppress_warnings("All-NaN slice encountered"):
+        return medianfunc(absolute_error, axis=axis)
 
 
 def _mape(a, b, weights, axis, skipna):
@@ -701,9 +717,11 @@ def _mape(a, b, weights, axis, skipna):
     epsilon = np.finfo(np.float64).eps
     mape = np.absolute(a - b) / np.maximum(np.absolute(a), epsilon)
     if weights is not None:
-        return sumfunc(mape * weights, axis=axis) / sumfunc(weights, axis=axis)
+        with suppress_warnings("invalid value encountered in true_divide"):
+            return sumfunc(mape * weights, axis=axis) / sumfunc(weights, axis=axis)
     else:
-        return meanfunc(mape, axis=axis)
+        with suppress_warnings("Mean of empty slice"):
+            return meanfunc(mape, axis=axis)
 
 
 def _smape(a, b, weights, axis, skipna):
@@ -747,6 +765,8 @@ def _smape(a, b, weights, axis, skipna):
     weights = _check_weights(weights)
     smape = np.absolute(a - b) / (np.absolute(a) + np.absolute(b))
     if weights is not None:
-        return sumfunc(smape * weights, axis=axis) / sumfunc(weights, axis=axis)
+        with suppress_warnings("invalid value encountered in true_divide"):
+            return sumfunc(smape * weights, axis=axis) / sumfunc(weights, axis=axis)
     else:
-        return meanfunc(smape, axis=axis)
+        with suppress_warnings("Mean of empty slice"):
+            return meanfunc(smape, axis=axis)
