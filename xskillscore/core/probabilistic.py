@@ -12,6 +12,7 @@ from .utils import (
     _preprocess_dims,
     _stack_input_if_needed,
     histogram,
+    suppress_warnings,
 )
 
 __all__ = [
@@ -919,9 +920,10 @@ def _drop_intermediate(fpr, tpr):
 def _auc(fpr, tpr, dim="probability_bin"):
     """Get area under the curve with trapez method."""
     # reverse tpr, fpr to fpr, tpr, see numpy.trapz(y, x=None)
-    area = xr.apply_ufunc(
-        np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
-    )
+    with suppress_warnings("The `numpy.trapz` function is not implemented"):
+        area = xr.apply_ufunc(
+            np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
+        )
     area = np.abs(area)
     if ((area > 1)).any():
         area = np.clip(area, 0, 1)  # allow only values between 0 and 1

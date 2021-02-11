@@ -144,7 +144,8 @@ def _effective_sample_size(a, b, axis, skipna):
     b_auto = _pearson_r(bm[0:-1], bm[1::], weights=None, axis=0, skipna=skipna)
 
     # compute effective sample size per Bretherton et al. 1999
-    n_eff = n * (1 - a_auto * b_auto) / (1 + a_auto * b_auto)
+    with suppress_warnings("divide by zero encountered in true_divide"):
+        n_eff = n * (1 - a_auto * b_auto) / (1 + a_auto * b_auto)
     n_eff = np.floor(n_eff)
     n_eff = np.clip(n_eff, 0, n)
     return n_eff
@@ -196,7 +197,8 @@ def _pearson_r(a, b, weights, axis, skipna):
         r_den = np.sqrt(sumfunc(am * am, axis=0) * sumfunc(bm * bm, axis=0))
 
     with suppress_warnings("invalid value encountered in true_divide"):
-        r = r_num / r_den
+        with suppress_warnings("invalid value encountered in double_scalars"):
+            r = r_num / r_den
     res = np.clip(r, -1.0, 1.0)
     return res
 
@@ -250,7 +252,10 @@ def _r2(a, b, weights, axis, skipna):
     num = sumfunc(squared_error, axis=0)
     den = sumfunc(am_squared, axis=0)
     with suppress_warnings("invalid value encountered in true_divide"):
-        r2 = 1 - (num / den)
+        with suppress_warnings("divide by zero encountered in true_divide"):
+            with suppress_warnings("divide by zero encountered in double_scalars"):
+                with suppress_warnings("invalid value encountered in double_scalars"):
+                    r2 = 1 - (num / den)
     return r2
 
 
@@ -290,8 +295,9 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         b = np.rollaxis(b, axis)
         # count non-nans
         dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
-        t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
-        _x = dof / (dof + t_squared)
+        with suppress_warnings("invalid value encountered in true_divide"):
+            t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
+            _x = dof / (dof + t_squared)
         _x = np.asarray(_x)
         _x = np.where(_x < 1.0, _x, 1.0)
         _a = 0.5 * dof
@@ -345,7 +351,8 @@ def _pearson_r_eff_p_value(a, b, axis, skipna):
     else:
         dof = _effective_sample_size(a, b, axis, skipna) - 2
         t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
-        _x = dof / (dof + t_squared)
+        with suppress_warnings("invalid value encountered in true_divide"):
+            _x = dof / (dof + t_squared)
         _x = np.asarray(_x)
         _x = np.where(_x < 1.0, _x, 1.0)
         _a = 0.5 * dof
@@ -474,7 +481,8 @@ def _spearman_r_eff_p_value(a, b, axis, skipna):
     rs = _spearman_r(a, b, None, axis, skipna)
     dof = _effective_sample_size(a, b, axis, skipna) - 2
     with suppress_warnings("invalid value encountered in true_divide"):
-        t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
+        with suppress_warnings("divide by zero encountered in true_divide"):
+            t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
     return p
 
