@@ -13,10 +13,13 @@ FORECASTS_NAME = "forecasts"
 
 def _get_category_bounds(category_edges):
     """Return formatted string of category bounds given list of category edges"""
-    return [
+    bounds = [
         f"[{str(category_edges[i])}, {str(category_edges[i + 1])})"
-        for i in range(len(category_edges) - 1)
+        for i in range(len(category_edges) - 2)
     ]
+    # Last category is right edge inclusive
+    bounds.append(f"[{str(category_edges[-2])}, {str(category_edges[-1])}]")
+    return bounds
 
 
 def dichotomous_only(method):
