@@ -8,4 +8,4 @@ scikit-learn
 scipy
 toolz
 xarray>=0.16.1
-xhistogram
+xhistogram>=0.1.2
