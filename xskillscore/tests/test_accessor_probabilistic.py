@@ -140,7 +140,7 @@ def test_reliability_accessor(o, f_prob, threshold, outer_bool):
 
 @pytest.mark.parametrize("outer_bool", [False, True])
 def test_rps_accessor(o, f_prob, outer_bool):
-    category_edges = np.linspace(0, 1 + 1e-8, 6)
+    category_edges = np.linspace(0, 1, 6)
     actual = rps(o, f_prob, category_edges=category_edges)
 
     ds = xr.Dataset()
@@ -156,7 +156,7 @@ def test_rps_accessor(o, f_prob, outer_bool):
 
 @pytest.mark.parametrize("outer_bool", [False, True])
 def test_roc_accessor(o, f_prob, outer_bool):
-    bin_edges = np.linspace(0, 1 + 1e-8, 6)
+    bin_edges = np.linspace(0, 1, 6)
     actual = roc(o, f_prob, bin_edges=bin_edges)
 
     ds = xr.Dataset()

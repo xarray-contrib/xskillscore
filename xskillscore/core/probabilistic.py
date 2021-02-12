@@ -461,8 +461,9 @@ def rps(
     forecasts : xarray.Dataset or xarray.DataArray
         The forecasts for the event.
     category_edges : array_like
-        Category bin edges used to compute the CDFs. Bins include the left most edge, \
-        but not the right.
+        Category bin edges used to compute the CDFs. All but the last \
+        (righthand-most) bin include the left edge and exclude the right \
+        edge. The last bin includes both edges.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``rps``.
         Defaults to None implying averaging over all dimensions.
@@ -606,7 +607,7 @@ def discrimination(
     observations,
     forecasts,
     dim=None,
-    probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
+    probability_bin_edges=np.linspace(0, 1, 6),
 ):
     """Returns the data required to construct the discrimination diagram for an event;
        the histogram of forecasts likelihood when observations indicate an event has
@@ -625,8 +626,9 @@ def discrimination(
         Defaults to None meaning compute over all dimensions.
     probability_bin_edges : array_like, optional
         Probability bin edges used to compute the histograms.
-        Bins include the left most edge, \
-        but not the right. Defaults to 6 equally spaced edges between 0 and 1+1e-8
+        All but the last (righthand-most) bin include the left edge and \
+        exclude the right edge. The last bin includes both edges. Defaults \
+        to 6 equally spaced edges between 0 and 1
 
     Returns
     -------
@@ -695,7 +697,7 @@ def reliability(
     observations,
     forecasts,
     dim=None,
-    probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
+    probability_bin_edges=np.linspace(0, 1, 6),
     keep_attrs=False,
 ):
     """Returns the data required to construct the reliability diagram for an event;
@@ -715,8 +717,9 @@ def reliability(
             Defaults to None meaning compute over all dimensions.
         probability_bin_edges : array_like, optional
             Probability bin edges used to compute the reliability.
-            Bins include the left most edge, \
-            but not the right. Defaults to 6 equally spaced edges between 0 and 1+1e-8
+            All but the last (righthand-most) bin include the left edge and \
+            exclude the right edge. The last bin includes both edges. Defaults \
+            to 6 equally spaced edges between 0 and 1
         keep_attrs : bool, optional
             If True, the attributes (attrs) will be copied from the first input to
             the new one.
@@ -884,8 +887,9 @@ def roc(
         Labeled array(s) over which to apply the function.
         If ``bin_edges=='continuous'``, forecasts are probabilities.
     bin_edges : array_like, str, default='continuous'
-        Bin edges for categorising observations and forecasts.
-        Bins include the left most edge, but not the right. ``bin_edges`` will be
+        Bin edges for categorising observations and forecasts. All but the last \
+        (righthand-most) bin include the left edge and exclude the right \
+        edge. The last bin includes both edges. ``bin_edges`` will be
         sorted in ascending order. If ``bin_edges=='continuous'``, calculate
         ``bin_edges`` from forecasts, equal to
         ``sklearn.metrics.roc_curve(f_boolean, o_prob)``.

@@ -216,7 +216,7 @@ def weights_cos_lat_dask(weights_cos_lat):
 @pytest.fixture
 def category_edges():
     """Category bin edges between 0 and 1."""
-    return np.linspace(0, 1 + 1e-8, 6)
+    return np.linspace(0, 1, 6)
 
 
 @pytest.fixture
