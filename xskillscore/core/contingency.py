@@ -54,12 +54,12 @@ class Contingency:
     forecasts : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     observation_category_edges : array_like
-        Bin edges for categorising observations.
-        All but the last (righthand-most) bin include the left edge and \
+        Bin edges for categorising observations. Similar to np.histogram, \
+        all but the last (righthand-most) bin include the left edge and \
         exclude the right edge. The last bin includes both edges.
     forecast_category_edges : array_like
-        Bin edges for categorising forecasts.
-        All but the last (righthand-most) bin include the left edge and \
+        Bin edges for categorising forecasts. Similar to np.histogram, \
+        all but the last (righthand-most) bin include the left edge and \
         exclude the right edge. The last bin includes both edges.
     dim : str, list
         The dimension(s) over which to compute the contingency table

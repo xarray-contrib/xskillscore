@@ -427,12 +427,9 @@ def test_reliability_values(o, f_prob):
 def test_reliability_perfect_values(o):
     """Test values for perfect forecast"""
     f_prob = xr.concat(10 * [o], dim="member")
-    # scipy bins are only left-edge inclusive and 1e-8 is added to the last bin, whereas
-    # xhistogram the rightmost edge of xhistogram bins is included - mimic scipy behaviour
     actual = reliability(
         o > 0.5,
         (f_prob > 0.5).mean("member"),
-        probability_bin_edges=np.linspace(0, 1 + 1e-8, 6),
     )
     expected_true_samples = (o > 0.5).sum()
     expected_false_samples = (o <= 0.5).sum()

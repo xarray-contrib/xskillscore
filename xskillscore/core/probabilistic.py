@@ -461,9 +461,9 @@ def rps(
     forecasts : xarray.Dataset or xarray.DataArray
         The forecasts for the event.
     category_edges : array_like
-        Category bin edges used to compute the CDFs. All but the last \
-        (righthand-most) bin include the left edge and exclude the right \
-        edge. The last bin includes both edges.
+        Category bin edges used to compute the CDFs. Similar to np.histogram, \
+        all but the last (righthand-most) bin include the left edge and exclude \
+        the right edge. The last bin includes both edges.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``rps``.
         Defaults to None implying averaging over all dimensions.
@@ -625,10 +625,10 @@ def discrimination(
         Dimension(s) over which to compute the histograms
         Defaults to None meaning compute over all dimensions.
     probability_bin_edges : array_like, optional
-        Probability bin edges used to compute the histograms.
-        All but the last (righthand-most) bin include the left edge and \
-        exclude the right edge. The last bin includes both edges. Defaults \
-        to 6 equally spaced edges between 0 and 1
+        Probability bin edges used to compute the histograms. Similar to np.histogram, \
+        all but the last (righthand-most) bin include the left edge and exclude the \
+        right edge. The last bin includes both edges. Defaults to 6 equally spaced \
+        edges between 0 and 1
 
     Returns
     -------
@@ -716,10 +716,10 @@ def reliability(
             Dimension(s) over which to compute the histograms
             Defaults to None meaning compute over all dimensions.
         probability_bin_edges : array_like, optional
-            Probability bin edges used to compute the reliability.
-            All but the last (righthand-most) bin include the left edge and \
-            exclude the right edge. The last bin includes both edges. Defaults \
-            to 6 equally spaced edges between 0 and 1
+            Probability bin edges used to compute the reliability. Similar to np.histogram,
+            all but the last (righthand-most) bin include the left edge and exclude the \
+            right edge. The last bin includes both edges. Defaults to 6 equally spaced \
+            edges between 0 and 1
         keep_attrs : bool, optional
             If True, the attributes (attrs) will be copied from the first input to
             the new one.
@@ -772,9 +772,13 @@ def reliability(
             N = np.zeros_like(r)
 
         for i in range(len(bin_edges) - 1):
-            # Follow xhistogram: all bins are half-open
-            # https://github.com/xgcm/xhistogram/issues/18
-            f_in_bin = (f >= bin_edges[i]) & (f < bin_edges[i + 1])
+            # Follow xhistogram behaviour: all bins are half-open, except for the right-most bin
+            # which adds an epsilon to the right edge
+            # see https://github.com/xgcm/xhistogram/issues/18
+            if i == (len(bin_edges) - 2):
+                f_in_bin = (f >= bin_edges[i]) & (f < (bin_edges[i + 1] + 1e-8))
+            else:
+                f_in_bin = (f >= bin_edges[i]) & (f < bin_edges[i + 1])
             o_f_in_bin = o & f_in_bin
             N_f_in_bin = f_in_bin.sum(axis=-1)
             N_o_f_in_bin = o_f_in_bin.sum(axis=-1)
@@ -887,12 +891,11 @@ def roc(
         Labeled array(s) over which to apply the function.
         If ``bin_edges=='continuous'``, forecasts are probabilities.
     bin_edges : array_like, str, default='continuous'
-        Bin edges for categorising observations and forecasts. All but the last \
-        (righthand-most) bin include the left edge and exclude the right \
-        edge. The last bin includes both edges. ``bin_edges`` will be
-        sorted in ascending order. If ``bin_edges=='continuous'``, calculate
-        ``bin_edges`` from forecasts, equal to
-        ``sklearn.metrics.roc_curve(f_boolean, o_prob)``.
+        Bin edges for categorising observations and forecasts. Similar to np.histogram, \
+        all but the last (righthand-most) bin include the left edge and exclude the \
+        right edge. The last bin includes both edges. ``bin_edges`` will be sorted in \
+        ascending order. If ``bin_edges=='continuous'``, calculate ``bin_edges`` from \
+        forecasts, equal to ``sklearn.metrics.roc_curve(f_boolean, o_prob)``.
     dim : str, list
         The dimension(s) over which to compute the contingency table
     drop_intermediate : bool, default=False
