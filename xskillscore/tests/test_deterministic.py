@@ -365,6 +365,9 @@ def test_correlation_broadcasts(a, b, metrics):
     metric(a, b.isel(lat=0), dim="time")
     metric(a, b.isel(lat=[0]), dim="time")
     b_changed_coords = b.isel(lat=[0]).assign_coords(lat=[123])
-    with pytest.raises(ValueError) as e:
-        metric(a, b_changed_coords, dim="lat")
-    assert "indexes along dimension" in str(e.value)
+    if (
+        "eff" not in metric.__name__
+    ):  # effective metrics require to be applied over time
+        with pytest.raises(ValueError) as e:
+            metric(a, b_changed_coords, dim="lat")
+        assert "indexes along dimension" in str(e.value)
