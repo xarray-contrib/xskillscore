@@ -843,8 +843,10 @@ def reliability(
                 r.append(N_o_f_in_bin / N_f_in_bin)
                 N.append(N_f_in_bin)
             else:
-                r[..., i] = N_o_f_in_bin / N_f_in_bin
-                N[..., i] = N_f_in_bin
+                with suppress_warnings("invalid value encountered in true_divide"):
+                    with suppress_warnings("invalid value encountered in long_scalars"):
+                        r[..., i] = N_o_f_in_bin / N_f_in_bin
+                        N[..., i] = N_f_in_bin
 
         if is_dask_array:
             return (
@@ -911,7 +913,11 @@ def _drop_intermediate(fpr, tpr):
     optimal_idxs["probability_bin"] = np.arange(optimal_idxs.probability_bin.size)
     if isinstance(optimal_idxs, xr.Dataset):
         optimal_idxs = optimal_idxs.to_array()
-    optimal_idxs = optimal_idxs.where(optimal_idxs, drop=True).probability_bin.values
+    with suppress_warnings("invalid value encountered in true_divide"):
+        with suppress_warnings("invalid value encountered in long_scalars"):
+            optimal_idxs = optimal_idxs.where(
+                optimal_idxs, drop=True
+            ).probability_bin.values
     tpr = tpr.isel(probability_bin=optimal_idxs)
     fpr = fpr.isel(probability_bin=optimal_idxs)
     return fpr, tpr
@@ -921,9 +927,11 @@ def _auc(fpr, tpr, dim="probability_bin"):
     """Get area under the curve with trapez method."""
     # reverse tpr, fpr to fpr, tpr, see numpy.trapz(y, x=None)
     with suppress_warnings("The `numpy.trapz` function is not implemented"):
-        area = xr.apply_ufunc(
-            np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
-        )
+        with suppress_warnings("invalid value encountered in long_scalars"):
+            with suppress_warnings("invalid value encountered in true_divide"):
+                area = xr.apply_ufunc(
+                    np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
+                )
     area = np.abs(area)
     if ((area > 1)).any():
         area = np.clip(area, 0, 1)  # allow only values between 0 and 1
@@ -1033,7 +1041,9 @@ def roc(
                     v = varlist[0]
                 else:
                     raise ValueError(
-                        f"Only works for `xr.Dataset` with one variable, found {forecasts.data_vars}. Considering looping over `data_vars` or `.to_array()`."
+                        "Only works for `xr.Dataset` with one variable, found"
+                        f"{forecasts.data_vars}. Considering looping over `data_vars`"
+                        "or `.to_array()`."
                     )
                 f_bin = forecasts[v]
             else:
@@ -1127,5 +1137,6 @@ def roc(
         return fpr, tpr, area
     else:
         raise NotImplementedError(
-            f"expect `return_results` from [all_as_tuple, area, all_as_metric_dim], found {return_results}"
+            "expect `return_results` from [all_as_tuple, area, all_as_metric_dim], "
+            f"found {return_results}"
         )
