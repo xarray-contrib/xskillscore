@@ -304,7 +304,10 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         _b = 0.5
         res = special.betainc(_a, _b, _x)
         # reset masked values to nan
-        # raises  <__array_function__ internals>:5: DeprecationWarning: Calling nonzero on 0d arrays is deprecated, as it behaves surprisingly. Use `atleast_1d(cond).nonzero()` if the old behavior was intended. If the context of this warning is of the form `arr[nonzero(cond)]`, just use `arr[cond]`.
+        # raises  <__array_function__ internals>:5: DeprecationWarning: Calling nonzero
+        # on 0d arrays is deprecated, as it behaves surprisingly. Use
+        # `atleast_1d(cond).nonzero()` if the old behavior was intended. If the context
+        # of this warning is of the form `arr[nonzero(cond)]`, just use `arr[cond]`.
         nan_locs = np.where(np.isnan(r))
         if len(nan_locs[0]) > 0:
             res[nan_locs] = np.nan
