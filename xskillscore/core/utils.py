@@ -1,8 +1,21 @@
+import contextlib
+import warnings
+
 import numpy as np
 import xarray as xr
 from xhistogram.xarray import histogram as xhist
 
 __all__ = ["histogram"]
+
+
+@contextlib.contextmanager
+def suppress_warnings(msg=None):
+    """Catch warnings with message msg. From
+    https://github.com/TheClimateCorporation/properscoring/blob/master/properscoring/
+    _utils.py#L23."""
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", msg)
+        yield
 
 
 def _preprocess_dims(dim, a):

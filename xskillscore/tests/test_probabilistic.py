@@ -21,6 +21,7 @@ from xskillscore.core.probabilistic import (
     rps,
     threshold_brier_score,
 )
+from xskillscore.core.utils import suppress_warnings
 
 DIMS = ["lon", "lat", ["lon", "lat"], None, []]
 
@@ -377,12 +378,14 @@ def test_discrimination_sum(o, f_prob, dim, chunk_bool, input_type):
         assign_type_input_output(disc, o)
         if "Dataset" in input_type:
             disc = disc[list(o.data_vars)[0]]
-        hist_event_sum = (
-            disc.sel(event=True).sum("forecast_probability", skipna=False).values
-        )
-        hist_no_event_sum = (
-            disc.sel(event=False).sum("forecast_probability", skipna=False).values
-        )
+        # dont understand the error message here, but it appeared
+        with suppress_warnings("invalid value encountered in true_divide"):
+            hist_event_sum = (
+                disc.sel(event=True).sum("forecast_probability", skipna=False).values
+            )
+            hist_no_event_sum = (
+                disc.sel(event=False).sum("forecast_probability", skipna=False).values
+            )
         # Note, xarray's assert_allclose is already imported but won't compare to scalar
         assert np.allclose(hist_event_sum[~np.isnan(hist_event_sum)], 1)
         assert np.allclose(hist_no_event_sum[~np.isnan(hist_no_event_sum)], 1)

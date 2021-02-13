@@ -69,7 +69,14 @@ def test_sign_test_categorical(a_1d, a_1d_worse, b_1d, observation):
     a_1d = logical(a_1d)
     a_1d_worse = logical(a_1d_worse)
     b_1d = logical(b_1d)
-    sign_test(a_1d, a_1d_worse, b_1d, time_dim="time", metric="categorical")
+    sign_test(
+        a_1d,
+        a_1d_worse,
+        b_1d,
+        time_dim="time",
+        metric="categorical",
+        orientation="positive",
+    )
 
 
 @pytest.mark.parametrize("metric", ["categorical", "mae"])
@@ -86,7 +93,7 @@ def test_sign_test_identical(a_1d, a_1d_worse, b_1d, metric):
         a_1d_worse = logical(a_1d_worse)
         b_1d = logical(b_1d)
     actual_significantly_different, actual_walk, actual_confidence = sign_test(
-        a_1d, a_1d_worse, b_1d, time_dim="time", metric=metric
+        a_1d, a_1d_worse, b_1d, time_dim="time", metric=metric, orientation="positive"
     )
     # check flat
     assert (
