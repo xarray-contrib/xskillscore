@@ -51,6 +51,9 @@ Internal Changes
 - Refactor ``asv`` benchmarks. (:pr:`231`) `Aaron Spring`_
 - Added tests for nans in correlation metrics (:issue:`246`, :pr:`247`) `Ray Bell`_
 - Added tests for weighted metrics against scikit-learn (:pr:`257`) `Ray Bell`_
+- Pin ``xhistogram`` to ``>=0.1.2`` and adjust code/documentation so that, as in
+  np.histogram, right-most bin is right-edge inclusive where bins are specified
+  (:pr:`269`) `Dougie Squire`_
 - Reduce warnings. (:issue:`41`, :pr:`268`) `Aaron Spring`_
 
 

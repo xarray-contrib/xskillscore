@@ -13,10 +13,13 @@ FORECASTS_NAME = "forecasts"
 
 def _get_category_bounds(category_edges):
     """Return formatted string of category bounds given list of category edges"""
-    return [
+    bounds = [
         f"[{str(category_edges[i])}, {str(category_edges[i + 1])})"
-        for i in range(len(category_edges) - 1)
+        for i in range(len(category_edges) - 2)
     ]
+    # Last category is right edge inclusive
+    bounds.append(f"[{str(category_edges[-2])}, {str(category_edges[-1])}]")
+    return bounds
 
 
 def dichotomous_only(method):
@@ -51,11 +54,13 @@ class Contingency:
     forecasts : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     observation_category_edges : array_like
-        Bin edges for categorising observations.
-        Bins include the left most edge, but not the right.
+        Bin edges for categorising observations. Similar to np.histogram, \
+        all but the last (righthand-most) bin include the left edge and \
+        exclude the right edge. The last bin includes both edges.
     forecast_category_edges : array_like
-        Bin edges for categorising forecasts.
-        Bins include the left most edge, but not the right.
+        Bin edges for categorising forecasts. Similar to np.histogram, \
+        all but the last (righthand-most) bin include the left edge and \
+        exclude the right edge. The last bin includes both edges.
     dim : str, list
         The dimension(s) over which to compute the contingency table
 
