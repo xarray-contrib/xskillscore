@@ -12,6 +12,7 @@ from .utils import (
     _preprocess_dims,
     _stack_input_if_needed,
     histogram,
+    suppress_warnings,
 )
 
 __all__ = [
@@ -253,7 +254,15 @@ def crps_ensemble(
         return res.mean(dim, keep_attrs=keep_attrs)
 
 
-def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=False):
+def brier_score(
+    observations,
+    forecasts,
+    member_dim="member",
+    fair=False,
+    dim=None,
+    weights=None,
+    keep_attrs=False,
+):
     """Calculate Brier score (BS).
 
     .. math:
@@ -266,7 +275,17 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
         Data should be boolean or logical \
         (True or 1 for event occurance, False or 0 for non-occurance).
     forecasts : xarray.Dataset or xarray.DataArray
-        The forecast likelihoods of the event. Data should be between 0 and 1.
+        The forecast likelihoods of the event.
+        If ``fair==False``, forecasts should be between 0 and 1 without a dimension
+        ``member_dim`` or should be boolean (True,False) or binary (0, 1) containing a
+        member dimension (probabilities will be internally calculated by
+        ``.mean(member_dim))``. If ``fair==True``, forecasts must be boolean
+        (True,False) or binary (0, 1) containing dimension ``member_dim``.
+    member_dim : str, optional
+        Name of ensemble member dimension. By default, 'member'.
+    fair: boolean
+        Apply ensemble member-size adjustment for unbiased, fair metric;
+        see Ferro (2013). Defaults to False.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``brier_score``.
         Defaults to None implying averaging over all dimensions.
@@ -311,21 +330,35 @@ def brier_score(observations, forecasts, dim=None, weights=None, keep_attrs=Fals
     * Brier, Glenn W. "VERIFICATION OF FORECASTS EXPRESSED IN TERMS OF PROBABILITY."
       Monthly Weather Review, 78(1): 1-3
       https://journals.ametsoc.org/doi/abs/10.1175/1520-0493%281950%29078%3C0001%3AVOFEIT%3E2.0.CO%3B2
-
+    * C. A. T. Ferro. Fair scores for ensemble forecasts. Q.R.J. Meteorol. Soc., 140:
+      1917–1923, 2013. doi: 10.1002/qj.2270.
+    * https://www-miklip.dkrz.de/about/problems/
     """
-    res = xr.apply_ufunc(
-        properscoring.brier_score,
-        observations,
-        forecasts,
-        input_core_dims=[[], []],
-        dask="parallelized",
-        output_dtypes=[float],
-        keep_attrs=keep_attrs,
-    )
-    if weights is not None:
-        return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
-    else:
-        return res.mean(dim, keep_attrs=keep_attrs)
+    with xr.set_options(keep_attrs=keep_attrs):
+        if fair:
+            if member_dim not in forecasts.dims:
+                raise ValueError("need forecast with member dim")
+            else:
+                M = forecasts[member_dim].size
+                e = (forecasts == 1).sum(member_dim)
+                o = observations
+                res = (e / M - o) ** 2 - e * (M - e) / (M ** 2 * (M - 1))
+        else:
+            if member_dim in forecasts.dims:
+                forecasts = forecasts.mean(member_dim)
+            res = xr.apply_ufunc(
+                properscoring.brier_score,
+                observations,
+                forecasts,
+                input_core_dims=[[], []],
+                dask="parallelized",
+                output_dtypes=[float],
+                keep_attrs=keep_attrs,
+            )
+        if weights is not None:
+            return res.weighted(weights).mean(dim)
+        else:
+            return res.mean(dim)
 
 
 def threshold_brier_score(
@@ -407,8 +440,8 @@ def threshold_brier_score(
     if isinstance(threshold, (xr.DataArray, xr.Dataset)):
         if "threshold" not in threshold.dims:
             raise ValueError(
-                "please provide threshold with threshold dim, found",
-                threshold.dims,
+                "please provide threshold as xr.DataArray with threshold dim, found",
+                f"dim = {threshold.dims}, type = {type(threshold)}",
             )
         input_core_dims = [[], [member_dim], ["threshold"]]
         output_core_dims = [["threshold"]]
@@ -433,6 +466,9 @@ def threshold_brier_score(
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
+    res = res.assign_coords(threshold=threshold)
+    if dim is None:  # dont average over threshold dim
+        dim = observations.dims
     if weights is not None:
         return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
@@ -444,6 +480,7 @@ def rps(
     forecasts,
     category_edges,
     dim=None,
+    fair=False,
     weights=None,
     keep_attrs=False,
     member_dim="member",
@@ -458,8 +495,15 @@ def rps(
     ----------
     observations : xarray.Dataset or xarray.DataArray
         The observations or set of observations of the event.
+        Data should be boolean or logical \
+        (True or 1 for event occurance, False or 0 for non-occurance).
     forecasts : xarray.Dataset or xarray.DataArray
-        The forecasts for the event.
+        The forecast likelihoods of the event.
+        If ``fair==False``, forecasts should be between 0 and 1 without a dimension
+        ``member_dim`` or should be boolean (True,False) or binary (0, 1) containing a
+        member dimension (probabilities will be internally calculated by
+        ``.mean(member_dim))``. If ``fair==True``, forecasts must be boolean
+        (True,False) or binary (0, 1) containing dimension ``member_dim``.
     category_edges : array_like
         Category bin edges used to compute the CDFs. Similar to np.histogram, \
         all but the last (righthand-most) bin include the left edge and exclude \
@@ -467,6 +511,9 @@ def rps(
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``rps``.
         Defaults to None implying averaging over all dimensions.
+    fair: boolean
+        Apply ensemble member-size adjustment for unbiased, fair metric;
+        see Ferro (2013). Defaults to False.
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is
         applied.
@@ -491,7 +538,7 @@ def rps(
     ...                                  ('y', np.arange(3)),
     ...                                  ('member', np.arange(3))])
     >>> category_edges = np.array([.2, .5, .8])
-    >>> rps(observations, forecasts, category_edges)
+    >>> rps(observations > 0.5, (forecasts > 0.5).mean('member'), category_edges)
     <xarray.DataArray 'histogram_category' (y: 3)>
     array([1.        , 1.        , 0.33333333])
     Coordinates:
@@ -499,9 +546,13 @@ def rps(
 
     References
     ----------
-    https://www.cawcr.gov.au/projects/verification/verif_web_page.html#RPS
+    * https://www.cawcr.gov.au/projects/verification/verif_web_page.html#RPS
+    * C. A. T. Ferro. Fair scores for ensemble forecasts. Q.R.J. Meteorol. Soc., 140:
+      1917–1923, 2013. doi: 10.1002/qj.2270.
+    * https://www-miklip.dkrz.de/about/problems/
     """
     bin_names = ["category"]
+    M = forecasts[member_dim].size
     bin_dim = f"{bin_names[0]}_bin"
     # histogram(dim=[]) not allowed therefore add fake member dim
     # to apply over when multi-dim observations
@@ -516,18 +567,31 @@ def rps(
             bin_names=bin_names,
             dim=[member_dim],
         )
+
     forecasts = histogram(
-        forecasts, bins=[category_edges], bin_names=bin_names, dim=[member_dim]
+        forecasts,
+        bins=[category_edges],
+        bin_names=bin_names,
+        dim=[member_dim],
     )
+    if fair:
+        e = forecasts
+
     # normalize f.sum()=1
-    # # can remove this once density=True
-    # https://github.com/xgcm/xhistogram/pull/17
     forecasts = forecasts / forecasts.sum(bin_dim)
     observations = observations / observations.sum(bin_dim)
-    # rps formula
-    res = ((observations.cumsum(bin_dim) - forecasts.cumsum(bin_dim)) ** 2).sum(bin_dim)
+
+    Fc = forecasts.cumsum(bin_dim)
+    Oc = observations.cumsum(bin_dim)
+
+    if fair:
+        Ec = e.cumsum(bin_dim)
+        res = (((Ec / M) - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
+    else:
+        res = ((Fc - Oc) ** 2).sum(bin_dim)
     if weights is not None:
         res = res.weighted(weights)
+    res = xr.apply_ufunc(np.clip, res, 0, 1, dask="allowed")  # dirty fix
     return res.mean(dim, keep_attrs=keep_attrs)
 
 
@@ -786,8 +850,10 @@ def reliability(
                 r.append(N_o_f_in_bin / N_f_in_bin)
                 N.append(N_f_in_bin)
             else:
-                r[..., i] = N_o_f_in_bin / N_f_in_bin
-                N[..., i] = N_f_in_bin
+                with suppress_warnings("invalid value encountered in true_divide"):
+                    with suppress_warnings("invalid value encountered in long_scalars"):
+                        r[..., i] = N_o_f_in_bin / N_f_in_bin
+                        N[..., i] = N_f_in_bin
 
         if is_dask_array:
             return (
@@ -854,7 +920,11 @@ def _drop_intermediate(fpr, tpr):
     optimal_idxs["probability_bin"] = np.arange(optimal_idxs.probability_bin.size)
     if isinstance(optimal_idxs, xr.Dataset):
         optimal_idxs = optimal_idxs.to_array()
-    optimal_idxs = optimal_idxs.where(optimal_idxs, drop=True).probability_bin.values
+    with suppress_warnings("invalid value encountered in true_divide"):
+        with suppress_warnings("invalid value encountered in long_scalars"):
+            optimal_idxs = optimal_idxs.where(
+                optimal_idxs, drop=True
+            ).probability_bin.values
     tpr = tpr.isel(probability_bin=optimal_idxs)
     fpr = fpr.isel(probability_bin=optimal_idxs)
     return fpr, tpr
@@ -863,9 +933,12 @@ def _drop_intermediate(fpr, tpr):
 def _auc(fpr, tpr, dim="probability_bin"):
     """Get area under the curve with trapez method."""
     # reverse tpr, fpr to fpr, tpr, see numpy.trapz(y, x=None)
-    area = xr.apply_ufunc(
-        np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
-    )
+    with suppress_warnings("The `numpy.trapz` function is not implemented"):
+        with suppress_warnings("invalid value encountered in long_scalars"):
+            with suppress_warnings("invalid value encountered in true_divide"):
+                area = xr.apply_ufunc(
+                    np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
+                )
     area = np.abs(area)
     if ((area > 1)).any():
         area = np.clip(area, 0, 1)  # allow only values between 0 and 1
@@ -975,7 +1048,9 @@ def roc(
                     v = varlist[0]
                 else:
                     raise ValueError(
-                        f"Only works for `xr.Dataset` with one variable, found {forecasts.data_vars}. Considering looping over `data_vars` or `.to_array()`."
+                        "Only works for `xr.Dataset` with one variable, found"
+                        f"{forecasts.data_vars}. Considering looping over `data_vars`"
+                        "or `.to_array()`."
                     )
                 f_bin = forecasts[v]
             else:
@@ -1069,5 +1144,6 @@ def roc(
         return fpr, tpr, area
     else:
         raise NotImplementedError(
-            f"expect `return_results` from [all_as_tuple, area, all_as_metric_dim], found {return_results}"
+            "expect `return_results` from [all_as_tuple, area, all_as_metric_dim], "
+            f"found {return_results}"
         )

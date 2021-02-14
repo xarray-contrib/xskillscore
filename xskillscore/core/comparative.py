@@ -184,7 +184,7 @@ def sign_test(
     N = notnan.cumsum(time_dim)
     # z_alpha is the value at which the standardized cumulative Gaussian distributed
     # exceeds alpha
-    confidence = st.norm.ppf(1 - alpha / 2) * xr.ufuncs.sqrt(N)
+    confidence = st.norm.ppf(1 - alpha / 2) * np.sqrt(N)
     confidence.coords["alpha"] = alpha
     significantly_different = np.abs(walk) > confidence
     return significantly_different, walk, confidence

@@ -10,6 +10,10 @@ Features
 - Added mean error
   :py:func:`~xskillscore.me`. (:issue:`202`, :pr:`200`)
   `Andrew Huang`_
+- :py:func:`~xskillscore.brier_score` and :py:func:`~xskillscore.rps` now contain
+  keyword ``fair`` to account for ensemble-size adjustments, but defaults to ``False``.
+  :py:func:`~xskillscore.brier_score` also accepts binary or boolean forecasts when a
+  ``member_dim`` dimension is present. (:issue:`162`, :pr:`211`) `Aaron Spring`_
 - Added MAE significance test :py:func:`~xskillscore.mae_test` from Jolliffe and Ebert
   https://www.cawcr.gov.au/projects/verification/CIdiff/FAQ-CIdiff.html
   (:issue:`192`, :pr:`209`) `Aaron Spring`_
@@ -30,6 +34,9 @@ Bug Fixes
 ~~~~~~~~~
 - :py:func:`~xskillscore.sign_test` now works for ``xr.Dataset`` inputs.
   (:issue:`198`, :pr:`199`) `Aaron Spring`_
+- :py:func:`~xskillscore.threshold_brier_score` does not average over thresholds when
+  ``dim==None``. Now also carries ``threshold`` as coordinate.
+  (:issue:`255`, :pr:`211`) `Aaron Spring`_
 - Passing weights no longer triggers eager computation.
   (:issue:`218`, :pr:`224`). `Andrew Huang`_
 
@@ -47,6 +54,8 @@ Internal Changes
 - Pin ``xhistogram`` to ``>=0.1.2`` and adjust code/documentation so that, as in
   np.histogram, right-most bin is right-edge inclusive where bins are specified
   (:pr:`269`) `Dougie Squire`_
+- Reduce warnings. (:issue:`41`, :pr:`268`) `Aaron Spring`_
+
 
 xskillscore v0.0.18 (2020-09-23)
 --------------------------------
