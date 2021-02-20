@@ -55,6 +55,7 @@ Internal Changes
   np.histogram, right-most bin is right-edge inclusive where bins are specified
   (:pr:`269`) `Dougie Squire`_
 - Reduce warnings. (:issue:`41`, :pr:`268`) `Aaron Spring`_
+- Use ``raise_if_dask_computes`` from xarray. (:issue:`272`, :pr:`273`) `Ray Bell`_
 
 
 xskillscore v0.0.18 (2020-09-23)
