@@ -10,7 +10,7 @@ URL = "https://github.com/xarray-contrib/xskillscore"
 with open("requirements.txt") as f:
     INSTALL_REQUIRES = f.read().strip().split("\n")
 TESTS_REQUIRE = ["pytest"]
-PYTHON_REQUIRE = ">=3.6"
+PYTHON_REQUIRE = ">=3.7"
 
 
 setup(
