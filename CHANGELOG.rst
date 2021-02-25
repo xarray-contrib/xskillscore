@@ -29,6 +29,7 @@ Breaking changes
   :py:func:`~xskillscore.mae_test`. Now tests from comparative.py return more than
   one object including a boolean indicating ``signficance`` based on ``alpha``.
   (:pr:`209`) `Aaron Spring`_
+- Drop support for python 3.6. (:issue:`237`, :pr:`276`) `Ray Bell`_
 
 Bug Fixes
 ~~~~~~~~~
