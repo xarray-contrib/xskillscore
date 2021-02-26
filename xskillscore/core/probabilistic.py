@@ -491,29 +491,29 @@ def rps(
         RPS(p, k) = \\sum_{m=1}^{M}
         [(\\sum_{k=1}^{m} p_k) - (\\sum_{k=1}^{m} o_k)]^{2}
 
-    where ``p`` and ``o`` are forecast and observation probabilities in ``M`` categories.
+    where ``p`` and ``o`` are forecast and observation probabilities in ``M``
+    categories.
 
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
         The observations or set of observations of the event.
         Further requirements are specified based on ``category_edges``.
-        Data should be boolean or logical \
-        (True or 1 for event occurance, False or 0 for non-occurance).
     forecasts : xarray.Dataset or xarray.DataArray
         The forecast likelihoods of the event.
         Further requirements are specified based on ``category_edges``.
     category_edges : array_like, xr.Dataset, xr.DataArray, None
 
-        - array_like: Category bin edges used to compute the CDFs based on boolean or
-          logical (True or 1 for event occurance, False or 0 for non-occurance)
-          observations. If ``fair==False``, forecasts should be between 0 and 1 without
-          a dimension ``member_dim`` or should be boolean (True,False) or binary (0, 1)
-          containing a member dimension (probabilities will be internally calculated by
-          ``.mean(member_dim))``. If ``fair==True``, forecasts must be boolean
-          (True,False) or binary (0, 1) containing dimension ``member_dim``.
-          Similar to np.histogram, all but the last (righthand-most) bin include the
+        - array_like: Category bin edges used to compute the CDFs. Similar to
+          np.histogram, all but the last (righthand-most) bin include the
           left edge and exclude the right edge. The last bin includes both edges.
+          CDFs based on boolean or logical (True or 1 for event occurance, False or 0
+          for non-occurance) observations.
+          If ``fair==False``, forecasts should be between 0 and 1 without a dimension
+          ``member_dim`` or boolean / binary containing a member dimension
+          (probabilities will be internally calculated by ``.mean(member_dim))``.
+          If ``fair==True``, forecasts must be boolean / binary containing dimension
+          ``member_dim``.
 
         - xr.Dataset/xr.DataArray: edges of the categories in absolute units provided
           as dimension ``category_dim``, ``threshold`` or ``quantile``. Forecasts and
@@ -524,7 +524,7 @@ def rps(
           for ``category_edges`` for forecasts.
 
         - None: expect than observations and forecasts are already CDFs containing
-          ``category_dim`` dimension.
+          ``category_dim``, ``quantile``, ``edge`` or ``threshold`` dimension.
 
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``rps``.
