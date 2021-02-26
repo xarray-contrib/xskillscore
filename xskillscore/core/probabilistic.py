@@ -522,6 +522,7 @@ def rps(
         is taken as category_edges for observations and the second item for category_edges for forecasts
 
         - None: expect than observations and forecasts are already CDFs containing ``category_dim`` dimension
+
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``rps``.
         Defaults to None implying averaging over all dimensions.
