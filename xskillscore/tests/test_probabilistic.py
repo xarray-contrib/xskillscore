@@ -519,15 +519,6 @@ def test_rps_vs_fair_rps(o, f_prob, category_edges, dim):
     assert (frps <= ufrps).all(), print("fairrps", frps, "\nufrps", ufrps)
 
 
-@pytest.mark.parametrize("dim", DIMS)
-@pytest.mark.parametrize("fair_bool", [True, False])
-def test_rps_limits(o, f_prob, category_edges, fair_bool, dim):
-    """Test rps between 0 and 1. Note: this only works because np.clip(rps,0,1)"""
-    res = rps(o, f_prob, dim=dim, fair=fair_bool, category_edges=category_edges)
-    assert (res <= 1.0).all(), print(res.max())
-    assert (res >= 0).all(), print(res.min())
-
-
 @pytest.mark.parametrize(
     "observation,forecast",
     [

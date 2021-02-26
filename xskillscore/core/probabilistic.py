@@ -488,26 +488,34 @@ def rps(
     """Calculate Ranked Probability Score.
 
      .. math::
-        RPS(p, k) = 1/M \\sum_{m=1}^{M}
+        RPS(p, k) = \\sum_{m=1}^{M}
         [(\\sum_{k=1}^{m} p_k) - (\\sum_{k=1}^{m} o_k)]^{2}
 
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
         The observations or set of observations of the event.
+        Further requirements are specified based on ``category_edges``.
         Data should be boolean or logical \
         (True or 1 for event occurance, False or 0 for non-occurance).
     forecasts : xarray.Dataset or xarray.DataArray
         The forecast likelihoods of the event.
+        Further requirements are specified based on ``category_edges``.
+    category_edges : array_like, xr.Dataset, xr.DataArray, None
+        - array_like: Category bin edges used to compute the CDFs based on boolean or logical
+        (True or 1 for event occurance, False or 0 for non-occurance) observations.
         If ``fair==False``, forecasts should be between 0 and 1 without a dimension
         ``member_dim`` or should be boolean (True,False) or binary (0, 1) containing a
         member dimension (probabilities will be internally calculated by
         ``.mean(member_dim))``. If ``fair==True``, forecasts must be boolean
         (True,False) or binary (0, 1) containing dimension ``member_dim``.
-    category_edges : array_like
-        Category bin edges used to compute the CDFs. Similar to np.histogram, \
-        all but the last (righthand-most) bin include the left edge and exclude \
-        the right edge. The last bin includes both edges.
+        Similar to np.histogram, all but the last (righthand-most) bin include the left edge
+        and exclude the right edge. The last bin includes both edges.
+        - xr.Dataset/xr.DataArray: edges of the categories in absolute units provided as dimension
+        ``category_dim``, ``threshold`` or ``quantile``. Forecasts and Observations are also in absolute units.
+        - tuple of xr.Dataset/xr.DataArray: same as xr.Dataset/xr.DataArray where the first item
+        is taken as category_edges for observations and the second item for category_edges for forecasts
+        - None: expect than observations and forecasts are already CDFs containing ``category_dim`` dimension
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``rps``.
         Defaults to None implying averaging over all dimensions.
@@ -550,48 +558,103 @@ def rps(
     * C. A. T. Ferro. Fair scores for ensemble forecasts. Q.R.J. Meteorol. Soc., 140:
       1917–1923, 2013. doi: 10.1002/qj.2270.
     * https://www-miklip.dkrz.de/about/problems/
+
     """
     bin_names = ["category"]
-    M = forecasts[member_dim].size
     bin_dim = f"{bin_names[0]}_bin"
-    # histogram(dim=[]) not allowed therefore add fake member dim
-    # to apply over when multi-dim observations
-    if len(observations.dims) == 1:
-        observations = histogram(
-            observations, bins=[category_edges], bin_names=bin_names, dim=None
-        )
-    else:
-        observations = histogram(
-            observations.expand_dims(member_dim),
+    M = forecasts[member_dim].size
+
+    def _check_identical_xr_types(a, b):
+        if type(a) != type(b):
+            raise ValueError(
+                f"a and b must be same type, found {type(a)} and {type(b)}"
+            )
+        for d in [a, b]:
+            if not isinstance(d, (xr.Dataset, xr.DataArray)):
+                raise ValueError("inputs must be xr.DataArray or xr.Dataset")
+
+    def _check_bin_dim(ds, bin_dim):
+        """Assert that bin_dim is in ds. Try to guess and rename edges dimension."""
+        for d in ["quantile", "threshold", "edge"]:
+            if d in ds.dims and bin_dim not in ds.dims:
+                ds = ds.rename({d: bin_dim})
+        if bin_dim not in ds.dims:
+            raise ValueError(f"require {bin_dim} dimension, found {ds.dims}")
+        return ds
+
+    _check_identical_xr_types(observations, forecasts)
+
+    # different ways of calculating RPS based on category_edges
+    if isinstance(category_edges, (xr.Dataset, xr.DataArray)) or isinstance(
+        category_edges, tuple
+    ):
+        if isinstance(
+            category_edges, tuple
+        ):  # edges tuple of two: use for obs and forecast edges separately
+            observations_edges, forecast_edges = category_edges
+            _check_identical_xr_types(forecast_edges, forecasts)
+            _check_identical_xr_types(observations_edges, forecasts)
+        else:  # edges only given once, so use for both obs and forecasts
+            _check_identical_xr_types(category_edges, forecasts)
+            observations_edges, forecast_edges = category_edges, category_edges
+
+        # cumulative probs
+        Fc = (forecasts < category_edges).mean(member_dim)
+        Oc = observations < category_edges
+        # todo: mask land
+
+    elif isinstance(category_edges, (np.ndarray, np.array)):
+        # histogram(dim=[]) not allowed therefore add fake member dim
+        # to apply over when multi-dim observations
+        if len(observations.dims) == 1:
+            observations = histogram(
+                observations, bins=[category_edges], bin_names=bin_names, dim=None
+            )
+        else:
+            observations = histogram(
+                observations.expand_dims(member_dim),
+                bins=[category_edges],
+                bin_names=bin_names,
+                dim=[member_dim],
+            )
+
+        forecasts = histogram(
+            forecasts,
             bins=[category_edges],
             bin_names=bin_names,
             dim=[member_dim],
         )
+        # if fair:
+        #    e = forecasts
 
-    forecasts = histogram(
-        forecasts,
-        bins=[category_edges],
-        bin_names=bin_names,
-        dim=[member_dim],
-    )
+        # normalize f.sum()=1 to make cdf
+        forecasts = forecasts / forecasts.sum(bin_dim)
+        observations = observations / observations.sum(bin_dim)
+
+        Fc = forecasts.cumsum(bin_dim)
+        Oc = observations.cumsum(bin_dim)
+
+    elif category_edges is None:  # expect cdfs already as inputs
+        Fc = forecasts
+        Oc = observations
+    else:
+        raise ValueError(
+            f"category_edges must be xr.DataArray, xr.Dataset, tuple of xr.objects, None or array-like, found {type(category_edges)}"
+        )
+
+    # check and maybe rename edges dim
+    Fc = _check_bin_dim(Fc, bin_dim)
+    Oc = _check_bin_dim(Oc, bin_dim)
+
+    # RPS formulas
     if fair:
-        e = forecasts
-
-    # normalize f.sum()=1
-    forecasts = forecasts / forecasts.sum(bin_dim)
-    observations = observations / observations.sum(bin_dim)
-
-    Fc = forecasts.cumsum(bin_dim)
-    Oc = observations.cumsum(bin_dim)
-
-    if fair:
-        Ec = e.cumsum(bin_dim)
+        Ec = forecasts.cumsum(bin_dim)
         res = (((Ec / M) - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
     else:
         res = ((Fc - Oc) ** 2).sum(bin_dim)
+
     if weights is not None:
         res = res.weighted(weights)
-    res = xr.apply_ufunc(np.clip, res, 0, 1, dask="allowed")  # dirty fix
     return res.mean(dim, keep_attrs=keep_attrs)
 
 
