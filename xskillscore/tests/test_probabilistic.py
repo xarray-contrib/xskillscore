@@ -473,15 +473,24 @@ def test_rps_wilks_example():
     """
     category_edges = np.array([-0.01, 0.01, 0.24, 10])
     # first example
+    # xhistogram way with np.array category_edges
     Obs = xr.DataArray([0.0001])  # no precip
     F1 = xr.DataArray([0] * 2 + [0.1] * 5 + [0.3] * 3, dims="member")
     F2 = xr.DataArray([0] * 2 + [0.1] * 3 + [0.3] * 5, dims="member")
     np.testing.assert_allclose(rps(Obs, F1, category_edges), 0.73)
     np.testing.assert_allclose(rps(Obs, F2, category_edges), 0.89)
+    # xr way with xr.DataArray category_edges
+    xr_category_edges = xr.DataArray(category_edges, dims="quantile")
+    assert_allclose(rps(Obs, F1, category_edges), rps(Obs, F1, xr_category_edges))
+    assert_allclose(rps(Obs, F2, category_edges), rps(Obs, F2, xr_category_edges))
+
     # second example
     Obs = xr.DataArray([0.3])  # larger than 0.25
     np.testing.assert_allclose(rps(Obs, F1, category_edges), 0.53)
     np.testing.assert_allclose(rps(Obs, F2, category_edges), 0.29)
+    # xr way with xr.DataArray category_edges
+    assert_allclose(rps(Obs, F1, category_edges), rps(Obs, F1, xr_category_edges))
+    assert_allclose(rps(Obs, F2, category_edges), rps(Obs, F2, xr_category_edges))
 
 
 @pytest.mark.parametrize("fair_bool", [True, False])
@@ -499,7 +508,6 @@ def test_rps_perfect_values(o, category_edges, fair_bool):
     """Test values for perfect forecast"""
     f = xr.concat(10 * [o], dim="member")
     res = rps(o, f, category_edges=category_edges, fair=fair_bool)
-    print(res)
     assert (res == 0).all()
 
 
@@ -518,15 +526,7 @@ def test_rps_vs_fair_rps(o, f_prob, category_edges, dim):
     size adjustment."""
     frps = rps(o, f_prob, dim=dim, fair=True, category_edges=category_edges)
     ufrps = rps(o, f_prob, dim=dim, fair=False, category_edges=category_edges)
-    # assert (frps <= ufrps).mean() >.9
-    assert (frps <= ufrps).all(), print(
-        "fairrps",
-        frps,
-        "\nufrps",
-        ufrps,
-        "\n diff: ufrps - frps, should be positive:\n",
-        ufrps - frps,
-    )
+    assert (frps <= ufrps).all()
 
 
 @pytest.mark.parametrize("fair_bool", [True, False])
