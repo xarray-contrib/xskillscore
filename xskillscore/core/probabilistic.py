@@ -628,7 +628,7 @@ def rps(
         # cumulative probs
         Fc = (forecasts < forecast_edges).mean(member_dim)
         Oc = observations < observations_edges
-        # todo: mask land
+        # todo: mask Fc and Oc where all nans
 
     elif isinstance(category_edges, np.ndarray):
         # histogram(dim=[]) not allowed therefore add fake member dim
@@ -651,8 +651,6 @@ def rps(
             bin_names=bin_names,
             dim=[member_dim],
         )
-        # if fair:
-        #    e = forecasts
 
         # normalize f.sum()=1 to make cdf
         forecasts = forecasts / forecasts.sum(bin_dim)
