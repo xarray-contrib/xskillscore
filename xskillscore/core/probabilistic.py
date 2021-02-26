@@ -491,6 +491,8 @@ def rps(
         RPS(p, k) = \\sum_{m=1}^{M}
         [(\\sum_{k=1}^{m} p_k) - (\\sum_{k=1}^{m} o_k)]^{2}
 
+    where ``p`` and ``o`` are forecast and observation probabilities in ``M`` categories.
+
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
@@ -564,6 +566,23 @@ def rps(
     bin_dim = f"{bin_names[0]}_bin"
     M = forecasts[member_dim].size
 
+    def _bool_to_int(ds):
+        """convert xr.object of dtype bool to int to evade:
+        TypeError: numpy boolean subtract, the `-` operator, is not supported"""
+
+        def _helper_bool_to_int(da):
+            if da.dtype == "bool":
+                da = da.astype("int")
+            return da
+
+        if isinstance(ds, xr.Dataset):
+            ds = ds.map(_helper_bool_to_int)
+        else:
+            ds = _helper_bool_to_int(ds)
+        return ds
+
+    forecasts = _bool_to_int(forecasts)
+
     def _check_identical_xr_types(a, b):
         if type(a) != type(b):
             raise ValueError(
@@ -599,11 +618,11 @@ def rps(
             observations_edges, forecast_edges = category_edges, category_edges
 
         # cumulative probs
-        Fc = (forecasts < category_edges).mean(member_dim)
-        Oc = observations < category_edges
+        Fc = (forecasts < forecast_edges).mean(member_dim)
+        Oc = observations < observations_edges
         # todo: mask land
 
-    elif isinstance(category_edges, (np.ndarray, np.array)):
+    elif isinstance(category_edges, np.ndarray):
         # histogram(dim=[]) not allowed therefore add fake member dim
         # to apply over when multi-dim observations
         if len(observations.dims) == 1:
@@ -635,6 +654,8 @@ def rps(
         Oc = observations.cumsum(bin_dim)
 
     elif category_edges is None:  # expect cdfs already as inputs
+        if member_dim in forecasts.dims:
+            forecasts = forecasts.mean(member_dim)
         Fc = forecasts
         Oc = observations
     else:
@@ -648,8 +669,8 @@ def rps(
 
     # RPS formulas
     if fair:
-        Ec = forecasts.cumsum(bin_dim)
-        res = (((Ec / M) - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
+        Ec = Fc * M
+        res = ((Ec / M - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
     else:
         res = ((Fc - Oc) ** 2).sum(bin_dim)
 

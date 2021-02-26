@@ -484,12 +484,13 @@ def test_rps_wilks_example():
     np.testing.assert_allclose(rps(Obs, F2, category_edges), 0.29)
 
 
-def test_2_category_rps_equals_brier_score(o, f_prob):
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_2_category_rps_equals_brier_score(o, f_prob, fair_bool):
     """Test that RPS for two categories equals the Brier Score."""
     category_edges = np.array([0.0, 0.5, 1.0])
     assert_allclose(
-        rps(o, f_prob, category_edges=category_edges, dim=None),
-        brier_score(o > 0.5, (f_prob > 0.5).mean("member"), dim=None),
+        rps(o, f_prob, category_edges=category_edges, dim=None, fair=fair_bool),
+        brier_score(o > 0.5, (f_prob > 0.5), dim=None, fair=fair_bool),
     )
 
 
@@ -498,6 +499,7 @@ def test_rps_perfect_values(o, category_edges, fair_bool):
     """Test values for perfect forecast"""
     f = xr.concat(10 * [o], dim="member")
     res = rps(o, f, category_edges=category_edges, fair=fair_bool)
+    print(res)
     assert (res == 0).all()
 
 
@@ -512,11 +514,79 @@ def test_rps_dask(o_dask, f_prob_dask, category_edges, fair_bool):
 
 @pytest.mark.parametrize("dim", DIMS)
 def test_rps_vs_fair_rps(o, f_prob, category_edges, dim):
-    """Test that fair rps is smaller or equal than rps due to ensemble-size
-    adjustment."""
+    """Test that fair rps is smaller (e.g. better) or equal than rps due to ensemble-
+    size adjustment."""
     frps = rps(o, f_prob, dim=dim, fair=True, category_edges=category_edges)
     ufrps = rps(o, f_prob, dim=dim, fair=False, category_edges=category_edges)
-    assert (frps <= ufrps).all(), print("fairrps", frps, "\nufrps", ufrps)
+    # assert (frps <= ufrps).mean() >.9
+    assert (frps <= ufrps).all(), print(
+        "fairrps",
+        frps,
+        "\nufrps",
+        ufrps,
+        "\n diff: ufrps - frps, should be positive:\n",
+        ufrps - frps,
+    )
+
+
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_rps_category_edges_xrDataArray(o, f_prob, fair_bool):
+    """Test rps with category_edges as xrDataArray for forecast and observations edges."""
+    actual = rps(
+        o,
+        f_prob,
+        dim="time",
+        fair=fair_bool,
+        category_edges=f_prob.quantile(q=[0.3, 0.5, 0.7], dim=["time", "member"]),
+    )
+    assert set(["lon", "lat"]) == set(actual.dims)
+    assert "quantile" not in actual.dims
+
+
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_rps_category_edges_xrDataset(o, f_prob, fair_bool):
+    """Test rps with category_edges as xrDataArray for forecast and observations edges."""
+    o = o.to_dataset(name="var")
+    o["var2"] = o["var"] ** 2
+    f_prob = f_prob.to_dataset(name="var")
+    f_prob["var2"] = f_prob["var"] ** 2
+    actual = rps(
+        o,
+        f_prob,
+        dim="time",
+        fair=fair_bool,
+        category_edges=f_prob.quantile(q=[0.3, 0.5, 0.7], dim=["time", "member"]),
+    )
+    assert set(["lon", "lat"]) == set(actual.dims)
+    assert "quantile" not in actual.dims
+
+
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_rps_category_edges_tuple(o, f_prob, fair_bool):
+    """Test rps with category_edges as tuple of xrDataArray for forecast and observations edges separately."""
+    actual = rps(
+        o,
+        f_prob,
+        dim="time",
+        fair=fair_bool,
+        category_edges=(
+            f_prob.quantile(q=[0.3, 0.5, 0.7], dim=["time", "member"]),
+            o.quantile(q=[0.3, 0.5, 0.7], dim="time"),
+        ),
+    )
+    assert set(["lon", "lat"]) == set(actual.dims)
+    assert "quantile" not in actual.dims
+
+
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_rps_category_edges_None(o, f_prob, fair_bool):
+    """Test rps with category_edges as None expecting o and f_prob are already CDFs."""
+    edges = xr.DataArray([0.2, 0.4, 0.6, 0.8], dims="quantile")
+    o_c = o > edges  # CDF
+    f_prob_c = f_prob > edges
+    actual = rps(o_c, f_prob_c, dim="time", fair=fair_bool, category_edges=None)
+    assert set(["lon", "lat"]) == set(actual.dims)
+    assert "quantile" not in actual.dims
 
 
 @pytest.mark.parametrize(
