@@ -504,6 +504,7 @@ def rps(
         The forecast likelihoods of the event.
         Further requirements are specified based on ``category_edges``.
     category_edges : array_like, xr.Dataset, xr.DataArray, None
+
         - array_like: Category bin edges used to compute the CDFs based on boolean or logical
         (True or 1 for event occurance, False or 0 for non-occurance) observations.
         If ``fair==False``, forecasts should be between 0 and 1 without a dimension
@@ -513,10 +514,13 @@ def rps(
         (True,False) or binary (0, 1) containing dimension ``member_dim``.
         Similar to np.histogram, all but the last (righthand-most) bin include the left edge
         and exclude the right edge. The last bin includes both edges.
+
         - xr.Dataset/xr.DataArray: edges of the categories in absolute units provided as dimension
         ``category_dim``, ``threshold`` or ``quantile``. Forecasts and Observations are also in absolute units.
+
         - tuple of xr.Dataset/xr.DataArray: same as xr.Dataset/xr.DataArray where the first item
         is taken as category_edges for observations and the second item for category_edges for forecasts
+
         - None: expect than observations and forecasts are already CDFs containing ``category_dim`` dimension
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``rps``.
