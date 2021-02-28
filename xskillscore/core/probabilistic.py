@@ -488,11 +488,15 @@ def rps(
     """Calculate Ranked Probability Score.
 
      .. math::
-        RPS(p, k) = \\sum_{m=1}^{M}
-        [(\\sum_{k=1}^{m} p_k) - (\\sum_{k=1}^{m} o_k)]^{2}
+        RPS = \\sum_{m=1}^{M}[(\\sum_{k=1}^{m} y_k) - (\\sum_{k=1}^{m} o_k)]^{2}
 
-    where ``p`` and ``o`` are forecast and observation probabilities in ``M``
+    where ``y`` and ``o`` are forecast and observation probabilities in ``M``
     categories.
+
+     .. note::
+        Takes the sum over all categories as in Weigel et al. 2007 and not the mean as
+        in https://www.cawcr.gov.au/projects/verification/verif_web_page.html#RPS.
+        Therefore RPS has no upper boundary.
 
     Parameters
     ----------
@@ -564,7 +568,9 @@ def rps(
 
     References
     ----------
-    * https://www.cawcr.gov.au/projects/verification/verif_web_page.html#RPS
+    * Weigel, A. P., Liniger, M. A., & Appenzeller, C. (2007). The Discrete Brier and
+      Ranked Probability Skill Scores. Monthly Weather Review, 135(1), 118–124.
+      doi: 10/b59qz5
     * C. A. T. Ferro. Fair scores for ensemble forecasts. Q.R.J. Meteorol. Soc., 140:
       1917–1923, 2013. doi: 10.1002/qj.2270.
     * https://www-miklip.dkrz.de/about/problems/
