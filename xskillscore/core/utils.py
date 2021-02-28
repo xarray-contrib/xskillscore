@@ -164,3 +164,38 @@ def histogram(*args, bins=None, bin_names=None, **kwargs):
         if bin_names:
             args = (arg.rename(bin_names[i]) for i, arg in enumerate(args))
         return xhist(*args, bins=bins, **kwargs)
+
+
+def _bool_to_int(ds):
+    """convert xr.object of dtype bool to int to evade:
+    TypeError: numpy boolean subtract, the `-` operator, is not supported"""
+
+    def _helper_bool_to_int(da):
+        if da.dtype == "bool":
+            da = da.astype("int")
+        return da
+
+    if isinstance(ds, xr.Dataset):
+        ds = ds.map(_helper_bool_to_int)
+    else:
+        ds = _helper_bool_to_int(ds)
+    return ds
+
+
+def _check_identical_xr_types(a, b):
+    """Check that a and b are both xr.Dataset or both xr.DataArray."""
+    if type(a) != type(b):
+        raise ValueError(f"a and b must be same type, found {type(a)} and {type(b)}")
+    for d in [a, b]:
+        if not isinstance(d, (xr.Dataset, xr.DataArray)):
+            raise ValueError("inputs must be xr.DataArray or xr.Dataset")
+
+
+def _keep_nans_masked(ds_before, ds_after, dim=None, ignore=None):
+    """Preserve all NaNs from ds_before for ds_after over while ignoring some dimensions optionally."""
+    mask = ds_before.isnull().all(dim)
+    overlap_dims = set(mask.dims) & set(ignore)
+    if len(overlap_dims) > 0:
+        mask = mask.mean(overlap_dims)
+    ds_after = ds_after.where(~mask.astype("bool"), other=np.nan)
+    return ds_after

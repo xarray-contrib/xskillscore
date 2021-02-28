@@ -7,8 +7,11 @@ import xarray as xr
 from .contingency import Contingency
 from .utils import (
     _add_as_coord,
+    _bool_to_int,
+    _check_identical_xr_types,
     _fail_if_dim_empty,
     _get_bin_centers,
+    _keep_nans_masked,
     _preprocess_dims,
     _stack_input_if_needed,
     histogram,
@@ -475,6 +478,16 @@ def threshold_brier_score(
         return res.mean(dim, keep_attrs=keep_attrs)
 
 
+def _check_bin_dim(ds, bin_dim):
+    """Assert that bin_dim is in ds. Try to guess and rename edges dimension."""
+    for d in ["quantile", "threshold", "edge"]:
+        if d in ds.dims and bin_dim not in ds.dims:
+            ds = ds.rename({d: bin_dim})
+    if bin_dim not in ds.dims:
+        raise ValueError(f"require {bin_dim} dimension, found {ds.dims}")
+    return ds
+
+
 def rps(
     observations,
     forecasts,
@@ -580,49 +593,7 @@ def rps(
     bin_dim = f"{bin_names[0]}_bin"
     M = forecasts[member_dim].size
 
-    def _bool_to_int(ds):
-        """convert xr.object of dtype bool to int to evade:
-        TypeError: numpy boolean subtract, the `-` operator, is not supported"""
-
-        def _helper_bool_to_int(da):
-            if da.dtype == "bool":
-                da = da.astype("int")
-            return da
-
-        if isinstance(ds, xr.Dataset):
-            ds = ds.map(_helper_bool_to_int)
-        else:
-            ds = _helper_bool_to_int(ds)
-        return ds
-
     forecasts = _bool_to_int(forecasts)
-
-    def _check_identical_xr_types(a, b):
-        if type(a) != type(b):
-            raise ValueError(
-                f"a and b must be same type, found {type(a)} and {type(b)}"
-            )
-        for d in [a, b]:
-            if not isinstance(d, (xr.Dataset, xr.DataArray)):
-                raise ValueError("inputs must be xr.DataArray or xr.Dataset")
-
-    def _check_bin_dim(ds, bin_dim):
-        """Assert that bin_dim is in ds. Try to guess and rename edges dimension."""
-        for d in ["quantile", "threshold", "edge"]:
-            if d in ds.dims and bin_dim not in ds.dims:
-                ds = ds.rename({d: bin_dim})
-        if bin_dim not in ds.dims:
-            raise ValueError(f"require {bin_dim} dimension, found {ds.dims}")
-        return ds
-
-    def _keep_nans_masked(ds_before, ds_after, dim=None, ignore=None):
-        """Preserve NaNs where all over dim were NaNs. Don't consider dimensions ignore when finding all NaNs."""
-        mask = ds_before.isnull().all(dim)
-        overlap_dims = set(mask.dims) & set(ignore)
-        if len(overlap_dims) > 0:
-            mask = mask.mean(overlap_dims)
-        ds_after = ds_after.where(~mask.astype("bool"), other=np.nan)
-        return ds_after
 
     _check_identical_xr_types(observations, forecasts)
 
