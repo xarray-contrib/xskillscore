@@ -609,6 +609,15 @@ def rps(
             raise ValueError(f"require {bin_dim} dimension, found {ds.dims}")
         return ds
 
+    def _keep_nans_masked(ds_before, ds_after, dim=None, ignore=None):
+        """Preserve NaNs where all over dim were NaNs. Don't consider dimensions ignore when finding all NaNs."""
+        mask = ds_before.isnull().all(dim)
+        overlap_dims = set(mask.dims) & set(ignore)
+        if len(overlap_dims) > 0:
+            mask = mask.mean(overlap_dims)
+        ds_after = ds_after.where(~mask.astype("bool"), other=np.nan)
+        return ds_after
+
     _check_identical_xr_types(observations, forecasts)
 
     # different ways of calculating RPS based on category_edges
@@ -628,7 +637,6 @@ def rps(
         # cumulative probs
         Fc = (forecasts < forecast_edges).mean(member_dim)
         Oc = observations < observations_edges
-        # todo: mask Fc and Oc where all nans
 
     elif isinstance(category_edges, np.ndarray):
         # histogram(dim=[]) not allowed therefore add fake member dim
@@ -682,7 +690,14 @@ def rps(
 
     if weights is not None:
         res = res.weighted(weights)
-    return res.mean(dim, keep_attrs=keep_attrs)
+    res = res.mean(dim, keep_attrs=keep_attrs)
+
+    # keep nans and prevent 0 for all nan grids
+    print(observations.dims, res.dims, dim)
+    res = _keep_nans_masked(
+        observations, res, dim, ignore=["quantile", "threshold", "edge", "category_bin"]
+    )
+    return res
 
 
 def rank_histogram(observations, forecasts, dim=None, member_dim="member"):

@@ -590,6 +590,24 @@ def test_rps_category_edges_None(o, f_prob, fair_bool):
 
 
 @pytest.mark.parametrize(
+    "category_edges",
+    [
+        xr.DataArray([0.2, 0.4, 0.6, 0.8], dims="quantile"),
+        np.array([0.2, 0.4, 0.6, 0.8]),
+    ],
+)
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_rps_keeps_masked(o, f_prob, fair_bool, category_edges):
+    """Test rps keeps NaNs."""
+    o = o.where(o.lat > 1)
+    f_prob = f_prob.where(f_prob.lat > 1)
+    actual = rps(o, f_prob, dim="time", category_edges=category_edges)
+    assert set(["lon", "lat"]) == set(actual.dims)
+    assert actual.isel(lat=[0, 1]).isnull().all()
+    assert actual.isel(lat=slice(2, None)).notnull().all()
+
+
+@pytest.mark.parametrize(
     "observation,forecast",
     [
         (
