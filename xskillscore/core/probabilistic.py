@@ -648,9 +648,11 @@ def rps(
         forecasts_category_edge     <U56 '[[0.0, 0.33), [0.33, 0.66)), [[0.33, 0....
         observations_category_edge  <U56 '[[0.0, 0.33), [0.33, 0.66)), [[0.33, 0....
 
-    You can also define multi-dimensional ``category_edges``, e.g. with xr.quantile.
-    However, you still need to ensure that ``category_edges`` covers the forecasts and
-    observations distributions.
+
+        You can also define multi-dimensional ``category_edges``, e.g. with xr.quantile.
+        However, you still need to ensure that ``category_edges`` covers the forecasts
+        and observations distributions.
+
     >>> category_edges = xr.concat([
     ...     xr.DataArray(0).expand_dims('category_edge').assign_coords(category_edge=[0]),
     ...     observations.quantile(q=[.33, .66]).rename({'quantile':'category_edge'}),
