@@ -585,15 +585,19 @@ def rps(
         The forecast of the event.
         Further requirements are specified based on ``category_edges``.
     category_edges : array_like, xr.Dataset, xr.DataArray, None
-        Category edges used to compute the CDFs. Similar to np.histogram, all but the last (righthand-most) bin include the left edge and exclude the right edge. The last bin includes both edges.
-        These ``category_edge`` must span the full range of the observations and forecasts distribution. Forecasts, observations and category_edge are expected in absolute units or probabilities consistently.
+        Category edges used to compute the CDFs. Similar to np.histogram, all but the
+        last (righthand-most) bin include the left edge and exclude the right edge. The
+        last bin includes both edges.
+        These ``category_edge`` must span the full range of the observations and
+        forecasts distribution. Forecasts, observations and category_edge are expected
+        in absolute units or probabilities consistently.
         ``category_edges`` decides how xs.rps interprets forecasts and observations.
 
-        - np.array (1d): will be internally converted to xr.DataArray or xr.Dataset
-          and broadcasted to observations.
+        - np.array (1d): will be internally converted and broadcasted to observations.
 
         - xr.Dataset/xr.DataArray: edges of the categories provided
-          as dimension ``category_edge`` with optional category labels as ``category_edge`` coordinate.
+          as dimension ``category_edge`` with optional category labels as
+          ``category_edge`` coordinate.
 
         - tuple of xr.Dataset/xr.DataArray: same as xr.Dataset/xr.DataArray, where the
           first item is taken as ``category_edges`` for observations and the second item
@@ -622,7 +626,8 @@ def rps(
     Returns
     -------
     xarray.Dataset or xarray.DataArray:
-        ranked probability score with coords ``forecasts_category_edge`` and ``observations_category_edge`` as str
+        ranked probability score with coords ``forecasts_category_edge`` and
+        ``observations_category_edge`` as str
 
 
     Examples
@@ -650,7 +655,7 @@ def rps(
     ...     xr.DataArray(0).expand_dims('category_edge').assign_coords(category_edge=[0]),
     ...     observations.quantile(q=[.33, .66]).rename({'quantile':'category_edge'}),
     ...     xr.DataArray(1).expand_dims('category_edge').assign_coords(category_edge=[1])
-    ... ],'category_edge')
+    ...     ],'category_edge')
     >>> xs.rps(observations, forecasts, category_edges, dim='x')
     <xarray.DataArray (y: 3)>
     array([1.18518519, 0.85185185, 0.40740741])
