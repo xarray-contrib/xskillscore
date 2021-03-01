@@ -13,6 +13,8 @@ FORECASTS_NAME = "forecasts"
 
 def _get_category_bounds(category_edges):
     """Return formatted string of category bounds given list of category edges"""
+    if isinstance(category_edges, (xr.DataArray, xr.Dataset)):
+        category_edges = category_edges.category_edge.values
     bounds = [
         f"[{str(category_edges[i])}, {str(category_edges[i + 1])})"
         for i in range(len(category_edges) - 2)

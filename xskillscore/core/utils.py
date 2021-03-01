@@ -193,9 +193,67 @@ def _check_identical_xr_types(a, b):
 
 def _keep_nans_masked(ds_before, ds_after, dim=None, ignore=None):
     """Preserve all NaNs from ds_before for ds_after over while ignoring some dimensions optionally."""
-    mask = ds_before.isnull().all(dim)
-    overlap_dims = set(mask.dims) & set(ignore)
-    if len(overlap_dims) > 0:
-        mask = mask.mean(overlap_dims)
+    print(
+        "ds_before.dims =",
+        ds_before.dims,
+        "ds_after.dims",
+        ds_after.dims,
+        "  dim =",
+        dim,
+    )
+    if dim is None:
+        dim = list(ds_before.dims)
+    elif isinstance(dim, str):
+        dim = [dim]
+    print("dim =", dim)
+
+    if ignore is None:
+        ignore = []
+    elif isinstance(ignore, str):
+        ignore = list(ignore)
+
+    # dim = set(dim) - set(ignore)
+
+    # all_dim = ds_before.dims #[d for d in dim if d in ds_before.dims]
+    all_dim = set(dim) ^ set(ignore)
+    print("all_dim", all_dim)
+    all_dim = [d for d in all_dim if d in ds_before.dims]
+    print("all_dim", all_dim)
+
+    mask = ds_before.isnull().all(all_dim)
+    print("mask", mask)
+    if False:
+        for d in dim:
+            assert d not in mask
+        if ignore is not None:
+            overlap_dims = set(mask.dims) & set(ignore)
+            print("overlap_dims", overlap_dims)
+            if len(overlap_dims) > 0:
+                mask = mask.mean(overlap_dims)
+    print("mask.dims", mask.dims)
     ds_after = ds_after.where(~mask.astype("bool"), other=np.nan)
+    for d in dim:
+        assert d not in ds_after.dims
+    if ignore is not None:
+        for d in ignore:
+            assert d not in ds_after.dims
     return ds_after
+
+
+def quantile_edges_pad_lower_upper(
+    ds, edges, dim, lower=0, upper=1, category_edge_dim="category_edge"
+):
+    assert isinstance(dim, list)
+    if isinstance(edges, list):
+        edges = np.array(edges)
+    assert isinstance(edges, np.ndarray)
+    q_edges = ds.quantile(q=edges, dim=dim).rename({"quantile": category_edge_dim})
+    ds_dim_reduced = ds.isel({d: 0 for d in dim}, drop=True)
+    lower = lower * xr.ones_like(ds_dim_reduced).expand_dims(
+        category_edge_dim
+    ).assign_coords({category_edge_dim: [lower]})
+    upper = upper * xr.ones_like(ds_dim_reduced).expand_dims(
+        category_edge_dim
+    ).assign_coords({category_edge_dim: [upper]})
+    ds_pad = xr.concat([lower, q_edges, upper], dim=category_edge_dim)
+    return ds_pad
