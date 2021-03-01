@@ -467,7 +467,7 @@ def threshold_brier_score(
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
-    res = res.assign_coords(threshold=threshold.threshold)
+    res = res.assign_coords(threshold=threshold)
     if dim is None:  # dont average over threshold dim
         dim = observations.dims
     if weights is not None:
