@@ -524,7 +524,6 @@ def rps(
     weights=None,
     keep_attrs=False,
     member_dim="member",
-    # skipna=False,
 ):
     """Calculate Ranked Probability Score.
 
@@ -585,23 +584,39 @@ def rps(
     Returns
     -------
     xarray.Dataset or xarray.DataArray:
-        ranked probability score
+        ranked probability score with coords ``forecasts_category_edge`` and ``observations_category_edge`` as str
+
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    >>> observations = xr.DataArray(np.random.random(size=(3,3)),
     ...                             coords=[('x', np.arange(3)),
     ...                                     ('y', np.arange(3))])
-    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+    >>> forecasts = xr.DataArray(np.random.random(size=(3,3,3)),
     ...                          coords=[('x', np.arange(3)),
     ...                                  ('y', np.arange(3)),
     ...                                  ('member', np.arange(3))])
-    >>> category_edges = np.array([.2, .5, .8])
-    >>> rps(observations > 0.5, (forecasts > 0.5).mean('member'), category_edges)
-    <xarray.DataArray 'histogram_category' (y: 3)>
-    array([1.        , 1.        , 0.33333333])
+    >>> category_edges = np.array([.0, .5, 1.])
+    >>> xs.rps(observations, forecasts, category_edges, dim='x')
+    <xarray.DataArray (y: 3)>
+    array([0.85185185, 0.59259259, 0.37037037])
     Coordinates:
-      * y        (y) int64 0 1 2
+      * y                           (y) int64 0 1 2
+        forecasts_category_edge     <U56 '[[0.0, 0.33), [0.33, 0.66)), [[0.33, 0....
+        observations_category_edge  <U56 '[[0.0, 0.33), [0.33, 0.66)), [[0.33, 0....
+
+    >>> category_edges = xr.concat([
+    ...     xr.DataArray(0).expand_dims('category_edge').assign_coords(category_edge=[0]),
+    ...     observations.quantile(q=[.33, .66]).rename({'quantile':'category_edge'}),
+    ...     xr.DataArray(1).expand_dims('category_edge').assign_coords(category_edge=[1])
+    ... ],'category_edge')
+    >>> xs.rps(observations, forecasts, category_edges, dim='x')
+    <xarray.DataArray (y: 3)>
+    array([1.18518519, 0.85185185, 0.40740741])
+    Coordinates:
+      * y                           (y) int64 0 1 2
+        forecasts_category_edge     <U56 '[[0.0, 0.33), [0.33, 0.66)), [[0.33, 0....
+        observations_category_edge  <U56 '[[0.0, 0.33), [0.33, 0.66)), [[0.33, 0....
 
     References
     ----------
@@ -615,7 +630,8 @@ def rps(
     """
     bin_names = ["category"]
     bin_dim = f"{bin_names[0]}_edge"
-    M = forecasts[member_dim].size
+    if fair:
+        M = forecasts[member_dim].size
 
     forecasts = _bool_to_int(forecasts)
 
@@ -701,9 +717,9 @@ def rps(
     _check_is_CDF(Fc)
     _check_is_CDF(Oc)
 
-    if category_edges is not None:
-        Fc[bin_dim] = _get_category_bounds(forecasts_edges)
-        Oc[bin_dim] = _get_category_bounds(observations_edges)
+    # if category_edges is not None:
+    #    Fc[bin_dim] = _get_category_bounds(forecasts_edges)
+    #    Oc[bin_dim] = _get_category_bounds(observations_edges)
 
     # RPS formulas
     if fair:
@@ -732,10 +748,19 @@ def rps(
     if weights is not None:
         res = res.weighted(weights)
 
-    res = res.mean(dim, keep_attrs=keep_attrs)
+    res = res.mean(dim)
 
     # keep nans and prevent 0 for all nan grids
     res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
+
+    if keep_attrs:
+        print(type(res.attrs), type(res))
+        res.attrs.update(observations.attrs)
+        res.attrs.update(forecasts.attrs)
+        if isinstance(res, xr.Dataset):
+            for v in res.data_vars:
+                res[v].attrs.update(observations[v].attrs)
+                res[v].attrs.update(forecasts[v].attrs)
     return res
 
 

@@ -467,6 +467,44 @@ def test_rps_reduce_dim(o, f_prob, category_edges, dim, fair_bool):
     assert_only_dim_reduced(dim, actual, o)
 
 
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_rps_skipna(o, f_prob, category_edges, fair_bool):
+    """Test that rps reduced dim and works for (chunked) ds and da"""
+    dim = "time"
+    o[0, 0, 0] = np.nan
+    skipna_True = rps(
+        o, f_prob, category_edges=category_edges, dim=dim, fair=fair_bool, skipna=True
+    )
+    skipna_False = rps(
+        o, f_prob, category_edges=category_edges, dim=dim, fair=fair_bool, skipna=True
+    )
+    print(skipna_True)
+    print(skipna_True - skipna_False)
+    assert False  # (skipna_True - skipna_False).notnull().any()
+
+
+@pytest.mark.parametrize("chunk_bool", [True, False])
+@pytest.mark.parametrize("input_type", ["Dataset", "multidim Dataset", "DataArray"])
+@pytest.mark.parametrize("keep_attrs", [True, False])
+def test_rps_api_and_inputs(
+    o, f_prob, category_edges, keep_attrs, input_type, chunk_bool
+):
+    """Test that rps keeps attributes, chunking, input types."""
+    o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
+    category_edges = xr.DataArray(category_edges, dims="category_edge")
+    if "Dataset" in input_type:
+        category_edges = category_edges.to_dataset(name="var")
+        if "multidim" in input_type:
+            category_edges["var2"] = category_edges["var"]
+    actual = rps(o, f_prob, category_edges, keep_attrs=keep_attrs)
+    # test that returns chunks
+    assert_chunk(actual, chunk_bool)
+    # test that attributes are kept
+    assert_keep_attrs(actual, o, keep_attrs)
+    # test that input types equal output types
+    assign_type_input_output(actual, o)
+
+
 def rps_xhist(
     observations,
     forecasts,
