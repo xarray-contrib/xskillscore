@@ -515,6 +515,44 @@ def _check_data_within_edges(forecasts, forecasts_edges):
 from .contingency import _get_category_bounds
 
 
+def _add_eps_to_last_in_dim(category_edges, dim):
+    """Add 10 eps to last edge to get last bin [ ] instead of [ ) like in xskillscore.core.utils.histogram"""
+    if isinstance(category_edges, xr.Dataset):
+        v1 = list(category_edges.data_vars)[0]
+        dtype = category_edges[v1]
+    else:
+        dtype = category_edges.dtype
+    eps = np.finfo(dtype).eps
+    category_edges_eps = xr.concat(
+        [
+            category_edges.isel({dim: slice(None, -1)}),
+            category_edges.isel({dim: [-1]}) + 10 * eps,
+        ],
+        dim,
+    )
+    return category_edges_eps
+
+
+def _check_is_CDF(cdf):
+    """Check basic characteristics of a cumulative distribution function."""
+
+    def func(cdf):
+        # CDF <=1
+        if not (cdf <= 1.0).all():
+            raise ValueError(f"Found CDF > 1, max = {cdf.max()}")
+        # CDF >=0
+        if not (cdf >= 0.0).all():
+            raise ValueError(f"Found CDF < 0, min = {cdf.min()}")
+        # CDF monotonic increasing
+        if not (cdf.astype("float").diff("category_edge") >= 0).all():
+            raise ValueError("Found CDF not monotonic increasing")
+
+    if isinstance(cdf, xr.Dataset):
+        cdf.map(func)
+    elif isinstance(cdf, xr.DataArray):
+        func(cdf)
+
+
 def rps(
     observations,
     forecasts,
@@ -605,6 +643,9 @@ def rps(
         forecasts_category_edge     <U56 '[[0.0, 0.33), [0.33, 0.66)), [[0.33, 0....
         observations_category_edge  <U56 '[[0.0, 0.33), [0.33, 0.66)), [[0.33, 0....
 
+    You can also define multi-dimensional ``category_edges``, e.g. with xr.quantile.
+    However, you still need to ensure that ``category_edges`` covers the forecasts and
+    observations distributions.
     >>> category_edges = xr.concat([
     ...     xr.DataArray(0).expand_dims('category_edge').assign_coords(category_edge=[0]),
     ...     observations.quantile(q=[.33, .66]).rename({'quantile':'category_edge'}),
@@ -663,25 +704,8 @@ def rps(
         _check_data_within_edges(forecasts, forecasts_edges)
         _check_data_within_edges(observations, observations_edges)
 
-        def add_eps_to_last_in_dim(category_edges, dim):
-            """Add 10 eps to last edge to get last bin [ ] instead of [ ) like in xskillscore.core.utils.histogram"""
-            if isinstance(category_edges, xr.Dataset):
-                v1 = list(category_edges.data_vars)[0]
-                dtype = category_edges[v1]
-            else:
-                dtype = category_edges.dtype
-            eps = np.finfo(dtype).eps
-            category_edges_eps = xr.concat(
-                [
-                    category_edges.isel({dim: slice(None, -1)}),
-                    category_edges.isel({dim: [-1]}) + 10 * eps,
-                ],
-                dim,
-            )
-            return category_edges_eps
-
-        forecasts_edges = add_eps_to_last_in_dim(forecasts_edges, bin_dim)
-        observations_edges = add_eps_to_last_in_dim(observations_edges, bin_dim)
+        forecasts_edges = _add_eps_to_last_in_dim(forecasts_edges, bin_dim)
+        observations_edges = _add_eps_to_last_in_dim(observations_edges, bin_dim)
 
         # cumulative probs, ignore lowest threshold as below category_edges
         Fc = (
@@ -705,27 +729,14 @@ def rps(
             f"category_edges must be xr.DataArray, xr.Dataset, tuple of xr.objects, None or array-like, found {type(category_edges)}"
         )
 
-    # check and maybe rename edges dim
-    def _check_is_CDF(cdf):
-        # CDF <=1
-        assert (Fc <= 1.0).all(), print(Fc)
-        # CDF >=0
-        assert (Fc >= 0.0).all(), print(Fc)
-        # CDF monotonic increasing
-        assert (Fc.diff("category_edge") >= 0).all()
-
     _check_is_CDF(Fc)
     _check_is_CDF(Oc)
 
-    # if category_edges is not None:
-    #    Fc[bin_dim] = _get_category_bounds(forecasts_edges)
-    #    Oc[bin_dim] = _get_category_bounds(observations_edges)
-
     # RPS formulas
-    if fair:
+    if fair:  # for ensemble member adjustment Ferro 2013
         Ec = Fc * M
         res = ((Ec / M - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
-    else:
+    else:  # normal formula
         res = ((Fc - Oc) ** 2).sum(bin_dim)
 
     # add category_edge as str into coords
@@ -744,17 +755,13 @@ def rps(
                 )
             }
         )
-
     if weights is not None:
         res = res.weighted(weights)
-
+    # combine many forecasts-observations pairs
     res = res.mean(dim)
-
     # keep nans and prevent 0 for all nan grids
     res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
-
-    if keep_attrs:
-        print(type(res.attrs), type(res))
+    if keep_attrs:  # attach by hand
         res.attrs.update(observations.attrs)
         res.attrs.update(forecasts.attrs)
         if isinstance(res, xr.Dataset):

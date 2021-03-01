@@ -467,22 +467,6 @@ def test_rps_reduce_dim(o, f_prob, category_edges, dim, fair_bool):
     assert_only_dim_reduced(dim, actual, o)
 
 
-@pytest.mark.parametrize("fair_bool", [True, False])
-def test_rps_skipna(o, f_prob, category_edges, fair_bool):
-    """Test that rps reduced dim and works for (chunked) ds and da"""
-    dim = "time"
-    o[0, 0, 0] = np.nan
-    skipna_True = rps(
-        o, f_prob, category_edges=category_edges, dim=dim, fair=fair_bool, skipna=True
-    )
-    skipna_False = rps(
-        o, f_prob, category_edges=category_edges, dim=dim, fair=fair_bool, skipna=True
-    )
-    print(skipna_True)
-    print(skipna_True - skipna_False)
-    assert False  # (skipna_True - skipna_False).notnull().any()
-
-
 @pytest.mark.parametrize("chunk_bool", [True, False])
 @pytest.mark.parametrize("input_type", ["Dataset", "multidim Dataset", "DataArray"])
 @pytest.mark.parametrize("keep_attrs", [True, False])
@@ -751,14 +735,10 @@ def test_rps_keeps_masked(o, f_prob, fair_bool, category_edges):
     """Test rps keeps NaNs."""
     o = o.where(o.lat > 1)
     f_prob = f_prob.where(f_prob.lat > 1)
-    print("o", o)
-    print("f_prob", f_prob)
     actual = rps(o, f_prob, dim="time", category_edges=category_edges)
     assert set(["lon", "lat"]) == set(actual.dims)
-    assert actual.isel(lat=[0, 1]).isnull().all(), print(actual.isel(lat=[0, 1]))
-    assert actual.isel(lat=slice(2, None)).notnull().all(), print(
-        actual.isel(lat=slice(2, None))
-    )
+    assert actual.isel(lat=[0, 1]).isnull().all()
+    assert actual.isel(lat=slice(2, None)).notnull().all()
 
 
 @pytest.mark.parametrize("fair_bool", [True, False], ids=["bool=fair", "fair=False"])
@@ -774,8 +754,6 @@ def test_rps_new_identical_old_xhistogram(o, f_prob, fair_bool):
     dim = "time"
     actual = rps(o, f_prob, dim=dim, category_edges=category_edges_xr)
     expected = rps_xhist(o, f_prob, dim=dim, category_edges=category_edges_np)
-    print(actual.coords["forecasts_category_edge"].values)
-    print(expected.coords["forecasts_category_edge"].values)
     assert_allclose(actual.rename("histogram_category_edge"), expected)
 
 
@@ -784,8 +762,6 @@ def test_rps_last_edge_included(o, f_prob):
     o = xr.ones_like(o)
     f_prob = xr.ones_like(f_prob)
     res_actual = rps(o, f_prob, dim="time", category_edges=category_edges_np)
-    print(res_actual)
-    print(res_actual.coords["forecasts_category_edge"])
     assert (res_actual == 0).all()
 
 
