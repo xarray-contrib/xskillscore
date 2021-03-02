@@ -597,7 +597,8 @@ def rps(
 
         - xr.Dataset/xr.DataArray: edges of the categories provided
           as dimension ``category_edge`` with optional category labels as
-          ``category_edge`` coordinate.
+          ``category_edge`` coordinate. Use xr.Dataset/xr.DataArray if edges
+          multi-dimensional and vary across dimensions.
 
         - tuple of np.array/xr.Dataset/xr.DataArray: same as above, where the
           first item is taken as ``category_edges`` for observations and the second item
