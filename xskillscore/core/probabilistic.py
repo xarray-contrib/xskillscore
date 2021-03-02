@@ -599,7 +599,7 @@ def rps(
           as dimension ``category_edge`` with optional category labels as
           ``category_edge`` coordinate.
 
-        - tuple of xr.Dataset/xr.DataArray: same as xr.Dataset/xr.DataArray, where the
+        - tuple of np.array/xr.Dataset/xr.DataArray: same as above, where the
           first item is taken as ``category_edges`` for observations and the second item
           for ``category_edges`` for forecasts.
 
@@ -685,27 +685,39 @@ def rps(
     _check_identical_xr_types(observations, forecasts)
 
     # different entry point of calculating RPS based on category_edges
-    if isinstance(category_edges, np.ndarray):
-        # prepare category_edges as xr object
-        category_edges = xr.DataArray(
-            category_edges,
-            dims="category_edge",
-            coords={"category_edge": category_edges},
-        )
-        category_edges = xr.ones_like(observations) * category_edges
-
-    if isinstance(category_edges, (xr.Dataset, xr.DataArray)) or isinstance(
-        category_edges, tuple
-    ):
-        if isinstance(
-            category_edges, tuple
-        ):  # edges tuple of two: use for obs and forecast edges separately
+    # category_edges tuple of two: use for obs and forecast category_edges separately
+    if isinstance(category_edges, (tuple, np.ndarray, xr.DataArray, xr.Dataset)):
+        if isinstance(category_edges, tuple):
+            assert isinstance(category_edges[0], type(category_edges[1]))
             observations_edges, forecasts_edges = category_edges
-            _check_identical_xr_types(forecasts_edges, forecasts)
-            _check_identical_xr_types(observations_edges, forecasts)
-        else:  # edges only given once, so use for both obs and forecasts
-            _check_identical_xr_types(category_edges, forecasts)
+        else:  # category_edges only given once, so use for both obs and forecasts
             observations_edges, forecasts_edges = category_edges, category_edges
+
+        if isinstance(observations_edges, np.ndarray):
+            # convert category_edges as xr object
+            observations_edges = xr.DataArray(
+                observations_edges,
+                dims="category_edge",
+                coords={"category_edge": observations_edges},
+            )
+            observations_edges = xr.ones_like(observations) * observations_edges
+
+            forecasts_edges = xr.DataArray(
+                forecasts_edges,
+                dims="category_edge",
+                coords={"category_edge": forecasts_edges},
+            )
+            forecasts_edges = (
+                xr.ones_like(
+                    forecasts
+                    if member_dim not in forecasts.dims
+                    else forecasts.isel({member_dim: 0}, drop=True)
+                )
+                * forecasts_edges
+            )
+
+        _check_identical_xr_types(forecasts_edges, forecasts)
+        _check_identical_xr_types(observations_edges, forecasts)
 
         _check_data_within_edges(forecasts, forecasts_edges)
         _check_data_within_edges(observations, observations_edges)
