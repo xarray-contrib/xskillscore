@@ -725,7 +725,11 @@ def test_rps_category_edges_None(o, f_prob, fair_bool):
 @pytest.mark.parametrize(
     "category_edges",
     [
-        xr.DataArray([0, 0.2, 0.4, 0.6, 0.8, 1.0], dims="category_edge"),
+        xr.DataArray(
+            [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+            dims="category_edge",
+            coords={"category_edge": [0, 0.2, 0.4, 0.6, 0.8, 1.0]},
+        ),
         np.array([0, 0.2, 0.4, 0.6, 0.8, 1.0]),
     ],
     ids=["edge xr", "edge np"],
@@ -739,6 +743,11 @@ def test_rps_keeps_masked(o, f_prob, fair_bool, category_edges):
     assert set(["lon", "lat"]) == set(actual.dims)
     assert actual.isel(lat=[0, 1]).isnull().all()
     assert actual.isel(lat=slice(2, None)).notnull().all()
+    # test forecasts_category_edge no repeats
+    assert (
+        "[0.0, 0.2), [0.2, 0.4), [0.4, 0.6), [0.6, 0.8), [0.8, 1.0]"
+        in actual.coords["forecasts_category_edge"]
+    )
 
 
 @pytest.mark.parametrize("fair_bool", [True, False], ids=["bool=fair", "fair=False"])
@@ -758,6 +767,7 @@ def test_rps_new_identical_old_xhistogram(o, f_prob, fair_bool):
 
 
 def test_rps_last_edge_included(o, f_prob):
+    """Test that last edges is included."""
     category_edges_np = np.array([0, 0.2, 0.4, 0.6, 0.8, 1.0])
     o = xr.ones_like(o)
     f_prob = xr.ones_like(f_prob)

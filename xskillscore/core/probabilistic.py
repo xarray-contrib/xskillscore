@@ -4,7 +4,7 @@ import numpy as np
 import properscoring
 import xarray as xr
 
-from .contingency import Contingency
+from .contingency import Contingency, _get_category_bounds
 from .utils import (
     _add_as_coord,
     _bool_to_int,
@@ -487,32 +487,33 @@ def _check_bin_dim(ds):
 
 
 def _check_data_within_edges(forecasts, forecasts_edges):
-    """Check that forecasts_edges has category_edge dimension and forecasts_edges span range of forecasts (per variable if xr.Dataset)."""
+    """Check that forecasts_edges has category_edge dimension and forecasts_edges span
+    range of forecasts (per variable if xr.Dataset), otherwise ValueError."""
     if "category_edge" not in forecasts_edges.dims:
         raise ValueError(
-            f"Expect to find category_edge in forecast_edges, found {forecasts_edges.dims}"
+            "Expect to find category_edge in forecast_edges, found "
+            f"{forecasts_edges.dims}"
         )
 
-    def _check(forecasts, forecasts_edges):
+    def _helper_check_data_within_edges(forecasts, forecasts_edges):
         if forecasts.min() < forecasts_edges.min():
             raise ValueError(
-                f"found forecasts outside forecast_edges, found forecasts_edges.min() = \n{forecasts_edges.min()}\n and forecasts.min() = \n {forecasts.min()}"
+                "found forecasts outside forecast_edges, found forecasts_edges.min() = "
+                f"{forecasts_edges.min()} and forecasts.min() = {forecasts.min()}"
             )
         if forecasts.max() > forecasts_edges.max():
             raise ValueError(
-                f"found forecasts outside forecast_edges, found forecasts_edges.max() = \n{forecasts_edges.max()}\n and forecasts.max() = \n {forecasts.max()}"
+                "found forecasts outside forecast_edges, found forecasts_edges.max() = "
+                f"{forecasts_edges.max()} and forecasts.max() = {forecasts.max()}"
             )
 
     if isinstance(forecasts, xr.Dataset):
         for v in forecasts.data_vars:
-            _check(forecasts[v], forecasts_edges[v])
+            _helper_check_data_within_edges(forecasts[v], forecasts_edges[v])
     elif isinstance(forecasts, xr.DataArray):
-        _check(forecasts, forecasts_edges)
+        _helper_check_data_within_edges(forecasts, forecasts_edges)
     else:
         raise ValueError("only defined for xr.DataArrays and xr.Datasets")
-
-
-from .contingency import _get_category_bounds
 
 
 def _add_eps_to_last_in_dim(category_edges, dim):
@@ -522,21 +523,20 @@ def _add_eps_to_last_in_dim(category_edges, dim):
         dtype = category_edges[v1]
     else:
         dtype = category_edges.dtype
-    eps = np.finfo(dtype).eps
     category_edges_eps = xr.concat(
         [
             category_edges.isel({dim: slice(None, -1)}),
-            category_edges.isel({dim: [-1]}) + 10 * eps,
+            category_edges.isel({dim: [-1]}) + 10 * np.finfo(dtype).eps,
         ],
         dim,
     )
     return category_edges_eps
 
 
-def _check_is_CDF(cdf):
+def _raise_value_error_cdf(cdf):
     """Check basic characteristics of a cumulative distribution function."""
 
-    def func(cdf):
+    def helper_raise_value_error_cdf(cdf):
         # CDF <=1
         if not (cdf <= 1.0).all():
             raise ValueError(f"Found CDF > 1, max = {cdf.max()}")
@@ -548,9 +548,9 @@ def _check_is_CDF(cdf):
             raise ValueError("Found CDF not monotonic increasing")
 
     if isinstance(cdf, xr.Dataset):
-        cdf.map(func)
+        cdf.map(helper_raise_value_error_cdf)
     elif isinstance(cdf, xr.DataArray):
-        func(cdf)
+        helper_raise_value_error_cdf(cdf)
 
 
 def rps(
@@ -632,21 +632,21 @@ def rps(
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.random(size=(3,3)),
+    >>> observations = xr.DataArray(np.random.random(size=(3, 3)),
     ...                             coords=[('x', np.arange(3)),
     ...                                     ('y', np.arange(3))])
-    >>> forecasts = xr.DataArray(np.random.random(size=(3,3,3)),
+    >>> forecasts = xr.DataArray(np.random.random(size=(3, 3, 3)),
     ...                          coords=[('x', np.arange(3)),
     ...                                  ('y', np.arange(3)),
     ...                                  ('member', np.arange(3))])
     >>> category_edges = np.array([.0, .5, 1.])
     >>> xs.rps(observations, forecasts, category_edges, dim='x')
     <xarray.DataArray (y: 3)>
-    array([0.85185185, 0.59259259, 0.37037037])
+    array([0.14814815, 0.7037037 , 1.51851852])
     Coordinates:
       * y                           (y) int64 0 1 2
-        forecasts_category_edge     <U56 '[[0.0, 0.33), [0.33, 0.66)), [[0.33, 0....
-        observations_category_edge  <U56 '[[0.0, 0.33), [0.33, 0.66)), [[0.33, 0....
+        forecasts_category_edge     <U38 '[0.0, 0.33), [0.33, 0.66), [0.66, 1.0]'
+        observations_category_edge  <U38 '[0.0, 0.33), [0.33, 0.66), [0.66, 1.0]'
 
 
         You can also define multi-dimensional ``category_edges``, e.g. with xr.quantile.
@@ -676,8 +676,7 @@ def rps(
     * https://www-miklip.dkrz.de/about/problems/
 
     """
-    bin_names = ["category"]
-    bin_dim = f"{bin_names[0]}_edge"
+    bin_dim = "category_edge"
     if fair:
         M = forecasts[member_dim].size
 
@@ -711,6 +710,7 @@ def rps(
         _check_data_within_edges(forecasts, forecasts_edges)
         _check_data_within_edges(observations, observations_edges)
 
+        # make last category_bin to include last edge [ ]
         forecasts_edges = _add_eps_to_last_in_dim(forecasts_edges, bin_dim)
         observations_edges = _add_eps_to_last_in_dim(observations_edges, bin_dim)
 
@@ -733,11 +733,12 @@ def rps(
         Oc = observations
     else:
         raise ValueError(
-            f"category_edges must be xr.DataArray, xr.Dataset, tuple of xr.objects, None or array-like, found {type(category_edges)}"
+            "category_edges must be xr.DataArray, xr.Dataset, tuple of xr.objects, "
+            f" None or array-like, found {type(category_edges)}"
         )
 
-    _check_is_CDF(Fc)
-    _check_is_CDF(Oc)
+    _raise_value_error_cdf(Fc)
+    _raise_value_error_cdf(Oc)
 
     # RPS formulas
     if fair:  # for ensemble member adjustment Ferro 2013
