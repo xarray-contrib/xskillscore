@@ -516,23 +516,6 @@ def _check_data_within_edges(forecasts, forecasts_edges):
         raise ValueError("only defined for xr.DataArrays and xr.Datasets")
 
 
-def _add_eps_to_last_in_dim(category_edges, dim):
-    """Add 10 eps to last edge to get last bin [ ] instead of [ ) like in xskillscore.core.utils.histogram"""
-    if isinstance(category_edges, xr.Dataset):
-        v1 = list(category_edges.data_vars)[0]
-        dtype = category_edges[v1]
-    else:
-        dtype = category_edges.dtype
-    category_edges_eps = xr.concat(
-        [
-            category_edges.isel({dim: slice(None, -1)}),
-            category_edges.isel({dim: [-1]}) + 10 * np.finfo(dtype).eps,
-        ],
-        dim,
-    )
-    return category_edges_eps
-
-
 def _raise_value_error_cdf(cdf):
     """Check basic characteristics of a cumulative distribution function."""
 
@@ -722,10 +705,6 @@ def rps(
 
         _check_data_within_edges(forecasts, forecasts_edges)
         _check_data_within_edges(observations, observations_edges)
-
-        # make last category_bin to include last edge [ ]
-        forecasts_edges = _add_eps_to_last_in_dim(forecasts_edges, bin_dim)
-        observations_edges = _add_eps_to_last_in_dim(observations_edges, bin_dim)
 
         # cumulative probs, ignore lowest threshold as below category_edges
         Fc = (
