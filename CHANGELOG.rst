@@ -57,6 +57,8 @@ Internal Changes
   (:pr:`269`) `Dougie Squire`_
 - Reduce warnings. (:issue:`41`, :pr:`268`) `Aaron Spring`_
 - Use ``raise_if_dask_computes`` from xarray. (:issue:`272`, :pr:`273`) `Ray Bell`_
+- :py:func:`~xskillscore.threshold_brier_score` now carries threshold values as
+  coordinates. (:pr:`279`) `Aaron Spring`_
 
 
 xskillscore v0.0.18 (2020-09-23)

@@ -420,7 +420,7 @@ def threshold_brier_score(
            [0.18518519, 0.37037037, 0.03703704]])
     Coordinates:
       * y          (y) int64 0 1 2
-      * threshold  (threshold) int64 1 2 3
+      * threshold  (threshold) float64 0.2 0.5 0.8
 
     See Also
     --------
@@ -434,8 +434,9 @@ def threshold_brier_score(
     """
     if isinstance(threshold, list):
         threshold.sort()
-        threshold = xr.DataArray(threshold, dims="threshold")
-        threshold["threshold"] = np.arange(1, 1 + threshold.threshold.size)
+        threshold = xr.DataArray(
+            threshold, dims="threshold", coords={"threshold": threshold}
+        )
 
     if isinstance(threshold, (xr.DataArray, xr.Dataset)):
         if "threshold" not in threshold.dims:
