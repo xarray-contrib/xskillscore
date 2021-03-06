@@ -662,7 +662,8 @@ def rps(
     if member_dim not in forecasts.dims:
         raise ValueError(
             f"Expect to find {member_dim} in forecasts dimensions, found"
-            f"{forecasts.dims}.")
+            f"{forecasts.dims}."
+        )
     if fair:
         M = forecasts[member_dim].size
 
