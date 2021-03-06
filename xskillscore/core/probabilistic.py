@@ -565,7 +565,7 @@ def rps(
         The observations of the event.
         Further requirements are specified based on ``category_edges``.
     forecasts : xarray.Dataset or xarray.DataArray
-        The forecast of the event.
+        The forecast of the event with dimension specified by ``member_dim``.
         Further requirements are specified based on ``category_edges``.
     category_edges : array_like, xr.Dataset, xr.DataArray, None
         Category edges used to compute the CDFs. Similar to np.histogram, all but the
@@ -595,9 +595,7 @@ def rps(
         over multiple forecasts-observations pairs. Defaults to None implying averaging
         over all dimensions.
     fair: boolean
-        Apply ensemble member-size adjustment for unbiased, fair metric;
-        see Ferro (2013). If ``fair==True``, forecasts must contain the dimension
-        ``member_dim``. Defaults to False.
+        Apply ensemble member-size adjustment for unbiased, fair metric; see Ferro (2013).
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is
         applied.
@@ -661,6 +659,9 @@ def rps(
 
     """
     bin_dim = "category_edge"
+    if member_dim not in forecasts.dims:
+        raise ValueError(f"Expect to find {member_dim} in forecasts dimensions, found"
+                         f"{forecasts.dims}.")
     if fair:
         M = forecasts[member_dim].size
 
@@ -707,6 +708,8 @@ def rps(
         _check_data_within_edges(observations, observations_edges)
 
         # cumulative probs, ignore lowest threshold as below category_edges
+        # ignores the right-most edge. The effective right-most edge is np.inf.
+        # therefore the CDFs Fc and Oc both reach 1 for the right-most edge.
         Fc = (
             (forecasts < forecasts_edges)
             .mean(member_dim)
