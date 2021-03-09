@@ -744,12 +744,15 @@ def test_rps_keeps_masked(o, f_prob, fair_bool, category_edges):
     assert set(["lon", "lat"]) == set(actual.dims)
     assert actual.isel(lat=[0, 1]).isnull().all()
     assert actual.isel(lat=slice(2, None)).notnull().all()
-    print(actual.coords["forecasts_category_edge"].values)
     # test forecasts_category_edge no repeats
     assert (
         "[-np.inf, 0.2), [0.2, 0.4), [0.4, 0.6), [0.6, 0.8), [0.8, np.inf]"
         in actual.coords["forecasts_category_edge"].values
     )
+    # one more category internally used than category_edges provided
+    assert len(category_edges) + 1 == str(
+        actual.coords["forecasts_category_edge"].values
+    ).count("[")
 
 
 @pytest.mark.parametrize("fair_bool", [True, False], ids=["bool=fair", "fair=False"])
