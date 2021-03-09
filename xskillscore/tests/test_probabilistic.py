@@ -21,7 +21,7 @@ from xskillscore.core.probabilistic import (
     rps,
     threshold_brier_score,
 )
-from xskillscore.core.utils import quantile_edges_pad_lower_upper, suppress_warnings
+from xskillscore.core.utils import suppress_warnings
 
 DIMS = ["lon", "lat", ["lon", "lat"], None, []]
 
@@ -655,9 +655,9 @@ def test_rps_vs_fair_rps(o, f_prob, category_edges, dim):
 @pytest.mark.parametrize("fair_bool", [True, False])
 def test_rps_category_edges_xrDataArray(o, f_prob, fair_bool):
     """Test rps with category_edges as xrDataArray for forecast and observations edges."""
-    category_edges = quantile_edges_pad_lower_upper(
-        f_prob, edges=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]
-    )
+    category_edges = f_prob.quantile(
+        q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]
+    ).rename({"quantile": "category_edge"})
     actual = rps(
         o,
         f_prob,
@@ -676,9 +676,9 @@ def test_rps_category_edges_xrDataset(o, f_prob, fair_bool):
     o["var2"] = o["var"] ** 2
     f_prob = f_prob.to_dataset(name="var")
     f_prob["var2"] = f_prob["var"] ** 2
-    category_edges = quantile_edges_pad_lower_upper(
-        f_prob, edges=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]
-    )
+    category_edges = f_prob.quantile(
+        q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]
+    ).rename({"quantile": "category_edge"})
     actual = rps(
         o,
         f_prob,
@@ -693,10 +693,11 @@ def test_rps_category_edges_xrDataset(o, f_prob, fair_bool):
 @pytest.mark.parametrize("fair_bool", [True, False])
 def test_rps_category_edges_tuple(o, f_prob, fair_bool):
     """Test rps with category_edges as tuple of xrDataArray for forecast and observations edges separately."""
-    edges = [0.3, 0.5, 0.7]
-    o_edges = quantile_edges_pad_lower_upper(o, edges=edges, dim=["time"])
-    f_edges = quantile_edges_pad_lower_upper(
-        f_prob, edges=edges, dim=["time", "member"]
+    o_edges = o.quantile(q=[0.2, 0.4, 0.6, 0.8], dim="time").rename(
+        {"quantile": "category_edge"}
+    )
+    f_edges = f_prob.quantile(q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]).rename(
+        {"quantile": "category_edge"}
     )
     actual = rps(
         o,
@@ -726,11 +727,11 @@ def test_rps_category_edges_None(o, f_prob, fair_bool):
     "category_edges",
     [
         xr.DataArray(
-            [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+            [0.2, 0.4, 0.6, 0.8],
             dims="category_edge",
-            coords={"category_edge": [0, 0.2, 0.4, 0.6, 0.8, 1.0]},
+            coords={"category_edge": [0.2, 0.4, 0.6, 0.8]},
         ),
-        np.array([0, 0.2, 0.4, 0.6, 0.8, 1.0]),
+        np.array([0.2, 0.4, 0.6, 0.8]),
     ],
     ids=["edge xr", "edge np"],
 )
@@ -743,10 +744,11 @@ def test_rps_keeps_masked(o, f_prob, fair_bool, category_edges):
     assert set(["lon", "lat"]) == set(actual.dims)
     assert actual.isel(lat=[0, 1]).isnull().all()
     assert actual.isel(lat=slice(2, None)).notnull().all()
+    print(actual.coords["forecasts_category_edge"].values)
     # test forecasts_category_edge no repeats
     assert (
-        "[0.0, 0.2), [0.2, 0.4), [0.4, 0.6), [0.6, 0.8), [0.8, 1.0]"
-        in actual.coords["forecasts_category_edge"]
+        "[-np.inf, 0.2), [0.2, 0.4), [0.4, 0.6), [0.6, 0.8), [0.8, np.inf]"
+        in actual.coords["forecasts_category_edge"].values
     )
 
 
@@ -763,7 +765,10 @@ def test_rps_new_identical_old_xhistogram(o, f_prob, fair_bool):
     dim = "time"
     actual = rps(o, f_prob, dim=dim, category_edges=category_edges_xr)
     expected = rps_xhist(o, f_prob, dim=dim, category_edges=category_edges_np)
-    assert_allclose(actual.rename("histogram_category_edge"), expected)
+    drop = ["observations_category_edge", "forecasts_category_edge"]
+    assert_allclose(
+        actual.rename("histogram_category_edge").drop(drop), expected.drop(drop)
+    )
 
 
 def test_rps_last_edge_included(o, f_prob):

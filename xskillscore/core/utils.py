@@ -211,24 +211,3 @@ def _keep_nans_masked(ds_before, ds_after, dim=None, ignore=None):
         for d in ignore:
             assert d not in ds_after.dims
     return ds_after
-
-
-def quantile_edges_pad_lower_upper(
-    ds, edges, dim, lower=0, upper=1, category_edge_dim="category_edge"
-):
-    """Convenience function to get category_edges for xs.rps based on quantiles with
-    lower as first category_edge and upper as last category_edge."""
-    assert isinstance(dim, list)
-    if isinstance(edges, list):
-        edges = np.array(edges)
-    assert isinstance(edges, np.ndarray)
-    q_edges = ds.quantile(q=edges, dim=dim).rename({"quantile": category_edge_dim})
-    ds_dim_reduced = ds.isel({d: 0 for d in dim}, drop=True)
-    lower = lower * xr.ones_like(ds_dim_reduced).expand_dims(
-        category_edge_dim
-    ).assign_coords({category_edge_dim: [lower]})
-    upper = upper * xr.ones_like(ds_dim_reduced).expand_dims(
-        category_edge_dim
-    ).assign_coords({category_edge_dim: [upper]})
-    ds_pad = xr.concat([lower, q_edges, upper], dim=category_edge_dim)
-    return ds_pad
