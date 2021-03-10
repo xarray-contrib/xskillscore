@@ -4,11 +4,14 @@ import numpy as np
 import properscoring
 import xarray as xr
 
-from .contingency import Contingency
+from .contingency import Contingency, _get_category_bounds
 from .utils import (
     _add_as_coord,
+    _bool_to_int,
+    _check_identical_xr_types,
     _fail_if_dim_empty,
     _get_bin_centers,
+    _keep_nans_masked,
     _preprocess_dims,
     _stack_input_if_needed,
     histogram,
@@ -476,6 +479,23 @@ def threshold_brier_score(
         return res.mean(dim, keep_attrs=keep_attrs)
 
 
+def _assign_rps_category_bounds(res, edges, name, bin_dim="category_edge"):
+    """Add category_edge coord to rps return.
+    Additionally adds left-most -np.inf category and right-most +np.inf category."""
+    if edges[bin_dim].size >= 2:
+        res = res.assign_coords(
+            {
+                f"{name}_category_edge": ", ".join(
+                    _get_category_bounds(edges[bin_dim].values)
+                )
+            }
+        )
+        res[
+            f"{name}_category_edge"
+        ] = f"[-np.inf, {edges[bin_dim].isel({bin_dim:0}).values}), {str(res[f'{name}_category_edge'].values)[:-1]}), [{edges[bin_dim].isel({bin_dim:-1}).values}, np.inf]"
+    return res
+
+
 def rps(
     observations,
     forecasts,
@@ -489,32 +509,62 @@ def rps(
     """Calculate Ranked Probability Score.
 
      .. math::
-        RPS(p, k) = 1/M \\sum_{m=1}^{M}
-        [(\\sum_{k=1}^{m} p_k) - (\\sum_{k=1}^{m} o_k)]^{2}
+        RPS = \\sum_{m=1}^{M}[(\\sum_{k=1}^{m} y_k) - (\\sum_{k=1}^{m} o_k)]^{2}
+
+    where ``y`` and ``o`` are forecast and observation probabilities in ``M``
+    categories.
+
+     .. note::
+        Takes the sum over all categories as in Weigel et al. 2007 and not the mean as
+        in https://www.cawcr.gov.au/projects/verification/verif_web_page.html#RPS.
+        Therefore RPS has no upper boundary.
 
     Parameters
     ----------
     observations : xarray.Dataset or xarray.DataArray
-        The observations or set of observations of the event.
-        Data should be boolean or logical \
-        (True or 1 for event occurance, False or 0 for non-occurance).
+        The observations of the event.
+        Further requirements are specified based on ``category_edges``.
     forecasts : xarray.Dataset or xarray.DataArray
-        The forecast likelihoods of the event.
-        If ``fair==False``, forecasts should be between 0 and 1 without a dimension
-        ``member_dim`` or should be boolean (True,False) or binary (0, 1) containing a
-        member dimension (probabilities will be internally calculated by
-        ``.mean(member_dim))``. If ``fair==True``, forecasts must be boolean
-        (True,False) or binary (0, 1) containing dimension ``member_dim``.
-    category_edges : array_like
-        Category bin edges used to compute the CDFs. Similar to np.histogram, \
-        all but the last (righthand-most) bin include the left edge and exclude \
-        the right edge. The last bin includes both edges.
+        The forecast of the event with dimension specified by ``member_dim``.
+        Further requirements are specified based on ``category_edges``.
+    category_edges : array_like, xr.Dataset, xr.DataArray, None
+        Edges (left-edge inclusive) of the bins used to calculate the cumulative
+        density function (cdf). Note that here the bins have to include the full range
+        of observations and forecasts data. Effectively, negative infinity is appended
+        to the left side of category_edges, and positive infinity is appended to the
+        right side. Thus, N category edges produces N+1 bins. For example, specifying
+        category_edges = [0,1] will compute the RPS for bins [-inf, 0), [0, 1) and
+        [1, inf), which results in CDF bins [-inf, 0), [-inf, 1) and [-inf, inf).
+        Note that the edges are right-edge exclusive.
+        Forecasts, observations and category_edge are expected
+        in absolute units or probabilities consistently.
+
+        - np.array (1d): will be internally converted and broadcasted to observations.
+          Use this if you wish to use the same category edges for all elements of both
+          forecasts and observations.
+
+        - xr.Dataset/xr.DataArray: edges of the categories provided
+          as dimension ``category_edge`` with optional category labels as
+          ``category_edge`` coordinate. Use xr.Dataset/xr.DataArray if edges
+          multi-dimensional and vary across dimensions. Use this if your category edges
+          vary across dimensions of forecasts and observations, but are the same for
+          both.
+
+        - tuple of np.array/xr.Dataset/xr.DataArray: same as above, where the
+          first item is taken as ``category_edges`` for observations and the second item
+          for ``category_edges`` for forecasts. Use this if your category edges vary
+          across dimensions of forecasts and observations, and are different for each.
+
+        - None: expect than observations and forecasts are already CDFs containing
+          ``category_edge`` dimension. Use this if your category edges vary across
+          dimensions of forecasts and observations, and are different for each.
+
     dim : str or list of str, optional
-        Dimension over which to compute mean after computing ``rps``.
-        Defaults to None implying averaging over all dimensions.
+        Dimension over which to mean after computing ``rps``. This represents a mean
+        over multiple forecasts-observations pairs. Defaults to None implying averaging
+        over all dimensions.
     fair: boolean
-        Apply ensemble member-size adjustment for unbiased, fair metric;
-        see Ferro (2013). Defaults to False.
+        Apply ensemble member-size adjustment for unbiased, fair metric; see Ferro (2013).
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is
         applied.
@@ -527,73 +577,145 @@ def rps(
     Returns
     -------
     xarray.Dataset or xarray.DataArray:
-        ranked probability score
+        ranked probability score with coords ``forecasts_category_edge`` and
+        ``observations_category_edge`` as str
+
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    >>> observations = xr.DataArray(np.random.random(size=(3, 3)),
     ...                             coords=[('x', np.arange(3)),
     ...                                     ('y', np.arange(3))])
-    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+    >>> forecasts = xr.DataArray(np.random.random(size=(3, 3, 3)),
     ...                          coords=[('x', np.arange(3)),
     ...                                  ('y', np.arange(3)),
     ...                                  ('member', np.arange(3))])
-    >>> category_edges = np.array([.2, .5, .8])
-    >>> rps(observations > 0.5, (forecasts > 0.5).mean('member'), category_edges)
-    <xarray.DataArray 'histogram_category' (y: 3)>
-    array([1.        , 1.        , 0.33333333])
+    >>> category_edges = np.array([.33, .66])
+    >>> xs.rps(observations, forecasts, category_edges, dim='x')
+    <xarray.DataArray (y: 3)>
+    array([0.14814815, 0.7037037 , 1.51851852])
     Coordinates:
-      * y        (y) int64 0 1 2
+      * y                           (y) int64 0 1 2
+        forecasts_category_edge     <U38 '[-np.inf, 0.33), [0.33, 0.66), [0.66, np.inf]'
+        observations_category_edge  <U38 '[-np.inf, 0.33), [0.33, 0.66), [0.66, np.inf]'
+
+
+    You can also define multi-dimensional ``category_edges``, e.g. with xr.quantile.
+    However, you still need to ensure that ``category_edges`` covers the forecasts
+    and observations distributions.
+
+    >>> category_edges = observations.quantile(
+    ...     q=[.33, .66]).rename({'quantile': 'category_edge'}),
+    >>> xs.rps(observations, forecasts, category_edges, dim='x')
+    <xarray.DataArray (y: 3)>
+    array([1.18518519, 0.85185185, 0.40740741])
+    Coordinates:
+      * y                           (y) int64 0 1 2
+        forecasts_category_edge     <U38 '[-np.inf, 0.33), [0.33, 0.66), [0.66, np.inf]'
+        observations_category_edge  <U38 '[-np.inf, 0.33), [0.33, 0.66), [0.66, np.inf]'
 
     References
     ----------
-    * https://www.cawcr.gov.au/projects/verification/verif_web_page.html#RPS
+    * Weigel, A. P., Liniger, M. A., & Appenzeller, C. (2007). The Discrete Brier and
+      Ranked Probability Skill Scores. Monthly Weather Review, 135(1), 118–124.
+      doi: 10/b59qz5
     * C. A. T. Ferro. Fair scores for ensemble forecasts. Q.R.J. Meteorol. Soc., 140:
       1917–1923, 2013. doi: 10.1002/qj.2270.
     * https://www-miklip.dkrz.de/about/problems/
+
     """
-    bin_names = ["category"]
-    M = forecasts[member_dim].size
-    bin_dim = f"{bin_names[0]}_bin"
-    # histogram(dim=[]) not allowed therefore add fake member dim
-    # to apply over when multi-dim observations
-    if len(observations.dims) == 1:
-        observations = histogram(
-            observations, bins=[category_edges], bin_names=bin_names, dim=None
+    bin_dim = "category_edge"
+    if member_dim not in forecasts.dims:
+        raise ValueError(
+            f"Expect to find {member_dim} in forecasts dimensions, found"
+            f"{forecasts.dims}."
         )
+    if fair:
+        M = forecasts[member_dim].size
+
+    forecasts = _bool_to_int(forecasts)
+
+    _check_identical_xr_types(observations, forecasts)
+
+    # different entry point of calculating RPS based on category_edges
+    # category_edges tuple of two: use for obs and forecast category_edges separately
+    if isinstance(category_edges, (tuple, np.ndarray, xr.DataArray, xr.Dataset)):
+        if isinstance(category_edges, tuple):
+            assert isinstance(category_edges[0], type(category_edges[1]))
+            observations_edges, forecasts_edges = category_edges
+        else:  # category_edges only given once, so use for both obs and forecasts
+            observations_edges, forecasts_edges = category_edges, category_edges
+
+        if isinstance(observations_edges, np.ndarray):
+            # convert category_edges as xr object
+            observations_edges = xr.DataArray(
+                observations_edges,
+                dims="category_edge",
+                coords={"category_edge": observations_edges},
+            )
+            observations_edges = xr.ones_like(observations) * observations_edges
+
+            forecasts_edges = xr.DataArray(
+                forecasts_edges,
+                dims="category_edge",
+                coords={"category_edge": forecasts_edges},
+            )
+            forecasts_edges = (
+                xr.ones_like(
+                    forecasts
+                    if member_dim not in forecasts.dims
+                    else forecasts.isel({member_dim: 0}, drop=True)
+                )
+                * forecasts_edges
+            )
+
+        _check_identical_xr_types(forecasts_edges, forecasts)
+        _check_identical_xr_types(observations_edges, forecasts)
+
+        # cumulative probability functions
+        # lowest category is [-np.inf, category_edges.isel(category_edge=0)]
+        # ignores the right-most edge. The effective right-most edge is np.inf.
+        # therefore the CDFs Fc and Oc both reach 1 for the right-most edge.
+        # < makes edges right-edge exclusive
+        Fc = (forecasts < forecasts_edges).mean(member_dim)
+        Oc = (observations < observations_edges).astype("int")
+
+    elif category_edges is None:  # expect CDFs already as inputs
+        if member_dim in forecasts.dims:
+            forecasts = forecasts.mean(member_dim)
+        Fc = forecasts
+        Oc = observations
     else:
-        observations = histogram(
-            observations.expand_dims(member_dim),
-            bins=[category_edges],
-            bin_names=bin_names,
-            dim=[member_dim],
+        raise ValueError(
+            "category_edges must be xr.DataArray, xr.Dataset, tuple of xr.objects, "
+            f" None or array-like, found {type(category_edges)}"
         )
 
-    forecasts = histogram(
-        forecasts,
-        bins=[category_edges],
-        bin_names=bin_names,
-        dim=[member_dim],
-    )
-    if fair:
-        e = forecasts
-
-    # normalize f.sum()=1
-    forecasts = forecasts / forecasts.sum(bin_dim)
-    observations = observations / observations.sum(bin_dim)
-
-    Fc = forecasts.cumsum(bin_dim)
-    Oc = observations.cumsum(bin_dim)
-
-    if fair:
-        Ec = e.cumsum(bin_dim)
-        res = (((Ec / M) - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
-    else:
+    # RPS formulas
+    if fair:  # for ensemble member adjustment, see Ferro 2013
+        Ec = Fc * M
+        res = ((Ec / M - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
+    else:  # normal formula
         res = ((Fc - Oc) ** 2).sum(bin_dim)
+
+    # add category_edge as str into coords
+    if category_edges is not None:
+        res = _assign_rps_category_bounds(res, observations_edges, "observations")
+        res = _assign_rps_category_bounds(res, forecasts_edges, "forecasts")
     if weights is not None:
         res = res.weighted(weights)
-    res = xr.apply_ufunc(np.clip, res, 0, 1, dask="allowed")  # dirty fix
-    return res.mean(dim, keep_attrs=keep_attrs)
+    # combine many forecasts-observations pairs
+    res = res.mean(dim)
+    # keep nans and prevent 0 for all nan grids
+    res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
+    if keep_attrs:  # attach by hand
+        res.attrs.update(observations.attrs)
+        res.attrs.update(forecasts.attrs)
+        if isinstance(res, xr.Dataset):
+            for v in res.data_vars:
+                res[v].attrs.update(observations[v].attrs)
+                res[v].attrs.update(forecasts[v].attrs)
+    return res
 
 
 def rank_histogram(observations, forecasts, dim=None, member_dim="member"):

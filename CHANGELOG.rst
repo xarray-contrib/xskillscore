@@ -22,6 +22,10 @@ Features
   without replacement. (:issue:`215`, :pr:`225`) `Aaron Spring`_
 - Added receiver operating characteristic (ROC) :py:func:`~xskillscore.roc`.
   (:issue:`114`, :issue:`256`, :pr:`236`, :pr:`259`) `Aaron Spring`_
+- Added many options for ``category_edges`` in :py:func:`~xskillscore.rps`, which
+  allows multi-dimensional edges. :py:func:`~xskillscore.rps` now
+  requires dimension ``member_dim`` in forecasts. (:issue:`275`, :pr:`277`)
+  `Aaron Spring`_
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
@@ -40,6 +44,8 @@ Bug Fixes
   (:issue:`255`, :pr:`211`) `Aaron Spring`_
 - Passing weights no longer triggers eager computation.
   (:issue:`218`, :pr:`224`). `Andrew Huang`_
+- :py:func:`~xskillscore.rps` not restricted to ``[0, 1]``.
+  (:issue:`266`, :pr:`277`) `Aaron Spring`_
 
 Internal Changes
 ~~~~~~~~~~~~~~~~

@@ -467,29 +467,162 @@ def test_rps_reduce_dim(o, f_prob, category_edges, dim, fair_bool):
     assert_only_dim_reduced(dim, actual, o)
 
 
+@pytest.mark.parametrize("chunk_bool", [True, False])
+@pytest.mark.parametrize("input_type", ["Dataset", "multidim Dataset", "DataArray"])
+@pytest.mark.parametrize("keep_attrs", [True, False])
+def test_rps_api_and_inputs(
+    o, f_prob, category_edges, keep_attrs, input_type, chunk_bool
+):
+    """Test that rps keeps attributes, chunking, input types."""
+    o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
+    category_edges = xr.DataArray(category_edges, dims="category_edge")
+    if "Dataset" in input_type:
+        category_edges = category_edges.to_dataset(name="var")
+        if "multidim" in input_type:
+            category_edges["var2"] = category_edges["var"]
+    actual = rps(o, f_prob, category_edges, keep_attrs=keep_attrs)
+    # test that returns chunks
+    assert_chunk(actual, chunk_bool)
+    # test that attributes are kept
+    assert_keep_attrs(actual, o, keep_attrs)
+    # test that input types equal output types
+    assign_type_input_output(actual, o)
+
+
+def rps_xhist(
+    observations,
+    forecasts,
+    category_edges,
+    dim=None,
+    fair=False,
+    weights=None,
+    keep_attrs=False,
+    member_dim="member",
+):
+    """Old way to calculate RPS with xhistogram.
+
+    category_edges : array_like, xr.Dataset, xr.DataArray, None
+
+        - array_like: Category bin edges used to compute the CDFs. Similar to
+          np.histogram, all but the last (righthand-most) bin include the
+          left edge and exclude the right edge. The last bin includes both edges.
+          CDFs based on boolean or logical (True or 1 for event occurance, False or 0
+          for non-occurance) observations.
+          If ``fair==False``, forecasts should be between 0 and 1 without a dimension
+          ``member_dim`` or boolean / binary containing a member dimension
+          (probabilities will be internally calculated by ``.mean(member_dim))``.
+          If ``fair==True``, forecasts must be boolean / binary containing dimension
+          ``member_dim``."""
+    from xskillscore.core.contingency import _get_category_bounds
+    from xskillscore.core.utils import _keep_nans_masked, histogram
+
+    bin_names = ["category"]
+    bin_dim = f"{bin_names[0]}_edge"
+    M = forecasts[member_dim].size
+
+    assert isinstance(category_edges, np.ndarray)
+
+    # histogram(dim=[]) not allowed therefore add fake member dim
+    # to apply over when multi-dim observations
+    if len(observations.dims) == 1:
+        observations_bins = histogram(
+            observations,
+            bins=[category_edges],
+            bin_names=["category_edge"],
+            dim=None,
+        )
+    else:
+        observations_bins = histogram(
+            observations.expand_dims(member_dim),
+            bins=[category_edges],
+            bin_names=["category_edge"],
+            dim=[member_dim],
+        )
+    if "category_edge_bin" in observations_bins.dims:
+        observations_bins = observations_bins.rename(
+            {"category_edge_bin": "category_edge"}
+        )
+
+    forecasts = histogram(
+        forecasts,
+        bins=[category_edges],
+        bin_names=["category_edge"],
+        dim=[member_dim],
+    )
+    if "category_edge_bin" in forecasts.dims:
+        forecasts = forecasts.rename({"category_edge_bin": "category_edge"})
+
+    # normalize f.sum()=1 to make cdf
+    forecasts = forecasts / forecasts.sum(bin_dim)
+
+    Fc = forecasts.cumsum(bin_dim)
+    Oc = observations_bins.cumsum(bin_dim)
+
+    # RPS formulas
+    if fair:
+        Ec = Fc * M
+        res = ((Ec / M - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
+    else:
+        res = ((Fc - Oc) ** 2).sum(bin_dim)
+
+    if weights is not None:
+        res = res.weighted(weights)
+
+    res = res.mean(dim, keep_attrs=keep_attrs)
+    # add bin edges as coords
+    res = res.assign_coords(
+        {"forecasts_category_edge": ", ".join(_get_category_bounds(category_edges))}
+    )
+    res = res.assign_coords(
+        {"observations_category_edge": ", ".join(_get_category_bounds(category_edges))}
+    )
+
+    # keep nans and prevent 0 for all nan grids
+    res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
+    return res
+
+
 def test_rps_wilks_example():
     """Test with values from Wilks, D. S. (2006). Statistical methods in the
     atmospheric sciences (2nd ed, Vol. 91). Amsterdam ; Boston: Academic Press. p.301.
     """
-    category_edges = np.array([-0.01, 0.01, 0.24, 10])
+    category_edges = np.array([0.0, 0.01, 0.24, 1.0])
     # first example
-    Obs = xr.DataArray([0.0001])  # no precip
-    F1 = xr.DataArray([0] * 2 + [0.1] * 5 + [0.3] * 3, dims="member")
-    F2 = xr.DataArray([0] * 2 + [0.1] * 3 + [0.3] * 5, dims="member")
-    np.testing.assert_allclose(rps(Obs, F1, category_edges), 0.73)
-    np.testing.assert_allclose(rps(Obs, F2, category_edges), 0.89)
+    # xhistogram way with np.array category_edges
+    Obs = xr.DataArray([0.0001])  # .expand_dims('time')  # no precip
+    F1 = xr.DataArray(
+        [0] * 2 + [0.1] * 5 + [0.3] * 3, dims="member"
+    )  # .expand_dims('time')
+    F2 = xr.DataArray(
+        [0] * 2 + [0.1] * 3 + [0.3] * 5, dims="member"
+    )  # .expand_dims('time')
+    np.testing.assert_allclose(rps_xhist(Obs, F1, category_edges), 0.73)
+    np.testing.assert_allclose(rps_xhist(Obs, F2, category_edges), 0.89)
+    # xr way with xr.DataArray category_edges
+    xr_category_edges = xr.DataArray(
+        category_edges, dims="category_edge", coords={"category_edge": category_edges}
+    )
+    assert_allclose(rps(Obs, F1, category_edges), rps(Obs, F1, xr_category_edges))
+    assert_allclose(rps(Obs, F2, category_edges), rps(Obs, F2, xr_category_edges))
+
     # second example
     Obs = xr.DataArray([0.3])  # larger than 0.25
-    np.testing.assert_allclose(rps(Obs, F1, category_edges), 0.53)
-    np.testing.assert_allclose(rps(Obs, F2, category_edges), 0.29)
+    np.testing.assert_allclose(rps_xhist(Obs, F1, category_edges), 0.53)
+    np.testing.assert_allclose(rps_xhist(Obs, F2, category_edges), 0.29)
+    # xr way with xr.DataArray category_edges
+    assert_allclose(rps(Obs, F1, category_edges), rps(Obs, F1, xr_category_edges))
+    assert_allclose(rps(Obs, F2, category_edges), rps(Obs, F2, xr_category_edges))
 
 
-def test_2_category_rps_equals_brier_score(o, f_prob):
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_2_category_rps_equals_brier_score(o, f_prob, fair_bool):
     """Test that RPS for two categories equals the Brier Score."""
     category_edges = np.array([0.0, 0.5, 1.0])
     assert_allclose(
-        rps(o, f_prob, category_edges=category_edges, dim=None),
-        brier_score(o > 0.5, (f_prob > 0.5).mean("member"), dim=None),
+        rps(o, f_prob, category_edges=category_edges, dim=None, fair=fair_bool).drop(
+            ["forecasts_category_edge", "observations_category_edge"]
+        ),
+        brier_score(o > 0.5, (f_prob > 0.5), dim=None, fair=fair_bool),
     )
 
 
@@ -512,20 +645,142 @@ def test_rps_dask(o_dask, f_prob_dask, category_edges, fair_bool):
 
 @pytest.mark.parametrize("dim", DIMS)
 def test_rps_vs_fair_rps(o, f_prob, category_edges, dim):
-    """Test that fair rps is smaller or equal than rps due to ensemble-size
-    adjustment."""
+    """Test that fair rps is smaller (e.g. better) or equal than rps due to ensemble-
+    size adjustment."""
     frps = rps(o, f_prob, dim=dim, fair=True, category_edges=category_edges)
     ufrps = rps(o, f_prob, dim=dim, fair=False, category_edges=category_edges)
-    assert (frps <= ufrps).all(), print("fairrps", frps, "\nufrps", ufrps)
+    assert (frps <= ufrps).all()
 
 
-@pytest.mark.parametrize("dim", DIMS)
 @pytest.mark.parametrize("fair_bool", [True, False])
-def test_rps_limits(o, f_prob, category_edges, fair_bool, dim):
-    """Test rps between 0 and 1. Note: this only works because np.clip(rps,0,1)"""
-    res = rps(o, f_prob, dim=dim, fair=fair_bool, category_edges=category_edges)
-    assert (res <= 1.0).all(), print(res.max())
-    assert (res >= 0).all(), print(res.min())
+def test_rps_category_edges_xrDataArray(o, f_prob, fair_bool):
+    """Test rps with category_edges as xrDataArray for forecast and observations edges."""
+    category_edges = f_prob.quantile(
+        q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]
+    ).rename({"quantile": "category_edge"})
+    actual = rps(
+        o,
+        f_prob,
+        dim="time",
+        fair=fair_bool,
+        category_edges=category_edges,
+    )
+    assert set(["lon", "lat"]) == set(actual.dims)
+    assert "category_edge" not in actual.dims
+
+
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_rps_category_edges_xrDataset(o, f_prob, fair_bool):
+    """Test rps with category_edges as xrDataArray for forecast and observations edges."""
+    o = o.to_dataset(name="var")
+    o["var2"] = o["var"] ** 2
+    f_prob = f_prob.to_dataset(name="var")
+    f_prob["var2"] = f_prob["var"] ** 2
+    category_edges = f_prob.quantile(
+        q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]
+    ).rename({"quantile": "category_edge"})
+    actual = rps(
+        o,
+        f_prob,
+        dim="time",
+        fair=fair_bool,
+        category_edges=category_edges,
+    )
+    assert set(["lon", "lat"]) == set(actual.dims)
+    assert "category_edge" not in actual.dims
+
+
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_rps_category_edges_tuple(o, f_prob, fair_bool):
+    """Test rps with category_edges as tuple of xrDataArray for forecast and observations edges separately."""
+    o_edges = o.quantile(q=[0.2, 0.4, 0.6, 0.8], dim="time").rename(
+        {"quantile": "category_edge"}
+    )
+    f_edges = f_prob.quantile(q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]).rename(
+        {"quantile": "category_edge"}
+    )
+    actual = rps(
+        o,
+        f_prob,
+        dim="time",
+        fair=fair_bool,
+        category_edges=(o_edges, f_edges),
+    )
+    assert set(["lon", "lat"]) == set(actual.dims)
+    assert "category_edge" not in actual.dims
+
+
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_rps_category_edges_None(o, f_prob, fair_bool):
+    """Test rps with category_edges as None expecting o and f_prob are already CDFs."""
+    e = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
+    bin_dim = "category_edge"
+    edges = xr.DataArray(e, dims=bin_dim, coords={bin_dim: e})
+    o_c = o < edges  # CDF
+    f_prob_c = f_prob < edges  # CDF
+    actual = rps(o_c, f_prob_c, dim="time", fair=fair_bool, category_edges=None)
+    assert set(["lon", "lat"]) == set(actual.dims)
+    assert "quantile" not in actual.dims
+
+
+@pytest.mark.parametrize(
+    "category_edges",
+    [
+        xr.DataArray(
+            [0.2, 0.4, 0.6, 0.8],
+            dims="category_edge",
+            coords={"category_edge": [0.2, 0.4, 0.6, 0.8]},
+        ),
+        np.array([0.2, 0.4, 0.6, 0.8]),
+    ],
+    ids=["edge xr", "edge np"],
+)
+@pytest.mark.parametrize("fair_bool", [True, False], ids=["fair=True", "fair=False"])
+def test_rps_keeps_masked(o, f_prob, fair_bool, category_edges):
+    """Test rps keeps NaNs."""
+    o = o.where(o.lat > 1)
+    f_prob = f_prob.where(f_prob.lat > 1)
+    actual = rps(o, f_prob, dim="time", category_edges=category_edges)
+    assert set(["lon", "lat"]) == set(actual.dims)
+    assert actual.isel(lat=[0, 1]).isnull().all()
+    assert actual.isel(lat=slice(2, None)).notnull().all()
+    # test forecasts_category_edge no repeats
+    assert (
+        "[-np.inf, 0.2), [0.2, 0.4), [0.4, 0.6), [0.6, 0.8), [0.8, np.inf]"
+        in actual.coords["forecasts_category_edge"].values
+    )
+    # one more category internally used than category_edges provided
+    assert len(category_edges) + 1 == str(
+        actual.coords["forecasts_category_edge"].values
+    ).count("[")
+
+
+@pytest.mark.parametrize("fair_bool", [True, False], ids=["bool=fair", "fair=False"])
+def test_rps_new_identical_old_xhistogram(o, f_prob, fair_bool):
+    """Test that new rps algorithm is identical to old algorithm with xhistogram.
+    Makes a difference whether full range of f_prob is covered or not."""
+    category_edges_np = np.array([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    category_edges_xr = xr.DataArray(
+        category_edges_np,
+        dims="category_edge",
+        coords={"category_edge": category_edges_np},
+    )
+    dim = "time"
+    actual = rps(o, f_prob, dim=dim, category_edges=category_edges_xr)
+    expected = rps_xhist(o, f_prob, dim=dim, category_edges=category_edges_np)
+    drop = ["observations_category_edge", "forecasts_category_edge"]
+    assert_allclose(
+        actual.rename("histogram_category_edge").drop(drop), expected.drop(drop)
+    )
+
+
+def test_rps_last_edge_included(o, f_prob):
+    """Test that last edges is included."""
+    category_edges_np = np.array([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    o = xr.ones_like(o)
+    f_prob = xr.ones_like(f_prob)
+    res_actual = rps(o, f_prob, dim="time", category_edges=category_edges_np)
+    assert (res_actual == 0).all()
 
 
 @pytest.mark.parametrize(
