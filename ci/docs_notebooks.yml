@@ -1,6 +1,7 @@
 name: xskillscore-docs-notebooks
 channels:
   - conda-forge
+  - nodefaults
 dependencies:
   - bottleneck
   - cftime
@@ -14,7 +15,7 @@ dependencies:
   - xhistogram>=0.1.2
   - importlib_metadata
   - jupyterlab
-  - matplotlib
+  - matplotlib-base
   - nbsphinx
   - nbstripout
   - sphinx
