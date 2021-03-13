@@ -1,6 +1,7 @@
 name: xskillscore-minimum-tests
 channels:
   - conda-forge
+  - numba/label/dev # Temporary fix to get Numba on Python 3.9
 dependencies:
   - bottleneck
   - cftime
