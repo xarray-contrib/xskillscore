@@ -5,6 +5,11 @@ Changelog History
 xskillscore v0.0.20 (2021-XX-XX)
 --------------------------------
 
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Use ``pytest-xdist`` and ``matplotlib-base`` in environments to speed up CI.
+  (:pr:`283`) `Aaron Spring`_
+
 
 xskillscore v0.0.19 (2021-03-12)
 --------------------------------
