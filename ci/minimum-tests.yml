@@ -1,6 +1,7 @@
 name: xskillscore-minimum-tests
 channels:
   - conda-forge
+  - nodefaults
 dependencies:
   - bottleneck
   - cftime
@@ -16,6 +17,7 @@ dependencies:
   - pytest
   - pytest-cov
   - pytest-lazy-fixture
+  - pytest-xdist
   - pip
   - pip:
     - -e ..
