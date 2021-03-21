@@ -1,6 +1,6 @@
 bottleneck
 cftime
-git+git://github.com/dask/dask.git
+git+https://github.com/dask/dask.git
 numba>=0.52
 numpy
 properscoring
