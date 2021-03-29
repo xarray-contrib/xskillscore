@@ -1,6 +1,6 @@
 bottleneck
 cftime
-dask!=2021.03.0
+dask!=2021.3.0
 numba>=0.52
 numpy
 properscoring
