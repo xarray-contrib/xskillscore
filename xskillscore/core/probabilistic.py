@@ -625,7 +625,7 @@ def rps(
 
     """
     bin_dim = "category_edge"
-    if member_dim not in forecasts.dims:
+    if member_dim not in forecasts.dims and category_edges is not None:
         raise ValueError(
             f"Expect to find {member_dim} in forecasts dimensions, found"
             f"{forecasts.dims}."
@@ -707,7 +707,10 @@ def rps(
     # combine many forecasts-observations pairs
     res = res.mean(dim)
     # keep nans and prevent 0 for all nan grids
-    res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
+    try:                                                                                                                                       
+        res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
+    except Exception as e:
+        print(f'could not mask all NaNs properly due to {type(e).__name__}: {e}')
     if keep_attrs:  # attach by hand
         res.attrs.update(observations.attrs)
         res.attrs.update(forecasts.attrs)
