@@ -38,8 +38,8 @@ jobs:
         run: conda list
 
       - name: Run tests
-        shell: bash -l {0}
-        run: python -m pytest --cov=xskillscore --cov-report=xml xskillscore
+        run: |
+          pytest -n 4 --cov=xskillscore --cov-report=xml --verbose
 
       - name: Coverage
         uses: codecov/codecov-action@v1.0.7
