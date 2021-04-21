@@ -13,14 +13,19 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
 
-      - name: Setup Conda Environment
+      - name: Setup conda environment
         uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
           python-version: ${{ matrix.python-version }}
+          mamba-version: '*'
           environment-file: ci/minimum-tests.yml
           activate-environment: xskillscore-minimum-tests
           auto-activate-base: false
+
+      - name: Build environment
+        run: |
+          mamba env update -f ci/minimum-tests.yml
 
       - name: Install upstream packages
         shell: bash -l {0}
@@ -42,4 +47,4 @@ jobs:
           pytest -n 4 --cov=xskillscore --cov-report=xml --verbose
 
       - name: Coverage
-        uses: codecov/codecov-action@v1.0.7
+        uses: codecov/codecov-action@v1
