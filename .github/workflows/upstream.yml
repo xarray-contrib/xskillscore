@@ -27,7 +27,7 @@ jobs:
         run: |
           python -m pip install git+https://github.com/pydata/xarray.git
           python -m pip install git+https://github.com/dask/dask.git
-          python -m pip install git+https://github.com/xgcm/xhistogram.git          
+          python -m pip install git+https://github.com/xgcm/xhistogram.git 
 
       - name: Install
         shell: bash -l {0}
