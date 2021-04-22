@@ -683,7 +683,7 @@ def rps(
     elif category_edges is None:  # expect CDFs already as inputs
         if bin_dim not in forecasts.dims:
             raise ValueError(
-                 "Expected dimension {bin_dim} in forecasts, found {forecasts.dims}"
+                "Expected dimension {bin_dim} in forecasts, found {forecasts.dims}"
             )
         if bin_dim not in observations.dims:
             raise ValueError(
