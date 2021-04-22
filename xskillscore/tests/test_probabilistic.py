@@ -467,6 +467,19 @@ def test_rps_reduce_dim(o, f_prob, category_edges, dim, fair_bool):
     assert_only_dim_reduced(dim, actual, o)
 
 
+def test_rps_category_edges_None_fails(o, f_prob):
+    """Test that rps expects inputs to have category_edges dim if category_edges is None."""
+    with pytest.raises(ValueError, match="Expected dimension"):
+        rps(o, f_prob, category_edges=None, dim=[])
+
+
+def test_rps_category_edges_None_fails(o, f_prob):
+    """Test that rps expects inputs to have category_edges dim if category_edges is None."""
+    o = o.rename({"time": "category_edges"})
+    f_prob = f_prob.rename({"time": "category_edges"}).mean("member")
+    assert rps(o, f_prob, category_edges=None, dim=[])
+
+
 @pytest.mark.parametrize("chunk_bool", [True, False])
 @pytest.mark.parametrize("input_type", ["Dataset", "multidim Dataset", "DataArray"])
 @pytest.mark.parametrize("keep_attrs", [True, False])
