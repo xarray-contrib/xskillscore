@@ -477,7 +477,7 @@ def test_rps_category_edges_None_works(o, f_prob):
     """Test that rps expects inputs to have category_edges dim if category_edges is None."""
     o = o.rename({"time": "category_edge"})
     f_prob = f_prob.rename({"time": "category_edge"}).mean("member")
-    assert rps(o, f_prob, category_edges=None, dim=[])
+    rps(o, f_prob, category_edges=None, dim=[])
 
 
 @pytest.mark.parametrize("chunk_bool", [True, False])
