@@ -9,6 +9,9 @@ Internal Changes
 ~~~~~~~~~~~~~~~~
 - Use ``pytest-xdist`` and ``matplotlib-base`` in environments to speed up CI.
   (:pr:`283`) `Aaron Spring`_
+- :py:func:`~xskillscore.rps` does not break from masking NaNs anymore.
+  :py:func:`~xskillscore.rps` expilicty checks for ``bin_dim`` if
+  ``category_edges==None``. (:pr:`287`) `Aaron Spring`_
 
 
 xskillscore v0.0.19 (2021-03-12)
