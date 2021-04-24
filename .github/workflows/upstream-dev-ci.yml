@@ -2,10 +2,10 @@ name: CI Upstream
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
   schedule:
     - cron: "0 0 * * 4"  # Thursdays At 00:00 UTC
   workflow_dispatch: # allows you to trigger the workflow run manually
