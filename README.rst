@@ -3,7 +3,7 @@ xskillscore: Metrics for verifying forecasts
 
 .. image:: https://github.com/xarray-contrib/xskillscore/actions/workflows/xskillscore_testing.yml/badge.svg
    :target: https://github.com/xarray-contrib/xskillscore/actions/workflows/xskillscore_testing.yml
-   
+
 .. image:: https://github.com/xarray-contrib/xskillscore/actions/workflows/upstream-dev-ci.yml/badge.svg
    :target: https://github.com/xarray-contrib/xskillscore/actions/workflows/upstream-dev-ci.yml
 
