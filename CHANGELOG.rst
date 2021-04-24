@@ -11,7 +11,6 @@ Internal Changes
   (:pr:`283`) `Aaron Spring`_
 
 
-
 xskillscore v0.0.19 (2021-03-12)
 --------------------------------
 
