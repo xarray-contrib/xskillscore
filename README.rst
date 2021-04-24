@@ -1,8 +1,12 @@
 xskillscore: Metrics for verifying forecasts
 ============================================
 
-.. image:: https://github.com/xarray-contrib/xskillscore/workflows/xskillscore%20testing/badge.svg
-   :target: https://github.com/xarray-contrib/xskillscore/workflows/xskillscore%20testing/
+.. image:: https://github.com/xarray-contrib/xskillscore/actions/workflows/xskillscore_testing/badge.svg
+   :target: https://github.com/xarray-contrib/xskillscore/actions/workflows/xskillscore_testing.yml
+   
+.. image:: https://github.com/xarray-contrib/xskillscore/actions/workflows/upstream-dev-ci.yml/badge.svg
+   :target: https://github.com/xarray-contrib/xskillscore/actions/workflows/upstream-dev-ci.yml
+
 
 .. image:: https://img.shields.io/pypi/v/xskillscore.svg
    :target: https://pypi.python.org/pypi/xskillscore/
