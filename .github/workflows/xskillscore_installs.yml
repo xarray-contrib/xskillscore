@@ -38,6 +38,8 @@ jobs:
         python-version: 3.8
     - name: Set environment variables
       run: |
+        which python
+        printenv
         echo "CONDA_ENV_FILE=ci/minimum-tests.yml" >> $GITHUB_ENV
         echo "PYTHON_VERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
     - name: Install dependencies
