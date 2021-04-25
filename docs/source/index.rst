@@ -13,14 +13,14 @@ xskillscore: Metrics for verifying forecasts
 .. image:: https://anaconda.org/conda-forge/xskillscore/badges/version.svg
    :target: https://anaconda.org/conda-forge/xskillscore/
 
-.. image:: https://codecov.io/gh/xarray-contrib/xskillscore/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/xarray-contrib/xskillscore/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/xarray-contrib/xskillscore
 
 .. image:: https://img.shields.io/conda/dn/conda-forge/xskillscore.svg
    :target: https://anaconda.org/conda-forge/xskillscore
 
 .. image:: https://mybinder.org/badge_logo.svg
- :target: https://mybinder.org/v2/gh/raybellwaves/xskillscore-tutorial/master?urlpath=lab
+   :target: https://mybinder.org/v2/gh/raybellwaves/xskillscore-tutorial/master?urlpath=lab
 
 Installation
 ============

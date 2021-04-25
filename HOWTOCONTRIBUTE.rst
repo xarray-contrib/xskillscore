@@ -116,9 +116,9 @@ Preparing Pull Requests
     $ cd xskillscore
     $ git remote add upstream git@github.com:xarray-contrib/xskillscore.git
 
-    # now, to fix a bug or add feature create your own branch off "master":
+    # now, to fix a bug or add feature create your own branch off "main":
 
-    $ git checkout -b your-bugfix-feature-branch-name master
+    $ git checkout -b your-bugfix-feature-branch-name main
 
    If you need some help with Git, follow this quick start
    guide: https://git.wiki.kernel.org/index.php/QuickStart
@@ -162,7 +162,7 @@ These benchmarks are all found in the ``asv_bench`` directory.
 
 If you need to run a benchmark, change your directory to ``asv_bench/`` and run::
 
-    $ asv continuous -f 1.1 upstream/master HEAD
+    $ asv continuous -f 1.1 upstream/main HEAD
 
 You can replace ``HEAD`` with the name of the branch you are working on,
 and report benchmarks that changed by more than 10%.
@@ -176,12 +176,12 @@ regressions.  You can run specific benchmarks using the ``-b`` flag, which
 takes a regular expression.  For example, this will only run tests from a
 ``asv_bench/benchmarks/deterministic.py`` file::
 
-    $ asv continuous -f 1.1 upstream/master HEAD -b ^deterministic
+    $ asv continuous -f 1.1 upstream/main HEAD -b ^deterministic
 
 If you want to only run a specific group of tests from a file, you can do it
 using ``.`` as a separator. For example::
 
-    $ asv continuous -f 1.1 upstream/master HEAD -b deterministic.Compute_small.time_xskillscore_metric_small
+    $ asv continuous -f 1.1 upstream/main HEAD -b deterministic.Compute_small.time_xskillscore_metric_small
 
 will only run the ``time_xskillscore_metric_small`` benchmark of class ``Compute_small``
 defined in ``deterministic.py``.
@@ -206,8 +206,8 @@ defined in ``deterministic.py``.
     head-fork: YOUR_GITHUB_USERNAME/xskillscore
     compare: your-branch-name
 
-    base-fork: raybellwaves/xskillscore
-    base: master
+    base-fork: xarray-contrib/xskillscore
+    base: main
 
 Note that you can create the Pull Request while you're working on this. The PR will update
 as you add more commits. ``xskillscore`` developers and contributors can then review your code

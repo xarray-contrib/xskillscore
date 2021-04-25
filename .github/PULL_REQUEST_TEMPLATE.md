@@ -26,7 +26,7 @@ Please describe the tests that you ran to verify your changes. This could point 
 
 ## Pre-Merge Checklist (final steps)
 
--   [ ]  I have rebased onto master or develop (wherever I am merging) and dealt with any conflicts.
+-   [ ]  I have rebased onto main or develop (wherever I am merging) and dealt with any conflicts.
 -   [ ]  I have squashed commits to a reasonable amount, and force-pushed the squashed commits.
 
 ## References

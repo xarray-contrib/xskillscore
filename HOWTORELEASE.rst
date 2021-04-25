@@ -8,14 +8,14 @@ Release Procedure
  * Update ``CHANGELOG.rst``
  * Make sure all new changes, features are reflected in the documentation.
 
-#. Open a new pull request for this branch targeting `master`
+#. Open a new pull request for this branch targeting `main`
 
-#. After all tests pass and the PR has been approved, merge the PR into ``master``
+#. After all tests pass and the PR has been approved, merge the PR into ``main``
 
 #. Tag a release and push to github::
 
     $ git tag -a v0.0.xx -m "Version 0.0.xx"
-    $ git push origin master --tags
+    $ git push origin main --tags
 
 #. Build and publish release on PyPI::
 
@@ -26,9 +26,9 @@ Release Procedure
 #. Update the stable branch (used by ReadTheDocs)::
 
     $ git checkout stable
-    $ git rebase master
+    $ git rebase main
     $ git push -f origin stable
-    $ git checkout master
+    $ git checkout main
 
 #. Go to https://readthedocs.org and add the new version to "Active Versions"
    under the version tab. Force-build "stable" if it isn't already building.

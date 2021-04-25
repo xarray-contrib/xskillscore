@@ -13,7 +13,7 @@ xskillscore: Metrics for verifying forecasts
 .. image:: https://anaconda.org/conda-forge/xskillscore/badges/version.svg
    :target: https://anaconda.org/conda-forge/xskillscore/
 
-.. image:: https://codecov.io/gh/xarray-contrib/xskillscore/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/xarray-contrib/xskillscore/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/xarray-contrib/xskillscore
 
 .. image:: https://img.shields.io/readthedocs/xskillscore/stable.svg?style=flat
