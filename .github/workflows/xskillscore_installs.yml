@@ -36,9 +36,9 @@ jobs:
       with:
         python-version: 3.8
     - name: Set environment variables
-        run: |
-          echo "CONDA_ENV_FILE=ci/minimum-tests.yml" >> $GITHUB_ENV
-          echo "PYTHON_VERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
+      run: |
+        echo "CONDA_ENV_FILE=ci/minimum-tests.yml" >> $GITHUB_ENV
+        echo "PYTHON_VERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
