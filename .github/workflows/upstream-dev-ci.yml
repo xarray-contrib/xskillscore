@@ -2,10 +2,10 @@ name: CI Upstream
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
   schedule:
     - cron: "0 0 * * 4"  # Thursdays At 00:00 UTC
   workflow_dispatch: # allows you to trigger the workflow run manually
@@ -60,7 +60,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Set up conda environment
         run: |
-          mamba env update -f ci/requirements/dev.yml
+          mamba env update -f ci/dev.yml
           bash ci/install-upstream-wheels.sh
       - name: Install xskillscore
         run: |
