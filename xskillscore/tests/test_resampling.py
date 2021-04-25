@@ -40,7 +40,7 @@ def test_resampling_roughly_identical_mean(f_prob):
     r1 = resample_iterations(da, iterations=iterations, replace=True)
     r2 = resample_iterations_idx(da, iterations=iterations, replace=True)
     xr.testing.assert_allclose(
-        r1.mean("iteration"), r2.mean("iteration"), atol=0.03, rtol=0.03
+        r1.mean("iteration"), r2.mean("iteration"), atol=0.05, rtol=0.05
     )
 
 
