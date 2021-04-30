@@ -475,7 +475,7 @@ def test_rps_category_edges_None_fails(o, f_prob):
 
 def test_rps_category_edges_None_works(o, f_prob):
     """Test that rps expects inputs to have category_edges dim if category_edges is None."""
-    o = o.rename({"time": "category_edge"})
+    o = o.rename({"time": "category"})
     f_prob = f_prob.rename({"time": "category"}).mean("member")
     rps(o, f_prob, category_edges=None, dim=[])
 
