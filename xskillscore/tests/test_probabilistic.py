@@ -476,7 +476,7 @@ def test_rps_category_edges_None_fails(o, f_prob):
 def test_rps_category_edges_None_works(o, f_prob):
     """Test that rps expects inputs to have category_edges dim if category_edges is None."""
     o = o.rename({"time": "category_edge"})
-    f_prob = f_prob.rename({"time": "category_edge"}).mean("member")
+    f_prob = f_prob.rename({"time": "category"}).mean("member")
     rps(o, f_prob, category_edges=None, dim=[])
 
 
@@ -727,7 +727,7 @@ def test_rps_category_edges_tuple(o, f_prob, fair_bool):
 def test_rps_category_edges_None(o, f_prob, fair_bool):
     """Test rps with category_edges as None expecting o and f_prob are already CDFs."""
     e = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
-    bin_dim = "category_edge"
+    bin_dim = "category"
     edges = xr.DataArray(e, dims=bin_dim, coords={bin_dim: e})
     o_c = o < edges  # CDF
     f_prob_c = f_prob < edges  # CDF
