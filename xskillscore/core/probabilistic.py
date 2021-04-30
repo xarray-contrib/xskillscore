@@ -556,8 +556,9 @@ def rps(
           across dimensions of forecasts and observations, and are different for each.
 
         - None: expect than observations and forecasts are already CDFs containing
-          ``category_edge`` dimension. Use this if your category edges vary across
-          dimensions of forecasts and observations, and are different for each.
+          ``category`` dimension. Use this if your category edges vary across
+          dimensions of forecasts and observations, and are different for each and
+          already cumulatively pre-computed.
 
     dim : str or list of str, optional
         Dimension over which to mean after computing ``rps``. This represents a mean
@@ -681,18 +682,19 @@ def rps(
         Oc = (observations < observations_edges).astype("int")
 
     elif category_edges is None:  # expect CDFs already as inputs
-        if bin_dim not in forecasts.dims:
+        category_dim = "category"
+        if category_dim not in forecasts.dims:
             raise ValueError(
-                "Expected dimension {bin_dim} in forecasts, found {forecasts.dims}"
+                "Expected dimension {category_dim} in cumulative forecasts, found {forecasts.dims}"
             )
         if bin_dim not in observations.dims:
             raise ValueError(
-                "Expected dimension {bin_dim} in observations, found {observations.dims}"
+                "Expected dimension {category_dim} in cumulative observations, found {observations.dims}"
             )
         if member_dim in forecasts.dims:
             forecasts = forecasts.mean(member_dim)
-        Fc = forecasts
-        Oc = observations
+        Fc = forecasts.rename({category_dim: bin_dim})
+        Oc = observations.rename({category_dim: bin_dim})
     else:
         raise ValueError(
             "category_edges must be xr.DataArray, xr.Dataset, tuple of xr.objects, "
