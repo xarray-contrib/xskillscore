@@ -558,7 +558,7 @@ def rps(
         - None: expect than observations and forecasts are already CDFs containing
           ``category`` dimension. Use this if your category edges vary across
           dimensions of forecasts and observations, and are different for each and
-          already cumulatively pre-computed.
+          already cumulatively pre-computed. Requires fair==False.
 
     dim : str or list of str, optional
         Dimension over which to mean after computing ``rps``. This represents a mean
@@ -634,6 +634,8 @@ def rps(
             )
         if fair:
             M = forecasts[member_dim].size
+    elif category_edges is None and fair:
+        raise ValueError("category_edges=None and fair=True does not work.")
 
     forecasts = _bool_to_int(forecasts)
 
