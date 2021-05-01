@@ -699,7 +699,9 @@ def rps(
         Fc = forecasts.rename({category_dim: bin_dim})
         Oc = observations.rename({category_dim: bin_dim})
         assert bin_dim in Fc.dims, print(f"found {Fc.dims}")
+        assert category_dim not in Fc.dims, print(f"found {Fc.dims}")
         assert bin_dim in Oc.dims, print(f"found {Oc.dims}")
+        assert category_dim not in Oc.dims, print(f"found {Oc.dims}")
     else:
         raise ValueError(
             "category_edges must be xr.DataArray, xr.Dataset, tuple of xr.objects, "
@@ -708,7 +710,7 @@ def rps(
 
     # RPS formulas
     if fair:  # for ensemble member adjustment, see Ferro 2013
-        Ec = Fc * M
+        Ec = Fc * M  # maybe try to get M even for category_edges=None as coordinate
         res = ((Ec / M - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
     else:  # normal formula
         res = ((Fc - Oc) ** 2).sum(bin_dim)
