@@ -723,8 +723,7 @@ def test_rps_category_edges_tuple(o, f_prob, fair_bool):
     assert "category_edge" not in actual.dims
 
 
-@pytest.mark.parametrize("fair_bool", [True, False])
-def test_rps_category_edges_None(o, f_prob, fair_bool):
+def test_rps_category_edges_None(o, f_prob):
     """Test rps with category_edges as None expecting o and f_prob are already CDFs."""
     e = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
     bin_dim = "category"
@@ -733,7 +732,7 @@ def test_rps_category_edges_None(o, f_prob, fair_bool):
     f_c = (f_prob < edges).mean("member")  # CDF
     print(o_c)
     print(f_c)
-    actual = rps(o_c, f_c, dim="time", fair=fair_bool, category_edges=None)
+    actual = rps(o_c, f_c, dim="time", fair=False, category_edges=None)
     print(actual)
     assert set(["lon", "lat"]) == set(actual.dims)
     assert "quantile" not in actual.dims
