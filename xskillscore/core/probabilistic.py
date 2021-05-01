@@ -685,11 +685,11 @@ def rps(
         category_dim = "category"
         if category_dim not in forecasts.dims:
             raise ValueError(
-                "Expected dimension {category_dim} in cumulative forecasts, found {forecasts.dims}"
+                f"Expected dimension {category_dim} in cumulative forecasts, found {forecasts.dims}"
             )
         if bin_dim not in observations.dims:
             raise ValueError(
-                "Expected dimension {category_dim} in cumulative observations, found {observations.dims}"
+                f"Expected dimension {category_dim} in cumulative observations, found {observations.dims}"
             )
         if member_dim in forecasts.dims:
             forecasts = forecasts.mean(member_dim)
