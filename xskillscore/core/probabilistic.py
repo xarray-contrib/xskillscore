@@ -695,6 +695,8 @@ def rps(
             forecasts = forecasts.mean(member_dim)
         Fc = forecasts.rename({category_dim: bin_dim})
         Oc = observations.rename({category_dim: bin_dim})
+        assert category_dim in Fc.dims, print(f"found {Fc.dims}")
+        assert category_dim in Oc.dims, print(f"found {Oc.dims}")
     else:
         raise ValueError(
             "category_edges must be xr.DataArray, xr.Dataset, tuple of xr.objects, "
@@ -716,7 +718,7 @@ def rps(
         res = res.weighted(weights)
     # combine many forecasts-observations pairs
     res = res.mean(dim)
-    # keep nans and prevent 0 for all nan grids
+    # keep nans and prevent 0 for all nan grids, could prevent this with skipna=False
     try:
         res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
     except Exception as e:
