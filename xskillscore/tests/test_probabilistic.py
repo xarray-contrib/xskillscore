@@ -730,10 +730,10 @@ def test_rps_category_edges_None(o, f_prob, fair_bool):
     bin_dim = "category"
     edges = xr.DataArray(e, dims=bin_dim, coords={bin_dim: e})
     o_c = o < edges  # CDF
-    f_prob_c = (f_prob < edges).mean("member")  # CDF
+    f_c = (f_prob < edges).mean("member")  # CDF
     print(o_c)
-    print(f_prob_c)
-    actual = rps(o_c, f_prob_c, dim="time", fair=fair_bool, category_edges=None)
+    print(f_c)
+    actual = rps(o_c, f_c, dim="time", fair=fair_bool, category_edges=None)
     print(actual)
     assert set(["lon", "lat"]) == set(actual.dims)
     assert "quantile" not in actual.dims
