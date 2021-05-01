@@ -626,7 +626,7 @@ def rps(
 
     """
     bin_dim = "category_edge"
-    if member_dim not in forecasts.dims and category_edges is not None:
+    if member_dim not in forecasts.dims and category_edges != None:
         raise ValueError(
             f"Expect to find {member_dim} in forecasts dimensions, found"
             f"{forecasts.dims}."
