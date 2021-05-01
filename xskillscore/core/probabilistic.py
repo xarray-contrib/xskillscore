@@ -698,10 +698,7 @@ def rps(
             forecasts = forecasts.mean(member_dim)
         Fc = forecasts.rename({category_dim: bin_dim})
         Oc = observations.rename({category_dim: bin_dim})
-        assert bin_dim in Fc.dims, print(f"found {Fc.dims}")
-        assert category_dim not in Fc.dims, print(f"found {Fc.dims}")
-        assert bin_dim in Oc.dims, print(f"found {Oc.dims}")
-        assert category_dim not in Oc.dims, print(f"found {Oc.dims}")
+
     else:
         raise ValueError(
             "category_edges must be xr.DataArray, xr.Dataset, tuple of xr.objects, "
@@ -714,7 +711,6 @@ def rps(
         res = ((Ec / M - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
     else:  # normal formula
         res = ((Fc - Oc) ** 2).sum(bin_dim)
-    assert bin_dim not in res.dims
 
     # add category_edge as str into coords
     if category_edges is not None:
@@ -729,7 +725,6 @@ def rps(
         res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
     except Exception as e:
         print(f"could not mask all NaNs properly due to {type(e).__name__}: {e}")
-    assert bin_dim not in res.dims
     if keep_attrs:  # attach by hand
         res.attrs.update(observations.attrs)
         res.attrs.update(forecasts.attrs)
