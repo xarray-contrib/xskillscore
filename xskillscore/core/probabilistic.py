@@ -695,8 +695,8 @@ def rps(
             forecasts = forecasts.mean(member_dim)
         Fc = forecasts.rename({category_dim: bin_dim})
         Oc = observations.rename({category_dim: bin_dim})
-        assert category_dim in Fc.dims, print(f"found {Fc.dims}")
-        assert category_dim in Oc.dims, print(f"found {Oc.dims}")
+        assert bin_dim in Fc.dims, print(f"found {Fc.dims}")
+        assert bin_dim in Oc.dims, print(f"found {Oc.dims}")
     else:
         raise ValueError(
             "category_edges must be xr.DataArray, xr.Dataset, tuple of xr.objects, "
