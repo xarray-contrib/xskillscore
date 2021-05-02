@@ -560,7 +560,7 @@ def rps(
           or probability ``pdf`` distribution functions specified by ``category_dist``
           containing ``category`` dimension. Use this if your category edges vary across
           dimensions of forecasts and observations, and are different for each and
-          already (cumulatively) pre-computed. Requires fair==False.
+          already (cumulatively) pre-computed.
 
     dim : str or list of str, optional
         Dimension over which to mean after computing ``rps``. This represents a mean
