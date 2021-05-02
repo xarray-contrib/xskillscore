@@ -633,10 +633,28 @@ def test_2_category_rps_equals_brier_score(o, f_prob, fair_bool):
     """Test that RPS for two categories equals the Brier Score."""
     category_edges = np.array([0.0, 0.5, 1.0])
     assert_allclose(
-        rps(o, f_prob, category_edges=category_edges, dim=None, fair=fair_bool).drop(
-            ["forecasts_category_edge", "observations_category_edge"]
-        ),
+        rps(
+            o.rename({"time": "category"}),
+            f_prob.rename({"time": "category"}),
+            category_edges=category_edges,
+            dim=None,
+            fair=fair_bool,
+        ).drop(["forecasts_category_edge", "observations_category_edge"]),
         brier_score(o > 0.5, (f_prob > 0.5), dim=None, fair=fair_bool),
+    )
+
+
+def test_rps_fair_category_edges_None(o, f_prob):
+    """Test that RPS without category_edges works for fair==True if forecast[member] set."""
+    rps(
+        o.rename({"time": "category"}),
+        f_prob.mean("member")
+        .rename({"time": "category"})
+        .assign_coords(member=f_prob.member.size),
+        category_edges=None,
+        dim=None,
+        fair=True,
+        category_dist="pdf",
     )
 
 

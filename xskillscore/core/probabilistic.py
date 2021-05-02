@@ -655,7 +655,12 @@ def rps(
         if fair:
             M = forecasts[member_dim].size
     elif category_edges is None and fair:
-        raise ValueError("category_edges=None and fair=True does not work.")
+        if member_dim in forecasts.coords and member_dim not in forecasts.dims:
+            M = forecasts[member_dim].astype("int")
+        else:
+            raise ValueError(
+                "category_edges=None and fair=True only works if forecast[member_dim] is a number in forecasts.coords."
+            )
 
     forecasts = _bool_to_int(forecasts)
 
