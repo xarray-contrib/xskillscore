@@ -470,14 +470,15 @@ def test_rps_reduce_dim(o, f_prob, category_edges, dim, fair_bool):
 def test_rps_category_edges_None_fails(o, f_prob):
     """Test that rps expects inputs to have category_edges dim if category_edges is None."""
     with pytest.raises(ValueError, match="Expected dimension"):
-        rps(o, f_prob, category_edges=None, dim=[])
+        rps(o, f_prob, category_edges=None, dim=[], category_dist="cdf")
 
 
-def test_rps_category_edges_None_works(o, f_prob):
+@pytest.mark.parametrize("category_dist", ["cdf", "pdf"])
+def test_rps_category_edges_None_works(o, f_prob, category_dist):
     """Test that rps expects inputs to have category_edges dim if category_edges is None."""
     o = o.rename({"time": "category"})
     f_prob = f_prob.rename({"time": "category"}).mean("member")
-    rps(o, f_prob, category_edges=None, dim=[])
+    rps(o, f_prob, category_edges=None, dim=[], category_dist=category_dist)
 
 
 @pytest.mark.parametrize("chunk_bool", [True, False])
@@ -723,15 +724,23 @@ def test_rps_category_edges_tuple(o, f_prob, fair_bool):
     assert "category_edge" not in actual.dims
 
 
-def test_rps_category_edges_None(o, f_prob):
+@pytest.mark.parametrize("category_dist", ["cdf", "pdf"])
+def test_rps_category_edges_None(o, f_prob, category_dist):
     """Test rps with category_edges as None expecting o and f_prob are already CDFs."""
     e = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
     bin_dim = "category"
     edges = xr.DataArray(e, dims=bin_dim, coords={bin_dim: e})
     o_c = o < edges  # CDF
     f_c = (f_prob < edges).mean("member")  # CDF
-    actual = rps(o_c, f_c, dim="time", fair=False, category_edges=None)
-    assert set(["lon", "lat"]) == set(actual.isel(category=0, drop=True).dims)
+    actual = rps(
+        o_c,
+        f_c,
+        dim="time",
+        fair=False,
+        category_edges=None,
+        category_dist=category_dist,
+    )
+    assert set(["lon", "lat"]) == set(actual.dims)
     assert "quantile" not in actual.dims
     assert "member" not in actual.dims
 

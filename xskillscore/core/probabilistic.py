@@ -505,6 +505,7 @@ def rps(
     weights=None,
     keep_attrs=False,
     member_dim="member",
+    category_dist=None,
 ):
     """Calculate Ranked Probability Score.
 
@@ -555,10 +556,11 @@ def rps(
           for ``category_edges`` for forecasts. Use this if your category edges vary
           across dimensions of forecasts and observations, and are different for each.
 
-        - None: expect than observations and forecasts are already CDFs containing
-          ``category`` dimension. Use this if your category edges vary across
+        - None: expect than observations and forecasts are already cumulative ``cdf``
+          or probability ``pdf`` distribution functions specified by ``category_dist``
+          containing ``category`` dimension. Use this if your category edges vary across
           dimensions of forecasts and observations, and are different for each and
-          already cumulatively pre-computed. Requires fair==False.
+          already (cumulatively) pre-computed. Requires fair==False.
 
     dim : str or list of str, optional
         Dimension over which to mean after computing ``rps``. This represents a mean
@@ -574,6 +576,10 @@ def rps(
         one. If False (default), the new object will be returned without attributes.
     member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
+    category_dist: str or None
+        Indicates whether observations and forecasts are probability distribution
+        functions by ``pdf`` or cumulative distribution functions by ``cdf``.
+        Only valid if `category_edges` is None. Defaults: None.
 
     Returns
     -------
@@ -685,6 +691,12 @@ def rps(
         Oc = (observations < observations_edges).astype("int")
 
     elif category_edges is None:  # expect CDFs already as inputs
+        if category_dist not in ["cdf", "pdf"]:
+            raise ValueError(
+                "If ``category_edges==None``, ``category_dist`` must be"
+                " either ``cdf`` or ``pdf``"
+                f" found ``category_dist={category_dist}``"
+            )
         category_dim = "category"
         if category_dim not in forecasts.dims:
             raise ValueError(
@@ -694,10 +706,19 @@ def rps(
             raise ValueError(
                 f"Expected dimension {category_dim} in cumulative observations, found {observations.dims}"
             )
+
         if member_dim in forecasts.dims:
             forecasts = forecasts.mean(member_dim)
-        Fc = forecasts.rename({category_dim: bin_dim})
-        Oc = observations.rename({category_dim: bin_dim})
+
+        forecasts = forecasts.rename({category_dim: bin_dim})
+        observations = observations.rename({category_dim: bin_dim})
+
+        if category_dist == "pdf":  # convert to cdf
+            Fc = forecasts.cumsum(bin_dim)
+            Oc = observations.cumsum(bin_dim)
+        else:
+            Fc = forecasts
+            Oc = observations
 
     else:
         raise ValueError(
