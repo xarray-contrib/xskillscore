@@ -559,7 +559,7 @@ def rps(
         - None: expect than observations and forecasts are already cumulative ``cdf``
           or probability ``pdf`` distribution functions specified by ``category_dist``
           containing ``category`` dimension. Use this if your category edges vary across
-          dimensions of forecasts and observations, and are different for each and
+          dimensions of forecasts and observations, and are different for each or
           already (cumulatively) pre-computed.
 
     dim : str or list of str, optional
