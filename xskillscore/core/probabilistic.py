@@ -567,7 +567,9 @@ def rps(
         over multiple forecasts-observations pairs. Defaults to None implying averaging
         over all dimensions.
     fair: boolean
-        Apply ensemble member-size adjustment for unbiased, fair metric; see Ferro (2013).
+        Apply ensemble member-size adjustment for unbiased, fair metric; see Ferro
+        (2013). If ``fair==True`` and ``category_edges==None``, require forecasts to
+        have number of members in coordinates as forecasts[member_dim].
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is
         applied.
