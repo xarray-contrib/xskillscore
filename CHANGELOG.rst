@@ -12,7 +12,10 @@ Internal Changes
 - :py:func:`~xskillscore.rps` does not break from masking NaNs anymore.
   :py:func:`~xskillscore.rps` expilicty checks for ``bin_dim`` if
   ``category_edges==None``. (:pr:`287`) `Aaron Spring`_
-
+- Specify category distribution type with ``category_dist`` in
+  :py:func:`~xskillscore.rps` if ``category_edges==None`` that forecasts and
+  observations are probability distribution functions ``pdf`` or cumulative
+  distribution functions ``cdf``. (:pr:`300`) `Aaron Spring`_
 
 xskillscore v0.0.19 (2021-03-12)
 --------------------------------

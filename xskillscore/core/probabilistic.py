@@ -590,6 +590,8 @@ def rps(
 
     Examples
     --------
+    >>> import xskillscore as xs
+    >>> np.random.seed(42)
     >>> observations = xr.DataArray(np.random.random(size=(3, 3)),
     ...                             coords=[('x', np.arange(3)),
     ...                                     ('y', np.arange(3))])
@@ -600,11 +602,11 @@ def rps(
     >>> category_edges = np.array([.33, .66])
     >>> xs.rps(observations, forecasts, category_edges, dim='x')
     <xarray.DataArray (y: 3)>
-    array([0.14814815, 0.7037037 , 1.51851852])
+    array([0.37037037, 0.81481481, 1.        ])
     Coordinates:
       * y                           (y) int64 0 1 2
-        forecasts_category_edge     <U38 '[-np.inf, 0.33), [0.33, 0.66), [0.66, np.inf]'
-        observations_category_edge  <U38 '[-np.inf, 0.33), [0.33, 0.66), [0.66, np.inf]'
+        observations_category_edge  <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
+        forecasts_category_edge     <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
 
 
     You can also define multi-dimensional ``category_edges``, e.g. with xr.quantile.
@@ -612,14 +614,26 @@ def rps(
     and observations distributions.
 
     >>> category_edges = observations.quantile(
-    ...     q=[.33, .66]).rename({'quantile': 'category_edge'}),
+    ...     q=[.33, .66]).rename({'quantile': 'category_edge'})
     >>> xs.rps(observations, forecasts, category_edges, dim='x')
     <xarray.DataArray (y: 3)>
-    array([1.18518519, 0.85185185, 0.40740741])
+    array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
       * y                           (y) int64 0 1 2
-        forecasts_category_edge     <U38 '[-np.inf, 0.33), [0.33, 0.66), [0.66, np.inf]'
-        observations_category_edge  <U38 '[-np.inf, 0.33), [0.33, 0.66), [0.66, np.inf]'
+        observations_category_edge  <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
+        forecasts_category_edge     <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
+
+    You can also provide cumulative (probability) distribution functions as inputs
+    without specifying ``category_edges`` but ``category_dist``:
+
+    >>> category_edges = category_edges.rename({'category_edge': 'category'})
+    >>> observations = observations < category_edges
+    >>> forecasts = (forecasts < category_edges).mean('member') # not exactly probabilities here
+    >>> xs.rps(observations, forecasts, category_edges=None, dim='x', category_dist='cdf')
+    <xarray.DataArray (y: 3)>
+    array([0.37037037, 0.81481481, 0.88888889])
+    Coordinates:
+      * y        (y) int64 0 1 2
 
     References
     ----------
