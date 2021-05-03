@@ -629,8 +629,9 @@ def test_rps_wilks_example():
 
 
 def test_rps_wilks_example_pdf():
-    """Test xs.rps(category_edges=None, input_distributions='p') with values from Wilks, D. S. (2006). Statistical methods in the
-    atmospheric sciences (2nd ed, Vol. 91). Amsterdam ; Boston: Academic Press. p.301.
+    """Test xs.rps(category_edges=None, input_distributions='p') with values from
+    Wilks, D. S. (2006). Statistical methods in the atmospheric sciences (2nd ed,
+    Vol. 91). Amsterdam ; Boston: Academic Press. p.301.
     """
     Obs = xr.DataArray([1.0, 0.0, 0.0], dims="category")  # no precip
     F1 = xr.DataArray([0.2, 0.5, 0.3], dims="category")
@@ -669,7 +670,8 @@ def test_2_category_rps_equals_brier_score(o, f_prob, fair_bool):
 
 
 def test_rps_fair_category_edges_None(o, f_prob):
-    """Test that RPS without category_edges works for fair==True if forecast[member] set."""
+    """Test that RPS without category_edges works for fair==True if forecast[member]
+    set."""
     rps(
         o.rename({"time": "category"}),
         f_prob.mean("member")

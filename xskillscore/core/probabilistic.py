@@ -629,34 +629,47 @@ def rps(
         observations_category_edge  <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
         forecasts_category_edge     <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
 
-    If you have probabilistic forecasts, i.e. without a ``member`` dimension but different ``category`` probabilities, you can also provide ``p``robability distribution inputs
-    by specifying ``category_edges=None`` but ``input_distributions``:
+    If you have probabilistic forecasts, i.e. without a ``member`` dimension but
+    different ``category`` probabilities, you can also provide probability
+    distribution inputs by specifying ``category_edges=None`` but
+    ``input_distributions``:
 
     >>> category_edges = category_edges.rename({'category_edge': 'category'})
     >>> observations_p = xr.concat([
-    ...     (observations < category_edges.isel(category=0)).assign_coords(category='below normal'),
-    ...     ((observations >= category_edges.isel(category=0)) & (observations < category_edges.isel(category=1))).assign_coords(category='normal'),
-    ...     (observations >= category_edges.isel(category=1)).assign_coords(category='above normal')
+    ...     (observations < category_edges.isel(category=0)
+    ...         ).assign_coords(category='below normal'),
+    ...     ((observations >= category_edges.isel(category=0)) & (
+    ...         observations < category_edges.isel(category=1))
+    ...         ).assign_coords(category='normal'),
+    ...     (observations >= category_edges.isel(category=1)
+    ...         ).assign_coords(category='above normal')
     ... ], 'category')
     >>> #print(observations_p.sum('category'))
     >>> assert (observations_p.sum('category')==1).all()
     >>> forecasts_p = xr.concat([
-    ...     (forecasts < category_edges.isel(category=0)).assign_coords(category='below normal'),
-    ...     ((forecasts >= category_edges.isel(category=0)) & (forecasts < category_edges.isel(category=1))).assign_coords(category='normal'),
-    ...     (forecasts >= category_edges.isel(category=1)).assign_coords(category='above normal')
+    ...     (forecasts < category_edges.isel(category=0)
+    ...         ).assign_coords(category='below normal'),
+    ...     ((forecasts >= category_edges.isel(category=0)
+    ...         ) & (forecasts < category_edges.isel(category=1))
+    ...         ).assign_coords(category='normal'),
+    ...     (forecasts >= category_edges.isel(category=1)
+    ...         ).assign_coords(category='above normal')
     ... ], 'category').mean('member')
     >>> assert (forecasts_p.sum('category')==1).all()
-    >>> xs.rps(observations_p, forecasts_p, category_edges=None, dim='x', input_distributions='p')
+    >>> xs.rps(observations_p, forecasts_p, category_edges=None, dim='x',
+    ...     input_distributions='p')
     <xarray.DataArray (y: 3)>
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
       * y        (y) int64 0 1 2
 
-    Providing ``c``umulative distribution inputs yields identical results, where highest category equals 1 by default and can be ignored:
+    Providing cumulative distribution inputs yields identical results, where highest
+    category equals 1 by default and can be ignored:
 
     >>> observations_c = observations < category_edges
     >>> forecasts_c = (forecasts < category_edges).mean('member')
-    >>> xs.rps(observations_c, forecasts_c, category_edges=None, dim='x', input_distributions='c')
+    >>> xs.rps(observations_c, forecasts_c, category_edges=None, dim='x',
+    ...     input_distributions='c')
     <xarray.DataArray (y: 3)>
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
