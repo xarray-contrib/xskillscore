@@ -699,7 +699,8 @@ def rps(
             M = forecasts[member_dim].astype("int")
         else:
             raise ValueError(
-                "category_edges=None and fair=True only works if forecast[member_dim] is a number in forecasts.coords."
+                "category_edges=None and fair=True only works "
+                "if forecast[member_dim] is a number in forecasts.coords."
             )
 
     forecasts = _bool_to_int(forecasts)
@@ -760,11 +761,13 @@ def rps(
         category_dim = "category"
         if category_dim not in forecasts.dims:
             raise ValueError(
-                f"Expected dimension {category_dim} in cumulative forecasts, found {forecasts.dims}"
+                f"Expected dimension {category_dim} in cumulative forecasts, "
+                f"found {forecasts.dims}"
             )
         if category_dim not in observations.dims:
             raise ValueError(
-                f"Expected dimension {category_dim} in cumulative observations, found {observations.dims}"
+                f"Expected dimension {category_dim} in cumulative observations, "
+                f"found {observations.dims}"
             )
 
         if member_dim in forecasts.dims:
