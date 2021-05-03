@@ -775,7 +775,7 @@ def rps(
 
     # RPS formulas
     if fair:  # for ensemble member adjustment, see Ferro 2013
-        Ec = Fc * M  # maybe try to get M even for category_edges=None as coordinate
+        Ec = Fc * M
         res = ((Ec / M - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
     else:  # normal formula
         res = ((Fc - Oc) ** 2).sum(bin_dim)
