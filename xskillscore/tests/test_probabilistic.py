@@ -470,7 +470,7 @@ def test_rps_reduce_dim(o, f_prob, category_edges, dim, fair_bool):
 def test_rps_category_edges_None_fails(o, f_prob):
     """Test that rps expects inputs to have category_edges dim if category_edges is None."""
     with pytest.raises(ValueError, match="Expected dimension"):
-        rps(o, f_prob, category_edges=None, dim=[], input_distributions="cdf")
+        rps(o, f_prob, category_edges=None, dim=[], input_distributions="c")
 
 
 @pytest.mark.parametrize("input_distributions", ["c", "p"])
