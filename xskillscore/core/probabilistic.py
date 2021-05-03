@@ -505,7 +505,7 @@ def rps(
     weights=None,
     keep_attrs=False,
     member_dim="member",
-    category_dist=None,
+    input_distributions=None,
 ):
     """Calculate Ranked Probability Score.
 
@@ -529,6 +529,10 @@ def rps(
         The forecast of the event with dimension specified by ``member_dim``.
         Further requirements are specified based on ``category_edges``.
     category_edges : array_like, xr.Dataset, xr.DataArray, None
+        If forecasts and observations are probabilistic, use ``category_edges=None``
+        and set ``input_distributions``. If forecasts are deterministic and given in
+        absolute units, set ``category_edges`` and leave ``input_distributions=None``.
+
         Edges (left-edge inclusive) of the bins used to calculate the cumulative
         density function (cdf). Note that here the bins have to include the full range
         of observations and forecasts data. Effectively, negative infinity is appended
@@ -556,11 +560,11 @@ def rps(
           for ``category_edges`` for forecasts. Use this if your category edges vary
           across dimensions of forecasts and observations, and are different for each.
 
-        - None: expect than observations and forecasts are already cumulative ``cdf``
-          or probability ``pdf`` distribution functions specified by ``category_dist``
-          containing ``category`` dimension. Use this if your category edges vary across
-          dimensions of forecasts and observations, and are different for each and
-          already (cumulatively) pre-computed. Requires fair==False.
+        - None: expect that observations and forecasts are already cumulative
+          distribution functions (``c``) or probability density functions (``p``), as
+          specified by the ``input_distributions`` arg. In this case, the inputs
+          observations and forecasts must contain a dimension named ``category`` with
+          the bin values of the density function.
 
     dim : str or list of str, optional
         Dimension over which to mean after computing ``rps``. This represents a mean
@@ -578,9 +582,9 @@ def rps(
         one. If False (default), the new object will be returned without attributes.
     member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
-    category_dist: str or None
-        Indicates whether observations and forecasts are probability distribution
-        functions by ``pdf`` or cumulative distribution functions by ``cdf``.
+    input_distributions: str or None
+        Indicates whether observations and forecasts are probability distributions by
+        ``p`` or cumulative distributions by ``c``.
         Only valid if `category_edges` is None. Defaults: None.
 
     Returns
@@ -625,13 +629,34 @@ def rps(
         observations_category_edge  <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
         forecasts_category_edge     <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
 
-    You can also provide cumulative (probability) distribution functions as inputs
-    without specifying ``category_edges`` but ``category_dist``:
+    If you have probabilistic forecasts, i.e. without a ``member`` dimension but different ``category`` probabilities, you can also provide ``p``robability distribution inputs
+    by specifying ``category_edges=None`` but ``input_distributions``:
 
     >>> category_edges = category_edges.rename({'category_edge': 'category'})
-    >>> observations = observations < category_edges
-    >>> forecasts = (forecasts < category_edges).mean('member') # not exactly probabilities here
-    >>> xs.rps(observations, forecasts, category_edges=None, dim='x', category_dist='cdf')
+    >>> observations_p = xr.concat([
+    ...     (observations < category_edges.isel(category=0)).assign_coords(category='below normal'),
+    ...     ((observations >= category_edges.isel(category=0)) & (observations < category_edges.isel(category=1))).assign_coords(category='normal'),
+    ...     (observations >= category_edges.isel(category=1)).assign_coords(category='above normal')
+    ... ], 'category')
+    >>> #print(observations_p.sum('category'))
+    >>> assert (observations_p.sum('category')==1).all()
+    >>> forecasts_p = xr.concat([
+    ...     (forecasts < category_edges.isel(category=0)).assign_coords(category='below normal'),
+    ...     ((forecasts >= category_edges.isel(category=0)) & (forecasts < category_edges.isel(category=1))).assign_coords(category='normal'),
+    ...     (forecasts >= category_edges.isel(category=1)).assign_coords(category='above normal')
+    ... ], 'category').mean('member')
+    >>> assert (forecasts_p.sum('category')==1).all()
+    >>> xs.rps(observations_p, forecasts_p, category_edges=None, dim='x', input_distributions='p')
+    <xarray.DataArray (y: 3)>
+    array([0.37037037, 0.81481481, 0.88888889])
+    Coordinates:
+      * y        (y) int64 0 1 2
+
+    Providing ``c``umulative distribution inputs yields identical results, where highest category equals 1 by default and can be ignored:
+
+    >>> observations_c = observations < category_edges
+    >>> forecasts_c = (forecasts < category_edges).mean('member')
+    >>> xs.rps(observations_c, forecasts_c, category_edges=None, dim='x', input_distributions='c')
     <xarray.DataArray (y: 3)>
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
@@ -711,12 +736,13 @@ def rps(
         Fc = (forecasts < forecasts_edges).mean(member_dim)
         Oc = (observations < observations_edges).astype("int")
 
-    elif category_edges is None:  # expect CDFs already as inputs
-        if category_dist not in ["cdf", "pdf"]:
+    elif category_edges is None:  # expect inputs as cdfs or pdfs
+        if input_distributions not in ["c", "p"]:
             raise ValueError(
-                "If ``category_edges==None``, ``category_dist`` must be"
-                " either ``cdf`` or ``pdf``"
-                f" found ``category_dist={category_dist}``"
+                "If forecasts and observations are probabilistic, you use correctly"
+                " ``category_edges==None``, but ``input_distributions`` must be"
+                " either ``c`` for cumulative or ``p`` for probability"
+                f" found ``input_distributions={input_distributions}``"
             )
         category_dim = "category"
         if category_dim not in forecasts.dims:
@@ -734,7 +760,7 @@ def rps(
         forecasts = forecasts.rename({category_dim: bin_dim})
         observations = observations.rename({category_dim: bin_dim})
 
-        if category_dist == "pdf":  # convert to cdf
+        if input_distributions == "p":  # convert to cdf
             Fc = forecasts.cumsum(bin_dim)
             Oc = observations.cumsum(bin_dim)
         else:
