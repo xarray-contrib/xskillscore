@@ -596,17 +596,21 @@ def rps(
 
     Examples
     --------
+    In the examples below `o` is used for observations and `f` for forecasts.
+    
+    >>> import numpy as np
+    >>> import xarray as xr
     >>> import xskillscore as xs
     >>> np.random.seed(42)
-    >>> observations = xr.DataArray(np.random.random(size=(3, 3)),
-    ...                             coords=[('x', np.arange(3)),
-    ...                                     ('y', np.arange(3))])
-    >>> forecasts = xr.DataArray(np.random.random(size=(3, 3, 3)),
-    ...                          coords=[('x', np.arange(3)),
-    ...                                  ('y', np.arange(3)),
-    ...                                  ('member', np.arange(3))])
+    >>> o = xr.DataArray(np.random.random(size=(3, 3)),
+    ...                  coords=[('x', np.arange(3)),
+    ...                          ('y', np.arange(3))])
+    >>> f = xr.DataArray(np.random.random(size=(3, 3, 3)),
+    ...                  coords=[('x', np.arange(3)),
+    ...                          ('y', np.arange(3)),
+    ...                          ('member', np.arange(3))])
     >>> category_edges = np.array([.33, .66])
-    >>> xs.rps(observations, forecasts, category_edges, dim='x')
+    >>> xs.rps(o, f, category_edges, dim='x')
     <xarray.DataArray (y: 3)>
     array([0.37037037, 0.81481481, 1.        ])
     Coordinates:
@@ -619,9 +623,8 @@ def rps(
     However, you still need to ensure that ``category_edges`` covers the forecasts
     and observations distributions.
 
-    >>> category_edges = observations.quantile(
-    ...     q=[.33, .66]).rename({'quantile': 'category_edge'})
-    >>> xs.rps(observations, forecasts, category_edges, dim='x')
+    >>> category_edges = o.quantile(q=[.33, .66]).rename({'quantile': 'category_edge'})
+    >>> xs.rps(o, f, category_edges, dim='x')
     <xarray.DataArray (y: 3)>
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
@@ -635,29 +638,28 @@ def rps(
     ``input_distributions``:
 
     >>> category_edges = category_edges.rename({'category_edge': 'category'})
-    >>> observations_p = xr.concat([
-    ...     (observations < category_edges.isel(category=0)
-    ...         ).assign_coords(category='below normal'),
-    ...     ((observations >= category_edges.isel(category=0)) & (
-    ...         observations < category_edges.isel(category=1))
-    ...         ).assign_coords(category='normal'),
-    ...     (observations >= category_edges.isel(category=1)
-    ...         ).assign_coords(category='above normal')
+    >>> categories = ["below normal", "normal", "above_normal"]
+    >>> o_p = xr.concat([
+    ...     (o < category_edges.isel(category=0)
+    ...         ).assign_coords(category=categories[0]),
+    ...     ((o >= category_edges.isel(category=0)) & (
+    ...         o < category_edges.isel(category=1))
+    ...         ).assign_coords(category=categories[1]),
+    ...     (o >= category_edges.isel(category=1)
+    ...         ).assign_coords(category=categories[2])
     ... ], 'category')
-    >>> #print(observations_p.sum('category'))
     >>> assert (observations_p.sum('category')==1).all()
-    >>> forecasts_p = xr.concat([
-    ...     (forecasts < category_edges.isel(category=0)
-    ...         ).assign_coords(category='below normal'),
-    ...     ((forecasts >= category_edges.isel(category=0)
-    ...         ) & (forecasts < category_edges.isel(category=1))
-    ...         ).assign_coords(category='normal'),
-    ...     (forecasts >= category_edges.isel(category=1)
-    ...         ).assign_coords(category='above normal')
+    >>> f_p = xr.concat([
+    ...     (f < category_edges.isel(category=0)
+    ...         ).assign_coords(category=categories[0]),
+    ...     ((f >= category_edges.isel(category=0)
+    ...         ) & (f < category_edges.isel(category=1))
+    ...         ).assign_coords(category=categories[1]),
+    ...     (f >= category_edges.isel(category=1)
+    ...         ).assign_coords(category=categories[2])
     ... ], 'category').mean('member')
-    >>> assert (forecasts_p.sum('category')==1).all()
-    >>> xs.rps(observations_p, forecasts_p, category_edges=None, dim='x',
-    ...     input_distributions='p')
+    >>> assert (f_p.sum('category')==1).all()
+    >>> xs.rps(o_p, f_p, category_edges=None, dim='x', input_distributions='p')
     <xarray.DataArray (y: 3)>
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
@@ -666,10 +668,9 @@ def rps(
     Providing cumulative distribution inputs yields identical results, where highest
     category equals 1 by default and can be ignored:
 
-    >>> observations_c = observations < category_edges
-    >>> forecasts_c = (forecasts < category_edges).mean('member')
-    >>> xs.rps(observations_c, forecasts_c, category_edges=None, dim='x',
-    ...     input_distributions='c')
+    >>> o_c = o < category_edges
+    >>> f_c = (f < category_edges).mean('member')
+    >>> xs.rps(o_c, f_c, category_edges=None, dim='x', input_distributions='c')
     <xarray.DataArray (y: 3)>
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
@@ -683,7 +684,6 @@ def rps(
     * C. A. T. Ferro. Fair scores for ensemble forecasts. Q.R.J. Meteorol. Soc., 140:
       1917–1923, 2013. doi: 10.1002/qj.2270.
     * https://www-miklip.dkrz.de/about/problems/
-
     """
     bin_dim = "category_edge"
     if category_edges is not None:
