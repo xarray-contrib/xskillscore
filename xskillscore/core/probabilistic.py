@@ -634,7 +634,7 @@ def rps(
 
     If you have probabilistic forecasts, i.e. without a ``member`` dimension but
     different ``category`` probabilities, you can also provide probability
-    distribution inputs by specifying ``category_edges=None`` but
+    distribution inputs by specifying ``category_edges=None`` and
     ``input_distributions``:
 
     >>> category_edges = category_edges.rename({'category_edge': 'category'})
