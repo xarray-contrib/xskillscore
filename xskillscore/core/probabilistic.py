@@ -597,7 +597,7 @@ def rps(
     Examples
     --------
     In the examples below `o` is used for observations and `f` for forecasts.
-    
+
     >>> import numpy as np
     >>> import xarray as xr
     >>> import xskillscore as xs
