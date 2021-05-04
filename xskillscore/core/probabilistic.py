@@ -540,9 +540,9 @@ def rps(
         right side. Thus, N category edges produces N+1 bins. For example, specifying
         category_edges = [0,1] will compute the RPS for bins [-inf, 0), [0, 1) and
         [1, inf), which results in CDF bins [-inf, 0), [-inf, 1) and [-inf, inf).
-        Note that the edges are right-edge exclusive.
-        Forecasts, observations and category_edge are expected
-        in absolute units or probabilities consistently.
+        Note that the edges are right-edge exclusive. Forecasts, observations and
+        category_edge are expected in absolute units or probabilities consistently.
+        dtypes are handled accordingly:
 
         - np.array (1d): will be internally converted and broadcasted to observations.
           Use this if you wish to use the same category edges for all elements of both
