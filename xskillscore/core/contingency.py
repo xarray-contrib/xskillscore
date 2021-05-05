@@ -70,31 +70,26 @@ class Contingency:
 
     Examples
     --------
-    >>> a = xr.DataArray(
-    ...     np.random.normal(size=(3, 3)),
-            coords=[('x', np.arange(3)), ('y', np.arange(3))]
-    ... ).to_dataset(name='test1')
-    >>> b = xr.DataArray(
-    ...    np.random.normal(size=(3, 3)),
-    ...    coords=[('x', np.arange(3)), ('y', np.arange(3))]
-    ... ).to_dataset(name='test1')
-    >>> a['test2'] = xr.DataArray(np.random.normal(size=(3,3)),
-    ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
-    >>> b['test2'] = xr.DataArray(np.random.normal(size=(3,3)),
-    ...                           coords=[('x', np.arange(3)), ('y', np.arange(3))])
-    >>> category_edges_a = np.linspace(-2,2,5)
-    >>> category_edges_b = np.linspace(-3,3,5)
-    >>> Contingency(a, b, category_edges_a, category_edges_b, dim=['x','y'])
+    >>> da = xr.DataArray(np.random.normal(size=(3, 3)),
+    ...                   coords=[("x", np.arange(3)), ("y", np.arange(3))])
+    >>> o = xr.Dataset({"var1": da, "var2": da})
+    >>> f = o * 1.1
+    >>> o_category_edges = np.linspace(-2, 2, 5)
+    >>> f_category_edges = np.linspace(-3, 3, 5)
+    >>> xs.Contingency(o, f,
+    ...                o_category_edges, f_category_edges,
+    ...                dim=['x', 'y']) # doctest: +ELLIPSIS
     <xskillscore.Contingency>
     Dimensions:                       (forecasts_category: 4, observations_category: 4)
     Coordinates:
-        observations_category_bounds  (observations_category) <U12 '(-2.0, -1.0]'...
-        forecasts_category_bounds     (forecasts_category) <U12 '(-3.0, -1.5]' .....
+        observations_category_bounds  (observations_category) <U12 '[-2.0, -1.0)'...
+        forecasts_category_bounds     (forecasts_category) <U12 '[-3.0, -1.5)' .....
       * observations_category         (observations_category) int64 1 2 3 4
       * forecasts_category            (forecasts_category) int64 1 2 3 4
     Data variables:
-        test2                         (observations_category, forecasts_category) int64
-        test1                         (observations_category, forecasts_category) int64
+        ...                           (observations_category, forecasts_category) int64 ...
+        ...                           (observations_category, forecasts_category) int64 ...
+
 
     References
     ----------

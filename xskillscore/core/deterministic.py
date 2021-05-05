@@ -348,14 +348,16 @@ def effective_sample_size(a, b, dim="time", skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import effective_sample_size
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
+    ...                  dims=['time', 'x', 'y'])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> effective_sample_size(a, b, dim='time')
+    ...                  dims=['time', 'x', 'y'])
+    >>> xs.effective_sample_size(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[4., 0., 4.],
+           [3., 4., 4.],
+           [3., 4., 2.]])
+    Dimensions without coordinates: x, y
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
@@ -953,13 +955,8 @@ def mae(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import mae
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
     >>> mae(a, b, dim='time')
     """
     dim, axis = _preprocess_dims(dim, a)
