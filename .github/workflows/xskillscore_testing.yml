@@ -73,8 +73,7 @@ jobs:
           activate-environment: xskillscore-minimum-tests
           auto-update-conda: false
           python-version: "3.8"
-
-      - name: Install conda dependencies
+      - name: Set up conda environment
         run: |
           mamba env update -f ci/minimum-tests.yml
       - name: Install xskillscore
