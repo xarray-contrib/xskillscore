@@ -1,12 +1,24 @@
 import numpy as np
 import pytest
 import xarray as xr
+import xskillscore as xs
 
 from xskillscore import Contingency
 
 PERIODS = 12  # effective_p_value produces nans for shorter periods
 
 np.random.seed(42)
+
+
+@pytest.fixture(autouse=True)
+def add_standard_imports(doctest_namespace):
+    """imports for doctest"""
+    doctest_namespace["np"] = np
+    doctest_namespace["xr"] = xr
+    doctest_namespace["xs"] = xs
+
+    # always seed numpy.random to make the examples deterministic
+    np.random.seed(42)
 
 
 @pytest.fixture

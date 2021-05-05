@@ -150,6 +150,10 @@ Preparing Pull Requests
 
     $ pytest xskillscore
 
+   You can also test the code in the docstrings by doing::
+
+    $ pytest --doctest-modules xskillscore --ignore xskillscore/tests
+
   Please stick to `xarray <http://xarray.pydata.org/en/stable/contributing.html>`_'s testing recommendations.
 
 #. Running the performance test suite
