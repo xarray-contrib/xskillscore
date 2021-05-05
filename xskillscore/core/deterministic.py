@@ -597,8 +597,6 @@ def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
     * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
 
-
-
     Examples
     --------
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])

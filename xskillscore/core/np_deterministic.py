@@ -8,6 +8,7 @@ from .utils import suppress_warnings
 __all__ = [
     "_pearson_r",
     "_pearson_r_p_value",
+    "_pearson_r_eff_p_value",
     "_me",
     "_rmse",
     "_mse",
@@ -17,6 +18,7 @@ __all__ = [
     "_mape",
     "_spearman_r",
     "_spearman_r_p_value",
+    "_spearman_r_eff_p_value",
     "_effective_sample_size",
     "_r2",
 ]
@@ -151,58 +153,6 @@ def _effective_sample_size(a, b, axis, skipna):
     return n_eff
 
 
-def _pearson_r(a, b, weights, axis, skipna):
-    """ndarray implementation of scipy.stats.pearsonr.
-
-    Parameters
-    ----------
-    a : ndarray
-        Input array.
-    b : ndarray
-        Input array.
-    axis : int
-        The axis to apply the correlation along.
-    weights : ndarray
-        Input array of weights for a and b.
-    skipna : bool
-        If True, skip NaNs when computing function.
-
-    Returns
-    -------
-    res : ndarray
-        Pearson's correlation coefficient.
-
-    See Also
-    --------
-    scipy.stats.pearsonr
-    """
-    sumfunc, meanfunc = _get_numpy_funcs(skipna)
-    if skipna:
-        a, b, weights = _match_nans(a, b, weights)
-    weights = _check_weights(weights)
-    a = np.rollaxis(a, axis)
-    b = np.rollaxis(b, axis)
-    if weights is not None:
-        weights = np.rollaxis(weights, axis)
-
-    am, bm = __compute_anomalies(a, b, weights=weights, axis=0, skipna=skipna)
-
-    if weights is not None:
-        r_num = sumfunc(weights * am * bm, axis=0)
-        r_den = np.sqrt(
-            sumfunc(weights * am * am, axis=0) * sumfunc(weights * bm * bm, axis=0)
-        )
-    else:
-        r_num = sumfunc(am * bm, axis=0)
-        r_den = np.sqrt(sumfunc(am * am, axis=0) * sumfunc(bm * bm, axis=0))
-
-    with suppress_warnings("invalid value encountered in true_divide"):
-        with suppress_warnings("invalid value encountered in double_scalars"):
-            r = r_num / r_den
-    res = np.clip(r, -1.0, 1.0)
-    return res
-
-
 def _r2(a, b, weights, axis, skipna):
     """ndarray implementation of sklearn.metrics.r2_score.
 
@@ -257,6 +207,58 @@ def _r2(a, b, weights, axis, skipna):
                 with suppress_warnings("invalid value encountered in double_scalars"):
                     r2 = 1 - (num / den)
     return r2
+
+
+def _pearson_r(a, b, weights, axis, skipna):
+    """ndarray implementation of scipy.stats.pearsonr.
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int
+        The axis to apply the correlation along.
+    weights : ndarray
+        Input array of weights for a and b.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    res : ndarray
+        Pearson's correlation coefficient.
+
+    See Also
+    --------
+    scipy.stats.pearsonr
+    """
+    sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
+    weights = _check_weights(weights)
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    if weights is not None:
+        weights = np.rollaxis(weights, axis)
+
+    am, bm = __compute_anomalies(a, b, weights=weights, axis=0, skipna=skipna)
+
+    if weights is not None:
+        r_num = sumfunc(weights * am * bm, axis=0)
+        r_den = np.sqrt(
+            sumfunc(weights * am * am, axis=0) * sumfunc(weights * bm * bm, axis=0)
+        )
+    else:
+        r_num = sumfunc(am * bm, axis=0)
+        r_den = np.sqrt(sumfunc(am * am, axis=0) * sumfunc(bm * bm, axis=0))
+
+    with suppress_warnings("invalid value encountered in true_divide"):
+        with suppress_warnings("invalid value encountered in double_scalars"):
+            r = r_num / r_den
+    res = np.clip(r, -1.0, 1.0)
+    return res
 
 
 def _pearson_r_p_value(a, b, weights, axis, skipna):
