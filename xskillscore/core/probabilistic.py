@@ -150,9 +150,11 @@ def crps_quadrature(
     ...                             coords=[('x', np.arange(3)),
     ...                                     ('y', np.arange(3))])
     >>> from scipy.stats import norm
-    >>> xs.crps_quadrature(observations, norm)
-    <xarray.DataArray ()>
-    array(0.48154676)
+    >>> xs.crps_quadrature(observations, norm, dim="x")
+    <xarray.DataArray (y: 3)>
+    array([0.80280921, 0.31818197, 0.32364912])
+    Coordinates:
+      * y        (y) int64 0 1 2
 
     See Also
     --------
@@ -312,9 +314,13 @@ def brier_score(
     ...                          coords=[('x', np.arange(3)),
     ...                                  ('y', np.arange(3)),
     ...                                  ('member', np.arange(3))])
-    >>> xs.brier_score(observations > .5, (forecasts > .5).mean('member'))
-    <xarray.DataArray ()>
-    array(0.34567901)
+    >>> xs.brier_score(observations > .5,
+    ...                (forecasts > .5).mean('member'),
+    ...                dim="y")
+    <xarray.DataArray (x: 3)>
+    array([0.37037037, 0.14814815, 0.51851852])
+    Coordinates:
+      * x        (x) int64 0 1 2
 
     See Also
     --------
