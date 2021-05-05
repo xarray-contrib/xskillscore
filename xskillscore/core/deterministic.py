@@ -505,10 +505,8 @@ def spearman_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fa
 
     Examples
     --------
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-    ...                  dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-    ...                  dims=['time', 'x', 'y'])
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
     >>> xs.spearman_r_p_value(a, b, dim='time')
     <xarray.DataArray (x: 3, y: 3)>
     array([[0.28475698, 0.39100222, 0.1881204 ],
