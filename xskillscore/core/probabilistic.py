@@ -597,10 +597,6 @@ def rps(
     --------
     In the examples below `o` is used for observations and `f` for forecasts.
 
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> import xskillscore as xs
-    >>> np.random.seed(42)
     >>> o = xr.DataArray(np.random.random(size=(3, 3)),
     ...                  coords=[('x', np.arange(3)),
     ...                          ('y', np.arange(3))])
@@ -616,7 +612,6 @@ def rps(
       * y                           (y) int64 0 1 2
         observations_category_edge  <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
         forecasts_category_edge     <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
-
 
     You can also define multi-dimensional ``category_edges``, e.g. with xr.quantile.
     However, you still need to ensure that ``category_edges`` covers the forecasts
@@ -647,7 +642,7 @@ def rps(
     ...     (o >= category_edges.isel(category=1)
     ...         ).assign_coords(category=categories[2])
     ... ], 'category')
-    >>> assert (observations_p.sum('category')==1).all()
+    >>> assert (o_p.sum('category')==1).all()
     >>> f_p = xr.concat([
     ...     (f < category_edges.isel(category=0)
     ...         ).assign_coords(category=categories[0]),
