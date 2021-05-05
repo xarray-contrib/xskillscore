@@ -66,12 +66,8 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> a = xr.DataArray(np.random.rand(1000, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> from xskillscore.resampling import resample_iterations
-    >>> resample_iterations(a, 500, 'time')
+    >>> a = xr.DataArray(np.random.rand(1000, 3, 3), dims=['time', 'x', 'y'])
+    >>> xs.resample_iterations(a, 500, 'time')  # doctest: +ELLIPSIS
     <xarray.DataArray (time: 1000, x: 3, y: 3, iteration: 500)>
 
     See also
@@ -149,12 +145,8 @@ def resample_iterations_idx(
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> a = xr.DataArray(np.random.rand(1000, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> from xskillscore.resampling import resample_iterations_idx
-    >>> resample_iterations_idx(a, 500, 'time')
+    >>> a = xr.DataArray(np.random.rand(1000, 3, 3), dims=['time', 'x', 'y'])
+    >>> xs.resample_iterations_idx(a, 500, 'time') # doctest: +ELLIPSIS
     <xarray.DataArray (time: 1000, x: 3, y: 3, iteration: 500)>
 
     See also

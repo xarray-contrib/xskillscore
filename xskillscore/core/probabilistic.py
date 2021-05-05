@@ -146,15 +146,13 @@ def crps_quadrature(
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    >>> observations = xr.DataArray(np.random.normal(size=(3, 3)),
     ...                             coords=[('x', np.arange(3)),
     ...                                     ('y', np.arange(3))])
     >>> from scipy.stats import norm
-    >>> crps_quadrature(observations, norm)
-    <xarray.DataArray (y: 3)>
-    array([0.80280921, 0.31818197, 0.32364912])
-    Coordinates:
-      * y        (y) int64 0 1 2
+    >>> xs.crps_quadrature(observations, norm)
+    <xarray.DataArray ()>
+    array(0.48154676)
 
     See Also
     --------
@@ -307,18 +305,16 @@ def brier_score(
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    >>> observations = xr.DataArray(np.random.normal(size=(3, 3)),
     ...                             coords=[('x', np.arange(3)),
     ...                                     ('y', np.arange(3))])
-    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+    >>> forecasts = xr.DataArray(np.random.normal(size=(3, 3, 3)),
     ...                          coords=[('x', np.arange(3)),
     ...                                  ('y', np.arange(3)),
     ...                                  ('member', np.arange(3))])
-    >>> brier_score(observations > .5, (forecasts > .5).mean('member'))
-    <xarray.DataArray (y: 3)>
-    array([0.51851852, 0.14814815, 0.37037037])
-    Coordinates:
-      * y        (y) int64 0 1 2
+    >>> xs.brier_score(observations > .5, (forecasts > .5).mean('member'))
+    <xarray.DataArray ()>
+    array(0.34567901)
 
     See Also
     --------
@@ -416,13 +412,10 @@ def threshold_brier_score(
     ...                                  ('y', np.arange(3)),
     ...                                  ('member', np.arange(3))])
     >>> threshold = [.2, .5, .8]
-    >>> threshold_brier_score(observations, forecasts, threshold)
-    <xarray.DataArray (y: 3, threshold: 3)>
-    array([[0.44444444, 0.51851852, 0.48148148],
-           [0.18518519, 0.14814815, 0.03703704],
-           [0.18518519, 0.37037037, 0.03703704]])
+    >>> xs.threshold_brier_score(observations, forecasts, threshold)
+    <xarray.DataArray (threshold: 3)>
+    array([0.27160494, 0.34567901, 0.18518519])
     Coordinates:
-      * y          (y) int64 0 1 2
       * threshold  (threshold) float64 0.2 0.5 0.8
 
     See Also
@@ -751,18 +744,18 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member"):
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    >>> observations = xr.DataArray(np.random.normal(size=(3, 3)),
     ...                             coords=[('x', np.arange(3)),
     ...                                     ('y', np.arange(3))])
-    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+    >>> forecasts = xr.DataArray(np.random.normal(size=(3, 3, 3)),
     ...                          coords=[('x', np.arange(3)),
     ...                                  ('y', np.arange(3)),
     ...                                  ('member', np.arange(3))])
-    >>> rank_histogram(observations, forecasts, dim='x')
+    >>> xs.rank_histogram(observations, forecasts, dim='x')
     <xarray.DataArray 'histogram_rank' (y: 3, rank: 4)>
-    array([[0, 1, 1, 1],
-           [0, 1, 0, 2],
-           [1, 0, 1, 1]])
+    array([[0, 0, 1, 2],
+           [0, 1, 2, 0],
+           [0, 0, 2, 1]])
     Coordinates:
       * y        (y) int64 0 1 2
       * rank     (rank) float64 1.0 2.0 3.0 4.0
@@ -836,26 +829,22 @@ def discrimination(
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(30,30)),
+    >>> observations = xr.DataArray(np.random.normal(size=(30, 30)),
     ...                             coords=[('x', np.arange(30)),
     ...                                     ('y', np.arange(30))])
-    >>> forecasts = xr.DataArray(np.random.normal(size=(30,30,10)),
+    >>> forecasts = xr.DataArray(np.random.normal(size=(30, 30, 10)),
     ...                          coords=[('x', np.arange(30)),
     ...                                  ('y', np.arange(30)),
     ...                                  ('member', np.arange(10))])
     >>> forecast_event_likelihood = (forecasts > 0).mean('member')
     >>> observed_event = observations > 0
-    >>> disc = discrimination(observed_event,
-    ...                       forecast_event_likelihood,
-    ...                       dim=['x','y'])
+    >>> xs.discrimination(observed_event, forecast_event_likelihood, dim=['x','y'])
     <xarray.DataArray (event: 2, forecast_probability: 5)>
-    array([[0., 1., 0., 0., 0.],
-           [0., 1., 0., 0., 0.]])
+    array([[0.00437637, 0.15536105, 0.66739606, 0.12472648, 0.04814004],
+           [0.00451467, 0.16704289, 0.66365688, 0.1241535 , 0.04063205]])
     Coordinates:
       * forecast_probability  (forecast_probability) float64 0.1 0.3 0.5 0.7 0.9
       * event                 (event) bool True False
-
-
 
     References
     ----------
@@ -902,56 +891,56 @@ def reliability(
         the relative frequencies of occurrence of an event
         for a range of forecast probability bins
 
-        Parameters
-        ----------
-        observations : xarray.Dataset or xarray.DataArray
-            The observations or set of observations of the event.
-            Data should be boolean or logical \
-            (True or 1 for event occurance, False or 0 for non-occurance).
-        forecasts : xarray.Dataset or xarray.DataArray
-            The forecast likelihoods of the event. Data should be between 0 and 1.
-        dim : str or list of str, optional
-            Dimension(s) over which to compute the histograms
-            Defaults to None meaning compute over all dimensions.
-        probability_bin_edges : array_like, optional
-            Probability bin edges used to compute the reliability. Similar to np.histogram,
-            all but the last (righthand-most) bin include the left edge and exclude the \
-            right edge. The last bin includes both edges. Defaults to 6 equally spaced \
-            edges between 0 and 1
-        keep_attrs : bool, optional
-            If True, the attributes (attrs) will be copied from the first input to
-            the new one.
-            If False (default), the new object will be returned without attributes.
+    Parameters
+    ----------
+    observations : xarray.Dataset or xarray.DataArray
+        The observations or set of observations of the event.
+        Data should be boolean or logical \
+        (True or 1 for event occurance, False or 0 for non-occurance).
+    forecasts : xarray.Dataset or xarray.DataArray
+        The forecast likelihoods of the event. Data should be between 0 and 1.
+    dim : str or list of str, optional
+        Dimension(s) over which to compute the histograms
+        Defaults to None meaning compute over all dimensions.
+    probability_bin_edges : array_like, optional
+        Probability bin edges used to compute the reliability. Similar to np.histogram,
+        all but the last (righthand-most) bin include the left edge and exclude the \
+        right edge. The last bin includes both edges. Defaults to 6 equally spaced \
+        edges between 0 and 1
+    keep_attrs : bool, optional
+        If True, the attributes (attrs) will be copied from the first input to
+        the new one.
+        If False (default), the new object will be returned without attributes.
 
-        Returns
-        -------
-        xarray.Dataset or xarray.DataArray
-            The relative frequency of occurrence for each probability bin
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray
+        The relative frequency of occurrence for each probability bin
 
-        Examples
-        --------
-        >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
-        ...                          coords=[('x', np.arange(3)),
-        ...                                  ('y', np.arange(3)),
-        ...                                  ('member', np.arange(3))])
-        >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
-        ...                            coords=[('x', np.arange(3)),
-        ...                                    ('y', np.arange(3))])
-        >>> rel = reliability(observations > 0.1,
-        ...                   (forecasts > 0.1).mean('member'),
-        ...                   dim='x')
-        <xarray.DataArray (y: 3, forecast_probability: 5)>
-        array([[       nan, 1.        ,        nan,        nan,        nan],
-               [0.        , 0.5       ,        nan,        nan,        nan],
-               [       nan, 0.33333333,        nan,        nan,        nan]])
-        Coordinates:
-          * y                     (y) int64 0 1 2
-          * forecast_probability  (forecast_probability) float64 0.1 0.3 0.5 0.7 0.9
-            samples               (y, forecast_probability) float64 0.0 3.0 ... 0.0 0.0
+    Examples
+    --------
+    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
+    ...                          coords=[('x', np.arange(3)),
+    ...                                  ('y', np.arange(3)),
+    ...                                  ('member', np.arange(3))])
+    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
+    ...                             coords=[('x', np.arange(3)),
+    ...                                     ('y', np.arange(3))])
+    >>> xs.reliability(observations > 0.1,
+    ...                (forecasts > 0.1).mean('member'),
+    ...                dim='x')
+    <xarray.DataArray (y: 3, forecast_probability: 5)>
+    array([[nan, 0. , nan, 1. , nan],
+           [1. , 0.5, nan, nan, nan],
+           [nan, 0. , nan, 0. , nan]])
+    Coordinates:
+      * y                     (y) int64 0 1 2
+      * forecast_probability  (forecast_probability) float64 0.1 0.3 0.5 0.7 0.9
+        samples               (y, forecast_probability) float64 0.0 2.0 ... 1.0 0.0
 
-        Notes
-        -----
-        See http://www.cawcr.gov.au/projects/verification/
+    Notes
+    -----
+    See http://www.cawcr.gov.au/projects/verification/
     """
 
     def _reliability(o, f, bin_edges):
@@ -1128,21 +1117,15 @@ def roc(
         ``true positive rate`` and ``false positive rate`` contain
         ``probability_bin`` dimension with ascending ``bin_edges`` as coordinates.
 
-
     Examples
     --------
-    >>> f = xr.DataArray(
-    ...     np.random.normal(size=(1000)),
-            coords=[('time', np.arange(1000))]
-    ... )
-    >>> o = xr.DataArray(
-    ...    np.random.normal(size=(1000)),
-    ...    coords=[('time', np.arange(1000))]
-    ... )
+    >>> f = xr.DataArray(np.random.normal(size=(1000)),
+    ...                  coords=[('time', np.arange(1000))])
+    >>> o = f.copy()
     >>> category_edges = np.linspace(-2, 2, 5)
-    >>> roc(o, f, category_edges, dim=['time'])
+    >>> xs.roc(o, f, category_edges, dim=['time'])
     <xarray.DataArray 'histogram_observations_forecasts' ()>
-    array(0.46812223)
+    array(1.)
 
     See also
     --------
