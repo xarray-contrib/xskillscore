@@ -67,7 +67,7 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
     Examples
     --------
     >>> a = xr.DataArray(np.random.rand(1000, 3, 3), dims=['time', 'x', 'y'])
-    >>> xs.resample_iterations(a, 500, 'time')  # doctest: +ELLIPSIS
+    >>> xs.resample_iterations(a, 500, 'time')  # doctest: +SKIP
     <xarray.DataArray (time: 1000, x: 3, y: 3, iteration: 500)>
 
     See also

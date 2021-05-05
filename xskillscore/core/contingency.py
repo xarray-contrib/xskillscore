@@ -78,7 +78,7 @@ class Contingency:
     >>> f_category_edges = np.linspace(-3, 3, 5)
     >>> xs.Contingency(o, f,
     ...                o_category_edges, f_category_edges,
-    ...                dim=['x', 'y']) # doctest: +ELLIPSIS
+    ...                dim=['x', 'y']) # doctest: +SKIP
     <xskillscore.Contingency>
     Dimensions:                       (forecasts_category: 4, observations_category: 4)
     Coordinates:
@@ -87,8 +87,8 @@ class Contingency:
       * observations_category         (observations_category) int64 1 2 3 4
       * forecasts_category            (forecasts_category) int64 1 2 3 4
     Data variables:
-        ...                           (observations_category, forecasts_category) int64
-        ...                           (observations_category, forecasts_category) int64
+        var1                           (observations_category, forecasts_category) int64
+        var2                           (observations_category, forecasts_category) int64
 
 
     References
