@@ -77,18 +77,16 @@ def sign_test(
 
     Examples
     --------
-    >>> np.random.seed(42)
     >>> f1 = xr.DataArray(np.random.normal(size=(30)),
-    ...      coords=[('time', np.arange(30))])
-    >>> f2 = xr.DataArray(np.random.normal(size=(30)),
-    ...      coords=[('time', np.arange(30))]) + 2.
+    ...                   coords=[('time', np.arange(30))])
+    >>> f2 = f1 + 2
     >>> o = xr.DataArray(np.random.normal(size=(30)),
-    ...      coords=[('time', np.arange(30))])
-    >>> significantly_different, walk, confidence = sign_test(f1, f2, o,
+    ...                  coords=[('time', np.arange(30))])
+    >>> significantly_different, walk, confidence = xr.sign_test(f1, f2, o,
             time_dim='time', metric='mae', orientation='negative')
     >>> walk.plot()
     >>> confidence.plot(color='gray')
-    >>> (-1*confidence).plot(color='gray')
+    >>> (-1 * confidence).plot(color='gray')
     >>> walk
     <xarray.DataArray (time: 30)>
     array([ 1,  2,  3,  2,  3,  2,  3,  4,  3,  4,  5,  4,  5,  4,  5,  4,  5,
@@ -243,15 +241,15 @@ def mae_test(
 
     Examples
     --------
-    >>> np.random.seed(42)
     >>> f1 = xr.DataArray(np.random.normal(size=(30)),
-    ...      coords=[('time', np.arange(30))])
+    ...                   coords=[('time', np.arange(30))])
     >>> f2 = xr.DataArray(np.random.normal(size=(30)),
-    ...      coords=[('time', np.arange(30))])
+    ...                   coords=[('time', np.arange(30))])
     >>> o = xr.DataArray(np.random.normal(size=(30)),
-    ...      coords=[('time', np.arange(30))])
-    >>> significantly_different, diff, hwci = mae_test(f1, f2, o, time_dim='time',
-            dim=[], alpha=0.05)
+    ...                  coords=[('time', np.arange(30))])
+    >>> significantly_different, diff, hwci = xs.mae_test(
+    ...    f1, f2, o, time_dim='time', dim=[], alpha=0.05
+    ... )
     >>> significantly_different
     <xarray.DataArray ()>
     array(False)
@@ -274,7 +272,6 @@ def mae_test(
     References
     ----------
         * https://www.cawcr.gov.au/projects/verification/CIdiff/FAQ-CIdiff.html
-
     """
     if isinstance(dim, str):
         dim = [dim]

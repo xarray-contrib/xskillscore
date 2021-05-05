@@ -7,8 +7,6 @@ from xskillscore import Contingency
 
 PERIODS = 12  # effective_p_value produces nans for shorter periods
 
-np.random.seed(42)
-
 
 @pytest.fixture(autouse=True)
 def add_standard_imports(doctest_namespace):
