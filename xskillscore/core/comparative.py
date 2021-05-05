@@ -86,19 +86,22 @@ def sign_test(
     ... f1, f2, o, time_dim='time', metric='mae', orientation='negative'
     ... )
     >>> walk.plot() # doctest: +ELLIPSIS
+    [<matplotlib.lines.Line2D object at 0x...>]
     >>> confidence.plot(color='gray') # doctest: +ELLIPSIS
+    [<matplotlib.lines.Line2D object at 0x...>]
     >>> (-1 * confidence).plot(color='gray') # doctest: +ELLIPSIS
+    [<matplotlib.lines.Line2D object at 0x...>]
     >>> walk
     <xarray.DataArray (time: 30)>
-    array([ 1,  2,  3,  2,  3,  2,  3,  4,  3,  4,  5,  4,  5,  4,  5,  4,  5,
-            6,  7,  8,  9, 10,  9, 10, 11, 12, 11, 12, 13, 14])
+    array([ 1,  0,  1,  2,  1,  2,  3,  4,  5,  6,  5,  6,  7,  6,  7,  8,  9,
+           10,  9, 10, 11, 12, 13, 12, 11, 12, 13, 14, 15, 14])
     Coordinates:
       * time     (time) int64 0 1 2 3 4 5 6 7 8 9 ... 20 21 22 23 24 25 26 27 28 29
     >>> significantly_different
     <xarray.DataArray (time: 30)>
     array([False, False, False, False, False, False, False, False, False,
-           False, False, False, False, False, False, False, False, False,
-           False, False,  True,  True, False,  True,  True,  True,  True,
+           False, False, False, False, False, False,  True,  True,  True,
+            True,  True,  True,  True,  True,  True,  True,  True,  True,
             True,  True,  True])
     Coordinates:
       * time     (time) int64 0 1 2 3 4 5 6 7 8 9 ... 20 21 22 23 24 25 26 27 28 29
