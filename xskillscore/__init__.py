@@ -34,6 +34,7 @@ from .core.probabilistic import (
     rps,
     threshold_brier_score,
 )
+from .core.resampling import resample_iterations, resample_iterations_idx
 from .versioning.print_versions import show_versions
 
 try:

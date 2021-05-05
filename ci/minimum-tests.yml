@@ -6,6 +6,7 @@ dependencies:
   - bottleneck
   - cftime
   - dask
+  - matplotlib-base
   - numba>=0.52
   - numpy
   - properscoring
