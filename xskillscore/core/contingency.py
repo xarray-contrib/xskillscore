@@ -87,8 +87,8 @@ class Contingency:
       * observations_category         (observations_category) int64 1 2 3 4
       * forecasts_category            (forecasts_category) int64 1 2 3 4
     Data variables:
-        ...                           (observations_category, forecasts_category) int64 ...
-        ...                           (observations_category, forecasts_category) int64 ...
+        ...                           (observations_category, forecasts_category) int64
+        ...                           (observations_category, forecasts_category) int64
 
 
     References
