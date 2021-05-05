@@ -82,11 +82,12 @@ def sign_test(
     >>> f2 = f1 + 2
     >>> o = xr.DataArray(np.random.normal(size=(30)),
     ...                  coords=[('time', np.arange(30))])
-    >>> significantly_different, walk, confidence = xr.sign_test(f1, f2, o,
-            time_dim='time', metric='mae', orientation='negative')
-    >>> walk.plot()
-    >>> confidence.plot(color='gray')
-    >>> (-1 * confidence).plot(color='gray')
+    >>> significantly_different, walk, confidence = xs.sign_test(
+    ... f1, f2, o, time_dim='time', metric='mae', orientation='negative'
+    ... )
+    >>> walk.plot() # doctest: +ELLIPSIS
+    >>> confidence.plot(color='gray') # doctest: +ELLIPSIS
+    >>> (-1 * confidence).plot(color='gray') # doctest: +ELLIPSIS
     >>> walk
     <xarray.DataArray (time: 30)>
     array([ 1,  2,  3,  2,  3,  2,  3,  4,  3,  4,  5,  4,  5,  4,  5,  4,  5,
@@ -262,8 +263,9 @@ def mae_test(
     >>> # absolute magnitude of difference is smaller than half-width of
     >>> # confidence interval, therefore not significant at level alpha=0.05
     >>> # now comparing against an offset f2, the difference in MAE is significant
-    >>> significantly_different, diff, hwci = mae_test(f1, f2 + 2., o, time_dim='time',
-            dim=[], alpha=0.05)
+    >>> significantly_different, diff, hwci = xs.mae_test(
+    ... f1, f2 + 2., o, time_dim='time', dim=[], alpha=0.05
+    ... )
     >>> significantly_different
     <xarray.DataArray ()>
     array(True)
