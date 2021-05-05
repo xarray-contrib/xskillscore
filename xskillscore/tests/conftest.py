@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 import xarray as xr
-import xskillscore as xs
 
+import xskillscore as xs
 from xskillscore import Contingency
 
 PERIODS = 12  # effective_p_value produces nans for shorter periods
