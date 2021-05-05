@@ -17,7 +17,8 @@ Release Procedure
     $ git tag -a v0.0.xx -m "Version 0.0.xx"
     $ git push origin main --tags
 
-#. Build and publish release on PyPI::
+#. Build and publish release on PyPI using the GitHub action.
+   Otherwise you can manually do it with the following:
 
     $ git clean -xfd  # remove any files not checked into git
     $ python setup.py sdist bdist_wheel --universal  # build package

@@ -17,6 +17,8 @@ Internal Changes
   observations are probability distributions ``p`` or cumulative
   distributionss ``c``. See :py:func:`~xskillscore.rps` docstrings and doctests for
   examples. (:pr:`300`) `Aaron Spring`_
+- Add doctest on the docstring examples. (:pr:`302`) `Ray Bell`_
+
 
 xskillscore v0.0.19 (2021-03-12)
 --------------------------------

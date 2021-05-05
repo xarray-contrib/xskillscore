@@ -113,14 +113,16 @@ def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import pearson_r
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
+    ...                  dims=['time', 'x', 'y'])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> pearson_r(a, b, dim='time')
+    ...                  dims=['time', 'x', 'y'])
+    >>> xs.pearson_r(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[-0.17455755, -0.26648379, -0.74265833],
+           [ 0.32535918,  0.42496646,  0.1940647 ],
+           [-0.3203094 ,  0.33207755,  0.89250429]])
+    Dimensions without coordinates: x, y
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
@@ -132,96 +134,6 @@ def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     return xr.apply_ufunc(
         _pearson_r,
-        a,
-        b,
-        weights,
-        input_core_dims=input_core_dims,
-        kwargs={"axis": -1, "skipna": skipna},
-        dask="parallelized",
-        output_dtypes=[float],
-        keep_attrs=keep_attrs,
-    )
-
-
-def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
-    """R^2 (coefficient of determination) score.
-
-    We first take the total sum of squares of our known vector, a.
-
-    .. math::
-        SS_{\\mathrm{tot}} = \\sum_{i=1}^{n} (a_{i} - \\bar{a})^{2}
-
-    Next, we take the sum of squares of the error between our known vector
-    a and the predicted vector, b.
-
-    .. math::
-        SS_{\\mathrm{res}} = \\sum_{i=1}^{n} (a_{i} - b_{i})^{2}
-
-    Lastly we compute the coefficient of determiniation using these two
-    terms.
-
-    .. math::
-        R^{2} = 1 - \\frac{SS_{\\mathrm{res}}}{SS_{\\mathrm{tot}}}
-
-    .. note::
-        The coefficient of determination is *not* symmetric. In other words,
-        ``r2(a, b) != r2(b, a)``. Be careful and note that by our
-        convention, ``b`` is the modeled/predicted vector and ``a`` is the
-        observed vector.
-
-    Parameters
-    ----------
-    a : xarray.Dataset or xarray.DataArray
-        Labeled array(s) over which to apply the function.
-    b : xarray.Dataset or xarray.DataArray
-        Labeled array(s) over which to apply the function.
-    dim : str, list
-        The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result. Defaults to None reducing all dimensions.
-    weights : xarray.Dataset or xarray.DataArray or None
-        Weights matching dimensions of ``dim`` to apply during the function.
-    skipna : bool
-        If True, skip NaNs when computing function.
-    keep_attrs : bool
-        If True, the attributes (attrs) will be copied
-        from the first input to the new one.
-        If False (default), the new object will
-        be returned without attributes.
-
-    Returns
-    -------
-    xarray.DataArray or xarray.Dataset
-        R^2 (coefficient of determination) score.
-
-    See Also
-    --------
-    sklearn.metrics.r2_score
-
-    References
-    ----------
-    https://en.wikipedia.org/wiki/Coefficient_of_determination
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import r2
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> r2(a, b, dim='time')
-    """
-    _fail_if_dim_empty(dim)
-    dim, _ = _preprocess_dims(dim, a)
-    a, b = xr.broadcast(a, b, exclude=dim)
-    a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
-    weights = _preprocess_weights(a, dim, new_dim, weights)
-
-    input_core_dims = _determine_input_core_dims(new_dim, weights)
-
-    return xr.apply_ufunc(
-        _r2,
         a,
         b,
         weights,
@@ -266,14 +178,16 @@ def pearson_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fal
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import pearson_r_p_value
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
+    ...                  dims=['time', 'x', 'y'])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> pearson_r_p_value(a, b, dim='time')
+    ...                  dims=['time', 'x', 'y'])
+    >>> xs.pearson_r_p_value(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[0.77888033, 0.66476199, 0.15051516],
+           [0.59316935, 0.47567465, 0.75446898],
+           [0.59925464, 0.58509064, 0.04161894]])
+    Dimensions without coordinates: x, y
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
@@ -348,14 +262,16 @@ def effective_sample_size(a, b, dim="time", skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import effective_sample_size
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
+    ...                  dims=['time', 'x', 'y'])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> effective_sample_size(a, b, dim='time')
+    ...                  dims=['time', 'x', 'y'])
+    >>> xs.effective_sample_size(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[4., 0., 4.],
+           [3., 4., 4.],
+           [3., 4., 2.]])
+    Dimensions without coordinates: x, y
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
@@ -450,14 +366,16 @@ def pearson_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import pearson_r_eff_p_value
     >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
+    ...                  dims=['time', 'x', 'y'])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> pearson_r_eff_p_value(a, b, dim='time')
+    ...                  dims=['time', 'x', 'y'])
+    >>> xs.pearson_r_eff_p_value(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[0.82544245,        nan, 0.25734167],
+           [0.78902959, 0.57503354, 0.8059353 ],
+           [0.79242625, 0.66792245,        nan]])
+    Dimensions without coordinates: x, y
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
@@ -525,14 +443,14 @@ def spearman_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import spearman_r
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> spearman_r(a, b, dim='time')
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> xs.spearman_r(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[-0.6, -0.5, -0.7],
+           [ 0.4,  0.3,  0.3],
+           [-0.3, -0.1,  0.9]])
+    Dimensions without coordinates: x, y
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
@@ -587,14 +505,14 @@ def spearman_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fa
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import spearman_r_p_value
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> spearman_r_p_value(a, b, dim='time')
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> xs.spearman_r_p_value(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[0.28475698, 0.39100222, 0.1881204 ],
+           [0.50463158, 0.62383766, 0.62383766],
+           [0.62383766, 0.87288857, 0.03738607]])
+    Dimensions without coordinates: x, y
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
@@ -679,18 +597,16 @@ def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
     * Wilks, Daniel S. Statistical methods in the atmospheric sciences. Vol. 100.
       Academic press, 2011.
 
-
-
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import spearman_r_eff_p_value
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> spearman_r_eff_p_value(a, b, dim='time')
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> xs.spearman_r_eff_p_value(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[0.4       ,        nan, 0.3       ],
+           [0.73802024, 0.7       , 0.7       ],
+           [0.80602663, 0.9       ,        nan]])
+    Dimensions without coordinates: x, y
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
@@ -713,6 +629,96 @@ def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
         a,
         b,
         input_core_dims=[[new_dim], [new_dim]],
+        kwargs={"axis": -1, "skipna": skipna},
+        dask="parallelized",
+        output_dtypes=[float],
+        keep_attrs=keep_attrs,
+    )
+
+
+def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+    """R^2 (coefficient of determination) score.
+
+    We first take the total sum of squares of our known vector, a.
+
+    .. math::
+        SS_{\\mathrm{tot}} = \\sum_{i=1}^{n} (a_{i} - \\bar{a})^{2}
+
+    Next, we take the sum of squares of the error between our known vector
+    a and the predicted vector, b.
+
+    .. math::
+        SS_{\\mathrm{res}} = \\sum_{i=1}^{n} (a_{i} - b_{i})^{2}
+
+    Lastly we compute the coefficient of determiniation using these two
+    terms.
+
+    .. math::
+        R^{2} = 1 - \\frac{SS_{\\mathrm{res}}}{SS_{\\mathrm{tot}}}
+
+    .. note::
+        The coefficient of determination is *not* symmetric. In other words,
+        ``r2(a, b) != r2(b, a)``. Be careful and note that by our
+        convention, ``b`` is the modeled/predicted vector and ``a`` is the
+        observed vector.
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to apply the correlation along. Note that this dimension will
+        be reduced as a result. Defaults to None reducing all dimensions.
+    weights : xarray.Dataset or xarray.DataArray or None
+        Weights matching dimensions of ``dim`` to apply during the function.
+    skipna : bool
+        If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
+
+    Returns
+    -------
+    xarray.DataArray or xarray.Dataset
+        R^2 (coefficient of determination) score.
+
+    See Also
+    --------
+    sklearn.metrics.r2_score
+
+    References
+    ----------
+    https://en.wikipedia.org/wiki/Coefficient_of_determination
+
+    Examples
+    --------
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> r2(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[ -3.77828319,  -1.25687543,  -2.52495914],
+           [ -0.67280201, -39.45271514,  -5.78241791],
+           [ -1.66615797,  -1.56749317,   0.09843265]])
+    Dimensions without coordinates: x, y
+    """
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
+    a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
+    weights = _preprocess_weights(a, dim, new_dim, weights)
+
+    input_core_dims = _determine_input_core_dims(new_dim, weights)
+
+    return xr.apply_ufunc(
+        _r2,
+        a,
+        b,
+        weights,
+        input_core_dims=input_core_dims,
         kwargs={"axis": -1, "skipna": skipna},
         dask="parallelized",
         output_dtypes=[float],
@@ -752,14 +758,14 @@ def me(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import me
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
     >>> me(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[ 0.01748202, -0.14165293,  0.22455357],
+           [ 0.13893709, -0.23513353, -0.18174132],
+           [-0.29317762,  0.16887445, -0.17297527]])
+    Dimensions without coordinates: x, y
     """
     dim, axis = _preprocess_dims(dim, a)
     a, b = xr.broadcast(a, b, exclude=dim)
@@ -819,14 +825,14 @@ def rmse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import rmse
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> rmse(a, b, dim='time')
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> xs.rmse(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[0.30366872, 0.5147618 , 0.57410211],
+           [0.2963848 , 0.37177283, 0.40563885],
+           [0.55686111, 0.38189299, 0.21317579]])
+    Dimensions without coordinates: x, y
     """
     dim, axis = _preprocess_dims(dim, a)
     a, b = xr.broadcast(a, b, exclude=dim)
@@ -867,6 +873,7 @@ def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         If True, skip NaNs when computing function.
     keep_attrs : bool
         If True, the attributes (attrs) will be copied
+    --------
         from the first input to the new one.
         If False (default), the new object will
         be returned without attributes.
@@ -886,14 +893,14 @@ def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import mse
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> mse(a, b, dim='time')
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> xs.mse(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[0.09221469, 0.26497971, 0.32959323],
+           [0.08784395, 0.13821504, 0.16454288],
+           [0.31009429, 0.14584225, 0.04544392]])
+    Dimensions without coordinates: x, y
     """
     dim, axis = _preprocess_dims(dim, a)
     a, b = xr.broadcast(a, b, exclude=dim)
@@ -953,14 +960,14 @@ def mae(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import mae
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
     >>> mae(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[0.26014863, 0.40137207, 0.48871634],
+           [0.18809417, 0.30197826, 0.2984658 ],
+           [0.52934554, 0.19820357, 0.17335851]])
+    Dimensions without coordinates: x, y
     """
     dim, axis = _preprocess_dims(dim, a)
     a, b = xr.broadcast(a, b, exclude=dim)
@@ -1016,14 +1023,14 @@ def median_absolute_error(a, b, dim=None, skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import median_absolute_error
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> median_absolute_error(a, b, dim='time')
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> xs.median_absolute_error(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[0.28798217, 0.23322591, 0.62067468],
+           [0.12146232, 0.20314509, 0.23442927],
+           [0.59041981, 0.03289321, 0.21343494]])
+    Dimensions without coordinates: x, y
     """
     dim, axis = _preprocess_dims(dim, a)
     a, b = xr.broadcast(a, b, exclude=dim)
@@ -1089,14 +1096,14 @@ def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import mape
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> mape(a, b, dim='time')
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> xs.mape(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[0.6268041 , 9.45134297, 3.28717608],
+           [0.27099746, 1.58105176, 1.48258713],
+           [6.55806162, 0.22271096, 0.39302745]])
+    Dimensions without coordinates: x, y
     """
     dim, axis = _preprocess_dims(dim, a)
     a, b = xr.broadcast(a, b, exclude=dim)
@@ -1159,14 +1166,14 @@ def smape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from xskillscore import smape
-    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> smape(a, b, dim='time')
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=['time', 'x', 'y'])
+    >>> xs.smape(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[0.35591619, 0.43662087, 0.55372571],
+           [0.1864336 , 0.45831965, 0.38473469],
+           [0.58730494, 0.18081757, 0.14960832]])
+    Dimensions without coordinates: x, y
     """
     dim, axis = _preprocess_dims(dim, a)
     a, b = xr.broadcast(a, b, exclude=dim)

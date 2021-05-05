@@ -66,12 +66,8 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> a = xr.DataArray(np.random.rand(1000, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> from xskillscore.resampling import resample_iterations
-    >>> resample_iterations(a, 500, 'time')
+    >>> a = xr.DataArray(np.random.rand(1000, 3, 3), dims=['time', 'x', 'y'])
+    >>> xs.resample_iterations(a, 500, 'time')  # doctest: +SKIP
     <xarray.DataArray (time: 1000, x: 3, y: 3, iteration: 500)>
 
     See also
@@ -149,12 +145,11 @@ def resample_iterations_idx(
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import xarray as xr
     >>> a = xr.DataArray(np.random.rand(1000, 3, 3),
-                        dims=['time', 'x', 'y'])
-    >>> from xskillscore.resampling import resample_iterations_idx
-    >>> resample_iterations_idx(a, 500, 'time')
+    ...                  coords=[("time", np.arange(1000)),
+    ...                          ("x", np.arange(3)),
+    ...                          ("y", np.arange(3))])
+    >>> xs.resample_iterations_idx(a, 500, 'time') # doctest: +SKIP
     <xarray.DataArray (time: 1000, x: 3, y: 3, iteration: 500)>
 
     See also
@@ -176,7 +171,6 @@ def resample_iterations_idx(
       Stephenson, D. B., Meehl, G. A., … Delworth, T. (2013). A verification framework
       for interannual-to-decadal predictions experiments. Climate Dynamics, 40(1–2),
       245–272. https://doi.org/10/f4jjvf
-
     """
     # equivalent to above
     select_dim_items = forecast[dim].size
