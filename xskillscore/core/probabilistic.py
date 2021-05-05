@@ -504,6 +504,7 @@ def rps(
     weights=None,
     keep_attrs=False,
     member_dim="member",
+    input_distributions=None,
 ):
     """Calculate Ranked Probability Score.
 
@@ -527,6 +528,10 @@ def rps(
         The forecast of the event with dimension specified by ``member_dim``.
         Further requirements are specified based on ``category_edges``.
     category_edges : array_like, xr.Dataset, xr.DataArray, None
+        If forecasts and observations are probabilistic, use ``category_edges=None``
+        and set ``input_distributions``. If forecasts are deterministic and given in
+        absolute units, set ``category_edges`` and leave ``input_distributions=None``.
+
         Edges (left-edge inclusive) of the bins used to calculate the cumulative
         density function (cdf). Note that here the bins have to include the full range
         of observations and forecasts data. Effectively, negative infinity is appended
@@ -534,9 +539,9 @@ def rps(
         right side. Thus, N category edges produces N+1 bins. For example, specifying
         category_edges = [0,1] will compute the RPS for bins [-inf, 0), [0, 1) and
         [1, inf), which results in CDF bins [-inf, 0), [-inf, 1) and [-inf, inf).
-        Note that the edges are right-edge exclusive.
-        Forecasts, observations and category_edge are expected
-        in absolute units or probabilities consistently.
+        Note that the edges are right-edge exclusive. Forecasts, observations and
+        category_edge are expected in absolute units or probabilities consistently.
+        dtypes are handled accordingly:
 
         - np.array (1d): will be internally converted and broadcasted to observations.
           Use this if you wish to use the same category edges for all elements of both
@@ -554,16 +559,20 @@ def rps(
           for ``category_edges`` for forecasts. Use this if your category edges vary
           across dimensions of forecasts and observations, and are different for each.
 
-        - None: expect than observations and forecasts are already CDFs containing
-          ``category_edge`` dimension. Use this if your category edges vary across
-          dimensions of forecasts and observations, and are different for each.
+        - None: expect that observations and forecasts are already cumulative
+          distribution functions (``c``) or probability density functions (``p``), as
+          specified by the ``input_distributions`` arg. In this case, the inputs
+          observations and forecasts must contain a dimension named ``category`` with
+          the bin values of the density function.
 
     dim : str or list of str, optional
         Dimension over which to mean after computing ``rps``. This represents a mean
         over multiple forecasts-observations pairs. Defaults to None implying averaging
         over all dimensions.
     fair: boolean
-        Apply ensemble member-size adjustment for unbiased, fair metric; see Ferro (2013).
+        Apply ensemble member-size adjustment for unbiased, fair metric; see Ferro
+        (2013). If ``fair==True`` and ``category_edges==None``, require forecasts to
+        have number of members in coordinates as forecasts[member_dim].
     weights : xr.DataArray with dimensions from dim, optional
         Weights for `weighted.mean(dim)`. Defaults to None, such that no weighting is
         applied.
@@ -572,6 +581,10 @@ def rps(
         one. If False (default), the new object will be returned without attributes.
     member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
+    input_distributions: str or None
+        Indicates whether observations and forecasts are probability distributions by
+        ``p`` or cumulative distributions by ``c``.
+        Only valid if `category_edges` is None. Defaults: None.
 
     Returns
     -------
@@ -582,36 +595,80 @@ def rps(
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.random(size=(3, 3)),
-    ...                             coords=[('x', np.arange(3)),
-    ...                                     ('y', np.arange(3))])
-    >>> forecasts = xr.DataArray(np.random.random(size=(3, 3, 3)),
-    ...                          coords=[('x', np.arange(3)),
-    ...                                  ('y', np.arange(3)),
-    ...                                  ('member', np.arange(3))])
+    In the examples below `o` is used for observations and `f` for forecasts.
+
+    >>> o = xr.DataArray(np.random.random(size=(3, 3)),
+    ...                  coords=[('x', np.arange(3)),
+    ...                          ('y', np.arange(3))])
+    >>> f = xr.DataArray(np.random.random(size=(3, 3, 3)),
+    ...                  coords=[('x', np.arange(3)),
+    ...                          ('y', np.arange(3)),
+    ...                          ('member', np.arange(3))])
     >>> category_edges = np.array([.33, .66])
-    >>> xs.rps(observations, forecasts, category_edges, dim='x')
+    >>> xs.rps(o, f, category_edges, dim='x')
     <xarray.DataArray (y: 3)>
-    array([0.14814815, 0.7037037 , 1.51851852])
+    array([0.37037037, 0.81481481, 1.        ])
     Coordinates:
       * y                           (y) int64 0 1 2
-        forecasts_category_edge     <U38 '[-np.inf, 0.33), [0.33, 0.66), [0.66, np.inf]'
-        observations_category_edge  <U38 '[-np.inf, 0.33), [0.33, 0.66), [0.66, np.inf]'
-
+        observations_category_edge  <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
+        forecasts_category_edge     <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
 
     You can also define multi-dimensional ``category_edges``, e.g. with xr.quantile.
     However, you still need to ensure that ``category_edges`` covers the forecasts
     and observations distributions.
 
-    >>> category_edges = observations.quantile(
-    ...     q=[.33, .66]).rename({'quantile': 'category_edge'}),
-    >>> xs.rps(observations, forecasts, category_edges, dim='x')
+    >>> category_edges = o.quantile(q=[.33, .66]).rename({'quantile': 'category_edge'})
+    >>> xs.rps(o, f, category_edges, dim='x')
     <xarray.DataArray (y: 3)>
-    array([1.18518519, 0.85185185, 0.40740741])
+    array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
       * y                           (y) int64 0 1 2
-        forecasts_category_edge     <U38 '[-np.inf, 0.33), [0.33, 0.66), [0.66, np.inf]'
-        observations_category_edge  <U38 '[-np.inf, 0.33), [0.33, 0.66), [0.66, np.inf]'
+        observations_category_edge  <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
+        forecasts_category_edge     <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
+
+    If you have probabilistic forecasts, i.e. without a ``member`` dimension but
+    different ``category`` probabilities, you can also provide probability
+    distribution inputs by specifying ``category_edges=None`` and
+    ``input_distributions``:
+
+    >>> category_edges = category_edges.rename({'category_edge': 'category'})
+    >>> categories = ["below normal", "normal", "above_normal"]
+    >>> o_p = xr.concat([
+    ...     (o < category_edges.isel(category=0)
+    ...         ).assign_coords(category=categories[0]),
+    ...     ((o >= category_edges.isel(category=0)) & (
+    ...         o < category_edges.isel(category=1))
+    ...         ).assign_coords(category=categories[1]),
+    ...     (o >= category_edges.isel(category=1)
+    ...         ).assign_coords(category=categories[2])
+    ... ], 'category')
+    >>> assert (o_p.sum('category')==1).all()
+    >>> f_p = xr.concat([
+    ...     (f < category_edges.isel(category=0)
+    ...         ).assign_coords(category=categories[0]),
+    ...     ((f >= category_edges.isel(category=0)
+    ...         ) & (f < category_edges.isel(category=1))
+    ...         ).assign_coords(category=categories[1]),
+    ...     (f >= category_edges.isel(category=1)
+    ...         ).assign_coords(category=categories[2])
+    ... ], 'category').mean('member')
+    >>> assert (f_p.sum('category')==1).all()
+    >>> xs.rps(o_p, f_p, category_edges=None, dim='x', input_distributions='p')
+    <xarray.DataArray (y: 3)>
+    array([0.37037037, 0.81481481, 0.88888889])
+    Coordinates:
+      * y        (y) int64 0 1 2
+
+    Providing cumulative distribution inputs yields identical results, where highest
+    category equals 1 by default and can be ignored:
+
+    >>> o_c = o < category_edges
+    >>> f_c = (f < category_edges).mean('member')
+    >>> xs.rps(o_c, f_c, category_edges=None, dim='x', input_distributions='c')
+    <xarray.DataArray (y: 3)>
+    array([0.37037037, 0.81481481, 0.88888889])
+    Coordinates:
+      * y        (y) int64 0 1 2
 
     References
     ----------
@@ -621,16 +678,24 @@ def rps(
     * C. A. T. Ferro. Fair scores for ensemble forecasts. Q.R.J. Meteorol. Soc., 140:
       1917–1923, 2013. doi: 10.1002/qj.2270.
     * https://www-miklip.dkrz.de/about/problems/
-
     """
     bin_dim = "category_edge"
-    if member_dim not in forecasts.dims and category_edges is not None:
-        raise ValueError(
-            f"Expect to find {member_dim} in forecasts dimensions, found"
-            f"{forecasts.dims}."
-        )
-    if fair:
-        M = forecasts[member_dim].size
+    if category_edges is not None:
+        if member_dim not in forecasts.dims:
+            raise ValueError(
+                f"Expect to find {member_dim} in forecasts dimensions, found"
+                f"{forecasts.dims}."
+            )
+        if fair:
+            M = forecasts[member_dim].size
+    elif category_edges is None and fair:
+        if member_dim in forecasts.coords and member_dim not in forecasts.dims:
+            M = forecasts[member_dim].astype("int")
+        else:
+            raise ValueError(
+                "category_edges=None and fair=True only works "
+                "if forecast[member_dim] is a number in forecasts.coords."
+            )
 
     forecasts = _bool_to_int(forecasts)
 
@@ -679,19 +744,39 @@ def rps(
         Fc = (forecasts < forecasts_edges).mean(member_dim)
         Oc = (observations < observations_edges).astype("int")
 
-    elif category_edges is None:  # expect CDFs already as inputs
-        if bin_dim not in forecasts.dims:
+    elif category_edges is None:  # expect inputs as cdfs or pdfs
+        if input_distributions not in ["c", "p"]:
             raise ValueError(
-                "Expected dimension {bin_dim} in forecasts, found {forecasts.dims}"
+                "If forecasts and observations are probabilistic, you use correctly"
+                " ``category_edges==None``, but ``input_distributions`` must be"
+                " either ``c`` for cumulative or ``p`` for probability"
+                f" found ``input_distributions={input_distributions}``"
             )
-        if bin_dim not in observations.dims:
+        category_dim = "category"
+        if category_dim not in forecasts.dims:
             raise ValueError(
-                "Expected dimension {bin_dim} in observations, found {observations.dims}"
+                f"Expected dimension {category_dim} in cumulative forecasts, "
+                f"found {forecasts.dims}"
             )
+        if category_dim not in observations.dims:
+            raise ValueError(
+                f"Expected dimension {category_dim} in cumulative observations, "
+                f"found {observations.dims}"
+            )
+
         if member_dim in forecasts.dims:
             forecasts = forecasts.mean(member_dim)
-        Fc = forecasts
-        Oc = observations
+
+        forecasts = forecasts.rename({category_dim: bin_dim})
+        observations = observations.rename({category_dim: bin_dim})
+
+        if input_distributions == "p":  # convert to cdf
+            Fc = forecasts.cumsum(bin_dim)
+            Oc = observations.cumsum(bin_dim)
+        else:
+            Fc = forecasts
+            Oc = observations
+
     else:
         raise ValueError(
             "category_edges must be xr.DataArray, xr.Dataset, tuple of xr.objects, "
@@ -713,7 +798,7 @@ def rps(
         res = res.weighted(weights)
     # combine many forecasts-observations pairs
     res = res.mean(dim)
-    # keep nans and prevent 0 for all nan grids
+    # keep nans and prevent 0 for all nan grids, could prevent this with skipna=False
     try:
         res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
     except Exception as e:

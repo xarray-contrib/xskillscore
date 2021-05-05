@@ -470,14 +470,15 @@ def test_rps_reduce_dim(o, f_prob, category_edges, dim, fair_bool):
 def test_rps_category_edges_None_fails(o, f_prob):
     """Test that rps expects inputs to have category_edges dim if category_edges is None."""
     with pytest.raises(ValueError, match="Expected dimension"):
-        rps(o, f_prob, category_edges=None, dim=[])
+        rps(o, f_prob, category_edges=None, dim=[], input_distributions="c")
 
 
-def test_rps_category_edges_None_works(o, f_prob):
+@pytest.mark.parametrize("input_distributions", ["c", "p"])
+def test_rps_category_edges_None_works(o, f_prob, input_distributions):
     """Test that rps expects inputs to have category_edges dim if category_edges is None."""
-    o = o.rename({"time": "category_edge"})
-    f_prob = f_prob.rename({"time": "category_edge"}).mean("member")
-    rps(o, f_prob, category_edges=None, dim=[])
+    o = o.rename({"time": "category"})
+    f_prob = f_prob.rename({"time": "category"}).mean("member")
+    rps(o, f_prob, category_edges=None, dim=[], input_distributions=input_distributions)
 
 
 @pytest.mark.parametrize("chunk_bool", [True, False])
@@ -627,15 +628,59 @@ def test_rps_wilks_example():
     assert_allclose(rps(Obs, F2, category_edges), rps(Obs, F2, xr_category_edges))
 
 
+def test_rps_wilks_example_pdf():
+    """Test xs.rps(category_edges=None, input_distributions='p') with values from
+    Wilks, D. S. (2006). Statistical methods in the atmospheric sciences (2nd ed,
+    Vol. 91). Amsterdam ; Boston: Academic Press. p.301.
+    """
+    Obs = xr.DataArray([1.0, 0.0, 0.0], dims="category")  # no precip
+    F1 = xr.DataArray([0.2, 0.5, 0.3], dims="category")
+    F2 = xr.DataArray([0.2, 0.3, 0.5], dims="category")
+    np.testing.assert_allclose(
+        rps(Obs, F1, category_edges=None, input_distributions="p"), 0.73
+    )
+    np.testing.assert_allclose(
+        rps(Obs, F2, category_edges=None, input_distributions="p"), 0.89
+    )
+
+    # second example
+    Obs = xr.DataArray([0.0, 0.0, 1.0], dims="category")  # larger than 0.25
+    np.testing.assert_allclose(
+        rps(Obs, F1, category_edges=None, input_distributions="p"), 0.53
+    )
+    np.testing.assert_allclose(
+        rps(Obs, F2, category_edges=None, input_distributions="p"), 0.29
+    )
+
+
 @pytest.mark.parametrize("fair_bool", [True, False])
 def test_2_category_rps_equals_brier_score(o, f_prob, fair_bool):
     """Test that RPS for two categories equals the Brier Score."""
     category_edges = np.array([0.0, 0.5, 1.0])
     assert_allclose(
-        rps(o, f_prob, category_edges=category_edges, dim=None, fair=fair_bool).drop(
-            ["forecasts_category_edge", "observations_category_edge"]
-        ),
+        rps(
+            o.rename({"time": "category"}),
+            f_prob.rename({"time": "category"}),
+            category_edges=category_edges,
+            dim=None,
+            fair=fair_bool,
+        ).drop(["forecasts_category_edge", "observations_category_edge"]),
         brier_score(o > 0.5, (f_prob > 0.5), dim=None, fair=fair_bool),
+    )
+
+
+def test_rps_fair_category_edges_None(o, f_prob):
+    """Test that RPS without category_edges works for fair==True if forecast[member]
+    set."""
+    rps(
+        o.rename({"time": "category"}),
+        f_prob.mean("member")
+        .rename({"time": "category"})
+        .assign_coords(member=f_prob.member.size),
+        category_edges=None,
+        dim=None,
+        fair=True,
+        input_distributions="p",
     )
 
 
@@ -723,17 +768,25 @@ def test_rps_category_edges_tuple(o, f_prob, fair_bool):
     assert "category_edge" not in actual.dims
 
 
-@pytest.mark.parametrize("fair_bool", [True, False])
-def test_rps_category_edges_None(o, f_prob, fair_bool):
+@pytest.mark.parametrize("input_distributions", ["c", "p"])
+def test_rps_category_edges_None(o, f_prob, input_distributions):
     """Test rps with category_edges as None expecting o and f_prob are already CDFs."""
     e = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
-    bin_dim = "category_edge"
+    bin_dim = "category"
     edges = xr.DataArray(e, dims=bin_dim, coords={bin_dim: e})
     o_c = o < edges  # CDF
-    f_prob_c = f_prob < edges  # CDF
-    actual = rps(o_c, f_prob_c, dim="time", fair=fair_bool, category_edges=None)
+    f_c = (f_prob < edges).mean("member")  # CDF
+    actual = rps(
+        o_c,
+        f_c,
+        dim="time",
+        fair=False,
+        category_edges=None,
+        input_distributions=input_distributions,
+    )
     assert set(["lon", "lat"]) == set(actual.dims)
     assert "quantile" not in actual.dims
+    assert "member" not in actual.dims
 
 
 @pytest.mark.parametrize(
