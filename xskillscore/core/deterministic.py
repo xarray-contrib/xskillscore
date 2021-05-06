@@ -779,7 +779,7 @@ def me(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
         weights,
         input_core_dims=input_core_dims,
         kwargs={"axis": axis, "skipna": skipna},
-        dask="parallelized",
+        dask="allowed",
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
