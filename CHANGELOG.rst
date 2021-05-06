@@ -21,7 +21,7 @@ Internal Changes
   :py:func:`~xskillscore.rps` expilicty checks for ``bin_dim`` if
   ``category_edges==None``. (:pr:`287`) `Aaron Spring`_
 - Add doctest on the docstring examples. (:pr:`302`) `Ray Bell`_
-- Removed a call to compute weights in test (:pr:`306`) `Ray Bell`_
+- Removed a call to compute weights in testing (:pr:`306`) `Ray Bell`_
 
 
 xskillscore v0.0.19 (2021-03-12)
