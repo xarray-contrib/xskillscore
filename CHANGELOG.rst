@@ -7,6 +7,11 @@ xskillscore v0.0.20 (2021-XX-XX)
 
 Features
 ~~~~~~~~
+- Specify category distribution type with ``input_distributions`` in
+  :py:func:`~xskillscore.rps` if ``category_edges==None`` that forecasts and
+  observations are probability distributions ``p`` or cumulative
+  distributionss ``c``. See :py:func:`~xskillscore.rps` docstrings and doctests for
+  examples. (:pr:`300`) `Aaron Spring`_
 - Added slope of linear fit :py:func:`~xskillscore.linslope`. `Ray Bell`_
 
 Internal Changes
@@ -16,12 +21,8 @@ Internal Changes
 - :py:func:`~xskillscore.rps` does not break from masking NaNs anymore.
   :py:func:`~xskillscore.rps` expilicty checks for ``bin_dim`` if
   ``category_edges==None``. (:pr:`287`) `Aaron Spring`_
-- Specify category distribution type with ``input_distributions`` in
-  :py:func:`~xskillscore.rps` if ``category_edges==None`` that forecasts and
-  observations are probability distributions ``p`` or cumulative
-  distributionss ``c``. See :py:func:`~xskillscore.rps` docstrings and doctests for
-  examples. (:pr:`300`) `Aaron Spring`_
 - Add doctest on the docstring examples. (:pr:`302`) `Ray Bell`_
+- Removed a call to compute weights in testing (:pr:`306`) `Ray Bell`_
 
 
 xskillscore v0.0.19 (2021-03-12)

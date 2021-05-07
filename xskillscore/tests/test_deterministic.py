@@ -260,8 +260,6 @@ def test_distance_metrics_daskda_same_npda(
         actual = metric(a, b, dim, skipna=skipna)
     else:
         actual = metric(a, b, dim, weights=_weights, skipna=skipna)
-    if _weights is not None:
-        _weights = _weights.load()
     if metric is median_absolute_error:
         expected = metric(a.load(), b.load(), dim, skipna=skipna)
     else:
