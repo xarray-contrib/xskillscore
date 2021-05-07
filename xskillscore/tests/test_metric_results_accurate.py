@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 import sklearn.metrics
-from scipy.stats import pearsonr, spearmanr, linregress
+from scipy.stats import linregress, pearsonr, spearmanr
 from sklearn.metrics import (
     mean_absolute_error,
     mean_absolute_percentage_error,
@@ -92,7 +92,7 @@ def test_xs_same_as_scipy(a_1d, b_1d, xs_scipy_metrics):
     """Tests xskillscore metric is same as scipy metric."""
     xs_metric, scipy_metric, i = xs_scipy_metrics
     actual = xs_metric(a_1d, b_1d, "time")
-    expected = scipy_metric(a_1d, b_1d)[i]  
+    expected = scipy_metric(a_1d, b_1d)[i]
     assert np.allclose(actual, expected)
 
 

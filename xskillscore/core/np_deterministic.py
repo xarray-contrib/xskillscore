@@ -179,7 +179,7 @@ def _linslope(a, b, weights, axis, skipna):
     --------
     scipy.stats.linregress
     """
-    sumfunc, meanfunc = _get_numpy_funcs(skipna)    
+    sumfunc, meanfunc = _get_numpy_funcs(skipna)
     if skipna:
         a, b, weights = _match_nans(a, b, weights)
     weights = _check_weights(weights)

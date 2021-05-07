@@ -48,7 +48,7 @@ def weighted_linslope(x, y, w):
     ym = y - (np.sum(y * w) / np.sum(w))
     s_num = np.sum(w * xm * ym)
     s_den = np.sum(w * xm * xm)
-    return s_num / s_den   
+    return s_num / s_den
 
 
 xs_scipy_metrics = [(pearson_r, weighted_pearsonr), (linslope, weighted_linslope)]

@@ -119,7 +119,7 @@ def linslope(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     array([[-0.30948771, -0.21562529, -0.63141304],
            [ 0.31446077,  2.23858011,  0.44743617],
            [-0.22243944,  0.47034784,  1.08512859]])
-    Dimensions without coordinates: x, y   
+    Dimensions without coordinates: x, y
     """
     _fail_if_dim_empty(dim)
     dim, _ = _preprocess_dims(dim, a)
