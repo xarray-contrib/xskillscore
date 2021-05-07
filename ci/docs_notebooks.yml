@@ -14,7 +14,7 @@ dependencies:
   - xarray>=0.16.1
   # xhistogram 0.1.3 introduced an error that broke xskillscore
   # see https://github.com/xgcm/xhistogram/issues/48
-  - xhistogram!=0.1.3
+  - xhistogram==0.1.2
   - importlib_metadata
   - jupyterlab
   - matplotlib-base
@@ -25,6 +25,6 @@ dependencies:
   - sphinx_rtd_theme
   - pip
   - pip:
-    - sphinx_autosummary_accessors
-    # Install latest version of xskillscore.
-    - -e ..
+      - sphinx_autosummary_accessors
+      # Install latest version of xskillscore.
+      - -e ..
