@@ -4,6 +4,7 @@ import pytest
 from xarray.tests import CountingScheduler, assert_allclose, raise_if_dask_computes
 
 from xskillscore.core.deterministic import (
+    linslope,
     mae,
     mape,
     me,
@@ -19,6 +20,7 @@ from xskillscore.core.deterministic import (
 )
 
 WEIGHTED_METRICS = [
+    linslope,
     pearson_r,
     pearson_r_p_value,
     spearman_r,

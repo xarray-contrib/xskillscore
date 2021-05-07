@@ -1,7 +1,5 @@
 import numpy as np
 import pytest
-import sklearn.metrics
-from scipy.stats import pearsonr
 from sklearn.metrics import (
     mean_absolute_error,
     mean_absolute_percentage_error,
@@ -11,6 +9,7 @@ from sklearn.metrics import (
 
 import xskillscore as xs
 from xskillscore.core.deterministic import (
+    linslope,
     mae,
     mape,
     me,
@@ -44,7 +43,15 @@ def weighted_pearsonr(x, y, w):
     return r_num / r_den
 
 
-xs_scipy_metrics = [(pearson_r, weighted_pearsonr)]
+def weighted_linslope(x, y, w):
+    xm = x - (np.sum(x * w) / np.sum(w))
+    ym = y - (np.sum(y * w) / np.sum(w))
+    s_num = np.sum(w * xm * ym)
+    s_den = np.sum(w * xm * xm)
+    return s_num / s_den   
+
+
+xs_scipy_metrics = [(pearson_r, weighted_pearsonr), (linslope, weighted_linslope)]
 
 
 xs_np_metrics = [

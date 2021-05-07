@@ -4,6 +4,7 @@ from xarray.tests import assert_allclose
 
 from xskillscore.core.deterministic import (
     effective_sample_size,
+    linslope,
     mae,
     mape,
     me,
@@ -21,6 +22,7 @@ from xskillscore.core.deterministic import (
 )
 
 correlation_metrics = [
+    linslope,
     pearson_r,
     r2,
     pearson_r_p_value,

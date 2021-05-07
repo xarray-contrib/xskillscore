@@ -5,6 +5,10 @@ Changelog History
 xskillscore v0.0.20 (2021-XX-XX)
 --------------------------------
 
+Features
+~~~~~~~~
+- Added slope of linear fit :py:func:`~xskillscore.linslope`. `Ray Bell`_
+
 Internal Changes
 ~~~~~~~~~~~~~~~~
 - Use ``pytest-xdist`` and ``matplotlib-base`` in environments to speed up CI.
