@@ -78,7 +78,7 @@ def linslope(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
 
     .. math::
         s_{ab} = \\frac{ \\sum_{i=i}^{n} (a_{i} - \\bar{a}) (b_{i} - \\bar{b}) }
-                 {\\sum_{i=1}^{n} (a_{i} - \\bar{a})^{2}}
+                 { \\sum_{i=1}^{n} (a_{i} - \\bar{a})^{2} }
 
     Parameters
     ----------
