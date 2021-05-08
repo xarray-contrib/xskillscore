@@ -996,7 +996,7 @@ def test_roc_bin_edges_continuous_against_sklearn(
     forecast_1d_long, observation_1d_long, drop_intermediate_bool
 ):
     """Test xs.roc against sklearn.metrics.roc_curve/auc_score."""
-    fp = np.clip(forecast_1d_long, 0, 1)  # prob
+    fp = forecast_1d_long.clip(0, 1)  # prob
     ob = observation_1d_long > 0  # binary
     # sklearn
     sk_fpr, sk_tpr, _ = roc_curve(ob, fp, drop_intermediate=drop_intermediate_bool)
@@ -1017,7 +1017,7 @@ def test_roc_bin_edges_continuous_against_sklearn(
 
 def test_roc_bin_edges_drop_intermediate(forecast_1d_long, observation_1d_long):
     """Test that drop_intermediate reduces probability_bins in xs.roc ."""
-    fp = np.clip(forecast_1d_long, 0, 1)  # prob
+    fp = forecast_1d_long.clip(0, 1)  # prob
     ob = observation_1d_long > 0  # binary
     # xs
     txs_fpr, txs_tpr, txs_area = roc(
