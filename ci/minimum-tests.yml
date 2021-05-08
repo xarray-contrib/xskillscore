@@ -23,4 +23,4 @@ dependencies:
   - pytest-xdist
   - pip
   - pip:
-    - -e ..
+      - -e ..

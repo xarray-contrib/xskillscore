@@ -7,6 +7,7 @@ from .core.comparative import mae_test, sign_test
 from .core.contingency import Contingency
 from .core.deterministic import (
     effective_sample_size,
+    linslope,
     mae,
     mape,
     me,

@@ -25,6 +25,6 @@ dependencies:
   - sphinx_rtd_theme
   - pip
   - pip:
-    - sphinx_autosummary_accessors
-    # Install latest version of xskillscore.
-    - -e ..
+      - sphinx_autosummary_accessors
+      # Install latest version of xskillscore.
+      - -e ..

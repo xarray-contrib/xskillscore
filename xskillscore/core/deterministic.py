@@ -4,6 +4,7 @@ import xarray as xr
 
 from .np_deterministic import (
     _effective_sample_size,
+    _linslope,
     _mae,
     _mape,
     _me,
@@ -27,21 +28,22 @@ from .utils import (
 )
 
 __all__ = [
-    "pearson_r",
-    "pearson_r_p_value",
-    "pearson_r_eff_p_value",
-    "me",
-    "rmse",
-    "mse",
-    "mae",
-    "median_absolute_error",
-    "smape",
-    "mape",
-    "spearman_r",
-    "spearman_r_p_value",
-    "spearman_r_eff_p_value",
     "effective_sample_size",
+    "linslope",
+    "mae",
+    "mape",
+    "me",
+    "median_absolute_error",
+    "mse",
+    "pearson_r",
+    "pearson_r_eff_p_value",
+    "pearson_r_p_value",
     "r2",
+    "rmse",
+    "smape",
+    "spearman_r",
+    "spearman_r_eff_p_value",
+    "spearman_r_p_value",
 ]
 
 
@@ -69,6 +71,75 @@ def _determine_input_core_dims(dim, weights):
     else:
         input_core_dims = [dim, dim, dim]
     return input_core_dims
+
+
+def linslope(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+    """Slope of linear fit.
+
+    .. math::
+        s_{ab} = \\frac{ \\sum_{i=i}^{n} (a_{i} - \\bar{a}) (b_{i} - \\bar{b}) }
+                 { \\sum_{i=1}^{n} (a_{i} - \\bar{a})^{2} }
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to apply the correlation along. Note that this dimension will
+        be reduced as a result. Defaults to None reducing all dimensions.
+    weights : xarray.Dataset or xarray.DataArray or None
+        Weights matching dimensions of ``dim`` to apply during the function.
+    skipna : bool
+        If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
+
+    Returns
+    -------
+    xarray.DataArray or xarray.Dataset
+        Slope of linear fit.
+
+    See Also
+    --------
+    scipy.stats.linregress
+
+    Examples
+    --------
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3),
+    ...                  dims=['time', 'x', 'y'])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3),
+    ...                  dims=['time', 'x', 'y'])
+    >>> xs.linslope(a, b, dim='time')
+    <xarray.DataArray (x: 3, y: 3)>
+    array([[-0.30948771, -0.21562529, -0.63141304],
+           [ 0.31446077,  2.23858011,  0.44743617],
+           [-0.22243944,  0.47034784,  1.08512859]])
+    Dimensions without coordinates: x, y
+    """
+    _fail_if_dim_empty(dim)
+    dim, _ = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
+    a, b, new_dim, weights = _stack_input_if_needed(a, b, dim, weights)
+    weights = _preprocess_weights(a, dim, new_dim, weights)
+
+    input_core_dims = _determine_input_core_dims(new_dim, weights)
+
+    return xr.apply_ufunc(
+        _linslope,
+        a,
+        b,
+        weights,
+        input_core_dims=input_core_dims,
+        kwargs={"axis": -1, "skipna": skipna},
+        dask="parallelized",
+        output_dtypes=[float],
+        keep_attrs=keep_attrs,
+    )
 
 
 def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):

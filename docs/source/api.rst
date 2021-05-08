@@ -24,6 +24,7 @@ Correlation Metrics
     spearman_r_eff_p_value
     effective_sample_size
     r2
+    linslope
 
 Distance Metrics
 ~~~~~~~~~~~~~~~~

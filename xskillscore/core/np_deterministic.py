@@ -6,21 +6,22 @@ from scipy.stats import distributions
 from .utils import suppress_warnings
 
 __all__ = [
-    "_pearson_r",
-    "_pearson_r_p_value",
-    "_pearson_r_eff_p_value",
-    "_me",
-    "_rmse",
-    "_mse",
-    "_mae",
-    "_median_absolute_error",
-    "_smape",
-    "_mape",
-    "_spearman_r",
-    "_spearman_r_p_value",
-    "_spearman_r_eff_p_value",
     "_effective_sample_size",
+    "_linslope",
+    "_mae",
+    "_mape",
+    "_me",
+    "_median_absolute_error",
+    "_mse",
+    "_pearson_r",
+    "_pearson_r_eff_p_value",
+    "_pearson_r_p_value",
     "_r2",
+    "_rmse",
+    "_smape",
+    "_spearman_r",
+    "_spearman_r_eff_p_value",
+    "_spearman_r_p_value",
 ]
 
 
@@ -151,6 +152,55 @@ def _effective_sample_size(a, b, axis, skipna):
     n_eff = np.floor(n_eff)
     n_eff = np.clip(n_eff, 0, n)
     return n_eff
+
+
+def _linslope(a, b, weights, axis, skipna):
+    """ndarray implementation of scipy.stats.linregress[slope].
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int
+        The axis to apply the linear slope along.
+    weights : ndarray
+        Input array of weights for a and b.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    res : ndarray
+        slope of linear fit.
+
+    See Also
+    --------
+    scipy.stats.linregress
+    """
+    sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
+    weights = _check_weights(weights)
+    a = np.rollaxis(a, axis)
+    b = np.rollaxis(b, axis)
+    if weights is not None:
+        weights = np.rollaxis(weights, axis)
+
+    am, bm = __compute_anomalies(a, b, weights=weights, axis=0, skipna=skipna)
+
+    if weights is not None:
+        s_num = sumfunc(weights * am * bm, axis=0)
+        s_den = sumfunc(weights * am * am, axis=0)
+    else:
+        s_num = sumfunc(am * bm, axis=0)
+        s_den = sumfunc(am * am, axis=0)
+
+    with suppress_warnings("invalid value encountered in true_divide"):
+        with suppress_warnings("invalid value encountered in double_scalars"):
+            res = s_num / s_den
+    return res
 
 
 def _r2(a, b, weights, axis, skipna):

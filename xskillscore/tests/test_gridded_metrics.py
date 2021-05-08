@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from xskillscore.core.deterministic import (
+    linslope,
     mae,
     mape,
     me,
@@ -17,6 +18,7 @@ from xskillscore.core.deterministic import (
 )
 
 METRICS = [
+    linslope,
     mae,
     mse,
     median_absolute_error,

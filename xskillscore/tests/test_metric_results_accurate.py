@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 import sklearn.metrics
-from scipy.stats import pearsonr, spearmanr
+from scipy.stats import linregress, pearsonr, spearmanr
 from sklearn.metrics import (
     mean_absolute_error,
     mean_absolute_percentage_error,
@@ -11,6 +11,7 @@ from sklearn.metrics import (
 
 import xskillscore as xs
 from xskillscore.core.deterministic import (
+    linslope,
     mae,
     mape,
     me,
@@ -36,6 +37,7 @@ xs_skl_metrics_with_zeros = [
 ]
 
 xs_scipy_metrics = [
+    (linslope, linregress, 0),
     (pearson_r, pearsonr, 0),
     (spearman_r, spearmanr, 0),
     (pearson_r_p_value, pearsonr, 1),

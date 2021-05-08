@@ -12,6 +12,7 @@ Features
   observations are probability distributions ``p`` or cumulative
   distributionss ``c``. See :py:func:`~xskillscore.rps` docstrings and doctests for
   examples. (:pr:`300`) `Aaron Spring`_
+- Added slope of linear fit :py:func:`~xskillscore.linslope`. `Ray Bell`_
 
 Internal Changes
 ~~~~~~~~~~~~~~~~

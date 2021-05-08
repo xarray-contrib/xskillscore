@@ -7,6 +7,7 @@ from xskillscore.core.deterministic import (
     _preprocess_dims,
     _preprocess_weights,
     effective_sample_size,
+    linslope,
     mae,
     mape,
     me,
@@ -24,6 +25,7 @@ from xskillscore.core.deterministic import (
 )
 from xskillscore.core.np_deterministic import (
     _effective_sample_size,
+    _linslope,
     _mae,
     _mape,
     _me,
@@ -41,6 +43,7 @@ from xskillscore.core.np_deterministic import (
 )
 
 correlation_metrics = [
+    (linslope, _linslope),
     (pearson_r, _pearson_r),
     (r2, _r2),
     (pearson_r_p_value, _pearson_r_p_value),
@@ -51,6 +54,7 @@ correlation_metrics = [
     (effective_sample_size, _effective_sample_size),
 ]
 correlation_metrics_names = [
+    "linslope",
     "pearson_r",
     "r2",
     "pearson_r_p_value",
