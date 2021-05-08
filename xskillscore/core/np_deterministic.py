@@ -164,7 +164,7 @@ def _linslope(a, b, weights, axis, skipna):
     b : ndarray
         Input array.
     axis : int
-        The axis to apply the r2_score along.
+        The axis to apply the linear slope along.
     weights : ndarray
         Input array of weights for a and b.
     skipna : bool
