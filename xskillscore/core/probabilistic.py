@@ -1153,9 +1153,9 @@ def _auc(fpr, tpr, dim="probability_bin"):
                 area = xr.apply_ufunc(
                     np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
                 )
-    area = np.abs(area)
+    area = abs(area)
     if ((area > 1)).any():
-        area = np.clip(area, 0, 1)  # allow only values between 0 and 1
+        area = area.clip(0, 1)  # allow only values between 0 and 1
     return area
 
 
