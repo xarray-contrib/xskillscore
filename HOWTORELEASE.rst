@@ -18,7 +18,7 @@ Release Procedure
     $ git push origin main --tags
 
 #. Build and publish release on PyPI using the GitHub action.
-   Otherwise you can manually do it with the following:
+   Otherwise you can manually do it with the following::
 
     $ git clean -xfd  # remove any files not checked into git
     $ python setup.py sdist bdist_wheel --universal  # build package
