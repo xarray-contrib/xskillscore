@@ -16,15 +16,16 @@ Correlation Metrics
 .. autosummary::
     :toctree: api/
 
+    effective_sample_size
     pearson_r
     pearson_r_p_value
     pearson_r_eff_p_value
+    linslope
+    r2
     spearman_r
     spearman_r_p_value
     spearman_r_eff_p_value
-    effective_sample_size
-    r2
-    linslope
+
 
 Distance Metrics
 ~~~~~~~~~~~~~~~~
@@ -32,13 +33,13 @@ Distance Metrics
 .. autosummary::
     :toctree: api/
 
-    me
-    rmse
-    mse
     mae
-    median_absolute_error
-    smape
     mape
+    me
+    median_absolute_error
+    mse
+    rmse
+    smape
 
 
 Probabilistic Metrics
@@ -55,12 +56,13 @@ Currently, most of our probabilistic metrics are ported over from
     crps_ensemble
     crps_gaussian
     crps_quadrature
-    threshold_brier_score
-    rps
-    rank_histogram
     discrimination
+    rank_histogram
     reliability
     roc
+    rps
+    threshold_brier_score
+
 
 Contingency-based Metrics
 -------------------------
@@ -87,19 +89,20 @@ Dichotomous-Only (yes/no) Metrics
 .. autosummary::
     :toctree: api/
 
+    Contingency.bias_score
+    Contingency.correct_negatives
+    Contingency.equit_threat_score
+    Contingency.false_alarm_rate
+    Contingency.false_alarm_ratio
+    Contingency.false_alarms
+    Contingency.hit_rate
     Contingency.hits
     Contingency.misses
-    Contingency.false_alarms
-    Contingency.correct_negatives
-    Contingency.bias_score
-    Contingency.hit_rate
-    Contingency.false_alarm_ratio
-    Contingency.false_alarm_rate
-    Contingency.success_ratio
-    Contingency.threat_score
-    Contingency.equit_threat_score
     Contingency.odds_ratio
     Contingency.odds_ratio_skill_score
+    Contingency.success_ratio
+    Contingency.threat_score
+
 
 Multi-Category Metrics
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -108,10 +111,11 @@ Multi-Category Metrics
     :toctree: api/
 
     Contingency.accuracy
+    Contingency.gerrity_score
     Contingency.heidke_score
     Contingency.peirce_score
-    Contingency.gerrity_score
     roc
+
 
 Comparative
 -----------
@@ -121,8 +125,9 @@ Tests to compare whether one forecast is significantly better than another one.
 .. autosummary::
     :toctree: api/
 
-    sign_test
     mae_test
+    sign_test
+
 
 Resampling
 ----------
