@@ -87,17 +87,17 @@ def linslope(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     b : xarray.Dataset or xarray.DataArray
         Labeled array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result. Defaults to None reducing all dimensions.
+        The dimension(s) to apply the slope of linear fit along. Note that this
+        dimension will be reduced as a result. Defaults to None reducing all
+        dimensions.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : bool
-        If True, the attributes (attrs) will be copied
-        from the first input to the new one.
-        If False (default), the new object will
-        be returned without attributes.
+        If True, the attributes (attrs) will be copied from the first input to the
+        new one. If False (default), the new object will be returned without
+        attributes.
 
     Returns
     -------
