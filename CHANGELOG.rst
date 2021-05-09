@@ -2,7 +2,11 @@
 Changelog History
 =================
 
-xskillscore v0.0.20 (2021-XX-XX)
+xskillscore v0.0.XX (2021-XX-XX)
+--------------------------------
+
+
+xskillscore v0.0.20 (2021-05-08)
 --------------------------------
 
 Features
@@ -12,7 +16,7 @@ Features
   observations are probability distributions ``p`` or cumulative
   distributionss ``c``. See :py:func:`~xskillscore.rps` docstrings and doctests for
   examples. (:pr:`300`) `Aaron Spring`_
-- Added slope of linear fit :py:func:`~xskillscore.linslope`. `Ray Bell`_
+- Added slope of linear fit :py:func:`~xskillscore.linslope`. (:pr:`307`) `Ray Bell`_
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
