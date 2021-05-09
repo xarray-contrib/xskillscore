@@ -21,7 +21,6 @@ Correlation Metrics
     pearson_r_p_value
     pearson_r_eff_p_value
     linslope
-    r2
     spearman_r
     spearman_r_p_value
     spearman_r_eff_p_value
@@ -38,6 +37,7 @@ Distance Metrics
     me
     median_absolute_error
     mse
+    r2
     rmse
     smape
 

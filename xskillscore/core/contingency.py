@@ -399,6 +399,10 @@ class Contingency:
         xarray.Dataset or xarray.DataArray
             An array containing the hit rate(s)
 
+        See Also
+        --------
+        sklearn.metrics.recall_score
+
         References
         ----------
         https://www.cawcr.gov.au/projects/verification/#Contingency_table
@@ -478,6 +482,10 @@ class Contingency:
         -------
         xarray.Dataset or xarray.DataArray
             An array containing the success ratio(s)
+
+        See Also
+        --------
+        sklearn.metrics.precision_score
 
         References
         ----------
