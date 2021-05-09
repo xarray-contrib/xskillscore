@@ -14,7 +14,7 @@ Release Procedure
 
 #. Tag a release and push to github::
 
-    $ git fetch
+    $ git pull
     $ git tag -a v0.0.xx -m "Version 0.0.xx"
     $ git push origin main --tags
 
