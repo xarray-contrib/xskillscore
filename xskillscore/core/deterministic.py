@@ -801,7 +801,7 @@ def me(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     """Mean Error.
 
     .. math::
-        \\mathrm{ME} = \\frac{1}{n}\\sum_{i=1}^{n}\\a - b
+        \\mathrm{ME} = \\frac{1}{n}\\sum_{i=1}^{n}(a_{i} - b_{i})
 
     Parameters
     ----------
