@@ -18,7 +18,7 @@ Release Procedure
     $ git tag -a v0.0.xx -m "Version 0.0.xx"
     $ git push origin main --tags
 
-#. On creating a tag a GitHub action will publish release on PyPI. If that failes
+#. On creating a tag a GitHub action will publish release on PyPI. If that fails
    you can manually do it with the following::
 
     $ git clean -xfd  # remove any files not checked into git
