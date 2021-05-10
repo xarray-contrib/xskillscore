@@ -23,6 +23,11 @@ dependencies:
   - sphinx
   - sphinxcontrib-napoleon
   - sphinx_rtd_theme
+  - black
+  - doc8
+  - isort
+  - flake8
+  - pre-commit
   - pip
   - pip:
       - sphinx_autosummary_accessors
