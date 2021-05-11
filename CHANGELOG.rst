@@ -5,6 +5,10 @@ Changelog History
 xskillscore v0.0.21 (2021-XX-XX)
 --------------------------------
 
+Documentation
+~~~~~~~~~~~~~
+- Added more info in ``quick-start.ipynb`` (:pr:`316`) `Ray Bell`_.
+
 
 xskillscore v0.0.20 (2021-05-08)
 --------------------------------
