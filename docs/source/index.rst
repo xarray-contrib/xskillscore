@@ -39,7 +39,7 @@ You can also install the bleeding edge (pre-release versions) by running:
 
 .. code-block:: bash
 
-    pip install git+https://github.com/xarray-contrib/xskillscore@master --upgrade
+    pip install git+https://github.com/xarray-contrib/xskillscore@main --upgrade
 
 **Getting Started**
 
