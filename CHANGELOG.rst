@@ -14,7 +14,7 @@ Breaking changes
 - Renamed `mae_test` to `significance_test` to make this comparative metric
   generic. Now, it accepts any of the distance metrics functions except for
   `mape`. The new function has an additional argument called `metric` which is a
-  string and name of the target distance metric. (:pr:`319`)
+  string and name of the target distance metric. (:pr:`319`) `Taher Chegini`_.
 
 
 xskillscore v0.0.20 (2021-05-08)
@@ -269,3 +269,4 @@ Testing
 .. _`mcsitter`: https://github.com/mcsitter
 .. _`Riley X. Brady`: https://github.com/bradyrx
 .. _`Ray Bell`: https://github.com/raybellwaves
+.. _`Taher Chegini`: https://github.com/cheginit
