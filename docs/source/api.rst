@@ -125,7 +125,7 @@ Tests to compare whether one forecast is significantly better than another one.
 .. autosummary::
     :toctree: api/
 
-    mae_test
+    significance_test
     sign_test
 
 
