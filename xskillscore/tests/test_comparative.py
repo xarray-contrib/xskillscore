@@ -4,9 +4,10 @@ from dask import is_dask_collection
 from xarray.testing import assert_equal
 
 import xskillscore as xs
-from xskillscore import mae, mae_test, sign_test
+from xskillscore import mae, sign_test, significance_test
 
 OFFSET = -1
+METRIC = "mae"
 
 
 @pytest.fixture
@@ -266,8 +267,10 @@ def test_sign_test_NaNs_confidence(a, a_worse, b):
 @pytest.mark.parametrize("alpha", [0.05])
 @pytest.mark.parametrize("chunk", [True, False])
 @pytest.mark.parametrize("input", ["Dataset", "multidim Dataset", "DataArray", "mixed"])
-def test_mae_test_inputs(a_1d, a_1d_worse_less_corr, b_1d, input, chunk, alpha):
-    """Test mae_test with xr inputs and chunked."""
+def test_significance_test_inputs(
+    a_1d, a_1d_worse_less_corr, b_1d, input, chunk, alpha
+):
+    """Test significance_test with xr inputs and chunked."""
     if "Dataset" in input:
         name = "var"
         a_1d = a_1d.to_dataset(name=name)
@@ -284,8 +287,8 @@ def test_mae_test_inputs(a_1d, a_1d_worse_less_corr, b_1d, input, chunk, alpha):
         a_1d = a_1d.chunk()
         a_1d_worse_less_corr = a_1d_worse_less_corr.chunk()
         b_1d = b_1d.chunk()
-    actual_significantly_different, actual_diff, actual_hwci = mae_test(
-        a_1d, a_1d_worse_less_corr, b_1d, alpha=alpha
+    actual_significantly_different, actual_diff, actual_hwci = significance_test(
+        a_1d, a_1d_worse_less_corr, b_1d, METRIC, alpha=alpha
     )
     # check dask collection preserved
     for actual in [actual_significantly_different, actual_diff, actual_hwci]:
@@ -293,28 +296,39 @@ def test_mae_test_inputs(a_1d, a_1d_worse_less_corr, b_1d, input, chunk, alpha):
 
 
 @pytest.mark.parametrize("alpha", [0.0, 0, 1.0, 1.0, 5.0, 5])
-def test_mae_test_alpha(a_1d, a_1d_worse_less_corr, b_1d, alpha):
-    """Test mae_test alpha error messages."""
+def test_significance_test_alpha(a_1d, a_1d_worse_less_corr, b_1d, alpha):
+    """Test significance_test alpha error messages."""
     with pytest.raises(ValueError) as e:
-        mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=alpha)
+        significance_test(a_1d, a_1d_worse_less_corr, b_1d, METRIC, alpha=alpha)
     assert "`alpha` must be between 0 and 1 or `return_p`" in str(e.value)
 
 
+@pytest.mark.parametrize("metric", ["mape", "pearson_r"])
+def test_significance_test_metric_error(a_1d, a_1d_worse_less_corr, b_1d, metric):
+    """Test significance_test alpha error messages."""
+    with pytest.raises(ValueError) as e:
+        significance_test(a_1d, a_1d_worse_less_corr, b_1d, metric)
+    assert "`metric` should be a valid distance metric function" in str(e.value)
+
+
 @pytest.mark.parametrize("alpha", [0.05])
-def test_mae_test_better_significant(a_1d, a_1d_worse_less_corr, b_1d, alpha):
-    """Test mae_test favors better forecast."""
+@pytest.mark.parametrize(
+    "metric", ["me", "rmse", "mse", "mae", "median_absolute_error", "smape"]
+)
+def test_significance_test_metric(a_1d, a_1d_worse_less_corr, b_1d, metric, alpha):
+    """Test significance_test favors better forecast."""
     a_1d_worse_less_corr = a_1d.copy()
     # make a_worse worse every second timestep
     step = 3
     a_1d_worse_less_corr[::step] = a_1d_worse_less_corr[::step] + OFFSET * 3
-    actual_significantly_different, actual_diff, actual_hwci = mae_test(
-        a_1d, a_1d_worse_less_corr, b_1d, alpha=alpha
+    actual_significantly_different, actual_diff, actual_hwci = significance_test(
+        a_1d, a_1d_worse_less_corr, b_1d, metric, alpha=alpha
     )
     assert actual_significantly_different
 
 
-def test_mae_test_climpred(a_1d, b_1d):
-    """Test mae_test as climpred would use it with observations=None."""
+def test_significance_test_climpred(a_1d, b_1d):
+    """Test significance_test as climpred would use it with observations=None."""
     a_1d_worse_less_corr = a_1d.copy()
     # make a_worse worse every second timestep
     a_1d_worse_less_corr[::2] = a_1d_worse_less_corr[::2] + OFFSET
@@ -324,15 +338,16 @@ def test_mae_test_climpred(a_1d, b_1d):
     mae_f1o = mae(a_1d, b_1d, dim=dim)
     mae_f2o = mae(a_1d_worse_less_corr, b_1d, dim=dim)
 
-    actual_significantly_different, actual_diff, actual_hwci = mae_test(
+    actual_significantly_different, actual_diff, actual_hwci = significance_test(
         mae_f1o,
         mae_f2o,
         observations=None,
+        metric=None,
         dim=dim,
         time_dim=time_dim,
     )
-    expected_significantly_different, expected_diff, expected_hwci = mae_test(
-        a_1d, a_1d_worse_less_corr, b_1d, dim=dim, time_dim=time_dim
+    expected_significantly_different, expected_diff, expected_hwci = significance_test(
+        a_1d, a_1d_worse_less_corr, b_1d, METRIC, dim=dim, time_dim=time_dim
     )
     assert_equal(actual_significantly_different, expected_significantly_different)
     assert_equal(actual_diff, expected_diff)
@@ -340,13 +355,13 @@ def test_mae_test_climpred(a_1d, b_1d):
 
 
 @pytest.mark.parametrize("dim", [[], ["lon", "lat"]])
-def test_mae_test_dim(a, b, dim):
-    """Test mae_test for different dim on ."""
+def test_significance_test_dim(a, b, dim):
+    """Test significance_test for different dim on ."""
     a_worse = a.copy()
     # make a_worse worse every second timestep
     a_worse[::2, :, :] = a_worse[::2, :, :] + OFFSET
-    actual_significantly_different, actual_diff, actual_hwci = mae_test(
-        a, a_worse, b, dim=dim
+    actual_significantly_different, actual_diff, actual_hwci = significance_test(
+        a, a_worse, b, METRIC, dim=dim
     )
     # difference larger than half width ci
     assert (actual_diff > actual_hwci).mean() > 0.5
@@ -354,16 +369,16 @@ def test_mae_test_dim(a, b, dim):
         assert d not in actual_diff.dims, print(d, "found, but shouldnt")
 
 
-def test_mae_test_alpha_hwci(a_1d, a_1d_worse_less_corr, b_1d):
-    """Test mae_test with larger alpha leads to smaller hwci."""
+def test_significance_test_alpha_hwci(a_1d, a_1d_worse_less_corr, b_1d):
+    """Test significance_test with larger alpha leads to smaller hwci."""
     (
         actual_large_alpha_significantly_different,
         actual_large_alpha_diff,
         actual_large_alpha_alpha,
-    ) = mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=0.1)
+    ) = significance_test(a_1d, a_1d_worse_less_corr, b_1d, METRIC, alpha=0.1)
     (
         actual_small_alpha_significantly_different,
         actual_small_alpha_diff,
         actual_small_alpha_alpha,
-    ) = mae_test(a_1d, a_1d_worse_less_corr, b_1d, alpha=0.01)
+    ) = significance_test(a_1d, a_1d_worse_less_corr, b_1d, METRIC, alpha=0.01)
     assert actual_large_alpha_alpha < actual_small_alpha_alpha
