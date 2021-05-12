@@ -267,7 +267,7 @@ def test_sign_test_NaNs_confidence(a, a_worse, b):
 @pytest.mark.parametrize("alpha", [0.05])
 @pytest.mark.parametrize("chunk", [True, False])
 @pytest.mark.parametrize("input", ["Dataset", "multidim Dataset", "DataArray", "mixed"])
-def test_significance_test_inputs(
+def test_distance_half_width_interval_test_inputs(
     a_1d, a_1d_worse_less_corr, b_1d, input, chunk, alpha
 ):
     """Test significance_test with xr inputs and chunked."""
@@ -296,7 +296,9 @@ def test_significance_test_inputs(
 
 
 @pytest.mark.parametrize("alpha", [0.0, 0, 1.0, 1.0, 5.0, 5])
-def test_significance_test_alpha(a_1d, a_1d_worse_less_corr, b_1d, alpha):
+def test_distance_half_width_interval_test_alpha(
+    a_1d, a_1d_worse_less_corr, b_1d, alpha
+):
     """Test significance_test alpha error messages."""
     with pytest.raises(ValueError) as e:
         significance_test(a_1d, a_1d_worse_less_corr, b_1d, METRIC, alpha=alpha)
@@ -304,7 +306,9 @@ def test_significance_test_alpha(a_1d, a_1d_worse_less_corr, b_1d, alpha):
 
 
 @pytest.mark.parametrize("metric", ["mape", "pearson_r"])
-def test_significance_test_metric_error(a_1d, a_1d_worse_less_corr, b_1d, metric):
+def test_distance_half_width_interval_test_metric_error(
+    a_1d, a_1d_worse_less_corr, b_1d, metric
+):
     """Test significance_test alpha error messages."""
     with pytest.raises(ValueError) as e:
         significance_test(a_1d, a_1d_worse_less_corr, b_1d, metric)
@@ -315,7 +319,9 @@ def test_significance_test_metric_error(a_1d, a_1d_worse_less_corr, b_1d, metric
 @pytest.mark.parametrize(
     "metric", ["me", "rmse", "mse", "mae", "median_absolute_error", "smape"]
 )
-def test_significance_test_metric(a_1d, a_1d_worse_less_corr, b_1d, metric, alpha):
+def test_distance_half_width_interval_test(
+    a_1d, a_1d_worse_less_corr, b_1d, metric, alpha
+):
     """Test significance_test favors better forecast."""
     a_1d_worse_less_corr = a_1d.copy()
     # make a_worse worse every second timestep
@@ -327,7 +333,7 @@ def test_significance_test_metric(a_1d, a_1d_worse_less_corr, b_1d, metric, alph
     assert actual_significantly_different
 
 
-def test_significance_test_climpred(a_1d, b_1d):
+def test_distance_half_width_interval_test_climpred(a_1d, b_1d):
     """Test significance_test as climpred would use it with observations=None."""
     a_1d_worse_less_corr = a_1d.copy()
     # make a_worse worse every second timestep
@@ -355,7 +361,7 @@ def test_significance_test_climpred(a_1d, b_1d):
 
 
 @pytest.mark.parametrize("dim", [[], ["lon", "lat"]])
-def test_significance_test_dim(a, b, dim):
+def test_distance_half_width_interval_test_dim(a, b, dim):
     """Test significance_test for different dim on ."""
     a_worse = a.copy()
     # make a_worse worse every second timestep
@@ -369,7 +375,7 @@ def test_significance_test_dim(a, b, dim):
         assert d not in actual_diff.dims, print(d, "found, but shouldnt")
 
 
-def test_significance_test_alpha_hwci(a_1d, a_1d_worse_less_corr, b_1d):
+def test_distance_half_width_interval_test_alpha_hwci(a_1d, a_1d_worse_less_corr, b_1d):
     """Test significance_test with larger alpha leads to smaller hwci."""
     (
         actual_large_alpha_significantly_different,
