@@ -8,8 +8,6 @@ import xarray as xr
 
 from . import deterministic as dm
 
-XArray = Union[xr.Dataset, xr.DataArray]
-
 
 def sign_test(
     forecasts1,
@@ -197,15 +195,19 @@ def sign_test(
 
 
 def significance_test(
-    forecasts1: XArray,
-    forecasts2: XArray,
-    observations: Optional[XArray] = None,
+    forecasts1: Union[xr.Dataset, xr.DataArray],
+    forecasts2: Union[xr.Dataset, xr.DataArray],
+    observations: Optional[Union[xr.Dataset, xr.DataArray]] = None,
     metric: Optional[str] = None,
     dim: Optional[Union[str, List[str]]] = None,
     time_dim: str = "time",
     alpha: float = 0.05,
     **kwargs: Mapping,
-) -> Tuple[XArray, XArray, XArray]:
+) -> Tuple[
+    Union[xr.Dataset, xr.DataArray],
+    Union[xr.Dataset, xr.DataArray],
+    Union[xr.Dataset, xr.DataArray],
+]:
     """
     Returns the Jolliffe and Ebert significance test.
 
@@ -336,7 +338,7 @@ def significance_test(
             for p, v in params.items()
             if v.default == inspect._empty and p not in kwargs and p not in ["a", "b"]
         ]
-        if len(missing_args) > 2:
+        if len(missing_args) > 0:
             msg = (
                 f"The following positional arguments for {metric} are missing:\n"
                 + ", ".join(missing_args)
