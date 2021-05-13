@@ -244,7 +244,9 @@ def significance_test(
         time dimension of dimension over which to compute the temporal correlation.
         Defaults to ``'time'``.
     dim : str or list of str, optional
-        dimensions to apply metric function to. Cannot contain ``time_dim``. Defaults to [].
+        dimensions to apply metric function to. Cannot contain ``time_dim``. Defaults to None
+        which is then converted to ``[]`` since ``dim=None`` must not be passed to metric
+        functions.
     alpha : float, optional
         significance level alpha that forecast1 is different than forecast2.
     **kwargs : dict, optional
@@ -254,9 +256,9 @@ def significance_test(
     Returns
     -------
     xarray.DataArray or xarray.Dataset :
-        is the difference in MAE significant? boolean returns
+        Is the difference in scores (score(f2) - score(f1)) significant? (returns boolean)
     xarray.DataArray or xarray.Dataset :
-        Difference in xs.mae reduced by ``dim`` and ``time_dim``
+        Difference in scores (score(f2) - score(f1)) reduced by ``dim`` and ``time_dim``
     xarray.DataArray or xarray.Dataset :
         half-width of the confidence interval at the significance level ``alpha``.
 
@@ -303,7 +305,7 @@ def significance_test(
     if time_dim in dim:
         raise ValueError("`dim` cannot contain `time_dim`")
 
-    msg = f"`alpha` must be between 0 and 1 or `return_p`, found {alpha}"
+    msg = f"`alpha` must be between 0 and 1 or `return_p`, found {alpha}."
     if isinstance(alpha, (str, int)) and alpha != "return_p":
         raise ValueError(msg)
 
@@ -311,7 +313,6 @@ def significance_test(
         raise ValueError(msg)
 
     if observations is not None and isinstance(metric, str):
-        # Compare the forecasts and observations using metric
         valid_metrics = [
             "me",
             "rmse",
@@ -345,6 +346,7 @@ def significance_test(
             )
             raise ValueError(msg)
 
+        # Compare the forecasts and observations using metric
         score_f1o = err_func(observations, forecasts1, dim=dim, **kwargs)
         score_f2o = err_func(observations, forecasts2, dim=dim, **kwargs)
     elif observations is None and metric is None:
@@ -359,7 +361,7 @@ def significance_test(
 
     pearson_r_f1f2 = dm.pearson_r(score_f1o, score_f2o, dim=time_dim)
 
-    # diff mae
+    # diff metric
     diff = score_f2o.mean(time_dim) - score_f1o.mean(time_dim)
 
     notnan = 1 * (score_f1o.notnull() & score_f2o.notnull())
