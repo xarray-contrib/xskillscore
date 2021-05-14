@@ -1,4 +1,4 @@
-xskillscore.Contingency.peirce\_score
+﻿xskillscore.Contingency.peirce\_score
 =====================================
 
 .. currentmodule:: xskillscore

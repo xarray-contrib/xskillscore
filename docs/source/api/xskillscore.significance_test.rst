@@ -1,4 +1,4 @@
-xskillscore.significance\_test
+﻿xskillscore.significance\_test
 ==============================
 
 .. currentmodule:: xskillscore
