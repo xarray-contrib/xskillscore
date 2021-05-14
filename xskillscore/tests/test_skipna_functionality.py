@@ -1,3 +1,5 @@
+from typing import Callable, List
+
 import dask
 import numpy as np
 import pytest
@@ -19,7 +21,7 @@ from xskillscore.core.deterministic import (
     spearman_r_p_value,
 )
 
-WEIGHTED_METRICS = [
+WEIGHTED_METRICS: List[Callable] = [
     linslope,
     pearson_r,
     pearson_r_p_value,
@@ -34,7 +36,7 @@ WEIGHTED_METRICS = [
     r2,
 ]
 
-NON_WEIGHTED_METRICS = [median_absolute_error]
+NON_WEIGHTED_METRICS: List[Callable] = [median_absolute_error]
 
 
 def drop_nans(a, b, weights=None, dim="time"):

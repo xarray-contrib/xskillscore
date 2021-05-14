@@ -8,6 +8,7 @@ Contributors
 * mcsitter (`github <https://github.com/mcsitter/>`__)
 * Ray Bell (`github <https://github.com/raybellwaves/>`__
 * Riley X. Brady (`github <https://github.com/bradyrx/>`__)
+* Zachary Blackwood (`github <https://github.com/blackary/>`__)
 
 For a list of all the contributions, see the github
 `contribution graph <https://github.com/xarray-contrib/xskillscore/graphs/contributors>`__.

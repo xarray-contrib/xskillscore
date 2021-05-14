@@ -5,6 +5,10 @@ Changelog History
 xskillscore v0.0.21 (2021-XX-XX)
 --------------------------------
 
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Added mypy to linting (:pr:`320`) `Zachary Blackwood`_.
+
 Documentation
 ~~~~~~~~~~~~~
 - Added more info in ``quick-start.ipynb`` (:pr:`316`) `Ray Bell`_.
@@ -270,3 +274,4 @@ Testing
 .. _`Riley X. Brady`: https://github.com/bradyrx
 .. _`Ray Bell`: https://github.com/raybellwaves
 .. _`Taher Chegini`: https://github.com/cheginit
+.. _`Zachary Blackwood`: https://github.com/blackary

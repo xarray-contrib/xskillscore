@@ -1,8 +1,9 @@
+from typing import Callable, List
+
 import numpy as np
 import pytest
 
 from xskillscore.core.deterministic import (
-    linslope,
     mae,
     mape,
     median_absolute_error,
@@ -20,8 +21,8 @@ from xskillscore.core.deterministic import (
 # grid cells over space.
 AXES = ("time", "lat", "lon", ["lat", "lon"], ["time", "lat", "lon"])
 
-distance_metrics = [mae, mse, median_absolute_error, mape, smape, rmse]
-correlation_metrics = [
+distance_metrics: List[Callable] = [mae, mse, median_absolute_error, mape, smape, rmse]
+correlation_metrics: List[Callable] = [
     pearson_r,
     r2,
     pearson_r_p_value,

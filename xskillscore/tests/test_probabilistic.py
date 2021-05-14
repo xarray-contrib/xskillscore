@@ -4,6 +4,7 @@ import properscoring
 import pytest
 import xarray as xr
 from dask import is_dask_collection
+from pytest_lazyfixture import lazy_fixture
 from scipy.stats import norm
 from sklearn.calibration import calibration_curve
 from sklearn.metrics import roc_auc_score, roc_curve
@@ -853,12 +854,12 @@ def test_rps_last_edge_included(o, f_prob):
     "observation,forecast",
     [
         (
-            pytest.lazy_fixture("observation_1d_long"),
-            pytest.lazy_fixture("forecast_1d_long"),
+            lazy_fixture("observation_1d_long"),
+            lazy_fixture("forecast_1d_long"),
         ),
         (
-            pytest.lazy_fixture("observation_3d"),
-            pytest.lazy_fixture("forecast_3d"),
+            lazy_fixture("observation_3d"),
+            lazy_fixture("forecast_3d"),
         ),
     ],
 )
