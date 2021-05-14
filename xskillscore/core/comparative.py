@@ -337,7 +337,7 @@ def significance_test(
         missing_args = [
             p
             for p, v in params.items()
-            if v.default == inspect._empty and p not in kwargs and p not in ["a", "b"]
+            if v.default == inspect._empty and p not in kwargs and p not in ["a", "b"]  # type: ignore
         ]
         if len(missing_args) > 0:
             msg = (
