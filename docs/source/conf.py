@@ -32,6 +32,7 @@ print("xskillscore: %s, %s" % (xskillscore.__version__, xskillscore.__file__))
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autodoc.typehints",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.extlinks",
@@ -47,6 +48,8 @@ extlinks = {
     "issue": ("https://github.com/xarray-contrib/xskillscore/issues/%s", "GH#"),
     "pr": ("https://github.com/xarray-contrib/xskillscore/pull/%s", "GH#"),
 }
+
+autodoc_typehints = "description"
 
 nbsphinx_timeout = 60
 nbsphinx_execute = "always"
