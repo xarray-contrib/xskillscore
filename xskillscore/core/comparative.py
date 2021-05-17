@@ -69,15 +69,14 @@ def sign_test(
     Returns
     -------
     xarray.DataArray or xarray.Dataset
-        boolean returns answering whether forecast1 is
-        significantly different to forecast2
+        Boolean returns answering whether forecast1 is significantly different to
+        forecast2.
     xarray.DataArray or xarray.Dataset
         Positive (negative) walk values shows how often ``forecast1`` is better (worse)
         than ``forecast2`` according to metric computed over ``dim``.
     xarray.DataArray or xarray.Dataset
         confidence shows the positive boundary for a random walk at significance
         level ``alpha``.
-
 
     Examples
     --------
