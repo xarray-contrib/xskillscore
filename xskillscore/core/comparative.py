@@ -152,7 +152,7 @@ def sign_test(
         elif not callable(metric):
             raise ValueError(
                 f'metric needs to be a function/callable, string ["categorical", '
-                f"xskillscore.{{metric}}] or None, found {type(metric)}"
+                f"xskillscore.{{{metric}}}] or None, found {type(metric)}"
             )
         if observations is not None:
             # Compare the forecasts and observations using metric
