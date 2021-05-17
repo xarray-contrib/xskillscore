@@ -15,7 +15,7 @@ Documentation
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
-- Renamed `mae_test` to `significance_test` to make this comparative metric
+- Renamed `mae_test` to `halfwidth_ci_test` to make this comparative metric
   generic. Now, it accepts any of the distance metrics functions except for
   `mape`. The new function has an additional argument called `metric` which is a
   string and name of the target distance metric. (:pr:`319`) `Taher Chegini`_.
