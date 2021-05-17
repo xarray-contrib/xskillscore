@@ -228,25 +228,26 @@ def halfwidth_ci_test(
     Parameters
     ----------
     forecasts1 : xarray.Dataset or xarray.DataArray
-        first forecast to be compared to the observations
+        first forecast to be compared to the observations.
     forecasts2 : xarray.Dataset or xarray.DataArray
-        second forecast to be compared to the observations
+        second forecast to be compared to the observations.
     observations : xarray.Dataset or xarray.DataArray, optional
         observations to be compared to both forecasts. if None, assumes that arguments
         forecasts1 and forecasts2 are already MAEs. Defaults to None.
     metric : str, optional
-        Name of distance metric function to be used for computing the error between forecasts
-        and observation. It can be any of the xskillscore distance metric function excep for
-        ``mape``. Valid metrics are ``me``, ``rmse``, ``mse``, ``mae``, ``median_absolute_error``,
-        and ``smape``. Note that if metric is None, observations must also be None.
+        Name of distance metric function to be used for computing the error between
+        forecasts and observation. It can be any of the xskillscore distance metric
+        function except for``mape``. Valid metrics are ``me``, ``rmse``, ``mse``,
+        ``mae``, ``median_absolute_error`` and ``smape``. Note that if metric is None,
+        observations must also be None.
         Defaults to None.
     time_dim : str, optional
         time dimension of dimension over which to compute the temporal correlation.
         Defaults to ``'time'``.
     dim : str or list of str, optional
-        dimensions to apply metric function to. Cannot contain ``time_dim``. Defaults to None
-        which is then converted to ``[]`` since ``dim=None`` must not be passed to metric
-        functions.
+        dimensions to apply metric function to. Cannot contain ``time_dim``.
+        Defaults to None which is then converted to ``[]`` since ``dim=None`` must not
+        be passed to metric functions.
     alpha : float, optional
         significance level alpha that forecast1 is different than forecast2.
     **kwargs : dict, optional
@@ -256,9 +257,11 @@ def halfwidth_ci_test(
     Returns
     -------
     xarray.DataArray or xarray.Dataset :
-        Is the difference in scores (score(f2) - score(f1)) significant? (returns boolean).
+        Is the difference in scores (score(f2) - score(f1)) significant?
+        (returns boolean).
     xarray.DataArray or xarray.Dataset :
-        Difference in scores (score(f2) - score(f1)) reduced by ``dim`` and ``time_dim``.
+        Difference in scores (score(f2) - score(f1))
+        reduced by ``dim`` and ``time_dim``.
     xarray.DataArray or xarray.Dataset :
         half-width of the confidence interval at the significance level ``alpha``.
 
@@ -324,8 +327,8 @@ def halfwidth_ci_test(
         if metric not in valid_metrics:
             msg = (
                 f"`metric` should be a valid distance metric function, found {metric}."
-                + " Valid metrics are:\n"
-                + ", ".join(valid_metrics)
+                " Valid metrics are:\n"
+                ", ".join(valid_metrics)
             )
             raise ValueError(msg)
 
@@ -342,7 +345,7 @@ def halfwidth_ci_test(
         if len(missing_args) > 0:
             msg = (
                 f"The following positional arguments for {metric} are missing:\n"
-                + ", ".join(missing_args)
+                ", ".join(missing_args)
             )
             raise ValueError(msg)
 
@@ -354,8 +357,8 @@ def halfwidth_ci_test(
         score_f2o = forecasts2
     else:
         msg = (
-            "Both `metric` and `observations` arguments must be"
-            + " either None or valid inputs."
+            "Both `metric` and `observations` arguments must be either None or "
+            "valid inputs."
         )
         raise ValueError(msg)
 
