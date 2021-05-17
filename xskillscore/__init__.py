@@ -3,7 +3,7 @@ from pkg_resources import DistributionNotFound, get_distribution
 
 from .core import resampling
 from .core.accessor import XSkillScoreAccessor
-from .core.comparative import mae_test, sign_test
+from .core.comparative import halfwidth_ci_test, sign_test
 from .core.contingency import Contingency
 from .core.deterministic import (
     effective_sample_size,

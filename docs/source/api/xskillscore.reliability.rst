@@ -1,4 +1,4 @@
-﻿xskillscore.reliability
+xskillscore.reliability
 =======================
 
 .. currentmodule:: xskillscore

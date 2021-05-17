@@ -1,10 +1,12 @@
+import inspect
 import warnings
+from typing import List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as st
 import xarray as xr
 
-from .deterministic import mae, pearson_r
+from . import deterministic as dm
 
 
 def sign_test(
@@ -150,7 +152,7 @@ def sign_test(
         elif not callable(metric):
             raise ValueError(
                 f'metric needs to be a function/callable, string ["categorical", '
-                f"xskillscore.{{metric}}] or None, found {type(metric)}"
+                f"xskillscore.{{{metric}}}] or None, found {type(metric)}"
             )
         if observations is not None:
             # Compare the forecasts and observations using metric
@@ -192,19 +194,25 @@ def sign_test(
     return significantly_different, walk, confidence
 
 
-def mae_test(
-    forecasts1,
-    forecasts2,
-    observations=None,
-    dim=[],
-    time_dim="time",
-    alpha=0.05,
-):
+def halfwidth_ci_test(
+    forecasts1: Union[xr.Dataset, xr.DataArray],
+    forecasts2: Union[xr.Dataset, xr.DataArray],
+    observations: Optional[Union[xr.Dataset, xr.DataArray]] = None,
+    metric: Optional[str] = None,
+    dim: Optional[Union[str, List[str]]] = None,
+    time_dim: str = "time",
+    alpha: float = 0.05,
+    **kwargs: Mapping,
+) -> Tuple[
+    Union[xr.Dataset, xr.DataArray],
+    Union[xr.Dataset, xr.DataArray],
+    Union[xr.Dataset, xr.DataArray],
+]:
     """
-    Returns the Jolliffe and Ebert MAE significance test.
+    Returns the Jolliffe and Ebert significance test.
 
-    Tests whether forecasts1 and
-    forecasts2 have different mean absolute error (MAE) at significance level alpha.
+    Tests whether forecasts1 and forecasts2 have different distance from
+    observations at significance level alpha.
     https://www.cawcr.gov.au/projects/verification/CIdiff/FAQ-CIdiff.html
 
 
@@ -220,26 +228,40 @@ def mae_test(
     Parameters
     ----------
     forecasts1 : xarray.Dataset or xarray.DataArray
-        first forecast to be compared to the observations
+        first forecast to be compared to the observations.
     forecasts2 : xarray.Dataset or xarray.DataArray
-        second forecast to be compared to the observations
-    observations : xarray.Dataset or xarray.DataArray or None
+        second forecast to be compared to the observations.
+    observations : xarray.Dataset or xarray.DataArray, optional
         observations to be compared to both forecasts. if None, assumes that arguments
         forecasts1 and forecasts2 are already MAEs. Defaults to None.
-    time_dim : str
+    metric : str, optional
+        Name of distance metric function to be used for computing the error between
+        forecasts and observation. It can be any of the xskillscore distance metric
+        function except for``mape``. Valid metrics are ``me``, ``rmse``, ``mse``,
+        ``mae``, ``median_absolute_error`` and ``smape``. Note that if metric is None,
+        observations must also be None.
+        Defaults to None.
+    time_dim : str, optional
         time dimension of dimension over which to compute the temporal correlation.
         Defaults to ``'time'``.
-    dim : str or list of str
-        dimensions to apply MAE to. Cannot contain ``time_dim``. Defaults to [].
-    alpha : float
+    dim : str or list of str, optional
+        dimensions to apply metric function to. Cannot contain ``time_dim``.
+        Defaults to None which is then converted to ``[]`` since ``dim=None`` must not
+        be passed to metric functions.
+    alpha : float, optional
         significance level alpha that forecast1 is different than forecast2.
+    **kwargs : dict, optional
+        Optional keyword arguments passed directly on to call ``metric``,
+        excluding ``dim``.
 
     Returns
     -------
     xarray.DataArray or xarray.Dataset :
-        is the difference in MAE significant? boolean returns
+        Is the difference in scores (score(f2) - score(f1)) significant?
+        (returns boolean).
     xarray.DataArray or xarray.Dataset :
-        Difference in xs.mae reduced by ``dim`` and ``time_dim``
+        Difference in scores (score(f2) - score(f1))
+        reduced by ``dim`` and ``time_dim``.
     xarray.DataArray or xarray.Dataset :
         half-width of the confidence interval at the significance level ``alpha``.
 
@@ -251,8 +273,8 @@ def mae_test(
     ...                   coords=[('time', np.arange(30))])
     >>> o = xr.DataArray(np.random.normal(size=(30)),
     ...                  coords=[('time', np.arange(30))])
-    >>> significantly_different, diff, hwci = xs.mae_test(
-    ...    f1, f2, o, time_dim='time', dim=[], alpha=0.05
+    >>> significantly_different, diff, hwci = xs.halfwidth_ci_test(
+    ...    f1, f2, o, "mae", time_dim='time', dim=[], alpha=0.05
     ... )
     >>> significantly_different
     <xarray.DataArray ()>
@@ -266,8 +288,8 @@ def mae_test(
     >>> # absolute magnitude of difference is smaller than half-width of
     >>> # confidence interval, therefore not significant at level alpha=0.05
     >>> # now comparing against an offset f2, the difference in MAE is significant
-    >>> significantly_different, diff, hwci = xs.mae_test(
-    ... f1, f2 + 2., o, time_dim='time', dim=[], alpha=0.05
+    >>> significantly_different, diff, hwci = xs.halfwidth_ci_test(
+    ... f1, f2 + 2., o, "mae", time_dim='time', dim=[], alpha=0.05
     ... )
     >>> significantly_different
     <xarray.DataArray ()>
@@ -280,39 +302,79 @@ def mae_test(
     """
     if isinstance(dim, str):
         dim = [dim]
+    elif dim is None:
+        dim = []
+
     if time_dim in dim:
         raise ValueError("`dim` cannot contain `time_dim`")
 
-    msg = f"`alpha` must be between 0 and 1 or `return_p`, found {alpha}"
-    if isinstance(alpha, str):
-        if alpha != "return_p":
-            raise ValueError(msg)
-    elif isinstance(alpha, float):
-        if not 0 < alpha < 1:
-            raise ValueError(msg)
-    else:
+    msg = f"`alpha` must be between 0 and 1 or `return_p`, found {alpha}."
+    if isinstance(alpha, (str, int)) and alpha != "return_p":
         raise ValueError(msg)
 
-    if observations is not None:
+    if isinstance(alpha, float) and not (0 < alpha < 1):
+        raise ValueError(msg)
+
+    if observations is not None and isinstance(metric, str):
+        valid_metrics = [
+            "me",
+            "rmse",
+            "mse",
+            "mae",
+            "median_absolute_error",
+            "smape",
+        ]
+        if metric not in valid_metrics:
+            msg = (
+                f"`metric` should be a valid distance metric function, found {metric}."
+                " Valid metrics are:\n"
+                ", ".join(valid_metrics)
+            )
+            raise ValueError(msg)
+
+        err_func = getattr(dm, metric)
+        if dim is not None and "dim" in kwargs:
+            kwargs.pop("dim")
+
+        params = inspect.signature(err_func).parameters
+        missing_args = [
+            p
+            for p, v in params.items()
+            if v.default == inspect._empty and p not in kwargs and p not in ["a", "b"]  # type: ignore
+        ]
+        if len(missing_args) > 0:
+            msg = (
+                f"The following positional arguments for {metric} are missing:\n"
+                ", ".join(missing_args)
+            )
+            raise ValueError(msg)
+
         # Compare the forecasts and observations using metric
-        mae_f1o = mae(observations, forecasts1, dim=dim)
-        mae_f2o = mae(observations, forecasts2, dim=dim)
-    elif observations is None:
-        mae_f1o = forecasts1
-        mae_f2o = forecasts2
+        score_f1o = err_func(observations, forecasts1, dim=dim, **kwargs)
+        score_f2o = err_func(observations, forecasts2, dim=dim, **kwargs)
+    elif observations is None and metric is None:
+        score_f1o = forecasts1
+        score_f2o = forecasts2
+    else:
+        msg = (
+            "Both `metric` and `observations` arguments must be either None or "
+            "valid inputs."
+        )
+        raise ValueError(msg)
 
-    pearson_r_f1f2 = pearson_r(mae_f1o, mae_f2o, dim=time_dim)
+    pearson_r_f1f2 = dm.pearson_r(score_f1o, score_f2o, dim=time_dim)
 
-    # diff mae
-    diff = mae_f2o.mean(time_dim) - mae_f1o.mean(time_dim)
+    # diff metric
+    diff = score_f2o.mean(time_dim) - score_f1o.mean(time_dim)
 
-    notnan = 1 * (mae_f1o.notnull() & mae_f2o.notnull())
+    notnan = 1 * (score_f1o.notnull() & score_f2o.notnull())
     N = notnan.sum(time_dim)
     # average variances and take square root instead of averaging standard deviations
-    std = ((mae_f1o.var(time_dim) + mae_f2o.var(time_dim)) / 2) ** 0.5
+    std = ((score_f1o.var(time_dim) + score_f2o.var(time_dim)) * 0.5) ** 0.5
 
-    confidence = st.norm.ppf(1 - alpha / 2)
+    confidence = st.norm.ppf(1.0 - 0.5 * alpha)
     # half width of the confidence interval
     hwci = (2 * (1 - pearson_r_f1f2)) ** 0.5 * confidence * std / N ** 0.5
-    significantly_different = np.abs(diff) > hwci  # MAE difference significant?
+
+    significantly_different = np.abs(diff) > hwci  # metric difference significant?
     return significantly_different, diff, hwci
