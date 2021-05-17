@@ -1,4 +1,4 @@
-﻿xskillscore.core.resampling.resample\_iterations\_idx
+xskillscore.core.resampling.resample\_iterations\_idx
 =====================================================
 
 .. currentmodule:: xskillscore.core.resampling

@@ -1,4 +1,4 @@
-﻿xskillscore.crps\_quadrature
+xskillscore.crps\_quadrature
 ============================
 
 .. currentmodule:: xskillscore

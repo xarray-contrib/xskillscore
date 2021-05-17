@@ -1,4 +1,4 @@
-﻿xskillscore.Contingency.success\_ratio
+xskillscore.Contingency.success\_ratio
 ======================================
 
 .. currentmodule:: xskillscore

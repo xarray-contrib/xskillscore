@@ -1,4 +1,4 @@
-﻿xskillscore.crps\_ensemble
+xskillscore.crps\_ensemble
 ==========================
 
 .. currentmodule:: xskillscore

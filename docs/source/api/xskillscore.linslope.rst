@@ -1,4 +1,4 @@
-﻿xskillscore.linslope
+xskillscore.linslope
 ====================
 
 .. currentmodule:: xskillscore

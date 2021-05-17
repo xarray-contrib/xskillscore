@@ -1,4 +1,4 @@
-﻿xskillscore.sign\_test
+xskillscore.sign\_test
 ======================
 
 .. currentmodule:: xskillscore

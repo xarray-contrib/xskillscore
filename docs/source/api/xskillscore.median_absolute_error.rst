@@ -1,4 +1,4 @@
-﻿xskillscore.median\_absolute\_error
+xskillscore.median\_absolute\_error
 ===================================
 
 .. currentmodule:: xskillscore
