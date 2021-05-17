@@ -194,7 +194,7 @@ def sign_test(
     return significantly_different, walk, confidence
 
 
-def significance_test(
+def halfwidth_ci_test(
     forecasts1: Union[xr.Dataset, xr.DataArray],
     forecasts2: Union[xr.Dataset, xr.DataArray],
     observations: Optional[Union[xr.Dataset, xr.DataArray]] = None,
@@ -256,9 +256,9 @@ def significance_test(
     Returns
     -------
     xarray.DataArray or xarray.Dataset :
-        Is the difference in scores (score(f2) - score(f1)) significant? (returns boolean)
+        Is the difference in scores (score(f2) - score(f1)) significant? (returns boolean).
     xarray.DataArray or xarray.Dataset :
-        Difference in scores (score(f2) - score(f1)) reduced by ``dim`` and ``time_dim``
+        Difference in scores (score(f2) - score(f1)) reduced by ``dim`` and ``time_dim``.
     xarray.DataArray or xarray.Dataset :
         half-width of the confidence interval at the significance level ``alpha``.
 
@@ -270,7 +270,7 @@ def significance_test(
     ...                   coords=[('time', np.arange(30))])
     >>> o = xr.DataArray(np.random.normal(size=(30)),
     ...                  coords=[('time', np.arange(30))])
-    >>> significantly_different, diff, hwci = xs.significance_test(
+    >>> significantly_different, diff, hwci = xs.halfwidth_ci_test(
     ...    f1, f2, o, "mae", time_dim='time', dim=[], alpha=0.05
     ... )
     >>> significantly_different
@@ -285,7 +285,7 @@ def significance_test(
     >>> # absolute magnitude of difference is smaller than half-width of
     >>> # confidence interval, therefore not significant at level alpha=0.05
     >>> # now comparing against an offset f2, the difference in MAE is significant
-    >>> significantly_different, diff, hwci = xs.significance_test(
+    >>> significantly_different, diff, hwci = xs.halfwidth_ci_test(
     ... f1, f2 + 2., o, "mae", time_dim='time', dim=[], alpha=0.05
     ... )
     >>> significantly_different
