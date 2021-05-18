@@ -68,14 +68,15 @@ def sign_test(
 
     Returns
     -------
-    xarray.DataArray or xarray.Dataset : boolean returns answering whether forecast1 is
-        significantly different to forecast2
-    xarray.DataArray or xarray.Dataset : Positive (negative) walk values shows
-        how often ``forecast1`` is better (worse) than ``forecast2`` according to
-        metric computed over ``dim``.
-    xarray.DataArray or xarray.Dataset : confidence shows the positive boundary for a
-        random walk at significance level ``alpha``.
-
+    xarray.DataArray or xarray.Dataset
+        Boolean returns answering whether forecast1 is significantly different to
+        forecast2.
+    xarray.DataArray or xarray.Dataset
+        Positive (negative) walk values shows how often ``forecast1`` is better (worse)
+        than ``forecast2`` according to metric computed over ``dim``.
+    xarray.DataArray or xarray.Dataset
+        confidence shows the positive boundary for a random walk at significance
+        level ``alpha``.
 
     Examples
     --------
@@ -256,13 +257,13 @@ def halfwidth_ci_test(
 
     Returns
     -------
-    xarray.DataArray or xarray.Dataset :
+    xarray.DataArray or xarray.Dataset
         Is the difference in scores (score(f2) - score(f1)) significant?
         (returns boolean).
-    xarray.DataArray or xarray.Dataset :
-        Difference in scores (score(f2) - score(f1))
-        reduced by ``dim`` and ``time_dim``.
-    xarray.DataArray or xarray.Dataset :
+    xarray.DataArray or xarray.Dataset
+        Difference in scores (score(f2) - score(f1)) reduced by ``dim`` and
+        ``time_dim``.
+    xarray.DataArray or xarray.Dataset
         half-width of the confidence interval at the significance level ``alpha``.
 
     Examples
