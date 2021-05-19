@@ -49,6 +49,7 @@ extlinks = {
 }
 
 autodoc_typehints = "description"
+autodoc_typehints_description_target = "documented"
 
 nbsphinx_timeout = 60
 nbsphinx_execute = "always"
