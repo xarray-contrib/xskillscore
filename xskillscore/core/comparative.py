@@ -23,6 +23,7 @@ def sign_test(
 ):
     """
     Returns the Delsole and Tippett sign test over the given time dimension.
+
     The sign test can be applied to a wide class of measures of forecast quality,
     including ordered (ranked) categorical data. It is independent of
     distributional assumptions about the forecast errors. This is different than
