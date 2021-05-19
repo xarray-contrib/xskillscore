@@ -34,6 +34,7 @@ def sign_test(
     This procedure is equivalent to testing whether a coin is fair based on the
     frequency of heads. The null hypothesis is that the difference between the
     median scores is zero.
+
     Parameters
     ----------
     forecasts1 : xarray.Dataset or xarray.DataArray
