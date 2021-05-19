@@ -1,6 +1,6 @@
 import inspect
 import warnings
-from typing import Any, Callable, List, Mapping, Optional, Tuple, Union
+from typing import List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as st
