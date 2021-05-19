@@ -1,12 +1,14 @@
 import inspect
 import warnings
-from typing import List, Mapping, Optional, Tuple, Union
+from typing import Any, Callable, List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as st
 import xarray as xr
 
 from . import deterministic as dm
+
+XArray = Union[xr.Dataset, xr.DataArray]
 
 
 def sign_test(
@@ -21,7 +23,6 @@ def sign_test(
 ):
     """
     Returns the Delsole and Tippett sign test over the given time dimension.
-
     The sign test can be applied to a wide class of measures of forecast quality,
     including ordered (ranked) categorical data. It is independent of
     distributional assumptions about the forecast errors. This is different than
@@ -32,7 +33,6 @@ def sign_test(
     This procedure is equivalent to testing whether a coin is fair based on the
     frequency of heads. The null hypothesis is that the difference between the
     median scores is zero.
-
     Parameters
     ----------
     forecasts1 : xarray.Dataset or xarray.DataArray
@@ -69,14 +69,11 @@ def sign_test(
     Returns
     -------
     xarray.DataArray or xarray.Dataset
-        Boolean returns answering whether forecast1 is significantly different to
-        forecast2.
+        boolean whether ``forecast1`` is significantly different to ``forecast2``.
     xarray.DataArray or xarray.Dataset
-        Positive (negative) walk values shows how often ``forecast1`` is better (worse)
-        than ``forecast2`` according to metric computed over ``dim``.
+        walk values shows how often ``forecast1`` is better ``forecast2``.
     xarray.DataArray or xarray.Dataset
-        confidence shows the positive boundary for a random walk at significance
-        level ``alpha``.
+        confidence boundary for a random walk at significance level ``alpha``.
 
     Examples
     --------
@@ -196,19 +193,15 @@ def sign_test(
 
 
 def halfwidth_ci_test(
-    forecasts1: Union[xr.Dataset, xr.DataArray],
-    forecasts2: Union[xr.Dataset, xr.DataArray],
-    observations: Optional[Union[xr.Dataset, xr.DataArray]] = None,
+    forecasts1: XArray,
+    forecasts2: XArray,
+    observations: Optional[XArray] = None,
     metric: Optional[str] = None,
     dim: Optional[Union[str, List[str]]] = None,
     time_dim: str = "time",
     alpha: float = 0.05,
     **kwargs: Mapping,
-) -> Tuple[
-    Union[xr.Dataset, xr.DataArray],
-    Union[xr.Dataset, xr.DataArray],
-    Union[xr.Dataset, xr.DataArray],
-]:
+) -> Tuple[XArray, XArray, XArray]:
     """
     Returns the Jolliffe and Ebert significance test.
 
@@ -238,7 +231,7 @@ def halfwidth_ci_test(
     metric : str, optional
         Name of distance metric function to be used for computing the error between
         forecasts and observation. It can be any of the xskillscore distance metric
-        function except for``mape``. Valid metrics are ``me``, ``rmse``, ``mse``,
+        function except for ``mape``. Valid metrics are ``me``, ``rmse``, ``mse``,
         ``mae``, ``median_absolute_error`` and ``smape``. Note that if metric is None,
         observations must also be None.
         Defaults to None.
@@ -257,14 +250,9 @@ def halfwidth_ci_test(
 
     Returns
     -------
-    xarray.DataArray or xarray.Dataset
-        Is the difference in scores (score(f2) - score(f1)) significant?
-        (returns boolean).
-    xarray.DataArray or xarray.Dataset
-        Difference in scores (score(f2) - score(f1)) reduced by ``dim`` and
-        ``time_dim``.
-    xarray.DataArray or xarray.Dataset
-        half-width of the confidence interval at the significance level ``alpha``.
+    boolean whether the difference in scores (score(f2) - score(f1)) are significant.
+    difference in scores (score(f2) - score(f1)) reduced by ``dim`` and ``time_dim``.
+    half-width of the confidence interval at the significance level ``alpha``.
 
     Examples
     --------
@@ -295,7 +283,6 @@ def halfwidth_ci_test(
     >>> significantly_different
     <xarray.DataArray ()>
     array(True)
-
 
     References
     ----------
