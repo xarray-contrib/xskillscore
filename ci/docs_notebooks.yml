@@ -16,13 +16,15 @@ dependencies:
   # see https://github.com/xgcm/xhistogram/issues/48
   - xhistogram==0.1.2
   - importlib_metadata
+  - ipykernel
   - jupyterlab
   - matplotlib-base
   - nbsphinx
   - nbstripout
   - sphinx
-  - sphinxcontrib-napoleon
+  - sphinx-autosummary-accessors
   - sphinx_rtd_theme
+  - sphinxcontrib-napoleon
   - black
   - doc8
   - isort
@@ -30,6 +32,5 @@ dependencies:
   - pre-commit
   - pip
   - pip:
-      - sphinx_autosummary_accessors
       # Install latest version of xskillscore.
       - -e ..
