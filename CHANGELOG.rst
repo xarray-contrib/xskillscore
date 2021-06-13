@@ -12,7 +12,7 @@ Internal Changes
 Documentation
 ~~~~~~~~~~~~~
 - Added more info in ``quick-start.ipynb`` (:pr:`316`) `Ray Bell`_.
-- Created ``tabular-data.ipynb`` (:pr:`X`) `Ray Bell`_.
+- Created ``tabular-data.ipynb`` (:pr:`330`) `Ray Bell`_.
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
