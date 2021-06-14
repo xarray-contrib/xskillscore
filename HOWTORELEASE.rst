@@ -18,7 +18,7 @@ Release Procedure
     $ git tag -a v0.0.xx -m "Version 0.0.xx"
     $ git push origin main --tags
 
-#. On creating a tag a GitHub action will publish the release on PyPI. If that fails
+#. A GitHub action will publish the release on PyPI. If that fails
    you can manually do it with the following::
 
     $ git clean -xfd  # remove any files not checked into git
@@ -48,5 +48,4 @@ Release Procedure
  - Update version
  - Get sha256 from pypi.org for `xskillscore <https://pypi.org/project/xskillscore/#files>`_
  - Fill in the rest of information as described `here <https://github.com/conda-forge/xskillscore-feedstock#updating-xskillscore-feedstock>`_
-
- * Commit and submit a PR
+ - Commit and submit a PR
