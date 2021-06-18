@@ -1,6 +1,5 @@
 import numpy as np
 
-
 __all__ = ["_gerrity_s"]
 
 # TODO: Currently computes the Gerrity scoring matrix using nested for-loops.
