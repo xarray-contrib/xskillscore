@@ -7,7 +7,7 @@ xskillscore v0.0.22 (2021-XX-XX)
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
-- Created ``np_probabilistic.py`` (:pr:`333`) `Ray Bell`_. 
+- Created ``np_probabilistic.py`` (:pr:`333`) `Ray Bell`_.
 
 
 xskillscore v0.0.21 (2021-06-13)
