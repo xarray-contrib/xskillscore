@@ -2,12 +2,13 @@
 Changelog History
 =================
 
-xskillscore v0.0.22 (2021-XX-XX)
+xskillscore v0.0.22 (2021-06-29)
 --------------------------------
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
 - Created ``np_probabilistic.py`` (:pr:`333`) `Ray Bell`_.
+- Require ``xhistogram>=0.3.0`` (:pr:`337`).
 
 
 xskillscore v0.0.21 (2021-06-13)

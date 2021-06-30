@@ -13,9 +13,7 @@ dependencies:
   - scikit-learn
   - scipy
   - xarray>=0.16.1
-  # xhistogram 0.1.3 introduced an error that broke xskillscore
-  # see https://github.com/xgcm/xhistogram/issues/48
-  - xhistogram==0.1.2
+  - xhistogram>=0.3.0
   - coveralls
   - pytest
   - pytest-cov
