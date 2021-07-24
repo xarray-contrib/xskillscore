@@ -107,6 +107,8 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
         forecast_smp.append(forecast.isel({dim: idx}).assign_coords({dim: new_dim}))
     forecast_smp = xr.concat(forecast_smp, dim="iteration", **CONCAT_KWARGS)
     forecast_smp["iteration"] = np.arange(iterations)
+    if dim not in forecast.coords:
+        del forecast_smp.coords[dim]
     return forecast_smp.transpose(..., "iteration")
 
 
