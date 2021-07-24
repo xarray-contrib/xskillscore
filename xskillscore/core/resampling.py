@@ -212,5 +212,5 @@ def resample_iterations_idx(
     if dim_max is not None and dim_max <= forecast[dim].size:
         forecast_smp = forecast_smp.isel({dim: slice(None, dim_max)})
     if dim_coord_set:
-        forecast_smp = forecast_smp.drop(dim)
+        del forecast_smp.coords[dim]
     return forecast_smp
