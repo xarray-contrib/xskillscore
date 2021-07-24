@@ -160,7 +160,7 @@ def test_resample_inputs(a_1d, func, input, chunk, replace):
 def test_resample_dim_no_coord(func):
     """resample_iterations doesnt fail when no dim coords"""
     da = xr.DataArray(
-        np.random.rand(1000, 3, 3),
+        np.random.rand(100, 3, 3),
         coords=[("time", np.arange(100)), ("x", np.arange(3)), ("y", np.arange(3))],
     )
     assert func(da, 2, dim="time")
