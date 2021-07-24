@@ -172,7 +172,10 @@ def resample_iterations_idx(
       for interannual-to-decadal predictions experiments. Climate Dynamics, 40(1–2),
       245–272. https://doi.org/10/f4jjvf
     """
-    # equivalent to above
+    if dim not in forecast.coords:
+        # raise ValueError(f"dim={dim} needs to be coordinate.")
+        forecast.coords[dim] = np.arange(0, forecast[dim].size)
+
     select_dim_items = forecast[dim].size
     new_dim = forecast[dim]
 
