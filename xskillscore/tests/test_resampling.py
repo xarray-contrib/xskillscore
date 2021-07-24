@@ -158,7 +158,7 @@ def test_resample_inputs(a_1d, func, input, chunk, replace):
 
 @pytest.mark.parametrize("func", resample_iterations_funcs)
 def test_resample_dim_no_coord(func):
-    """resample_iterations doesnt fail when no dim coords
+    """resample_iterations doesnt fail when no dim coords"""
     da = xr.DataArray(
         np.random.rand(1000, 3, 3),
         coords=[("time", np.arange(100)), ("x", np.arange(3)), ("y", np.arange(3))],
