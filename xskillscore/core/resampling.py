@@ -175,6 +175,9 @@ def resample_iterations_idx(
     if dim not in forecast.coords:
         # raise ValueError(f"dim={dim} needs to be coordinate.")
         forecast.coords[dim] = np.arange(0, forecast[dim].size)
+        dim_coord_set = True
+    else:
+        dim_coord_set = False
 
     select_dim_items = forecast[dim].size
     new_dim = forecast[dim]
@@ -208,4 +211,6 @@ def resample_iterations_idx(
     # return only dim_max members
     if dim_max is not None and dim_max <= forecast[dim].size:
         forecast_smp = forecast_smp.isel({dim: slice(None, dim_max)})
+    if dim_coord_set:
+        forecast_smp = forecast_smp.drop(dim)
     return forecast_smp
