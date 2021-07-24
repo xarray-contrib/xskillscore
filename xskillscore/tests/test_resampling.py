@@ -163,4 +163,4 @@ def test_resample_dim_no_coord(func):
         np.random.rand(100, 3, 3),
         coords=[("time", np.arange(100)), ("x", np.arange(3)), ("y", np.arange(3))],
     )
-    assert func(da, 2, dim="time")
+    func(da, 2, dim="time")
