@@ -9,7 +9,7 @@ Internal Changes
 ~~~~~~~~~~~~~~~~
 - :py:func:`~xskillscore.resampling.resample_iterations_idx` do not break when ``dim`` is
   not coordinate. (:issue:`303`, :pr:`339`) `Aaron Spring`_.
-- Allow ``float`` or integer`` forecasts in :py:func:`~xskillscore.brier_score`
+- Allow ``float`` or ``integer`` forecasts in :py:func:`~xskillscore.brier_score`
   (:issue:`285`, :pr:`341`) `Aaron Spring`_.
 
 
