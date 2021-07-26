@@ -175,7 +175,6 @@ def resample_iterations_idx(
       245–272. https://doi.org/10/f4jjvf
     """
     if dim not in forecast.coords:
-        # raise ValueError(f"dim={dim} needs to be coordinate.")
         forecast.coords[dim] = np.arange(0, forecast[dim].size)
         dim_coord_set = True
     else:
