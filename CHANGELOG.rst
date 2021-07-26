@@ -23,6 +23,10 @@ Internal Changes
 xskillscore v0.0.21 (2021-06-13)
 --------------------------------
 
+- Allow ``float`` or ``integer`` forecasts in :py:func:`~xskillscore.brier_score`
+  (:issue:`285`, :pr:`342`) `Aaron Spring`_
+
+
 Internal Changes
 ~~~~~~~~~~~~~~~~
 - Added mypy to linting (:pr:`320`) `Zachary Blackwood`_.
