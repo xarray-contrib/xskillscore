@@ -1070,3 +1070,14 @@ def test_roc_bin_edges_symmetric_asc_or_desc(
     assert_identical(fpr, fpr2.sortby(fpr.probability_bin))
     assert_identical(tpr, tpr2.sortby(tpr.probability_bin))
     assert_identical(area, area2)
+
+    
+    def test_brier_score_float_forecast_or_observations(o, f_prob):
+        """Test that forecast and observations can be float."""
+        o = o > 0.5
+        f_prob = (f_frob > 0.5).mean("member")
+        brier_score(o, f_prob)
+        brier_score(o, 0.5)
+        brier_score(0.5, f_prob)
+        
+        
