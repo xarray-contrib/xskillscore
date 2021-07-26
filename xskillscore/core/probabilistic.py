@@ -350,8 +350,9 @@ def brier_score(
                 o = observations
                 res = (e / M - o) ** 2 - e * (M - e) / (M ** 2 * (M - 1))
         else:
-            if member_dim in forecasts.dims:
-                forecasts = forecasts.mean(member_dim)
+            if isinstance(forecasts, (xr.Dataset, xr.DataArray)):
+                if member_dim in forecasts.dims:
+                    forecasts = forecasts.mean(member_dim)
             res = xr.apply_ufunc(
                 properscoring.brier_score,
                 observations,

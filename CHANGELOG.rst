@@ -5,6 +5,8 @@ Changelog History
 xskillscore v0.0.23 (2021-xx-xx)
 --------------------------------
 
+- Allow ``float`` or integer`` forecasts in :py:func:`~xskillscore.brier_score`
+  (:issue:`285`, :pr:`340`) `Aaron Spring`_
 
 xskillscore v0.0.22 (2021-06-29)
 --------------------------------
