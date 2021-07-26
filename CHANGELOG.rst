@@ -5,6 +5,11 @@ Changelog History
 xskillscore v0.0.23 (2021-xx-xx)
 --------------------------------
 
+Internal Changes
+~~~~~~~~~~~~~~~~
+- :py:func:`~xskillscore.resampling.resample_iterations_idx` do not break when ``dim`` is
+  not coordinate. (:issue:`303`, :pr:`339`) `Aaron Spring`_
+
 
 xskillscore v0.0.22 (2021-06-29)
 --------------------------------
