@@ -154,3 +154,14 @@ def test_resample_inputs(a_1d, func, input, chunk, replace):
     assert is_dask_collection(actual) if chunk else not is_dask_collection(actual)
     # input type preserved
     assert type(actual) == type(a_1d)
+
+
+@pytest.mark.parametrize("func", resample_iterations_funcs)
+def test_resample_dim_no_coord(func):
+    """resample_iterations doesnt fail when no dim coords"""
+    da = xr.DataArray(
+        np.random.rand(100, 3, 3),
+        coords=[("time", np.arange(100)), ("x", np.arange(3)), ("y", np.arange(3))],
+    )
+    del da.coords["time"]
+    assert "time" not in func(da, 2, dim="time").coords

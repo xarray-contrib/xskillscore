@@ -107,6 +107,8 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
         forecast_smp.append(forecast.isel({dim: idx}).assign_coords({dim: new_dim}))
     forecast_smp = xr.concat(forecast_smp, dim="iteration", **CONCAT_KWARGS)
     forecast_smp["iteration"] = np.arange(iterations)
+    if dim not in forecast.coords:
+        del forecast_smp.coords[dim]
     return forecast_smp.transpose(..., "iteration")
 
 
@@ -172,7 +174,12 @@ def resample_iterations_idx(
       for interannual-to-decadal predictions experiments. Climate Dynamics, 40(1–2),
       245–272. https://doi.org/10/f4jjvf
     """
-    # equivalent to above
+    if dim not in forecast.coords:
+        forecast.coords[dim] = np.arange(0, forecast[dim].size)
+        dim_coord_set = True
+    else:
+        dim_coord_set = False
+
     select_dim_items = forecast[dim].size
     new_dim = forecast[dim]
 
@@ -205,4 +212,6 @@ def resample_iterations_idx(
     # return only dim_max members
     if dim_max is not None and dim_max <= forecast[dim].size:
         forecast_smp = forecast_smp.isel({dim: slice(None, dim_max)})
+    if dim_coord_set:
+        del forecast_smp.coords[dim]
     return forecast_smp
