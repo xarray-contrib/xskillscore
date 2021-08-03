@@ -242,6 +242,10 @@ def crps_ensemble(
     --------
     properscoring.crps_ensemble
     """
+    observations = observations.broadcast_like(
+        forecasts.isel({member_dim: 0}, drop=True)
+    )
+    forecasts = forecasts.broadcast_like(observations)
     res = xr.apply_ufunc(
         properscoring.crps_ensemble,
         observations,
