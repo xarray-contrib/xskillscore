@@ -35,6 +35,15 @@ __all__ = [
 FORECAST_PROBABILITY_DIM = "forecast_probability"
 
 
+def probabilistic_broadcast(observations, forecasts, member_dim="member"):
+    """Broadcast dimension except for member_dim in forecasts."""
+    observations = observations.broadcast_like(
+        forecasts.isel({member_dim: 0}, drop=True)
+    )
+    forecasts = forecasts.broadcast_like(observations)
+    return observations, forecasts
+
+
 def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=False):
     """Continuous Ranked Probability Score with a Gaussian distribution.
 
@@ -242,10 +251,9 @@ def crps_ensemble(
     --------
     properscoring.crps_ensemble
     """
-    observations = observations.broadcast_like(
-        forecasts.isel({member_dim: 0}, drop=True)
+    observations, forecasts = probabilistic_broadcast(
+        observations, forecasts, member_dim=member_dim
     )
-    forecasts = forecasts.broadcast_like(observations)
     res = xr.apply_ufunc(
         properscoring.crps_ensemble,
         observations,
