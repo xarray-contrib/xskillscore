@@ -5,6 +5,11 @@ Changelog History
 xskillscore v0.0.23 (2021-xx-xx)
 --------------------------------
 
+Bug Fixes
+~~~~~~~~~
+- :py:func:`~xskillscore.crps_ensemble` broadcasts
+  (:issue:`345`, :pr:`346`) `Aaron Spring`_.
+
 Internal Changes
 ~~~~~~~~~~~~~~~~
 - :py:func:`~xskillscore.resampling.resample_iterations_idx` do not break when ``dim`` is
