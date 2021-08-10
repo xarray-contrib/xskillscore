@@ -10,9 +10,6 @@ xskillscore: Metrics for verifying forecasts
 .. image:: https://img.shields.io/pypi/v/xskillscore.svg
    :target: https://pypi.python.org/pypi/xskillscore/
 
-.. image:: https://anaconda.org/conda-forge/xskillscore/badges/version.svg
-   :target: https://anaconda.org/conda-forge/xskillscore/
-
 .. image:: https://codecov.io/gh/xarray-contrib/xskillscore/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/xarray-contrib/xskillscore
 
