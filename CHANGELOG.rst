@@ -2,7 +2,7 @@
 Changelog History
 =================
 
-xskillscore v0.0.23 (2021-xx-xx)
+xskillscore v0.0.23 (2021-08-09)
 --------------------------------
 
 Bug Fixes
