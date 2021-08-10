@@ -135,6 +135,13 @@ def test_crps_gaussian_api_and_inputs(o, f_prob, keep_attrs, input_type, chunk_b
 
 
 @pytest.mark.parametrize("dim", DIMS)
+def test_crps_ensemble_broadcast(o, f_prob, dim):
+    """Check that crps_ensemble broadcasts."""
+    crps_ensemble(o, f_prob.expand_dims("model").isel(model=[0] * 2), dim=dim)
+    crps_ensemble(o.expand_dims("model").isel(model=[0] * 2), f_prob, dim=dim)
+
+
+@pytest.mark.parametrize("dim", DIMS)
 def test_crps_gaussian_dim(o, f_prob, dim):
     """Check that crps_gaussian reduces only dim."""
     mu = f_prob.mean("member")
