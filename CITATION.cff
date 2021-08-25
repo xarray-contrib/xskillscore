@@ -1,0 +1,41 @@
+# YAML 1.2
+# Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
+cff-version: 1.0.3
+message: If you use this software, please cite it using these metadata.
+# FIXME title as repository name might not be the best name, please make human readable
+title: 'xarray-contrib/xskillscore: Release v0.0.23'
+doi: 10.5281/zenodo.5173153
+# FIXME splitting of full names is error prone, please check if given/family name are correct
+authors:
+- given-names: Ray
+  family-names: Bell
+  affiliation: DTN
+  https://orcid.org/0000-0003-2623-0587
+- given-names: Aaron
+  family-names: Spring
+  affiliation: Max-Planck-Institute for Meteorology
+  orcid: https://orcid.org/0000-0003-0216-2241
+- given-names: Riley
+  family-names: Brady
+  affiliation: McKinsey & Company
+  orcid: https://orcid.org/0000-0002-2309-8245
+- given-names: Andrew
+  family-names: Huang
+- given-names: Dougie
+  family-names: Squire
+  affiliation: CSIRO
+  orcid: https://orcid.org/0000-0003-3271-6874
+- given-names: Zachary
+  family-names: Blackwood
+  affiliation: DTN
+- given-names: Maximilian
+  family-names: Sitter
+  name-particle: Cosmo
+- given-names: Taher
+  family-names: Chegini
+  affiliation: University of Houston
+  https://orcid.org/0000-0002-5430-6000
+version: 0.0.23
+date-released: 2021-08-10
+repository-code: https://github.com/xarray-contrib/xskillscore
+license: Apache-2.0
