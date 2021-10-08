@@ -16,6 +16,7 @@ dependencies:
   - importlib_metadata
   - ipykernel
   - jupyterlab
+  - jupyterlab_code_formatter
   - matplotlib-base
   - nbsphinx
   - nbstripout
