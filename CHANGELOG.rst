@@ -6,7 +6,7 @@ xskillscore v0.0.24 (2021-10-08)
 --------------------------------
 Documentation
 ~~~~~~~~~~~~~
-- Replaced Boston house data in ``tabular.ipynb`` (:pr:`XX`) `Ray Bell`_.
+- Replaced Boston house data in ``tabular.ipynb`` (:pr:`352`) `Ray Bell`_.
 
 
 xskillscore v0.0.23 (2021-08-09)
