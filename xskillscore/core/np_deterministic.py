@@ -5,6 +5,12 @@ from scipy.stats import distributions
 
 from .utils import suppress_warnings
 
+try:
+    from bottleneck import nanrankdata as rankdata
+except ImportError:
+    from scipy.stats import rankdata
+
+
 __all__ = [
     "_effective_sample_size",
     "_linslope",
@@ -447,8 +453,8 @@ def _spearman_r(a, b, weights, axis, skipna):
     """
     if skipna:
         a, b, weights = _match_nans(a, b, weights)
-    _a = bn.nanrankdata(a, axis=axis)
-    _b = bn.nanrankdata(b, axis=axis)
+    _a = rankdata(a, axis=axis)
+    _b = rankdata(b, axis=axis)
     return _pearson_r(_a, _b, weights, axis, skipna)
 
 
