@@ -32,5 +32,8 @@ setup(
         "setuptools>=30.3.0",
         "setuptools_scm_git_archive",
     ],
+    extras_require={
+        "accel": ["numba>=0.52", "bottleneck"],
+    },
     zip_safe=False,
 )

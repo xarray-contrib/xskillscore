@@ -1,4 +1,3 @@
-bottleneck
 numpy
 properscoring
 scipy
