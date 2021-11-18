@@ -1,4 +1,3 @@
-import bottleneck as bn
 import numpy as np
 from scipy import special
 from scipy.stats import distributions
