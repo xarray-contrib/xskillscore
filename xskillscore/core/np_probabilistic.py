@@ -1,5 +1,5 @@
 import numpy as np
-
+import dask.array as da
 from .utils import suppress_warnings
 
 __all__ = ["_reliability"]
@@ -40,8 +40,8 @@ def _reliability(o, f, bin_edges):
 
     if is_dask_array:
         return (
-            r.stack(axis=-1).rechunk({-1: -1}),
-            N.stack(axis=-1).rechunk({-1: -1}),
+            da.stack(r, axis=-1).rechunk({-1: -1}),
+            da.stack(N, axis=-1).rechunk({-1: -1}),
         )
     else:
         return r, N
