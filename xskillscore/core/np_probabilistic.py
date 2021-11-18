@@ -1,4 +1,3 @@
-import dask.array as da
 import numpy as np
 
 from .utils import suppress_warnings
@@ -40,6 +39,7 @@ def _reliability(o, f, bin_edges):
                     N[..., i] = N_f_in_bin
 
     if is_dask_array:
+        import dask.array as da
         return (
             da.stack(r, axis=-1).rechunk({-1: -1}),
             da.stack(N, axis=-1).rechunk({-1: -1}),
