@@ -9,7 +9,7 @@ def _reliability(o, f, bin_edges):
     """Return the reliability and number of samples per bin"""
     # I couldn't get dask='parallelized' working in this case
     # so dealing with dask arrays explicitly
-    is_dask_array = o.chunksizes is None | f.chunksizes is None
+    is_dask_array = not isinstance(o, np.ndarray) or not isinstance(f, np.ndarray) 
 
     if is_dask_array:
         r = []
