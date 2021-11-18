@@ -21,5 +21,6 @@ dependencies:
   - xarray>=0.16.1
   - xhistogram>=0.3.0
   - scikit-learn
+  - cftime
   - pip:
       - -e ..
