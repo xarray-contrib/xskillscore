@@ -1,5 +1,4 @@
 bottleneck
-dask
 numpy
 properscoring
 scipy
