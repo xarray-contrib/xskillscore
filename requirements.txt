@@ -1,7 +1,6 @@
 bottleneck
 cftime
 dask
-numba>=0.52
 numpy
 properscoring
 scipy
