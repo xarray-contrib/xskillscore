@@ -1,5 +1,4 @@
 bottleneck
-cftime
 dask
 numpy
 properscoring
