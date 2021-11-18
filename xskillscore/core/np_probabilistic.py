@@ -41,6 +41,7 @@ def _reliability(o, f, bin_edges):
 
     if is_dask_array:
         import dask.array as da
+
         return (
             da.stack(r, axis=-1).rechunk({-1: -1}),
             da.stack(N, axis=-1).rechunk({-1: -1}),
