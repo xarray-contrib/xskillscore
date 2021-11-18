@@ -4,7 +4,6 @@ dask
 numba>=0.52
 numpy
 properscoring
-scikit-learn
 scipy
 toolz
 xarray>=0.16.1

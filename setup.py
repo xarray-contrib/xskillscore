@@ -9,7 +9,7 @@ LONG_DESCRIPTION = """Metrics for verifying forecasts"""
 URL = "https://github.com/xarray-contrib/xskillscore"
 with open("requirements.txt") as f:
     INSTALL_REQUIRES = f.read().strip().split("\n")
-TESTS_REQUIRE = ["pytest"]
+TESTS_REQUIRE = ["pytest", "scikit-learn"]
 PYTHON_REQUIRE = ">=3.7"
 
 
