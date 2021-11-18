@@ -40,8 +40,8 @@ def _reliability(o, f, bin_edges):
 
     if is_dask_array:
         return (
-            da.stack(r, axis=-1).rechunk({-1: -1}),
-            da.stack(N, axis=-1).rechunk({-1: -1}),
+            r.stack(axis=-1).rechunk({-1: -1}),
+            N.stack(axis=-1).rechunk({-1: -1}),
         )
     else:
         return r, N
