@@ -1,5 +1,6 @@
-import numpy as np
 import dask.array as da
+import numpy as np
+
 from .utils import suppress_warnings
 
 __all__ = ["_reliability"]
