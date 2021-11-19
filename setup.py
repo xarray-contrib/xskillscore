@@ -11,13 +11,13 @@ with open("requirements.txt") as f:
     INSTALL_REQUIRES = f.read().strip().split("\n")
 PYTHON_REQUIRE = ">=3.7"
 
-extras_require = {
+EXTRAS_REQUIRE = {
     "accel": ["numba>=0.52", "bottleneck"],
 }
 
-extras_require["complete"] = sorted({v for req in extras_require.values() for v in req})
+EXTRAS_REQUIRE["complete"] = sorted({v for req in EXTRAS_REQUIRE.values() for v in req})
 # after complete is set, add in test
-extras_require["test"] = [
+EXTRAS_REQUIRE["test"] = [
     "pytest",
     "scikit-learn",
     "cftime",
@@ -48,6 +48,6 @@ setup(
         "setuptools>=30.3.0",
         "setuptools_scm_git_archive",
     ],
-    extras_require=extras_require,
+    extras_require=EXTRAS_REQUIRE,
     zip_safe=False,
 )
