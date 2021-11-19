@@ -12,9 +12,11 @@ with open("requirements.txt") as f:
 TESTS_REQUIRE = ["pytest", "scikit-learn", "cftime", "dask", "matplotlib", "pytest-cov", "pytest-lazyfixures"]
 PYTHON_REQUIRE = ">=3.7"
 
-extras_require={
-    "accel": ["numba>=0.52", "bottleneck"],
-},
+extras_require=(
+    {
+        "accel": ["numba>=0.52", "bottleneck"],
+    }
+)
 extras_require["complete"] = sorted({v for req in extras_require.values() for v in req})
 # after complete is set, add in test
 extras_require['test'] = [
@@ -24,7 +26,7 @@ extras_require['test'] = [
     "dask[array]",
     "matplotlib",
     "pytest-cov",
-    "pytest-xdist"
+    "pytest-xdist",
     "pytest-lazyfixures"
 ]
 
