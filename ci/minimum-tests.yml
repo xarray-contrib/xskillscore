@@ -9,6 +9,7 @@ dependencies:
   - xhistogram>=0.3.0
   - cftime
   - scikit-learn
+  - dask-core
   - bottleneck
   - coveralls
   - matplotlib

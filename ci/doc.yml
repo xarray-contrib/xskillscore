@@ -22,5 +22,6 @@ dependencies:
   - xhistogram>=0.3.0
   - scikit-learn
   - cftime
+  - dask-core
   - pip:
       - -e ..
