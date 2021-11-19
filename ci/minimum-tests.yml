@@ -2,14 +2,15 @@ name: xskillscore-minimum-tests
 channels:
   - conda-forge
 dependencies:
-  - bottleneck
   - numpy
   - properscoring
   - scipy
   - xarray>=0.16.1
   - xhistogram>=0.3.0
-  - coveralls
   - cftime
+  - scikit-learn
+  - bottleneck
+  - coveralls
   - pytest
   - pytest-cov
   - pytest-lazy-fixture
