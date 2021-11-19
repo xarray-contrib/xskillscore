@@ -9,6 +9,7 @@ dependencies:
   - xarray>=0.16.1
   - xhistogram>=0.3.0
   - coveralls
+  - cftime
   - pytest
   - pytest-cov
   - pytest-lazy-fixture
