@@ -25,6 +25,7 @@ EXTRAS_REQUIRE["test"] = [
     "pytest-cov",
     "pytest-xdist",
     "pytest-lazyfixures",
+    "pre-commit",
 ]
 
 
