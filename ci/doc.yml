@@ -17,6 +17,7 @@ dependencies:
   - sphinx
   - sphinx_rtd_theme
   - sphinx-autosummary-accessors
+  - sphinx-copybutton
   - toolz
   - xarray>=0.16.1
   - xhistogram>=0.3.0

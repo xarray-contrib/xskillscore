@@ -27,6 +27,17 @@ EXTRAS_REQUIRE["test"] = [
     "pytest-lazyfixures",
     "pre-commit",
 ]
+EXTRAS_REQUIRE["docs"] = EXTRAS_REQUIRE["complete"] + [
+    "importlib_metadata",
+    "nbsphinx",
+    "nbstripout",
+    "doc8",
+    "sphinx",
+    "sphinx-autosummary-accessors",
+    "sphinxcontrib-napoleon",
+    "sphinx_rtd_theme",
+    "sphinx-copybutton",
+]
 
 
 setup(
