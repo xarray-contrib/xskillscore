@@ -8,7 +8,6 @@ jobs:
   cancel:
     name: Cancel previous runs
     runs-on: ubuntu-latest
-    if: github.repository == "xarray-contrib/xskillscore"
     steps:
     - uses: styfle/cancel-workflow-action@0.9.1
       with:

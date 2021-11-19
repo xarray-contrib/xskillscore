@@ -12,7 +12,7 @@ dependencies:
   - dask-core
   - bottleneck
   - coveralls
-  - matplotlib
+  - matplotlib-base
   - pytest
   - pytest-cov
   - pytest-lazy-fixture
