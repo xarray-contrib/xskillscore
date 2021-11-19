@@ -21,7 +21,6 @@ EXTRAS_REQUIRE["test"] = [
     "pytest",
     "scikit-learn",
     "cftime",
-    "dask[array]",
     "matplotlib",
     "pytest-cov",
     "pytest-xdist",

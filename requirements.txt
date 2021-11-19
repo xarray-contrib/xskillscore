@@ -1,6 +1,7 @@
 numpy
+xarray>=0.16.1
+xhistogram>=0.3.0
+dask
 properscoring
 scipy
 toolz
-xarray>=0.16.1
-xhistogram>=0.3.0
