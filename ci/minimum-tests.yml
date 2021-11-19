@@ -11,6 +11,7 @@ dependencies:
   - scikit-learn
   - bottleneck
   - coveralls
+  - matplotlib
   - pytest
   - pytest-cov
   - pytest-lazy-fixture
