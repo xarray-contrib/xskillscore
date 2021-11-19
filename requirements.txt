@@ -1,7 +1,7 @@
 numpy
 xarray>=0.16.1
 xhistogram>=0.3.0
-dask
+dask[array]
 properscoring
 scipy
 toolz
