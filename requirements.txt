@@ -1,10 +1,7 @@
-bottleneck
-cftime
-dask
-numba>=0.52
 numpy
+xarray>=0.16.1
+xhistogram>=0.3.0
+dask[array]
 properscoring
 scipy
 toolz
-xarray>=0.16.1
-xhistogram>=0.3.0

@@ -2,8 +2,18 @@
 Changelog History
 =================
 
+
+xskillscore v0.0.25 (2021-xx-xx)
+--------------------------------
+
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Reduce dependencies (:issue:`359`, :pr:`363`) `Aaron Spring`_.
+
+
 xskillscore v0.0.24 (2021-10-08)
 --------------------------------
+
 Documentation
 ~~~~~~~~~~~~~
 - Replaced Boston house data in ``tabular.ipynb`` (:pr:`352`) `Ray Bell`_.

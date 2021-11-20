@@ -1,4 +1,3 @@
-import dask.array as da
 import numpy as np
 
 from .utils import suppress_warnings
@@ -10,7 +9,8 @@ def _reliability(o, f, bin_edges):
     """Return the reliability and number of samples per bin"""
     # I couldn't get dask='parallelized' working in this case
     # so dealing with dask arrays explicitly
-    is_dask_array = isinstance(o, da.core.Array) | isinstance(f, da.core.Array)
+    # if true, imports dask.array later
+    is_dask_array = not isinstance(o, np.ndarray) or not isinstance(f, np.ndarray)
 
     if is_dask_array:
         r = []
@@ -40,6 +40,8 @@ def _reliability(o, f, bin_edges):
                     N[..., i] = N_f_in_bin
 
     if is_dask_array:
+        import dask.array as da
+
         return (
             da.stack(r, axis=-1).rechunk({-1: -1}),
             da.stack(N, axis=-1).rechunk({-1: -1}),

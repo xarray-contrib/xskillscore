@@ -1,5 +1,3 @@
-import bottleneck as bn
-import dask.array as darray
 import numpy as np
 import properscoring
 import xarray as xr
@@ -18,6 +16,11 @@ from .utils import (
     histogram,
     suppress_warnings,
 )
+
+try:
+    from bottleneck import nanrankdata as rankdata
+except ImportError:
+    from scipy.stats import rankdata
 
 __all__ = [
     "brier_score",
@@ -874,7 +877,7 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member"):
         """Concatenates x and y and returns the rank of the
         first element along the last axes"""
         xy = np.concatenate((x[..., np.newaxis], y), axis=-1)
-        return bn.nanrankdata(xy, axis=-1)[..., 0]
+        return rankdata(xy, axis=-1)[..., 0]
 
     if dim is not None:
         if len(dim) == 0:
