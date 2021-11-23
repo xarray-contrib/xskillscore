@@ -1087,6 +1087,7 @@ def test_brier_score_float_forecast_or_observations(o, f_prob):
     brier_score(o, 0.5)
     brier_score(1, f_prob)
 
+
 def test_rank_hist_tied():
     """Test that rank_histogram handles tied ranks."""
     a = xr.DataArray(np.zeros(100), dims='a')

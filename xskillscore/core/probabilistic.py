@@ -851,7 +851,7 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member", rando
     -------
     rank_histogram : xarray.Dataset or xarray.DataArray
         New object containing the histogram of ranks
-    
+
     Reference
     ---------
     * Hamill, T. M. (2001). Interpretation of Rank Histograms for Verifying
@@ -884,11 +884,11 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member", rando
         """Modify tied ranks by generating random rank."""
         # add experimental warning linking issue and PR
         u, counts = np.unique(ranks, return_counts=True, axis=-1)
-        for i,count in enumerate(counts):
+        for i, count in enumerate(counts):
             if count > 1:
-                ix = ranks == u[i] # index where to add random # raises warning
+                ix = ranks == u[i]  # index where to add random # raises warning
                 if ranks[ix].shape[0] != 0:
-                    ranks[ix] = ranks[ix] + np.random.randint(0, min(forecasts.member.size + 1, count), len(ranks[ix])) ## increase random rank
+                    ranks[ix] = ranks[ix] + np.random.randint(0, min(forecasts.member.size + 1, count), len(ranks[ix]))  # increase random rank
         return ranks
 
     def _rank_first(x, y):
