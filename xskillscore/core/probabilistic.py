@@ -880,16 +880,16 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member", rando
     -----
     See http://www.cawcr.gov.au/projects/verification/
     """
-    def add_random_tie(dr):
+    def add_random_tie(ranks):
         """Modify tied ranks by generating random rank."""
         # add experimental warning linking issue and PR
-        u, counts = np.unique(dr, return_counts=True,axis=-1)
+        u, counts = np.unique(ranks, return_counts=True, axis=-1)
         for i,count in enumerate(counts):
             if count > 1:
-                ix=dr==u[i] # index where to add random # raises warning
-                if dr[ix].shape[0]!=0:
-                    dr[ix] = dr[ix] + np.random.randint(0,min(forecasts.member.size+1,count),count) ## increase random rank
-        return dr
+                ix = ranks == u[i] # index where to add random # raises warning
+                if ranks[ix].shape[0] != 0:
+                    ranks[ix] = ranks[ix] + np.random.randint(0, min(forecasts.member.size + 1, count), len(ranks[ix])) ## increase random rank
+        return ranks
 
     def _rank_first(x, y):
         """Concatenates x and y and returns the rank of the
