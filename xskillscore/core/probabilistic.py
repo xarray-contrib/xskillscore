@@ -830,7 +830,7 @@ def rps(
     return res
 
 
-def rank_histogram(observations, forecasts, dim=None, member_dim="member"):
+def rank_histogram(observations, forecasts, dim=None, member_dim="member", random_for_tied=True):
     """Returns the rank histogram (Talagrand diagram) along the specified dimensions.
 
     Parameters
@@ -844,11 +844,19 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member"):
         Defaults to None meaning compute over all dimensions
     member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
+    random_for_tied : bool
+        Whether assign tied ranks random rank, see Hamill 2001
 
     Returns
     -------
     rank_histogram : xarray.Dataset or xarray.DataArray
         New object containing the histogram of ranks
+    
+    Reference
+    ---------
+    * Hamill, T. M. (2001). Interpretation of Rank Histograms for Verifying
+        Ensemble Forecasts. Monthly Weather Review, 129(3), 550–560.
+        doi: 10/dkkvh3
 
     Examples
     --------
@@ -872,12 +880,26 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member"):
     -----
     See http://www.cawcr.gov.au/projects/verification/
     """
+    def add_random_tie(dr):
+        """Modify tied ranks by generating random rank."""
+        # add experimental warning linking issue and PR
+        u, counts = np.unique(dr, return_counts=True,axis=-1)
+        for i,count in enumerate(counts):
+            if count > 1:
+                ix=dr==u[i] # index where to add random # raises warning
+                if dr[ix].shape[0]!=0:
+                    dr[ix] = dr[ix] + np.random.randint(0,min(forecasts.member.size+1,count),count) ## increase random rank
+        return dr
 
     def _rank_first(x, y):
         """Concatenates x and y and returns the rank of the
         first element along the last axes"""
         xy = np.concatenate((x[..., np.newaxis], y), axis=-1)
-        return rankdata(xy, axis=-1)[..., 0]
+        import scipy.stats
+        ranks = scipy.stats.rankdata(xy, method='min', axis=-1)[..., 0]
+        if random_for_tied:
+            ranks = add_random_tie(ranks)
+        return ranks
 
     if dim is not None:
         if len(dim) == 0:
