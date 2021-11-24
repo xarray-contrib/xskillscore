@@ -351,7 +351,7 @@ def test_rank_histogram_sum(o, f_prob, dim, chunk_bool, input_type, keep_attrs):
         with pytest.raises(ValueError):
             rank_histogram(o, f_prob, dim=dim)
     else:
-        rank_hist = rank_histogram(o, f_prob, dim=dim)
+        rank_hist = rank_histogram(o, f_prob, dim=dim, keep_attrs=keep_attrs)
         if "Dataset" in input_type:
             rank_hist = rank_hist[list(o.data_vars)[0]]
             o = o[list(o.data_vars)[0]]
