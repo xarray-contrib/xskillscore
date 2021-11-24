@@ -16,6 +16,7 @@ from .utils import (
     histogram,
     suppress_warnings,
 )
+import scipy.stats
 
 try:
     from bottleneck import nanrankdata as rankdata
@@ -830,7 +831,9 @@ def rps(
     return res
 
 
-def rank_histogram(observations, forecasts, dim=None, member_dim="member", random_for_tied=True):
+def rank_histogram(
+    observations, forecasts, dim=None, member_dim="member", random_for_tied=True
+):
     """Returns the rank histogram (Talagrand diagram) along the specified dimensions.
 
     Parameters
@@ -886,8 +889,8 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member", rando
         unique, counts = np.unique(ranks, return_counts=True, axis=-1)
         for i, count in enumerate(counts):
             if count > 1:  # duplicate
-                ix = ranks == unique[i] # index where to add random
-                r = np.arange(counts[i])  # counts
+                ix = ranks == unique[i]  # index where to add random
+                r = np.arange(counts[i])
                 np.random.shuffle(r)
                 ranks[ix] += r
         return ranks
@@ -896,11 +899,10 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member", rando
         """Concatenates x and y and returns the rank of the
         first element along the last axes"""
         xy = np.concatenate((x[..., np.newaxis], y), axis=-1)
-        import scipy.stats
         ranks = scipy.stats.rankdata(xy, axis=-1, method='min')
         if random_for_tied:
             ranks = np.apply_along_axis(lambda x: add_random_tie(x), -1, dr)
-        ranks = ranks[...,0]  # take obs rank
+        ranks = ranks[..., 0]  # take obs rank
         return ranks
 
     if dim is not None:
