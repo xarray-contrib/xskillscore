@@ -837,7 +837,7 @@ def rank_histogram(
     dim=None,
     member_dim="member",
     random_for_tied=True,
-    keep_attrs=False,
+    keep_attrs=True,
 ):
     """Returns the rank histogram (Talagrand diagram) along the specified dimensions.
 
