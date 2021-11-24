@@ -367,9 +367,8 @@ def test_rank_histogram_sum(o, f_prob, dim, chunk_bool, input_type):
 def test_rank_histogram_values(o, f_prob):
     """Test values in extreme cases that observations \
         all smaller/larger than forecasts"""
-    assert rank_histogram(o - 10, f_prob)[0] == o.size  # first is largest bin but not only populated
-    assert rank_histogram(o + 10, f_prob)[-1] == o.size  # last is largest bin but not only populated
-
+    assert rank_histogram(o - 10, f_prob)[0] == o.size
+    assert rank_histogram(o + 10, f_prob)[-1] == o.size
 
 @pytest.mark.parametrize("dim", DIMS)
 @pytest.mark.parametrize("chunk_bool", [True, False])
@@ -1090,8 +1089,8 @@ def test_brier_score_float_forecast_or_observations(o, f_prob):
 
 def test_rank_hist_tied():
     """Test that rank_histogram handles tied ranks."""
-    a = xr.DataArray(np.zeros(100), dims='a')
-    b = xr.DataArray(np.zeros((100, 10)), dims=['a', 'member'])
+    a = xr.DataArray(np.zeros(100), dims="a")
+    b = xr.DataArray(np.zeros((100, 10)), dims=["a", "member"])
     rh = rank_histogram(a, b)
     assert rh.max() != 100
     assert rh.min() > 3
