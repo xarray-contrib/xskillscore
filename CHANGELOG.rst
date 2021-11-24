@@ -6,9 +6,14 @@ Changelog History
 xskillscore v0.0.25 (2021-xx-xx)
 --------------------------------
 
+Bug Fixes
+~~~~~~~~~
+- :py:func:`~xskillscore.rank_histogram` handle tied ranks correctly.
+  (:issue:`359`, :pr:`363`) `Aaron Spring`_.
+
 Internal Changes
 ~~~~~~~~~~~~~~~~
-- Reduce dependencies (:issue:`359`, :pr:`363`) `Aaron Spring`_.
+- Reduce dependencies (:issue:`335`, :pr:`364`) `Aaron Spring`_.
 
 
 xskillscore v0.0.24 (2021-10-08)

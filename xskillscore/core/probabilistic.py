@@ -883,6 +883,7 @@ def rank_histogram(
     -----
     See http://www.cawcr.gov.au/projects/verification/
     """
+
     def add_random_tie(ranks):
         """Modify tied ranks by generating random rank."""
         ranks = ranks.copy()
