@@ -929,9 +929,17 @@ def rank_histogram(
     )
 
     bin_edges = np.arange(0.5, len(forecasts[member_dim]) + 2)
-    return histogram(
+    hist = histogram(
         ranks, bins=[bin_edges], bin_names=["rank"], dim=dim, bin_dim_suffix=""
     )
+    if keep_attrs:  # attach by hand
+        hist.attrs.update(observations.attrs)
+        hist.attrs.update(forecasts.attrs)
+        if isinstance(hist, xr.Dataset):
+            for v in hist.data_vars:
+                hist[v].attrs.update(observations[v].attrs)
+                hist[v].attrs.update(forecasts[v].attrs)
+    return hist
 
 
 def discrimination(
