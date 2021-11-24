@@ -832,7 +832,12 @@ def rps(
 
 
 def rank_histogram(
-    observations, forecasts, dim=None, member_dim="member", random_for_tied=True, keep_attrs=False
+    observations,
+    forecasts,
+    dim=None,
+    member_dim="member",
+    random_for_tied=True,
+    keep_attrs=False,
 ):
     """Returns the rank histogram (Talagrand diagram) along the specified dimensions.
 
