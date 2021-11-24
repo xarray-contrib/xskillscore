@@ -1,5 +1,6 @@
 import numpy as np
 import properscoring
+import scipy.stats
 import xarray as xr
 
 from .contingency import Contingency, _get_category_bounds
@@ -16,7 +17,6 @@ from .utils import (
     histogram,
     suppress_warnings,
 )
-import scipy.stats
 
 try:
     from bottleneck import nanrankdata as rankdata

@@ -358,7 +358,7 @@ def test_rank_histogram_sum(o, f_prob, dim, chunk_bool, input_type):
         assert_allclose(rank_hist.sum(), o.count())
         # test that returns chunks
         assert_chunk(rank_hist, chunk_bool)
-        # test that attributes are kept # TODO: add
+        # test that attributes are kept # TODO: add 
         # assert_keep_attrs(rank_hist, o, keep_attrs)
         # test that input types equal output types
         assign_type_input_output(rank_hist, o)
@@ -369,6 +369,7 @@ def test_rank_histogram_values(o, f_prob):
         all smaller/larger than forecasts"""
     assert rank_histogram(o - 10, f_prob)[0] == o.size
     assert rank_histogram(o + 10, f_prob)[-1] == o.size
+
 
 @pytest.mark.parametrize("dim", DIMS)
 @pytest.mark.parametrize("chunk_bool", [True, False])
