@@ -8,8 +8,9 @@ xskillscore v0.0.25 (2021-xx-xx)
 
 Bug Fixes
 ~~~~~~~~~
-- :py:func:`~xskillscore.rank_histogram` handles tied ranks correctly.
-  (:issue:`335`, :pr:`364`) `Aaron Spring`_.
+- :py:func:`~xskillscore.rank_histogram` ``random_for_tied=True`` handles tied ranks
+  correctly by default. ``random_for_tied=False`` ignores this and retains previous
+  behaviour. (:issue:`335`, :pr:`364`) `Aaron Spring`_.
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
