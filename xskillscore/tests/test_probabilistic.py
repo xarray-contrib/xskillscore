@@ -343,7 +343,8 @@ def test_brier_score_vs_fair_brier_score(o, f_prob, dim):
 @pytest.mark.parametrize("chunk_bool", [True, False])
 @pytest.mark.parametrize("input_type", ["DataArray", "Dataset", "multidim Dataset"])
 @pytest.mark.parametrize("dim", DIMS)
-def test_rank_histogram_sum(o, f_prob, dim, chunk_bool, input_type):
+@pytest.mark.parametrize("keep_attrs", [True, False])
+def test_rank_histogram_sum(o, f_prob, dim, chunk_bool, input_type, keep_attrs):
     """Test that the number of samples in the rank histogram is correct"""
     o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
     if dim == []:
