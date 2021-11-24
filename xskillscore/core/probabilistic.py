@@ -899,7 +899,7 @@ def rank_histogram(
         """Concatenates x and y and returns the rank of the
         first element along the last axes"""
         xy = np.concatenate((x[..., np.newaxis], y), axis=-1)
-        ranks = scipy.stats.rankdata(xy, axis=-1, method="min')
+        ranks = scipy.stats.rankdata(xy, axis=-1, method="min")
         if random_for_tied:
             ranks = np.apply_along_axis(lambda x: add_random_tie(x), -1, ranks)
         ranks = ranks[..., 0]  # take obs rank
