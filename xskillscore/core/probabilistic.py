@@ -832,7 +832,7 @@ def rps(
 
 
 def rank_histogram(
-    observations, forecasts, dim=None, member_dim="member", random_for_tied=True
+    observations, forecasts, dim=None, member_dim="member", random_for_tied=True, keep_attrs=False
 ):
     """Returns the rank histogram (Talagrand diagram) along the specified dimensions.
 
@@ -849,6 +849,8 @@ def rank_histogram(
         Name of ensemble member dimension. By default, 'member'.
     random_for_tied : bool
         Whether assign tied ranks random rank, see Hamill 2001
+    keep_attrs : bool, optional
+        Whether to copy attributes from the first argument to the output.
 
     Returns
     -------
@@ -923,6 +925,7 @@ def rank_histogram(
         input_core_dims=[[], [member_dim]],
         dask="parallelized",
         output_dtypes=[int],
+        keep_attrs=keep_attrs,
     )
 
     bin_edges = np.arange(0.5, len(forecasts[member_dim]) + 2)
