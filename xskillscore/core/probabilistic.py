@@ -891,18 +891,6 @@ def rank_histogram(
     See http://www.cawcr.gov.au/projects/verification/
     """
 
-    def add_random_tie(ranks):
-        """Modify tied ranks by generating random rank."""
-        ranks = ranks.copy()
-        unique, counts = np.unique(ranks, return_counts=True, axis=-1)
-        for i, count in enumerate(counts):
-            if count > 1:  # duplicate
-                ix = ranks == unique[i]  # index where to add random
-                r = np.arange(counts[i])
-                np.random.shuffle(r)
-                ranks[ix] += r
-        return ranks
-
     def _rank_first(x, y):
         """Concatenates x and y and returns the rank of the
         first element along the last axes"""
