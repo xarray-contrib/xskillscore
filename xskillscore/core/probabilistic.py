@@ -910,9 +910,7 @@ def rank_histogram(
         if random_for_tied:
             ranks_min = scipy.stats.rankdata(xy, axis=-1, method="min")
             ranks_max = scipy.stats.rankdata(xy, axis=-1, method="max")
-            ranks = np.int32((ranks_max - ranks_min + 1) * np.random.rand(*xy.shape)) + ranks_min
-            # ranks = scipy.stats.rankdata(xy, axis=-1, method="min")
-            # ranks = np.apply_along_axis(lambda x: add_random_tie(x), -1, ranks)
+            ranks = ranks_min + np.int32((ranks_max - ranks_min + 1) * np.random.rand(*xy.shape))
         else:  # no special handling of ties
             ranks = rankdata(xy, axis=-1)
         ranks = ranks[..., 0]  # take obs rank
