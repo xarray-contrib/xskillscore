@@ -853,7 +853,8 @@ def rank_histogram(
     member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
     random_for_tied : bool
-        Whether assign tied ranks random rank, see Hamill 2001
+        Whether to randomly generate ranks for tied values so that,
+        on average, tied values result in a flat histogram - see Hamill 2001
     keep_attrs : bool, optional
         Whether to copy attributes from the first argument to the output.
 
