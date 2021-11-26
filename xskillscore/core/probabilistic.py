@@ -1,5 +1,6 @@
 import numpy as np
 import properscoring
+import scipy.stats
 import xarray as xr
 
 from .contingency import Contingency, _get_category_bounds
@@ -830,7 +831,14 @@ def rps(
     return res
 
 
-def rank_histogram(observations, forecasts, dim=None, member_dim="member"):
+def rank_histogram(
+    observations,
+    forecasts,
+    dim=None,
+    member_dim="member",
+    random_for_tied=True,
+    keep_attrs=True,
+):
     """Returns the rank histogram (Talagrand diagram) along the specified dimensions.
 
     Parameters
@@ -844,11 +852,22 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member"):
         Defaults to None meaning compute over all dimensions
     member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
+    random_for_tied : bool
+        Whether to randomly generate ranks for tied values so that,
+        on average, tied values result in a flat histogram - see Hamill 2001
+    keep_attrs : bool, optional
+        Whether to copy attributes from the first argument to the output.
 
     Returns
     -------
     rank_histogram : xarray.Dataset or xarray.DataArray
         New object containing the histogram of ranks
+
+    Reference
+    ---------
+    * Hamill, T. M. (2001). Interpretation of Rank Histograms for Verifying
+        Ensemble Forecasts. Monthly Weather Review, 129(3), 550–560.
+        doi: 10/dkkvh3
 
     Examples
     --------
@@ -877,7 +896,16 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member"):
         """Concatenates x and y and returns the rank of the
         first element along the last axes"""
         xy = np.concatenate((x[..., np.newaxis], y), axis=-1)
-        return rankdata(xy, axis=-1)[..., 0]
+        if random_for_tied:
+            ranks_min = scipy.stats.rankdata(xy, axis=-1, method="min")
+            ranks_max = scipy.stats.rankdata(xy, axis=-1, method="max")
+            ranks = ranks_min + np.int32(
+                (ranks_max - ranks_min + 1) * np.random.rand(*xy.shape)
+            )
+        else:  # no special handling of ties
+            ranks = rankdata(xy, axis=-1)
+        ranks = ranks[..., 0]  # take obs rank
+        return ranks
 
     if dim is not None:
         if len(dim) == 0:
@@ -894,12 +922,21 @@ def rank_histogram(observations, forecasts, dim=None, member_dim="member"):
         input_core_dims=[[], [member_dim]],
         dask="parallelized",
         output_dtypes=[int],
+        keep_attrs=keep_attrs,
     )
 
     bin_edges = np.arange(0.5, len(forecasts[member_dim]) + 2)
-    return histogram(
+    hist = histogram(
         ranks, bins=[bin_edges], bin_names=["rank"], dim=dim, bin_dim_suffix=""
     )
+    if keep_attrs:  # attach by hand
+        hist.attrs.update(observations.attrs)
+        hist.attrs.update(forecasts.attrs)
+        if isinstance(hist, xr.Dataset):
+            for v in hist.data_vars:
+                hist[v].attrs.update(observations[v].attrs)
+                hist[v].attrs.update(forecasts[v].attrs)
+    return hist
 
 
 def discrimination(
