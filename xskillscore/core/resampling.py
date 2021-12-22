@@ -1,8 +1,12 @@
+from typing import List, Optional, Union
+
 import dask
 import numpy as np
 import xarray as xr
 
 CONCAT_KWARGS = {"coords": "minimal", "compat": "override"}
+
+from .types import Dim, XArray
 
 
 def _gen_idx(forecast, dim, iterations, select_dim_items, replace, new_dim):
@@ -34,7 +38,13 @@ def _gen_idx(forecast, dim, iterations, select_dim_items, replace, new_dim):
     return idx_da
 
 
-def resample_iterations(forecast, iterations, dim="member", dim_max=None, replace=True):
+def resample_iterations(
+    forecast: XArray,
+    iterations: int,
+    dim: str = "member",
+    dim_max: Optional[int] = None,
+    replace: bool = True,
+) -> XArray:
     """Resample over ``dim`` by index ``iterations`` times.
 
     .. note::
@@ -101,11 +111,13 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
     # generate random indices to select from
     idx_da = _gen_idx(forecast, dim, iterations, select_dim_items, replace, new_dim)
     # select those indices in a loop
-    forecast_smp = []
+    forecast_smp_list: List[XArray] = []
     for i in np.arange(iterations):
         idx = idx_da.sel(iteration=i).data
-        forecast_smp.append(forecast.isel({dim: idx}).assign_coords({dim: new_dim}))
-    forecast_smp = xr.concat(forecast_smp, dim="iteration", **CONCAT_KWARGS)
+        forecast_smp_list.append(
+            forecast.isel({dim: idx}).assign_coords({dim: new_dim})
+        )
+    forecast_smp = xr.concat(forecast_smp_list, dim="iteration", **CONCAT_KWARGS)
     forecast_smp["iteration"] = np.arange(iterations)
     if dim not in forecast.coords:
         del forecast_smp.coords[dim]
@@ -113,8 +125,12 @@ def resample_iterations(forecast, iterations, dim="member", dim_max=None, replac
 
 
 def resample_iterations_idx(
-    forecast, iterations, dim="member", replace=True, dim_max=None
-):
+    forecast: XArray,
+    iterations: int,
+    dim: str = "member",
+    dim_max: Optional[int] = None,
+    replace: bool = True,
+) -> XArray:
     """Resample over ``dim`` by index ``iterations`` times.
 
     .. note::

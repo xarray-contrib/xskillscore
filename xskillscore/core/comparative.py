@@ -19,7 +19,7 @@ def sign_test(
     alpha: float = 0.05,
     metric: Optional[Union[Callable, str]] = None,
     orientation: str = "negative",
-):
+) -> Tuple[XArray, XArray, XArray]:
     """
     Returns the Delsole and Tippett sign test over the given time dimension.
 
