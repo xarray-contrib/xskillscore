@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import numpy as np
 import xarray as xr
@@ -13,7 +13,7 @@ OBSERVATIONS_NAME = "observations"
 FORECASTS_NAME = "forecasts"
 
 
-def _get_category_bounds(category_edges: Union[XArray, np.array])->List[str]:
+def _get_category_bounds(category_edges: Union[XArray, np.array]) -> List[str]:
     """Return formatted string of category bounds given list of category edges"""
     bounds = [
         f"[{str(category_edges[i])}, {str(category_edges[i + 1])})"
