@@ -1,4 +1,5 @@
 import warnings
+from typing import Optional
 
 import xarray as xr
 
@@ -20,6 +21,7 @@ from .np_deterministic import (
     _spearman_r_eff_p_value,
     _spearman_r_p_value,
 )
+from .types import Dim, XArray
 from .utils import (
     _fail_if_dim_empty,
     _preprocess_dims,
@@ -73,7 +75,14 @@ def _determine_input_core_dims(dim, weights):
     return input_core_dims
 
 
-def linslope(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+def linslope(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """Slope of linear fit.
 
     .. math::
@@ -142,7 +151,14 @@ def linslope(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+def pearson_r(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """Pearson's correlation coefficient.
 
     .. math::
@@ -216,7 +232,14 @@ def pearson_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def pearson_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+def pearson_r_p_value(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """2-tailed p-value associated with pearson's correlation coefficient.
 
     Parameters
@@ -372,7 +395,13 @@ def effective_sample_size(a, b, dim="time", skipna=False, keep_attrs=False):
     )
 
 
-def pearson_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
+def pearson_r_eff_p_value(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """
     2-tailed p-value associated with Pearson's correlation coefficient,
     accounting for autocorrelation.
@@ -476,7 +505,14 @@ def pearson_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
     )
 
 
-def spearman_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+def spearman_r(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """Spearman's correlation coefficient.
 
     Parameters
@@ -543,7 +579,14 @@ def spearman_r(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def spearman_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+def spearman_r_p_value(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """2-tailed p-value associated with Spearman's correlation coefficient.
 
     Parameters
@@ -605,7 +648,13 @@ def spearman_r_p_value(a, b, dim=None, weights=None, skipna=False, keep_attrs=Fa
     )
 
 
-def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
+def spearman_r_eff_p_value(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """
     2-tailed p-value associated with Spearman rank correlation coefficient,
     accounting for autocorrelation.
@@ -707,7 +756,14 @@ def spearman_r_eff_p_value(a, b, dim=None, skipna=False, keep_attrs=False):
     )
 
 
-def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+def r2(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """R^2 (coefficient of determination) score.
 
     We first take the total sum of squares of our known vector, a.
@@ -797,7 +853,14 @@ def r2(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def me(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+def me(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """Mean Error.
 
     .. math::
@@ -856,7 +919,14 @@ def me(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def rmse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+def rmse(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """Root Mean Squared Error.
 
     .. math::
@@ -923,7 +993,14 @@ def rmse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+def mse(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """Mean Squared Error.
 
     .. math::
@@ -991,7 +1068,14 @@ def mse(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def mae(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+def mae(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """Mean Absolute Error.
 
     .. math::
@@ -1058,7 +1142,13 @@ def mae(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def median_absolute_error(a, b, dim=None, skipna=False, keep_attrs=False):
+def median_absolute_error(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """
     Median Absolute Error.
 
@@ -1118,7 +1208,14 @@ def median_absolute_error(a, b, dim=None, skipna=False, keep_attrs=False):
     )
 
 
-def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+def mape(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """Mean Absolute Percentage Error.
 
     .. math::
@@ -1194,7 +1291,14 @@ def mape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
     )
 
 
-def smape(a, b, dim=None, weights=None, skipna=False, keep_attrs=False):
+def smape(
+    a: XArray,
+    b: XArray,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
     """Symmetric Mean Absolute Percentage Error.
 
     .. math::
