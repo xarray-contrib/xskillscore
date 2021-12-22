@@ -2,8 +2,27 @@
 Changelog History
 =================
 
-xskillscore v0.0.24 (2021-XX-XX)
+
+xskillscore v0.0.25 (2021-xx-xx)
 --------------------------------
+
+Bug Fixes
+~~~~~~~~~
+- :py:func:`~xskillscore.rank_histogram` ``random_for_tied=True`` handles tied ranks
+  correctly by default. ``random_for_tied=False`` ignores this and retains previous
+  behaviour. (:issue:`335`, :pr:`364`) `Aaron Spring`_.
+
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Reduce dependencies (:issue:`359`, :pr:`363`) `Aaron Spring`_.
+
+
+xskillscore v0.0.24 (2021-10-08)
+--------------------------------
+
+Documentation
+~~~~~~~~~~~~~
+- Replaced Boston house data in ``tabular.ipynb`` (:pr:`352`) `Ray Bell`_.
 
 
 xskillscore v0.0.23 (2021-08-09)

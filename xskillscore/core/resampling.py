@@ -1,6 +1,5 @@
 from typing import List, Optional, Union
 
-import dask
 import numpy as np
 import xarray as xr
 

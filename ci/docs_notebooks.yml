@@ -5,7 +5,7 @@ channels:
 dependencies:
   - bottleneck
   - cftime
-  - dask
+  - dask-core
   - numba>=0.52
   - numpy
   - properscoring
@@ -16,6 +16,7 @@ dependencies:
   - importlib_metadata
   - ipykernel
   - jupyterlab
+  - jupyterlab_code_formatter
   - matplotlib-base
   - nbsphinx
   - nbstripout

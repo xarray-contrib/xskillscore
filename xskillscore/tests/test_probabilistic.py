@@ -343,14 +343,15 @@ def test_brier_score_vs_fair_brier_score(o, f_prob, dim):
 @pytest.mark.parametrize("chunk_bool", [True, False])
 @pytest.mark.parametrize("input_type", ["DataArray", "Dataset", "multidim Dataset"])
 @pytest.mark.parametrize("dim", DIMS)
-def test_rank_histogram_sum(o, f_prob, dim, chunk_bool, input_type):
+@pytest.mark.parametrize("keep_attrs", [True, False])
+def test_rank_histogram_sum(o, f_prob, dim, chunk_bool, input_type, keep_attrs):
     """Test that the number of samples in the rank histogram is correct"""
     o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
     if dim == []:
         with pytest.raises(ValueError):
             rank_histogram(o, f_prob, dim=dim)
     else:
-        rank_hist = rank_histogram(o, f_prob, dim=dim)
+        rank_hist = rank_histogram(o, f_prob, dim=dim, keep_attrs=keep_attrs)
         if "Dataset" in input_type:
             rank_hist = rank_hist[list(o.data_vars)[0]]
             o = o[list(o.data_vars)[0]]
@@ -358,8 +359,8 @@ def test_rank_histogram_sum(o, f_prob, dim, chunk_bool, input_type):
         assert_allclose(rank_hist.sum(), o.count())
         # test that returns chunks
         assert_chunk(rank_hist, chunk_bool)
-        # test that attributes are kept # TODO: add
-        # assert_keep_attrs(rank_hist, o, keep_attrs)
+        # test that attributes are kept
+        assert_keep_attrs(rank_hist, o, keep_attrs)
         # test that input types equal output types
         assign_type_input_output(rank_hist, o)
 
@@ -367,8 +368,8 @@ def test_rank_histogram_sum(o, f_prob, dim, chunk_bool, input_type):
 def test_rank_histogram_values(o, f_prob):
     """Test values in extreme cases that observations \
         all smaller/larger than forecasts"""
-    assert rank_histogram((f_prob.min() - 1) + 0 * o, f_prob)[0] == o.size
-    assert rank_histogram((f_prob.max() + 1) + 0 * o, f_prob)[-1] == o.size
+    assert rank_histogram(o - 10, f_prob)[0] == o.size
+    assert rank_histogram(o + 10, f_prob)[-1] == o.size
 
 
 @pytest.mark.parametrize("dim", DIMS)
@@ -1086,3 +1087,12 @@ def test_brier_score_float_forecast_or_observations(o, f_prob):
     brier_score(o, f_prob)
     brier_score(o, 0.5)
     brier_score(1, f_prob)
+
+
+def test_rank_hist_tied():
+    """Test that rank_histogram handles tied ranks."""
+    a = xr.DataArray(np.zeros(100), dims="a")
+    b = xr.DataArray(np.zeros((100, 10)), dims=["a", "member"])
+    rh = rank_histogram(a, b)
+    assert rh.min() > 3
+    assert rh.max() < 30

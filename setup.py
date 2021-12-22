@@ -9,8 +9,35 @@ LONG_DESCRIPTION = """Metrics for verifying forecasts"""
 URL = "https://github.com/xarray-contrib/xskillscore"
 with open("requirements.txt") as f:
     INSTALL_REQUIRES = f.read().strip().split("\n")
-TESTS_REQUIRE = ["pytest"]
 PYTHON_REQUIRE = ">=3.7"
+
+EXTRAS_REQUIRE = {
+    "accel": ["numba>=0.52", "bottleneck"],
+}
+
+EXTRAS_REQUIRE["complete"] = sorted({v for req in EXTRAS_REQUIRE.values() for v in req})
+# after complete is set, add in test
+EXTRAS_REQUIRE["test"] = [
+    "pytest",
+    "scikit-learn",
+    "cftime",
+    "matplotlib",
+    "pytest-cov",
+    "pytest-xdist",
+    "pytest-lazyfixures",
+    "pre-commit",
+]
+EXTRAS_REQUIRE["docs"] = EXTRAS_REQUIRE["complete"] + [
+    "importlib_metadata",
+    "nbsphinx",
+    "nbstripout",
+    "doc8",
+    "sphinx",
+    "sphinx-autosummary-accessors",
+    "sphinxcontrib-napoleon",
+    "sphinx_rtd_theme",
+    "sphinx-copybutton",
+]
 
 
 setup(
@@ -24,7 +51,7 @@ setup(
     packages=find_packages(),
     install_requires=INSTALL_REQUIRES,
     test_suite="xskillscore/tests",
-    tests_require=TESTS_REQUIRE,
+    tests_require=["pytest"],
     python_requires=PYTHON_REQUIRE,
     use_scm_version={"version_scheme": "post-release", "local_scheme": "dirty-tag"},
     setup_requires=[
@@ -32,5 +59,6 @@ setup(
         "setuptools>=30.3.0",
         "setuptools_scm_git_archive",
     ],
+    extras_require=EXTRAS_REQUIRE,
     zip_safe=False,
 )
