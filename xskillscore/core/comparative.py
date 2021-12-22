@@ -1,25 +1,24 @@
 import inspect
 import warnings
-from typing import List, Mapping, Optional, Tuple, Union
+from typing import Callable, List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as st
 import xarray as xr
 
 from . import deterministic as dm
-
-XArray = Union[xr.Dataset, xr.DataArray]
+from .types import Dim, XArray
 
 
 def sign_test(
-    forecasts1,
-    forecasts2,
-    observations=None,
-    time_dim="time",
-    dim=[],
-    alpha=0.05,
-    metric=None,
-    orientation="negative",
+    forecasts1: XArray,
+    forecasts2: XArray,
+    observations: Optional[XArray] = None,
+    time_dim: str = "time",
+    dim: Dim = [],
+    alpha: float = 0.05,
+    metric: Optional[Union[Callable, str]] = None,
+    orientation: str = "negative",
 ):
     """
     Returns the Delsole and Tippett sign test over the given time dimension.
@@ -127,6 +126,12 @@ def sign_test(
 
     if isinstance(dim, str):
         dim = [dim]
+    elif dim is None:
+        d = set(forecasts1.dims) | set(forecasts2.dims)
+        if observations is not None:
+            d = d | set(observations.dims)
+        dim = list(d)
+        dim.remove(time_dim)
     if time_dim in dim:
         raise ValueError("`dim` cannot contain `time_dim`")
 
@@ -156,8 +161,8 @@ def sign_test(
             )
         if observations is not None:
             # Compare the forecasts and observations using metric
-            metric_f1o = metric(observations, forecasts1, dim=dim)
-            metric_f2o = metric(observations, forecasts2, dim=dim)
+            metric_f1o = metric(observations, forecasts1, dim=dim)  # type: ignore
+            metric_f2o = metric(observations, forecasts2, dim=dim)  # type: ignore
         else:
             raise ValueError("observations must be provided when metric is provided")
 
@@ -199,7 +204,7 @@ def halfwidth_ci_test(
     forecasts2: XArray,
     observations: Optional[XArray] = None,
     metric: Optional[str] = None,
-    dim: Optional[Union[str, List[str]]] = None,
+    dim: Dim = None,
     time_dim: str = "time",
     alpha: float = 0.05,
     **kwargs: Mapping,
