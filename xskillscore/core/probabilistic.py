@@ -1,3 +1,5 @@
+from typing import Callable, List, Optional, Tuple, Union
+
 import numpy as np
 import properscoring
 import scipy.stats
@@ -5,6 +7,7 @@ import xarray as xr
 
 from .contingency import Contingency, _get_category_bounds
 from .np_probabilistic import _reliability
+from .types import Dim, XArray
 from .utils import (
     _add_as_coord,
     _bool_to_int,
@@ -48,7 +51,14 @@ def probabilistic_broadcast(observations, forecasts, member_dim="member"):
     return observations, forecasts
 
 
-def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=False):
+def crps_gaussian(
+    observations: XArray,
+    mu: Union[XArray, float, int],
+    sig: Union[XArray, float, int],
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    keep_attrs: bool = False,
+) -> XArray:
     """Continuous Ranked Probability Score with a Gaussian distribution.
 
     Parameters
@@ -96,20 +106,17 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
     --------
     properscoring.crps_gaussian
     """
-    # check if same dimensions
-    if isinstance(mu, (int, float)):
-        mu = xr.DataArray(mu)
-    if isinstance(sig, (int, float)):
-        sig = xr.DataArray(sig)
-    if mu.dims != observations.dims:
-        observations, mu = xr.broadcast(observations, mu)
-    if sig.dims != observations.dims:
-        observations, sig = xr.broadcast(observations, sig)
+    xmu = xr.DataArray(mu) if isinstance(mu, (int, float)) else mu
+    xsig = xr.DataArray(sig) if isinstance(sig, (int, float)) else sig
+    if xmu.dims != observations.dims:
+        observations, xmu = xr.broadcast(observations, xmu)
+    if xsig.dims != observations.dims:
+        observations, xsig = xr.broadcast(observations, xsig)
     res = xr.apply_ufunc(
         properscoring.crps_gaussian,
         observations,
-        mu,
-        sig,
+        xmu,
+        xsig,
         input_core_dims=[[], [], []],
         dask="parallelized",
         output_dtypes=[float],
@@ -122,15 +129,15 @@ def crps_gaussian(observations, mu, sig, dim=None, weights=None, keep_attrs=Fals
 
 
 def crps_quadrature(
-    observations,
-    cdf_or_dist,
-    xmin=None,
-    xmax=None,
-    tol=1e-6,
-    dim=None,
-    weights=None,
-    keep_attrs=False,
-):
+    observations: XArray,
+    cdf_or_dist: Callable,
+    xmin: Optional[float] = None,
+    xmax: Optional[float] = None,
+    tol: float = 1e-6,
+    dim: Dim = None,
+    weights: bool = None,
+    keep_attrs: bool = False,
+) -> XArray:
     """Continuous Ranked Probability Score with numerical integration
     of the normal distribution.
 
@@ -193,15 +200,15 @@ def crps_quadrature(
 
 
 def crps_ensemble(
-    observations,
-    forecasts,
-    member_weights=None,
-    issorted=False,
-    member_dim="member",
-    dim=None,
-    weights=None,
-    keep_attrs=False,
-):
+    observations: XArray,
+    forecasts: XArray,
+    member_weights: Optional[XArray] = None,
+    issorted: bool = False,
+    member_dim: str = "member",
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    keep_attrs: bool = False,
+) -> XArray:
     """Continuous Ranked Probability Score with the ensemble distribution.
 
     Parameters
@@ -275,13 +282,13 @@ def crps_ensemble(
 
 
 def brier_score(
-    observations,
-    forecasts,
-    member_dim="member",
+    observations: XArray,
+    forecasts: XArray,
+    member_dim: str = "member",
     fair=False,
-    dim=None,
-    weights=None,
-    keep_attrs=False,
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    keep_attrs: bool = False,
 ):
     """Calculate Brier score (BS).
 
@@ -385,15 +392,15 @@ def brier_score(
 
 
 def threshold_brier_score(
-    observations,
-    forecasts,
-    threshold,
-    issorted=False,
-    member_dim="member",
-    dim=None,
-    weights=None,
-    keep_attrs=False,
-):
+    observations: XArray,
+    forecasts: XArray,
+    threshold: Union[float, List[float], XArray],
+    issorted: bool = False,
+    member_dim: str = "member",
+    dim: Dim = None,
+    weights: Optional[XArray] = None,
+    keep_attrs: bool = False,
+) -> XArray:
     """Calculate the Brier scores of an ensemble for exceeding given thresholds.
 
     Parameters
@@ -514,16 +521,16 @@ def _assign_rps_category_bounds(res, edges, name, bin_dim="category_edge"):
 
 
 def rps(
-    observations,
-    forecasts,
-    category_edges,
-    dim=None,
-    fair=False,
-    weights=None,
-    keep_attrs=False,
-    member_dim="member",
-    input_distributions=None,
-):
+    observations: XArray,
+    forecasts: XArray,
+    category_edges: Optional[Union[np.array, XArray, Tuple[XArray, XArray]]],
+    dim: Dim = None,
+    fair: bool = False,
+    weights: Optional[XArray] = None,
+    keep_attrs: bool = False,
+    member_dim: str = "member",
+    input_distributions: Optional[str] = None,
+) -> XArray:
     """Calculate Ranked Probability Score.
 
      .. math::
@@ -832,13 +839,13 @@ def rps(
 
 
 def rank_histogram(
-    observations,
-    forecasts,
-    dim=None,
-    member_dim="member",
-    random_for_tied=True,
-    keep_attrs=True,
-):
+    observations: XArray,
+    forecasts: XArray,
+    dim: Dim = None,
+    member_dim: str = "member",
+    random_for_tied: bool = True,
+    keep_attrs: bool = True,
+) -> XArray:
     """Returns the rank histogram (Talagrand diagram) along the specified dimensions.
 
     Parameters
@@ -940,11 +947,11 @@ def rank_histogram(
 
 
 def discrimination(
-    observations,
-    forecasts,
-    dim=None,
-    probability_bin_edges=np.linspace(0, 1, 6),
-):
+    observations: XArray,
+    forecasts: XArray,
+    dim: Dim = None,
+    probability_bin_edges: np.array = np.linspace(0, 1, 6),
+) -> XArray:
     """Returns the data required to construct the discrimination diagram for an event;
        the histogram of forecasts likelihood when observations indicate an event has
        occurred and has not occurred.
@@ -1026,12 +1033,12 @@ def discrimination(
 
 
 def reliability(
-    observations,
-    forecasts,
-    dim=None,
-    probability_bin_edges=np.linspace(0, 1, 6),
-    keep_attrs=False,
-):
+    observations: XArray,
+    forecasts: XArray,
+    dim: Dim = None,
+    probability_bin_edges: np.array = np.linspace(0, 1, 6),
+    keep_attrs: bool = False,
+) -> XArray:
     """Returns the data required to construct the reliability diagram for an event;
         the relative frequencies of occurrence of an event
         for a range of forecast probability bins
@@ -1170,13 +1177,13 @@ def _auc(fpr, tpr, dim="probability_bin"):
 
 
 def roc(
-    observations,
-    forecasts,
-    bin_edges="continuous",
-    dim=None,
-    drop_intermediate=False,
-    return_results="area",
-):
+    observations: XArray,
+    forecasts: XArray,
+    bin_edges: Union[str, np.array] = "continuous",
+    dim: Dim = None,
+    drop_intermediate: bool = False,
+    return_results: str = "area",
+) -> XArray:
     """Computes the relative operating characteristic for a range of thresholds.
 
     Parameters
@@ -1284,7 +1291,7 @@ def roc(
 
     # loop over each bin_edge and get true positive rate and false positive rate
     # from contingency
-    tpr, fpr = [], []
+    tpr_list, fpr_list = [], []
     for i in bin_edges:
         dichotomous_category_edges = np.array(
             [-np.inf, i, np.inf]
@@ -1296,12 +1303,14 @@ def roc(
             dichotomous_category_edges,
             dim=dim,
         )
-        fpr.append(dichotomous_contingency.false_alarm_rate())
-        tpr.append(dichotomous_contingency.hit_rate())
-    tpr = xr.concat(tpr, "probability_bin")
-    fpr = xr.concat(fpr, "probability_bin")
-    tpr["probability_bin"] = bin_edges
-    fpr["probability_bin"] = bin_edges
+        fpr_list.append(dichotomous_contingency.false_alarm_rate())
+        tpr_list.append(dichotomous_contingency.hit_rate())
+    tpr = xr.concat(tpr_list, "probability_bin").assign_coords(
+        probability_bin=bin_edges
+    )
+    fpr = xr.concat(fpr_list, "probability_bin").assign_coords(
+        probability_bin=bin_edges
+    )
 
     fpr = fpr.fillna(1.0)
     tpr = tpr.fillna(0.0)
