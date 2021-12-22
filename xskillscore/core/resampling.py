@@ -8,7 +8,14 @@ CONCAT_KWARGS = {"coords": "minimal", "compat": "override"}
 from .types import Dim, XArray
 
 
-def _gen_idx(forecast, dim, iterations, select_dim_items, replace, new_dim):
+def _gen_idx(
+    forecast: XArray,
+    dim: str,
+    iterations: int,
+    select_dim_items: int,
+    replace: bool,
+    new_dim: xr.DataArray,
+) -> XArray:
     """Generate indices to select from. Replace decides whether resampling is with or
     without replacement.
 

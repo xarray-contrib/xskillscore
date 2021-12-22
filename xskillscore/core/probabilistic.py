@@ -42,7 +42,9 @@ __all__ = [
 FORECAST_PROBABILITY_DIM = "forecast_probability"
 
 
-def probabilistic_broadcast(observations, forecasts, member_dim="member"):
+def probabilistic_broadcast(
+    observations: XArray, forecasts: XArray, member_dim: str = "member"
+) -> XArray:
     """Broadcast dimension except for member_dim in forecasts."""
     observations = observations.broadcast_like(
         forecasts.isel({member_dim: 0}, drop=True)
@@ -503,7 +505,9 @@ def threshold_brier_score(
         return res.mean(dim, keep_attrs=keep_attrs)
 
 
-def _assign_rps_category_bounds(res, edges, name, bin_dim="category_edge"):
+def _assign_rps_category_bounds(
+    res: XArray, edges: XArray, name: str, bin_dim: str = "category_edge"
+) -> XArray:
     """Add category_edge coord to rps return.
     Additionally adds left-most -np.inf category and right-most +np.inf category."""
     if edges[bin_dim].size >= 2:

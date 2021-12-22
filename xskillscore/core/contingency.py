@@ -1,8 +1,10 @@
 from functools import wraps
+from typing import Optional, Union
 
 import numpy as np
 import xarray as xr
 
+from .types import Dim, XArray
 from .utils import histogram
 
 __all__ = ["Contingency"]
@@ -37,7 +39,7 @@ def dichotomous_only(method):
     return wrapper
 
 
-def _display_metadata(self):
+def _display_metadata(self) -> str:
     """Called when Contingency objects are printed"""
     header = f"<xskillscore.{type(self).__name__}>\n"
     summary = header + "\n".join(str(self.table).split("\n")[1:]) + "\n"
@@ -98,11 +100,11 @@ class Contingency:
 
     def __init__(
         self,
-        observations,
-        forecasts,
-        observation_category_edges,
-        forecast_category_edges,
-        dim,
+        observations: XArray,
+        forecasts: XArray,
+        observation_category_edges: Union[XArray, np.array],
+        forecast_category_edges: Union[XArray, np.array],
+        dim: Dim,
     ):
         self._observations = observations.copy()
         self._forecasts = forecasts.copy()
@@ -140,7 +142,7 @@ class Contingency:
     def table(self):
         return self._table
 
-    def _get_contingency_table(self, dim):
+    def _get_contingency_table(self, dim: Dim) -> XArray:
         """Build the contingency table
 
         Parameters
@@ -198,7 +200,7 @@ class Contingency:
 
         return table
 
-    def _sum_categories(self, categories):
+    def _sum_categories(self, categories: Optional[str]) -> XArray:
         """Returns sums of specified categories in contingency table
 
         Parameters
@@ -234,11 +236,11 @@ class Contingency:
 
         return N
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return _display_metadata(self)
 
     @dichotomous_only
-    def hits(self, yes_category=2):
+    def hits(self, yes_category: int = 2) -> XArray:
         """Returns the number of hits (true positives) for dichotomous
         contingency data.
 
@@ -266,7 +268,7 @@ class Contingency:
         )
 
     @dichotomous_only
-    def misses(self, yes_category=2):
+    def misses(self, yes_category: int = 2) -> XArray:
         """Returns the number of misses (false negatives) for dichotomous
         contingency data.
 
@@ -295,7 +297,7 @@ class Contingency:
         )
 
     @dichotomous_only
-    def false_alarms(self, yes_category=2):
+    def false_alarms(self, yes_category: int = 2) -> XArray:
         """Returns the number of false alarms (false positives) for dichotomous
         contingency data.
 
@@ -324,7 +326,7 @@ class Contingency:
         )
 
     @dichotomous_only
-    def correct_negatives(self, yes_category=2):
+    def correct_negatives(self, yes_category: int = 2) -> XArray:
         """Returns the number of correct negatives (true negatives) for dichotomous
         contingency data.
 
@@ -353,7 +355,7 @@ class Contingency:
         )
 
     @dichotomous_only
-    def bias_score(self, yes_category=2):
+    def bias_score(self, yes_category: int = 2) -> XArray:
         """Returns the bias score(s) for dichotomous contingency data
 
         .. math::
@@ -381,7 +383,7 @@ class Contingency:
         )
 
     @dichotomous_only
-    def hit_rate(self, yes_category=2):
+    def hit_rate(self, yes_category: int = 2) -> XArray:
         """Returns the hit rate(s) (probability of detection) for
         dichotomous contingency data.
 
@@ -413,7 +415,7 @@ class Contingency:
         )
 
     @dichotomous_only
-    def false_alarm_ratio(self, yes_category=2):
+    def false_alarm_ratio(self, yes_category: int = 2) -> XArray:
         """Returns the false alarm ratio(s) for dichotomous contingency data.
 
         .. math::
@@ -439,7 +441,7 @@ class Contingency:
         )
 
     @dichotomous_only
-    def false_alarm_rate(self, yes_category=2):
+    def false_alarm_rate(self, yes_category: int = 2) -> XArray:
         """Returns the false alarm rate(s) (probability of false detection)
         for dichotomous contingency data.
 
@@ -467,7 +469,7 @@ class Contingency:
         )
 
     @dichotomous_only
-    def success_ratio(self, yes_category=2):
+    def success_ratio(self, yes_category: int = 2) -> XArray:
         """Returns the success ratio(s) for dichotomous contingency data.
 
         .. math::
@@ -497,7 +499,7 @@ class Contingency:
         )
 
     @dichotomous_only
-    def threat_score(self, yes_category=2):
+    def threat_score(self, yes_category: int = 2) -> XArray:
         """Returns the threat score(s) for dichotomous contingency data.
 
         .. math::
@@ -525,7 +527,7 @@ class Contingency:
         )
 
     @dichotomous_only
-    def equit_threat_score(self, yes_category=2):
+    def equit_threat_score(self, yes_category: int = 2) -> XArray:
         """Returns the equitable threat score(s) for dichotomous contingency data.
 
         .. math::
@@ -564,7 +566,7 @@ class Contingency:
         )
 
     @dichotomous_only
-    def odds_ratio(self, yes_category=2):
+    def odds_ratio(self, yes_category: int = 2) -> XArray:
         """Returns the odds ratio(s) for dichotomous contingency data
 
         .. math::
@@ -591,7 +593,7 @@ class Contingency:
         )
 
     @dichotomous_only
-    def odds_ratio_skill_score(self, yes_category=2):
+    def odds_ratio_skill_score(self, yes_category: int = 2) -> XArray:
         """Returns the odds ratio skill score(s) for dichotomous contingency data
 
         .. math::
@@ -622,7 +624,7 @@ class Contingency:
             + self.misses(yes_category) * self.false_alarms(yes_category)
         )
 
-    def accuracy(self):
+    def accuracy(self) -> XArray:
         """Returns the accuracy score(s) for a contingency table with K categories
 
         .. math::
@@ -653,7 +655,7 @@ class Contingency:
 
         return corr / N
 
-    def heidke_score(self):
+    def heidke_score(self) -> XArray:
         """Returns the Heidke skill score(s) for a contingency table with K categories
 
         .. math::
@@ -692,7 +694,7 @@ class Contingency:
 
         return (numer_1 - numer_2) / denom
 
-    def peirce_score(self):
+    def peirce_score(self) -> XArray:
         """Returns the Peirce skill score(s) (Hanssen and Kuipers discriminantor true
         skill statistic) for a contingency table with K categories.
 
@@ -730,7 +732,7 @@ class Contingency:
 
         return (numer_1 - numer_2) / denom
 
-    def gerrity_score(self):
+    def gerrity_score(self) -> XArray:
         """Returns Gerrity equitable score for a contingency table with K categories.
 
         .. math::

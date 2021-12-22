@@ -1,5 +1,5 @@
 import warnings
-from typing import Optional
+from typing import List, Optional, Union
 
 import xarray as xr
 
@@ -49,7 +49,9 @@ __all__ = [
 ]
 
 
-def _determine_input_core_dims(dim, weights):
+def _determine_input_core_dims(
+    dim: Union[str, List[str]], weights: Optional[XArray]
+) -> List[object]:
     """
     Determine input_core_dims based on type of dim and weights.
 
