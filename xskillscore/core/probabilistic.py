@@ -954,7 +954,7 @@ def discrimination(
     observations: XArray,
     forecasts: XArray,
     dim: Dim = None,
-    probability_bin_edges: np.array = np.linspace(0, 1, 6),
+    probability_bin_edges: Union[xr.DataArray, np.array] = np.linspace(0, 1, 6),
 ) -> XArray:
     """Returns the data required to construct the discrimination diagram for an event;
        the histogram of forecasts likelihood when observations indicate an event has
@@ -1040,7 +1040,7 @@ def reliability(
     observations: XArray,
     forecasts: XArray,
     dim: Dim = None,
-    probability_bin_edges: np.array = np.linspace(0, 1, 6),
+    probability_bin_edges: Union[np.array, xr.DataArray] = np.linspace(0, 1, 6),
     keep_attrs: bool = False,
 ) -> XArray:
     """Returns the data required to construct the reliability diagram for an event;
@@ -1183,7 +1183,7 @@ def _auc(fpr, tpr, dim="probability_bin"):
 def roc(
     observations: XArray,
     forecasts: XArray,
-    bin_edges: Union[str, np.array] = "continuous",
+    bin_edges: Union[str, np.array, xr.DataArray] = "continuous",
     dim: Dim = None,
     drop_intermediate: bool = False,
     return_results: str = "area",

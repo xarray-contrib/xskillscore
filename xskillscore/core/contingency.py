@@ -102,8 +102,8 @@ class Contingency:
         self,
         observations: XArray,
         forecasts: XArray,
-        observation_category_edges: Union[XArray, np.array],
-        forecast_category_edges: Union[XArray, np.array],
+        observation_category_edges: Union[xr.DataArray, np.array],
+        forecast_category_edges: Union[xr.DataArray, np.array],
         dim: Dim,
     ):
         self._observations = observations.copy()
