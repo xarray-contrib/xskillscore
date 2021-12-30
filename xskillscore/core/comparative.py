@@ -1,6 +1,6 @@
 import inspect
 import warnings
-from typing import Callable, List, Mapping, Optional, Tuple, Union
+from typing import Callable, List, Literal, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as st
@@ -18,7 +18,7 @@ def sign_test(
     dim: Dim = [],
     alpha: float = 0.05,
     metric: Optional[Union[Callable, str]] = None,
-    orientation: str = "negative",
+    orientation: Literal["negative", "positive"] = "negative",
 ) -> Tuple[XArray, XArray, XArray]:
     """
     Returns the Delsole and Tippett sign test over the given time dimension.
@@ -65,7 +65,7 @@ def sign_test(
         One of [``'positive'``, ``'negative'``]. Which skill values correspond to
         better skill? Smaller values (``'negative'``) or larger values
         (``'positive'``)? Defaults to ``'negative'``.
-        Ignored if ``metric== categorical``.
+        Ignored if ``metric==categorical``.
 
     Returns
     -------

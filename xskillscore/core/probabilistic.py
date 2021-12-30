@@ -1,4 +1,4 @@
-from typing import Callable, List, Optional, Tuple, Union
+from typing import Callable, List, Literal, Optional, Tuple, Union
 
 import numpy as np
 import properscoring
@@ -533,7 +533,7 @@ def rps(
     weights: Optional[XArray] = None,
     keep_attrs: bool = False,
     member_dim: str = "member",
-    input_distributions: Optional[str] = None,
+    input_distributions: Literal["c", "p"] = None,
 ) -> XArray:
     """Calculate Ranked Probability Score.
 
@@ -1186,7 +1186,7 @@ def roc(
     bin_edges: Union[str, np.array, xr.DataArray] = "continuous",
     dim: Dim = None,
     drop_intermediate: bool = False,
-    return_results: str = "area",
+    return_results: Literal["area", "all_as_tuple", "all_as_metric_dim"] = "area",
 ) -> XArray:
     """Computes the relative operating characteristic for a range of thresholds.
 
