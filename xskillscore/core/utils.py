@@ -1,6 +1,6 @@
 import contextlib
 import warnings
-from typing import List, Optional, Tuple, Union
+from typing import List, Tuple
 
 import numpy as np
 import xarray as xr
