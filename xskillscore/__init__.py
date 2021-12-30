@@ -1,5 +1,5 @@
 # flake8: noqa
-from pkg_resources import DistributionNotFound, get_distribution
+from pkg_resources import DistributionNotFound, get_distribution  # type: ignore
 
 from .core import resampling
 from .core.accessor import XSkillScoreAccessor
