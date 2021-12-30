@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 from xhistogram.xarray import histogram as xhist
 
-from .types import XArray
+from .types import Dim, XArray
 
 __all__ = ["histogram"]
 
@@ -21,9 +21,7 @@ def suppress_warnings(msg=None):
         yield
 
 
-def _preprocess_dims(
-    dim: Optional[Union[str, List[str]]], a: XArray
-) -> Tuple[List[str], Tuple[int, ...]]:
+def _preprocess_dims(dim: Dim, a: XArray) -> Tuple[List[str], Tuple[int, ...]]:
     """Preprocesses dimensions to prep for stacking.
     Parameters
     ----------
