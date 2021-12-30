@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from functools import wraps
-from typing import List, Optional, Union
+from typing import List
 
 import numpy as np
 import xarray as xr
@@ -13,7 +15,7 @@ OBSERVATIONS_NAME = "observations"
 FORECASTS_NAME = "forecasts"
 
 
-def _get_category_bounds(category_edges: Union[XArray, np.array]) -> List[str]:
+def _get_category_bounds(category_edges: XArray | np.array) -> List[str]:
     """Return formatted string of category bounds given list of category edges"""
     bounds = [
         f"[{str(category_edges[i])}, {str(category_edges[i + 1])})"
@@ -102,8 +104,8 @@ class Contingency:
         self,
         observations: XArray,
         forecasts: XArray,
-        observation_category_edges: Union[xr.DataArray, np.array],
-        forecast_category_edges: Union[xr.DataArray, np.array],
+        observation_category_edges: xr.DataArray | np.array,
+        forecast_category_edges: xr.DataArray | np.array,
         dim: Dim,
     ):
         self._observations = observations.copy()
@@ -200,7 +202,7 @@ class Contingency:
 
         return table
 
-    def _sum_categories(self, categories: Optional[str]) -> XArray:
+    def _sum_categories(self, categories: str | None) -> XArray:
         """Returns sums of specified categories in contingency table
 
         Parameters

@@ -1,4 +1,6 @@
-from typing import Callable, List, Literal, Optional, Tuple, Union
+from __future__ import annotations
+
+from typing import Callable, List, Literal, Tuple
 
 import numpy as np
 import properscoring
@@ -55,10 +57,10 @@ def probabilistic_broadcast(
 
 def crps_gaussian(
     observations: XArray,
-    mu: Union[XArray, float, int],
-    sig: Union[XArray, float, int],
+    mu: XArray | float | int,
+    sig: XArray | float | int,
     dim: Dim = None,
-    weights: Optional[XArray] = None,
+    weights: XArray | None = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Continuous Ranked Probability Score with a Gaussian distribution.
@@ -133,8 +135,8 @@ def crps_gaussian(
 def crps_quadrature(
     observations: XArray,
     cdf_or_dist: Callable,
-    xmin: Optional[float] = None,
-    xmax: Optional[float] = None,
+    xmin: float | None = None,
+    xmax: float | None = None,
     tol: float = 1e-6,
     dim: Dim = None,
     weights: bool = None,
@@ -204,11 +206,11 @@ def crps_quadrature(
 def crps_ensemble(
     observations: XArray,
     forecasts: XArray,
-    member_weights: Optional[XArray] = None,
+    member_weights: XArray | None = None,
     issorted: bool = False,
     member_dim: str = "member",
     dim: Dim = None,
-    weights: Optional[XArray] = None,
+    weights: XArray | None = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Continuous Ranked Probability Score with the ensemble distribution.
@@ -289,7 +291,7 @@ def brier_score(
     member_dim: str = "member",
     fair=False,
     dim: Dim = None,
-    weights: Optional[XArray] = None,
+    weights: XArray | None = None,
     keep_attrs: bool = False,
 ):
     """Calculate Brier score (BS).
@@ -396,11 +398,11 @@ def brier_score(
 def threshold_brier_score(
     observations: XArray,
     forecasts: XArray,
-    threshold: Union[float, List[float], XArray],
+    threshold: float | List[float] | XArray,
     issorted: bool = False,
     member_dim: str = "member",
     dim: Dim = None,
-    weights: Optional[XArray] = None,
+    weights: XArray | None = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Calculate the Brier scores of an ensemble for exceeding given thresholds.
@@ -527,13 +529,13 @@ def _assign_rps_category_bounds(
 def rps(
     observations: XArray,
     forecasts: XArray,
-    category_edges: Optional[Union[np.array, XArray, Tuple[XArray, XArray]]],
+    category_edges: np.array | XArray | Tuple[XArray, XArray] | None,
     dim: Dim = None,
     fair: bool = False,
-    weights: Optional[XArray] = None,
+    weights: XArray | None = None,
     keep_attrs: bool = False,
     member_dim: str = "member",
-    input_distributions: Literal["c", "p"] = None,
+    input_distributions: Literal["c", "p", None] = None,
 ) -> XArray:
     """Calculate Ranked Probability Score.
 
@@ -954,7 +956,7 @@ def discrimination(
     observations: XArray,
     forecasts: XArray,
     dim: Dim = None,
-    probability_bin_edges: Union[xr.DataArray, np.array] = np.linspace(0, 1, 6),
+    probability_bin_edges: xr.DataArray | np.array = np.linspace(0, 1, 6),
 ) -> XArray:
     """Returns the data required to construct the discrimination diagram for an event;
        the histogram of forecasts likelihood when observations indicate an event has
@@ -1040,7 +1042,7 @@ def reliability(
     observations: XArray,
     forecasts: XArray,
     dim: Dim = None,
-    probability_bin_edges: Union[np.array, xr.DataArray] = np.linspace(0, 1, 6),
+    probability_bin_edges: xr.DataArray | np.array = np.linspace(0, 1, 6),
     keep_attrs: bool = False,
 ) -> XArray:
     """Returns the data required to construct the reliability diagram for an event;
@@ -1183,7 +1185,7 @@ def _auc(fpr, tpr, dim="probability_bin"):
 def roc(
     observations: XArray,
     forecasts: XArray,
-    bin_edges: Union[str, np.array, xr.DataArray] = "continuous",
+    bin_edges: str | np.array | xr.DataArray = "continuous",
     dim: Dim = None,
     drop_intermediate: bool = False,
     return_results: Literal["area", "all_as_tuple", "all_as_metric_dim"] = "area",

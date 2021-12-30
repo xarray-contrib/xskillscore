@@ -1,4 +1,6 @@
-from typing import List, Optional, Union
+from __future__ import annotations
+
+from typing import List
 
 import numpy as np
 import xarray as xr
@@ -48,7 +50,7 @@ def resample_iterations(
     forecast: XArray,
     iterations: int,
     dim: str = "member",
-    dim_max: Optional[int] = None,
+    dim_max: int | None = None,
     replace: bool = True,
 ) -> XArray:
     """Resample over ``dim`` by index ``iterations`` times.
@@ -134,7 +136,7 @@ def resample_iterations_idx(
     forecast: XArray,
     iterations: int,
     dim: str = "member",
-    dim_max: Optional[int] = None,
+    dim_max: int | None = None,
     replace: bool = True,
 ) -> XArray:
     """Resample over ``dim`` by index ``iterations`` times.
