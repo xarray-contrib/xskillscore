@@ -18,5 +18,6 @@ dependencies:
   - pytest-lazy-fixture
   - pytest-xdist
   - pip
+  - typing_extensions
   - pip:
       - -e ..
