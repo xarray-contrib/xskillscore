@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import inspect
 import warnings
-from typing import Callable, List, Literal, Mapping, Tuple
+from typing import Callable, List, Mapping, Tuple
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 import numpy as np
 import scipy.stats as st
