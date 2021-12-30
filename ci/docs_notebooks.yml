@@ -29,7 +29,6 @@ dependencies:
   - isort
   - flake8
   - pre-commit
-  - typing_extensions
   - pip
   - pip:
       # Install latest version of xskillscore.
