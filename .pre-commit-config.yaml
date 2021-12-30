@@ -33,7 +33,11 @@ repos:
                "--ignore-path", "docs/source/api/"]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
+<<<<<<< HEAD
     rev: v0.910
+=======
+    rev: v0.812
+>>>>>>> 0584ac0fc512a86a471344020fdca79bb44cfd5c
     hooks:
       - id: mypy
         exclude: "asv_bench"
