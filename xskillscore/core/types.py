@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import List, Optional, Union
+from typing import List, Union
 
 import xarray as xr
 
-#XArray = Union[xr.Dataset, xr.DataArray]
 XArray = xr.Dataset | xr.DataArray
-Dim = Optional[Union[str, List[str]]]
+Dim = Union[str, List[str], None]
 # Dim = str | List[str] | None
