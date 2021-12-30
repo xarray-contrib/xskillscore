@@ -40,3 +40,4 @@ repos:
         args:
           - --ignore-missing-imports
           - --follow-imports=silent
+          - --install-types
