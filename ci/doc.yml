@@ -24,6 +24,5 @@ dependencies:
   - scikit-learn
   - cftime
   - dask-core
-  - typing_extensions
   - pip:
       - -e ..
