@@ -7,6 +7,9 @@ xskillscore: Metrics for verifying forecasts
 .. image:: https://github.com/xarray-contrib/xskillscore/actions/workflows/upstream-dev-ci.yml/badge.svg
    :target: https://github.com/xarray-contrib/xskillscore/actions/workflows/upstream-dev-ci.yml
 
+.. image:: https://results.pre-commit.ci/badge/github/xarray-contrib/xskillscore/main.svg
+   :target: https://results.pre-commit.ci/latest/github/xarray-contrib/xskillscore/main
+
 .. image:: https://img.shields.io/pypi/v/xskillscore.svg
    :target: https://pypi.python.org/pypi/xskillscore/
 
