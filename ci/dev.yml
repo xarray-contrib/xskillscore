@@ -28,7 +28,6 @@ dependencies:
   - black
   - coveralls
   - doc8
-  - importlib_metadata
   - isort
   - flake8
   - pre-commit
