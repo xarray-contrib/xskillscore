@@ -28,7 +28,6 @@ EXTRAS_REQUIRE["test"] = [
     "pre-commit",
 ]
 EXTRAS_REQUIRE["docs"] = EXTRAS_REQUIRE["complete"] + [
-    "importlib_metadata",
     "nbsphinx",
     "nbstripout",
     "doc8",

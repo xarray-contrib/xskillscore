@@ -1,9 +1,9 @@
 # YAML 1.2
 # Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
-cff-version: 1.0.3
+cff-version: 1.2.0
 message: If you use this software, please cite it using these metadata.
 # FIXME title as repository name might not be the best name, please make human readable
-title: 'xarray-contrib/xskillscore: Release v0.0.23'
+title: 'xarray-contrib/xskillscore: Metrics for verifying forecasts '
 doi: 10.5281/zenodo.5173153
 # FIXME splitting of full names is error prone, please check if given/family name are correct
 authors:
@@ -34,8 +34,6 @@ authors:
 - given-names: Taher
   family-names: Chegini
   affiliation: University of Houston
-  https://orcid.org/0000-0002-5430-6000
-version: 0.0.23
-date-released: 2021-08-10
-repository-code: https://github.com/xarray-contrib/xskillscore
+  orcid: https://orcid.org/0000-0002-5430-6000
+url: https://github.com/xarray-contrib/xskillscore
 license: Apache-2.0
