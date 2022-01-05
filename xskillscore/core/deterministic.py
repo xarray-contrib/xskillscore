@@ -83,7 +83,7 @@ def linslope(
     a: XArray,
     b: XArray,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -159,7 +159,7 @@ def pearson_r(
     a: XArray,
     b: XArray,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -240,7 +240,7 @@ def pearson_r_p_value(
     a: XArray,
     b: XArray,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -513,7 +513,7 @@ def spearman_r(
     a: XArray,
     b: XArray,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -587,7 +587,7 @@ def spearman_r_p_value(
     a: XArray,
     b: XArray,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -764,7 +764,7 @@ def r2(
     a: XArray,
     b: XArray,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -861,7 +861,7 @@ def me(
     a: XArray,
     b: XArray,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -927,7 +927,7 @@ def rmse(
     a: XArray,
     b: XArray,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -1001,7 +1001,7 @@ def mse(
     a: XArray,
     b: XArray,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -1076,7 +1076,7 @@ def mae(
     a: XArray,
     b: XArray,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -1216,7 +1216,7 @@ def mape(
     a: XArray,
     b: XArray,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -1299,7 +1299,7 @@ def smape(
     a: XArray,
     b: XArray,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:

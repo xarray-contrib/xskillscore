@@ -60,7 +60,7 @@ def crps_gaussian(
     mu: XArray | float | int,
     sig: XArray | float | int,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Continuous Ranked Probability Score with a Gaussian distribution.
@@ -135,8 +135,8 @@ def crps_gaussian(
 def crps_quadrature(
     observations: XArray,
     cdf_or_dist: Callable,
-    xmin: float | None = None,
-    xmax: float | None = None,
+    xmin: float = None,
+    xmax: float = None,
     tol: float = 1e-6,
     dim: Dim = None,
     weights: bool = None,
@@ -206,11 +206,11 @@ def crps_quadrature(
 def crps_ensemble(
     observations: XArray,
     forecasts: XArray,
-    member_weights: XArray | None = None,
+    member_weights: XArray = None,
     issorted: bool = False,
     member_dim: str = "member",
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Continuous Ranked Probability Score with the ensemble distribution.
@@ -291,7 +291,7 @@ def brier_score(
     member_dim: str = "member",
     fair=False,
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     keep_attrs: bool = False,
 ):
     """Calculate Brier score (BS).
@@ -402,7 +402,7 @@ def threshold_brier_score(
     issorted: bool = False,
     member_dim: str = "member",
     dim: Dim = None,
-    weights: XArray | None = None,
+    weights: XArray = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Calculate the Brier scores of an ensemble for exceeding given thresholds.
@@ -532,10 +532,10 @@ def rps(
     category_edges: np.array | XArray | Tuple[XArray, XArray] | None,
     dim: Dim = None,
     fair: bool = False,
-    weights: XArray | None = None,
+    weights: XArray = None,
     keep_attrs: bool = False,
     member_dim: str = "member",
-    input_distributions: Literal["c", "p", None] = None,
+    input_distributions: Literal["c", "p"] = None,
 ) -> XArray:
     """Calculate Ranked Probability Score.
 

@@ -15,7 +15,7 @@ from .types import Dim, XArray
 def sign_test(
     forecasts1: XArray,
     forecasts2: XArray,
-    observations: XArray | None = None,
+    observations: XArray = None,
     time_dim: str = "time",
     dim: Dim = [],
     alpha: float = 0.05,
@@ -204,8 +204,8 @@ def sign_test(
 def halfwidth_ci_test(
     forecasts1: XArray,
     forecasts2: XArray,
-    observations: XArray | None = None,
-    metric: str | None = None,
+    observations: XArray = None,
+    metric: str = None,
     dim: Dim = None,
     time_dim: str = "time",
     alpha: float = 0.05,
