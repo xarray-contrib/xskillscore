@@ -5,3 +5,4 @@ dask[array]
 properscoring
 scipy
 toolz
+typing_extensions
