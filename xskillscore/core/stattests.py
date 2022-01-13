@@ -34,8 +34,9 @@ def multipletests(
     ] = "all_as_result_dim",
     **multipletests_kwargs,
 ) -> Tuple[XArray, XArray]:
-    """Apply statsmodels.stats.multitest.multipletests for multi-dimensional
-    xr.DataArray, xr.Datasets.
+    """Apply statsmodels.stats.multitest.multipletests for controlling the false
+    discovery rate for multiple hypothesis tests for multi-dimensional
+    xr.DataArray and xr.Datasets.
 
     Args:
         p (xr.DataArray, xr.Dataset): uncorrected p-values.
@@ -60,16 +61,18 @@ def multipletests(
 
                 - 'pvals_corrected': return only the corrected p values
 
-                - 'all_as_tuple': return (reject, pvals_corrected, alphacSidak, alphacBonf) as tuple
+                - 'all_as_tuple': return (reject, pvals_corrected, alphacSidak,
+                  alphacBonf) as tuple
 
-                - 'all_as_result_dim': return (reject, pvals_corrected, alphacSidak, alphacBonf)
-                  concatenated into new ``results`` dimension
+                - 'all_as_result_dim': return (reject, pvals_corrected, alphacSidak,
+                  alphacBonf) concatenated into new ``result`` dimension
 
 
     Returns:
-        reject (xr.DataArray, xr.Dataset): true for hypothesis that can be rejected for given
-            alpha
-        pvals_corrected (xr.DataArray, xr.Dataset): p-values corrected for multiple tests
+        reject (xr.DataArray, xr.Dataset): true for hypothesis that can be rejected for
+            given alpha
+        pvals_corrected (xr.DataArray, xr.Dataset): p-values corrected for multiple
+            tests
         alphacSidak (xr.DataArray, xr.Dataset): corrected alpha for Sidak method
         alphacBonf (xr.DataArray, xr.Dataset): corrected alpha for Bonferroni method
 
@@ -87,7 +90,8 @@ def multipletests(
         >>> p = xr.DataArray(np.random.normal(size=(3,3)),
         ...                  coords=[('x', np.arange(3)),
         ...                          ('y', np.arange(3))])
-        >>> result = xs.multipletests(p, alpha=0.1, method='fdr_bh', return_results='all_as_result_dim')
+        >>> result = xs.multipletests(p, alpha=0.1, method='fdr_bh',
+        ...     return_results='all_as_result_dim')
         >>> result
         <xarray.DataArray (result: 4, x: 3, y: 3)>
         array([[[ 0.        ,  1.        ,  0.        ],
