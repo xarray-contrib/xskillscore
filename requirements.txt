@@ -6,3 +6,4 @@ properscoring
 scipy
 toolz
 typing_extensions
+statsmodels

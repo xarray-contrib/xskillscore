@@ -13,6 +13,7 @@ dependencies:
   - bottleneck
   - coveralls
   - matplotlib-base
+  - statsmodels
   - pytest
   - pytest-cov
   - pytest-lazy-fixture

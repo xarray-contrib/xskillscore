@@ -14,6 +14,7 @@ dependencies:
   - jupyterlab
   # Numerics
   - bottleneck
+  - statsmodels
   - cftime
   - dask-core
   - numba>=0.52

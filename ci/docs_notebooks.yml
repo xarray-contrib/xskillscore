@@ -17,6 +17,7 @@ dependencies:
   - jupyterlab
   - jupyterlab_code_formatter
   - matplotlib-base
+  - statsmodels
   - nbsphinx
   - nbstripout
   - sphinx
