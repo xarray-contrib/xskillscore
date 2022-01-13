@@ -87,7 +87,7 @@ def multipletests(
             f"Your method '{method}' is not in the accepted methods: {MULTIPLE_TESTS}"
         )
 
-    allowed_return_results = ["all_as_tuple", " pvals_corrected", " all_as_results_dim"]
+    allowed_return_results = ["all_as_tuple", "pvals_corrected", "all_as_results_dim"]
     if return_results not in allowed_return_results:
         raise NotImplementedError(
             f"expect `return_results` from {allowed_return_results}, "
