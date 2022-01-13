@@ -36,6 +36,7 @@ from .core.probabilistic import (
     threshold_brier_score,
 )
 from .core.resampling import resample_iterations, resample_iterations_idx
+from .core.stattests import multipletests
 from .versioning.print_versions import show_versions
 
 try:
