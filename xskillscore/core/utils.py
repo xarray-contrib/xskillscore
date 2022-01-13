@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 import contextlib
 import warnings
+from typing import List, Tuple
 
 import numpy as np
 import xarray as xr
 from xhistogram.xarray import histogram as xhist
+
+from .types import Dim, XArray
 
 __all__ = ["histogram"]
 
@@ -18,7 +23,7 @@ def suppress_warnings(msg=None):
         yield
 
 
-def _preprocess_dims(dim, a):
+def _preprocess_dims(dim: Dim | None, a: XArray) -> Tuple[List[str], Tuple[int, ...]]:
     """Preprocesses dimensions to prep for stacking.
     Parameters
     ----------
