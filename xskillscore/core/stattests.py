@@ -30,8 +30,8 @@ def multipletests(
     method: Literal[MULTIPLE_TESTS] = None,
     keep_attrs=True,
     return_results: Literal[
-        "pvals_corrected", "all_as_results_dim", "all_as_tuple"
-    ] = "all_as_results_dim",
+        "pvals_corrected", "all_as_result_dim", "all_as_tuple"
+    ] = "all_as_result_dim",
     **multipletests_kwargs,
 ) -> Tuple[XArray, XArray]:
     """Apply statsmodels.stats.multitest.multipletests for multi-dimensional
@@ -62,7 +62,7 @@ def multipletests(
 
                 - 'all_as_tuple': return (reject, pvals_corrected, alphacSidak, alphacBonf) as tuple
 
-                - 'all_as_results_dim': return (reject, pvals_corrected, alphacSidak, alphacBonf)
+                - 'all_as_result_dim': return (reject, pvals_corrected, alphacSidak, alphacBonf)
                   concatenated into new ``results`` dimension
 
 
@@ -73,8 +73,45 @@ def multipletests(
         alphacSidak (xr.DataArray, xr.Dataset): corrected alpha for Sidak method
         alphacBonf (xr.DataArray, xr.Dataset): corrected alpha for Bonferroni method
 
+    References:
+    * Wilks, D. S. (2016). “The Stippling Shows Statistically Significant Grid Points”:
+      How Research Results are Routinely Overstated and Overinterpreted, and What to Do
+      about It. Bulletin of the American Meteorological Society, 97(12), 2263–2273.
+      https://www.doi.org/10/f9mvth
+    * Benjamini, Y., & Hochberg, Y. (1994). Controlling the False Discovery Rate:
+      A Practical and Powerful Approach to Multiple Testing.
+      Journal of the Royal Statistical Society: Series B (Methodological), 57(1), 13.
+      https://www.doi.org/10.1111/j.2517-6161.1995.tb02031.x
+
     Example:
-        >>> reject, xpvals_corrected = xs.multipletests(p, method='fdr_bh')
+        >>> p = xr.DataArray(np.random.normal(size=(3,3)),
+        ...                  coords=[('x', np.arange(3)),
+        ...                          ('y', np.arange(3))])
+        >>> result = xs.multipletests(p, alpha=0.1, method='fdr_bh', return_results='all_as_result_dim')
+        >>> result
+        <xarray.DataArray (result: 4, x: 3, y: 3)>
+        array([[[ 0.        ,  1.        ,  0.        ],
+                [ 0.        ,  1.        ,  1.        ],
+                [ 0.        ,  0.        ,  1.        ]],
+        <BLANKLINE>
+               [[ 0.49671415, -0.1382643 ,  0.64768854],
+                [ 1.        , -0.23415337, -0.23413696],
+                [ 1.        ,  0.76743473, -0.46947439]],
+        <BLANKLINE>
+               [[ 0.1       ,  0.1       ,  0.1       ],
+                [ 0.1       ,  0.1       ,  0.1       ],
+                [ 0.1       ,  0.1       ,  0.1       ]],
+        <BLANKLINE>
+               [[ 0.1       ,  0.1       ,  0.1       ],
+                [ 0.1       ,  0.1       ,  0.1       ],
+                [ 0.1       ,  0.1       ,  0.1       ]]])
+        Coordinates:
+          * x                     (x) int64 0 1 2
+          * y                     (y) int64 0 1 2
+            multipletests_method  <U6 'fdr_bh'
+            multipletests_alpha   float64 0.1
+          * result                (result) <U15 'reject' ... 'alphacBonf'
+
     """
 
     if method is None:
@@ -87,7 +124,7 @@ def multipletests(
             f"Your method '{method}' is not in the accepted methods: {MULTIPLE_TESTS}"
         )
 
-    allowed_return_results = ["all_as_tuple", "pvals_corrected", "all_as_results_dim"]
+    allowed_return_results = ["all_as_tuple", "pvals_corrected", "all_as_result_dim"]
     if return_results not in allowed_return_results:
         raise NotImplementedError(
             f"expect `return_results` from {allowed_return_results}, "
@@ -117,7 +154,7 @@ def multipletests(
 
     returns = ["reject", "pvals_corrected", "alphacSidak", "alphacBonf"]
 
-    if return_results == "all_as_results_dim":
+    if return_results == "all_as_result_dim":
         return xr.concat(ret, "result").assign_coords(result=returns)
     elif return_results == "all_as_tuple":
         for i, r in enumerate(ret):

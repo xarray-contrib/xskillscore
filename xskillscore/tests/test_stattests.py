@@ -26,7 +26,7 @@ def test_multipletests_inputs(r_p, input, chunk):
     if chunk:
         r_p = r_p.chunk()
     ret = multipletests(
-        r_p, method=method, alpha=alpha, return_results="all_as_results_dim"
+        r_p, method=method, alpha=alpha, return_results="all_as_result_dim"
     )
     # check dask collection preserved
     assert is_dask_collection(ret) if chunk else not is_dask_collection(ret)
@@ -55,7 +55,7 @@ def test_multipletests_method(r_p):
 
 def test_multipletests_return_results(r_p):
     """Test that multipletests is sensitive to return_results."""
-    for return_results in ["pvals_corrected", "all_as_tuple", "all_as_results_dim"]:
+    for return_results in ["pvals_corrected", "all_as_tuple", "all_as_result_dim"]:
         ret = multipletests(r_p, method="fdr_bh", return_results=return_results)
         if return_results == "pvals_corrected":
             assert isinstance(ret, type(r_p))
@@ -66,7 +66,7 @@ def test_multipletests_return_results(r_p):
             assert all(isinstance(r, type(r_p)) for r in ret)
             print(ret)
             assert ret[1].coords["result"] == "pvals_corrected"
-        elif return_results == "all_as_results_dim":
+        elif return_results == "all_as_result_dim":
             assert isinstance(ret, type(r_p))
             assert "result" in ret.dims
             assert "pvals_corrected" in ret.result
