@@ -9,25 +9,23 @@ from typing_extensions import Literal
 
 from .types import XArray
 
-MULTIPLE_TESTS = [
-    "bonferroni",
-    "sidak",
-    "holm-sidak",
-    "hs",
-    "holm",
-    "simes-hochberg",
-    "hommel",
-    "fdr_bh",
-    "fdr_by",
-    "fdr_tsbh",
-    "fdr_tsbky",
-]
-
 
 def multipletests(
     p: XArray,
     alpha: float = 0.05,
-    method: Literal[MULTIPLE_TESTS] = None,
+    method: Literal[
+        "bonferroni",
+        "sidak",
+        "holm-sidak",
+        "hs",
+        "holm",
+        "simes-hochberg",
+        "hommel",
+        "fdr_bh",
+        "fdr_by",
+        "fdr_tsbh",
+        "fdr_tsbky",
+    ] = None,  # typing: signore
     keep_attrs=True,
     return_results: Literal[
         "pvals_corrected", "all_as_result_dim", "all_as_tuple"
@@ -117,6 +115,19 @@ def multipletests(
           * result                (result) <U15 'reject' ... 'alphacBonf'
 
     """
+    MULTIPLE_TESTS = [
+        "bonferroni",
+        "sidak",
+        "holm-sidak",
+        "hs",
+        "holm",
+        "simes-hochberg",
+        "hommel",
+        "fdr_bh",
+        "fdr_by",
+        "fdr_tsbh",
+        "fdr_tsbky",
+    ]
 
     if method is None:
         raise ValueError(
