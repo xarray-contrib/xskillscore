@@ -64,7 +64,6 @@ def test_multipletests_return_results(r_p):
         elif return_results == "all_as_tuple":
             assert isinstance(ret, tuple)
             assert all(isinstance(r, type(r_p)) for r in ret)
-            print(ret)
             assert ret[1].coords["result"] == "pvals_corrected"
         elif return_results == "all_as_result_dim":
             assert isinstance(ret, type(r_p))
