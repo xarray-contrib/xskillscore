@@ -128,6 +128,11 @@ def multipletests(
         "fdr_tsbh",
         "fdr_tsbky",
     ]
+    msg = "alpha must be float between 0.0 and 1.0"
+    if not isinstance(alpha, float):
+        raise ValueError(msg)
+    elif alpha <= 0.0 or alpha >= 1.0:
+        raise ValueError(msg)
 
     if method is None:
         raise ValueError(
@@ -141,7 +146,7 @@ def multipletests(
 
     allowed_return_results = ["all_as_tuple", "pvals_corrected", "all_as_result_dim"]
     if return_results not in allowed_return_results:
-        raise NotImplementedError(
+        raise ValueError(
             f"expect `return_results` from {allowed_return_results}, "
             f"found {return_results}"
         )

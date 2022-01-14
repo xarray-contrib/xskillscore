@@ -69,3 +69,20 @@ def test_multipletests_return_results(r_p):
             assert isinstance(ret, type(r_p))
             assert "result" in ret.dims
             assert "pvals_corrected" in ret.result
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        dict(method=None),
+        dict(method="doesnotexist"),
+        dict(method="fdr_bh", alpha=".5"),
+        dict(method="fdr_bh", alpha=[]),
+        dict(method="fdr_bh", alpha=True),
+        dict(method="fdr_bh", return_results=None),
+        dict(method="fdr_bh", return_results=True),
+    ],
+)
+def test_multipletests_fails(r_p, kwargs):
+    with pytest.raises(ValueError):
+        multipletests(r_p, **kwargs)
