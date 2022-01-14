@@ -25,7 +25,7 @@ def multipletests(
         "fdr_by",
         "fdr_tsbh",
         "fdr_tsbky",
-    ] = None,  # typing: signore
+    ] = None,
     keep_attrs=True,
     return_results: Literal[
         "pvals_corrected", "all_as_result_dim", "all_as_tuple"
