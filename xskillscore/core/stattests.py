@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Tuple
+from typing import Mapping, Tuple
 
 import numpy as np
 import xarray as xr
@@ -30,7 +30,7 @@ def multipletests(
     return_results: Literal[
         "pvals_corrected", "all_as_result_dim", "all_as_tuple"
     ] = "all_as_result_dim",
-    **multipletests_kwargs,
+    **multipletests_kwargs: Mapping,
 ) -> Tuple[XArray, XArray]:
     """Apply statsmodels.stats.multitest.multipletests for controlling the false
     discovery rate for multiple hypothesis tests for multi-dimensional
