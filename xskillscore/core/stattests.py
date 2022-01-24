@@ -36,45 +36,58 @@ def multipletests(
     discovery rate for multiple hypothesis tests for multi-dimensional
     xr.DataArray and xr.Datasets.
 
-    Args:
-        p (xr.DataArray, xr.Dataset): uncorrected p-values.
-        alpha (optional float): FWER, family-wise error rate. Defaults to 0.05.
-        method (str): Method used for testing and adjustment of pvalues. Can be
-            either the full name or initial letters.  Available methods are:
-            - "bonferroni" : one-step correction
-            - "sidak" : one-step correction
-            - "holm-sidak" : step down method using Sidak adjustments (alias "hs")
-            - "holm" : step-down method using Bonferroni adjustments
-            - "simes-hochberg" : step-up method (independent)
-            - "hommel" : closed method based on Simes tests (non-negative)
-            - "fdr_bh" : Benjamini/Hochberg (non-negative)
-            - "fdr_by" : Benjamini/Yekutieli (negative)
-            - "fdr_tsbh" : two stage fdr correction (non-negative)
-            - "fdr_tsbky" : two stage fdr correction (non-negative)
-        **multipletests_kwargs (optional dict): is_sorted, returnsorted
-           see statsmodels.stats.multitest.multitest
-        keep_attrs (bool):
-        return_results (str, default='area')
-            Specify how return is structed:
+    Parameters
+    ----------
+    p : xarray.Dataset or xarray.DataArray
+        uncorrected p-values.
+    alpha : float, optional
+        family-wise error rate (FWER). Defaults to 0.05.
+    method : str
+        Method used for testing and adjustment of pvalues. Can be
+        either the full name or initial letters. Available methods are:
+        - "bonferroni" : one-step correction
+        - "sidak" : one-step correction
+        - "holm-sidak" : step down method using Sidak adjustments (alias "hs")
+        - "holm" : step-down method using Bonferroni adjustments
+        - "simes-hochberg" : step-up method (independent)
+        - "hommel" : closed method based on Simes tests (non-negative)
+        - "fdr_bh" : Benjamini/Hochberg (non-negative)
+        - "fdr_by" : Benjamini/Yekutieli (negative)
+        - "fdr_tsbh" : two stage fdr correction (non-negative)
+        - "fdr_tsbky" : two stage fdr correction (non-negative)
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
+    return_results : str
+        Specify how return is structed:
 
-                - 'pvals_corrected': return only the corrected p values
+            - 'pvals_corrected': return only the corrected p values
 
-                - 'all_as_tuple': return (reject, pvals_corrected, alphacSidak,
-                  alphacBonf) as tuple
+            - 'all_as_tuple': return (reject, pvals_corrected, alphacSidak,
+              alphacBonf) as tuple
 
-                - 'all_as_result_dim': return (reject, pvals_corrected, alphacSidak,
-                  alphacBonf) concatenated into new ``result`` dimension
+            - 'all_as_result_dim': return (reject, pvals_corrected, alphacSidak,
+              alphacBonf) concatenated into new ``result`` dimension. (Default)
+
+    **multipletests_kwargs : dict, optional
+        is_sorted, returnsorted, see statsmodels.stats.multitest.multitest
 
 
-    Returns:
-        reject (xr.DataArray, xr.Dataset): true for hypothesis that can be rejected for
-            given alpha
-        pvals_corrected (xr.DataArray, xr.Dataset): p-values corrected for multiple
-            tests
-        alphacSidak (xr.DataArray, xr.Dataset): corrected alpha for Sidak method
-        alphacBonf (xr.DataArray, xr.Dataset): corrected alpha for Bonferroni method
+    Returns
+    -------
+    reject : xarray.Dataset or xarray.DataArray
+        true for hypothesis that can be rejected for given alpha
+    pvals_corrected : xarray.Dataset or xarray.DataArray
+        p-values corrected for multiple tests
+    alphacSidak : xarray.Dataset or xarray.DataArray
+        corrected alpha for Sidak method
+    alphacBonf : xarray.Dataset or xarray.DataArray
+        corrected alpha for Bonferroni method
 
-    References:
+    References
+    ----------
     * Wilks, D. S. (2016). “The Stippling Shows Statistically Significant Grid Points”:
       How Research Results are Routinely Overstated and Overinterpreted, and What to Do
       about It. Bulletin of the American Meteorological Society, 97(12), 2263–2273.
@@ -84,7 +97,8 @@ def multipletests(
       Journal of the Royal Statistical Society: Series B (Methodological), 57(1), 13.
       https://www.doi.org/10.1111/j.2517-6161.1995.tb02031.x
 
-    Example:
+    Examples
+    --------
         >>> p = xr.DataArray(np.random.normal(size=(3,3)),
         ...                  coords=[('x', np.arange(3)),
         ...                          ('y', np.arange(3))])
