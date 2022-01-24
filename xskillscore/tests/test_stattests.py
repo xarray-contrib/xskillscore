@@ -53,6 +53,27 @@ def test_multipletests_method(r_p):
     assert not ret_hs.equals(ret_fdr_bh)
 
 
+@pytest.mark.parametrize(
+    "method",
+    [
+        "bonferroni",
+        "sidak",
+        "holm-sidak",
+        "hs",
+        "holm",
+        "simes-hochberg",
+        "hommel",
+        "fdr_bh",
+        "fdr_by",
+        "fdr_tsbh",
+        "fdr_tsbky",
+    ],
+)
+def test_multipletests_all_methods(r_p, method):
+    """Test that multipletests accepts all methods."""
+    assert multipletests(r_p, method=method).any()
+
+
 def test_multipletests_return_results(r_p):
     """Test that multipletests is sensitive to return_results."""
     for return_results in ["pvals_corrected", "all_as_tuple", "all_as_result_dim"]:
