@@ -35,6 +35,7 @@ Features
 - :py:func:`~xskillscore.multipletests` controlling the false discovery rate for
   multiple hypothesis tests. (:issue:`365`, :pr:`370`) `Aaron Spring`_.
 
+
 Bug Fixes
 ~~~~~~~~~
 - :py:func:`~xskillscore.crps_ensemble` broadcasts
