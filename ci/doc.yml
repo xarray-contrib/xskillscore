@@ -13,11 +13,10 @@ dependencies:
   - properscoring
   - matplotlib-base
   - scipy
-  - sphinx
+  - sphinx<4.4
   - sphinx_rtd_theme
   - sphinx-autosummary-accessors
   - sphinx-copybutton
-  - toolz
   - xarray>=0.16.1
   - xhistogram>=0.3.0
   - scikit-learn
