@@ -14,7 +14,7 @@ dependencies:
   - statsmodels
   - matplotlib-base
   - scipy
-  - sphinx
+  - sphinx<4.4
   - sphinx_rtd_theme
   - sphinx-autosummary-accessors
   - sphinx-copybutton
