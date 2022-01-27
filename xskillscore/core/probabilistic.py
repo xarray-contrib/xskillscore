@@ -1223,7 +1223,7 @@ def roc(
 
             - 'all_as_metric_dim': return ``true positive rate`` and
               ``false positive rate`` at each bin and ``area under curve`` of ROC
-              concatinated into new ``metric`` dimension
+              concatenated into new ``metric`` dimension
 
     Returns
     -------

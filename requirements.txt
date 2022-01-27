@@ -5,3 +5,4 @@ dask[array]
 properscoring
 scipy
 typing_extensions
+statsmodels
