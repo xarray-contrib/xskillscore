@@ -679,15 +679,14 @@ class Contingency:
         https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
-        numer_1 = (
-            self.table.where(
-                self.table[OBSERVATIONS_NAME + "_category"]
-                == self.table[FORECASTS_NAME + "_category"]
-            ).sum(
-                dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
-                skipna=True,
-            )
-            / self._sum_categories("total")
+        numer_1 = self.table.where(
+            self.table[OBSERVATIONS_NAME + "_category"]
+            == self.table[FORECASTS_NAME + "_category"]
+        ).sum(
+            dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
+            skipna=True,
+        ) / self._sum_categories(
+            "total"
         )
         numer_2 = (
             self._sum_categories("observations") * self._sum_categories("forecasts")
@@ -715,15 +714,14 @@ class Contingency:
         https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
-        numer_1 = (
-            self.table.where(
-                self.table[OBSERVATIONS_NAME + "_category"]
-                == self.table[FORECASTS_NAME + "_category"]
-            ).sum(
-                dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
-                skipna=True,
-            )
-            / self._sum_categories("total")
+        numer_1 = self.table.where(
+            self.table[OBSERVATIONS_NAME + "_category"]
+            == self.table[FORECASTS_NAME + "_category"]
+        ).sum(
+            dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
+            skipna=True,
+        ) / self._sum_categories(
+            "total"
         )
         numer_2 = (
             self._sum_categories("observations") * self._sum_categories("forecasts")

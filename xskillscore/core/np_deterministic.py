@@ -250,10 +250,10 @@ def _r2(a, b, weights, axis, skipna):
 
     if weights is not None:
         squared_error = weights * ((a - b) ** 2)
-        am_squared = weights * (am ** 2)
+        am_squared = weights * (am**2)
     else:
         squared_error = (a - b) ** 2
-        am_squared = am ** 2
+        am_squared = am**2
     num = sumfunc(squared_error, axis=0)
     den = sumfunc(am_squared, axis=0)
     with suppress_warnings("invalid value encountered in true_divide"):
@@ -353,7 +353,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         # count non-nans
         dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
         with suppress_warnings("invalid value encountered in true_divide"):
-            t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
+            t_squared = r**2 * (dof / ((1.0 - r) * (1.0 + r)))
             _x = dof / (dof + t_squared)
         _x = np.asarray(_x)
         _x = np.where(_x < 1.0, _x, 1.0)
@@ -410,7 +410,7 @@ def _pearson_r_eff_p_value(a, b, axis, skipna):
         return r
     else:
         dof = _effective_sample_size(a, b, axis, skipna) - 2
-        t_squared = r ** 2 * (dof / ((1.0 - r) * (1.0 + r)))
+        t_squared = r**2 * (dof / ((1.0 - r) * (1.0 + r)))
         with suppress_warnings("invalid value encountered in true_divide"):
             _x = dof / (dof + t_squared)
         _x = np.asarray(_x)

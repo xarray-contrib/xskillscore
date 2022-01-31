@@ -375,7 +375,7 @@ def halfwidth_ci_test(
 
     confidence = st.norm.ppf(1.0 - 0.5 * alpha)
     # half width of the confidence interval
-    hwci = (2 * (1 - pearson_r_f1f2)) ** 0.5 * confidence * std / N ** 0.5
+    hwci = (2 * (1 - pearson_r_f1f2)) ** 0.5 * confidence * std / N**0.5
 
     significantly_different = np.abs(diff) > hwci  # metric difference significant?
     return significantly_different, diff, hwci
