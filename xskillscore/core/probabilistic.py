@@ -376,7 +376,7 @@ def brier_score(
                 M = forecasts[member_dim].size
                 e = (forecasts == 1).sum(member_dim)
                 o = observations
-                res = (e / M - o) ** 2 - e * (M - e) / (M ** 2 * (M - 1))
+                res = (e / M - o) ** 2 - e * (M - e) / (M**2 * (M - 1))
         else:
             if isinstance(forecasts, (xr.Dataset, xr.DataArray)):
                 if member_dim in forecasts.dims:
@@ -818,7 +818,7 @@ def rps(
     # RPS formulas
     if fair:  # for ensemble member adjustment, see Ferro 2013
         Ec = Fc * M
-        res = ((Ec / M - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
+        res = ((Ec / M - Oc) ** 2 - Ec * (M - Ec) / (M**2 * (M - 1))).sum(bin_dim)
     else:  # normal formula
         res = ((Fc - Oc) ** 2).sum(bin_dim)
 
@@ -1012,27 +1012,21 @@ def discrimination(
 
     _fail_if_dim_empty(dim)
 
-    hist_event = (
-        histogram(
-            forecasts.where(observations),
-            bins=[probability_bin_edges],
-            bin_names=[FORECAST_PROBABILITY_DIM],
-            bin_dim_suffix="",
-            dim=dim,
-        )
-        / (observations).sum(dim=dim)
-    )
+    hist_event = histogram(
+        forecasts.where(observations),
+        bins=[probability_bin_edges],
+        bin_names=[FORECAST_PROBABILITY_DIM],
+        bin_dim_suffix="",
+        dim=dim,
+    ) / (observations).sum(dim=dim)
 
-    hist_no_event = (
-        histogram(
-            forecasts.where(np.logical_not(observations)),
-            bins=[probability_bin_edges],
-            bin_names=[FORECAST_PROBABILITY_DIM],
-            bin_dim_suffix="",
-            dim=dim,
-        )
-        / (np.logical_not(observations)).sum(dim=dim)
-    )
+    hist_no_event = histogram(
+        forecasts.where(np.logical_not(observations)),
+        bins=[probability_bin_edges],
+        bin_names=[FORECAST_PROBABILITY_DIM],
+        bin_dim_suffix="",
+        dim=dim,
+    ) / (np.logical_not(observations)).sum(dim=dim)
 
     return xr.concat([hist_event, hist_no_event], dim="event").assign_coords(
         {"event": [True, False]}

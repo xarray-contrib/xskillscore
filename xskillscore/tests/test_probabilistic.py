@@ -584,7 +584,7 @@ def rps_xhist(
     # RPS formulas
     if fair:
         Ec = Fc * M
-        res = ((Ec / M - Oc) ** 2 - Ec * (M - Ec) / (M ** 2 * (M - 1))).sum(bin_dim)
+        res = ((Ec / M - Oc) ** 2 - Ec * (M - Ec) / (M**2 * (M - 1))).sum(bin_dim)
     else:
         res = ((Fc - Oc) ** 2).sum(bin_dim)
 
