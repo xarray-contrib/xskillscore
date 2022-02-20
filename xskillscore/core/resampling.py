@@ -225,7 +225,7 @@ def resample_iterations_idx(
     # bug fix if singleton dimension
     singleton_dims = []
     for d in forecast.dims:
-        if forecast.sizes["d"] == 1:
+        if forecast.sizes[d] == 1:
             singleton_dims.append(d)
             forecast = forecast.isel({d: [0] * 2})
 
