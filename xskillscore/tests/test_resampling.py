@@ -107,7 +107,7 @@ def test_resample_iterations_dix_no_squeeze(f_prob):
     actual = resample_iterations_idx(da, iterations=ITERATIONS)
     other = resample_iterations(da, iterations=ITERATIONS)
     assert "test_dim" in actual.dims
-    assert actual.coords.to_dataset().equal(other.coords.to_dataset())
+    assert actual.coords.to_dataset().equals(other.coords.to_dataset())
 
 
 @pytest.mark.parametrize("func", resample_iterations_funcs)
