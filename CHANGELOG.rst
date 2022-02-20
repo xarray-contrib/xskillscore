@@ -11,6 +11,10 @@ Bug Fixes
 - :py:func:`~xskillscore.rank_histogram` ``random_for_tied=True`` handles tied ranks
   correctly by default. ``random_for_tied=False`` ignores this and retains previous
   behaviour. (:issue:`335`, :pr:`364`) `Aaron Spring`_.
+- Allow singleton dimension in :py:func:`~xskillscore.resample_iterations_idx` as
+  this is allowed in :py:func:`~xskillscore.resample_iterations` also.
+  (:issue:`375`, :pr:`376`) `Aaron Spring`_.
+
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
