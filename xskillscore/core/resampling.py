@@ -227,8 +227,8 @@ def resample_iterations_idx(
     for d in forecast.dims:
         if forecast.sizes["d"] == 1:
             singleton_dims.append(d)
-            forecast = forecast.isel({d:[0]*2})
-        
+            forecast = forecast.isel({d: [0] * 2})
+
     # bug fix when only one iteration
     if iterations == 1:
         forecast_smp = forecast.isel({dim: idx_da.isel(iteration=0, drop=True).values})
@@ -246,5 +246,5 @@ def resample_iterations_idx(
     if dim_coord_set:
         del forecast_smp.coords[dim]
     for d in singleton_dims:
-        forecast_smp = forecast_smp.isel({d:[0]})
+        forecast_smp = forecast_smp.isel({d: [0]})
     return forecast_smp
