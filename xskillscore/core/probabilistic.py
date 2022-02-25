@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import Callable, List, Tuple
+from typing import Callable, List, Literal, Tuple
 
 import numpy as np
 import properscoring
 import scipy.stats
 import xarray as xr
-from typing_extensions import Literal
 
 from .contingency import Contingency, _get_category_bounds
 from .np_probabilistic import _reliability
