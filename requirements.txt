@@ -4,5 +4,4 @@ xhistogram>=0.3.0
 dask[array]
 properscoring
 scipy
-typing_extensions
 statsmodels
