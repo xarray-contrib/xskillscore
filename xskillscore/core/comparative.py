@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import inspect
 import warnings
-from typing import Callable, List, Mapping, Tuple
+from typing import Callable, List, Literal, Mapping, Tuple
 
 import numpy as np
 import scipy.stats as st
 import xarray as xr
-from typing_extensions import Literal
 
 from . import deterministic as dm
 from .types import Dim, XArray

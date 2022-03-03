@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import Mapping, Tuple
+from typing import Literal, Mapping, Tuple
 
 import numpy as np
 import xarray as xr
 from statsmodels.stats.multitest import multipletests as statsmodels_multipletests
-from typing_extensions import Literal
 
 from .types import XArray
 
