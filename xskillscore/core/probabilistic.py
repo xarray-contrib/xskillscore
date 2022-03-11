@@ -835,9 +835,9 @@ def rps(
     observations_mask = observations.notnull().all(mask_observations_dim)
     rps = rps.where(forecasts_mask).where(observations_mask)
     # keep nans and prevent 0 for all nan grids, could prevent this with skipna=False
-    #try:
+    # try:
     #    res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
-    #except Exception as e:
+    # except Exception as e:
     #    print(f"could not mask all NaNs properly due to {type(e).__name__}: {e}")
     if keep_attrs:  # attach by hand
         res.attrs.update(observations.attrs)
