@@ -829,10 +829,10 @@ def rps(
         res = res.weighted(weights)
     # combine many forecasts-observations pairs
     res = res.mean(dim)
-    mask_forecasts_dim = [d for d in forecasts.dim]
-    forecasts_mask = forecasts.notnull().all(mask_forecasts_dim)
-    mask_observations_dim = [d for d in observations.dim]
-    observations_mask = observations.notnull().all(mask_observations_dim)
+    mask_forecasts_dims = [d for d in forecasts.dims]
+    forecasts_mask = forecasts.notnull().all(mask_forecasts_dims)
+    mask_observations_dims = [d for d in observations.dims]
+    observations_mask = observations.notnull().all(mask_observations_dims)
     rps = rps.where(forecasts_mask).where(observations_mask)
     # keep nans and prevent 0 for all nan grids, could prevent this with skipna=False
     # try:
