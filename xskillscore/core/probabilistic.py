@@ -833,7 +833,7 @@ def rps(
     forecasts_mask = forecasts.notnull().all(mask_forecasts_dims)
     mask_observations_dims = [d for d in observations.dims]
     observations_mask = observations.notnull().all(mask_observations_dims)
-    rps = rps.where(forecasts_mask).where(observations_mask)
+    res = res.where(forecasts_mask).where(observations_mask)
     # keep nans and prevent 0 for all nan grids, could prevent this with skipna=False
     # try:
     #    res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
