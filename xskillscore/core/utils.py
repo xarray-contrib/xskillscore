@@ -205,7 +205,7 @@ def _keep_nans_masked(ds_before, ds_after, dim=None, ignore=None):
     if ignore is None:
         ignore = []
     elif isinstance(ignore, str):
-        ignore = list(ignore)
+        ignore = [ignore]
     all_dim = set(dim) ^ set(ignore)
     all_dim = [d for d in all_dim if d in ds_before.dims]
     mask = ds_before.isnull().all(all_dim)
