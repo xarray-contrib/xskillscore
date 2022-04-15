@@ -372,4 +372,4 @@ def test_correlation_broadcasts(a, b, metrics):
     ):  # effective metrics require to be applied over time
         with pytest.raises(ValueError) as e:
             metric(a, b_changed_coords, dim="lat")
-        assert "cannot align objects" in str(e.value)
+        assert "cannot align" in str(e.value)
