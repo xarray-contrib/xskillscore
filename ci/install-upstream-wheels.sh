@@ -10,7 +10,6 @@ conda uninstall -y --force \
     xhistogram \
     xskillscore
 
-
 # to limit the runtime of Upstream CI
 python -m pip install pytest-timeout
 python -m pip install \
