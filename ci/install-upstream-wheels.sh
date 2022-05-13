@@ -35,4 +35,3 @@ python -m pip install \
     git+https://github.com/pydata/bottleneck  \
     git+https://github.com/xgcm/xhistogram \
     git+https://github.com/numpy/numpy
-
