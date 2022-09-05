@@ -710,10 +710,8 @@ def rps(
       1917–1923, 2013. doi: 10.1002/qj.2270.
     * https://www-miklip.dkrz.de/about/problems/
     """
-
     if isinstance(dim, str):
         dim = [dim]
-
     bin_dim = "category_edge"
     if category_edges is not None:
         if member_dim not in forecasts.dims:
@@ -839,12 +837,12 @@ def rps(
     )
 
     if keep_attrs:  # attach by hand
-        res.attrs.update(observations.attrs)
         res.attrs.update(forecasts.attrs)
+        res.attrs.update(observations.attrs)
         if isinstance(res, xr.Dataset):
             for v in res.data_vars:
-                res[v].attrs.update(observations[v].attrs)
                 res[v].attrs.update(forecasts[v].attrs)
+                res[v].attrs.update(observations[v].attrs)
     return res
 
 

@@ -197,10 +197,9 @@ def _check_identical_xr_types(a, b):
 
 
 def _keep_nans_masked(observations, forecasts, res, dim=None, member_dim="member"):
-    """Preserve all NaNs from ds_before for ds_after over while ignoring some dimensions optionally."""
+    """Preserve all NaNs from inputs (observations, forecasts) on output (res)."""
     if dim is None:
-        forecasts_mask_dim = None
-        observations_mask_dim = None
+        forecasts_mask_dim, observations_mask_dim = None, None
     else:
         forecasts_mask_dim = dim + [member_dim] if member_dim in forecasts.dims else dim
         if "category_edge" in forecasts.dims:
