@@ -864,6 +864,16 @@ def test_rps_last_edge_included(o, f_prob):
     assert (res_actual == 0).all()
 
 
+def test_rps_mask_Dataset_additional_var(o, f_prob):
+    """Test that rps doesn't fail and just drops additional data variables."""
+    category_edges_np = np.array([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    o = o.to_dataset(name="var")
+    o["var2"] = o["var"] ** 2  # add new var only in observations
+    f_prob = f_prob.to_dataset(name="var")
+    actual = rps(o, f_prob, dim="time", category_edges=category_edges_np)
+    assert "var2" not in actual.data_vars
+
+
 @pytest.mark.parametrize(
     "observation,forecast",
     [
