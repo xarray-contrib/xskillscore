@@ -539,6 +539,9 @@ def rps_xhist(
     from xskillscore.core.contingency import _get_category_bounds
     from xskillscore.core.utils import _keep_nans_masked, histogram
 
+    if isinstance(dim, str):
+        dim = [dim]
+
     bin_names = ["category"]
     bin_dim = f"{bin_names[0]}_edge"
     M = forecasts[member_dim].size
@@ -601,7 +604,10 @@ def rps_xhist(
     )
 
     # keep nans and prevent 0 for all nan grids
-    res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
+    res = _keep_nans_masked(
+        observations, forecasts, res, dim=dim, member_dim=member_dim
+    )
+    # res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
     return res
 
 
