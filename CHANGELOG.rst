@@ -21,7 +21,8 @@ Internal Changes
 - Reduce dependencies (:issue:`359`, :pr:`363`) `Aaron Spring`_.
 - Implement ``typing`` for all ``xs.{calls}``.
   (:issue:`317`, :pr:`366`) `Aaron Spring`_.
-
+- Refactor masking ``NaN`` in :py:func:`~xskillscore.rps`.
+  (:pr:`397`) `Aaron Spring`_.
 
 xskillscore v0.0.24 (2021-10-08)
 --------------------------------
