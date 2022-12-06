@@ -539,6 +539,9 @@ def rps_xhist(
     from xskillscore.core.contingency import _get_category_bounds
     from xskillscore.core.utils import _keep_nans_masked, histogram
 
+    if isinstance(dim, str):
+        dim = [dim]
+
     bin_names = ["category"]
     bin_dim = f"{bin_names[0]}_edge"
     M = forecasts[member_dim].size
@@ -601,7 +604,10 @@ def rps_xhist(
     )
 
     # keep nans and prevent 0 for all nan grids
-    res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
+    res = _keep_nans_masked(
+        observations, forecasts, res, dim=dim, member_dim=member_dim
+    )
+    # res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
     return res
 
 
@@ -856,6 +862,16 @@ def test_rps_last_edge_included(o, f_prob):
     f_prob = xr.ones_like(f_prob)
     res_actual = rps(o, f_prob, dim="time", category_edges=category_edges_np)
     assert (res_actual == 0).all()
+
+
+def test_rps_mask_Dataset_additional_var(o, f_prob):
+    """Test that rps doesn't fail and just drops additional data variables."""
+    category_edges_np = np.array([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    o = o.to_dataset(name="var")
+    o["var2"] = o["var"] ** 2  # add new var only in observations
+    f_prob = f_prob.to_dataset(name="var")
+    actual = rps(o, f_prob, dim="time", category_edges=category_edges_np)
+    assert "var2" not in actual.data_vars
 
 
 @pytest.mark.parametrize(

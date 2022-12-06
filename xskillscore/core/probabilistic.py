@@ -710,6 +710,8 @@ def rps(
       1917–1923, 2013. doi: 10.1002/qj.2270.
     * https://www-miklip.dkrz.de/about/problems/
     """
+    if isinstance(dim, str):
+        dim = [dim]
     bin_dim = "category_edge"
     if category_edges is not None:
         if member_dim not in forecasts.dims:
@@ -829,18 +831,18 @@ def rps(
         res = res.weighted(weights)
     # combine many forecasts-observations pairs
     res = res.mean(dim)
-    # keep nans and prevent 0 for all nan grids, could prevent this with skipna=False
-    try:
-        res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
-    except Exception as e:
-        print(f"could not mask all NaNs properly due to {type(e).__name__}: {e}")
+
+    res = _keep_nans_masked(
+        observations, forecasts, res, dim=dim, member_dim=member_dim
+    )
+
     if keep_attrs:  # attach by hand
-        res.attrs.update(observations.attrs)
         res.attrs.update(forecasts.attrs)
+        res.attrs.update(observations.attrs)
         if isinstance(res, xr.Dataset):
             for v in res.data_vars:
-                res[v].attrs.update(observations[v].attrs)
                 res[v].attrs.update(forecasts[v].attrs)
+                res[v].attrs.update(observations[v].attrs)
     return res
 
 

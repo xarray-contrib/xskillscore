@@ -196,23 +196,22 @@ def _check_identical_xr_types(a, b):
             raise ValueError("inputs must be xr.DataArray or xr.Dataset")
 
 
-def _keep_nans_masked(ds_before, ds_after, dim=None, ignore=None):
-    """Preserve all NaNs from ds_before for ds_after over while ignoring some dimensions optionally."""
+def _keep_nans_masked(observations, forecasts, res, dim=None, member_dim="member"):
+    """Preserve all NaNs from inputs (observations, forecasts) on output (res)."""
     if dim is None:
-        dim = list(ds_before.dims)
-    elif isinstance(dim, str):
-        dim = [dim]
-    if ignore is None:
-        ignore = []
-    elif isinstance(ignore, str):
-        ignore = list(ignore)
-    all_dim = set(dim) ^ set(ignore)
-    all_dim = [d for d in all_dim if d in ds_before.dims]
-    mask = ds_before.isnull().all(all_dim)
-    ds_after = ds_after.where(~mask.astype("bool"), other=np.nan)
-    for d in dim:
-        assert d not in ds_after.dims
-    if ignore is not None:
-        for d in ignore:
-            assert d not in ds_after.dims
-    return ds_after
+        forecasts_mask_dim, observations_mask_dim = None, None
+    else:
+        forecasts_mask_dim = dim + [member_dim] if member_dim in forecasts.dims else dim
+        if "category_edge" in forecasts.dims:
+            forecasts_mask_dim = forecasts_mask_dim + ["category_edge"]
+        if "category" in forecasts.dims:
+            forecasts_mask_dim = forecasts_mask_dim + ["category"]
+        observations_mask_dim = dim
+        if "category_edge" in observations.dims:
+            observations_mask_dim = observations_mask_dim + ["category_edge"]
+        if "category" in observations.dims:
+            observations_mask_dim = observations_mask_dim + ["category"]
+    res = res.where(observations.notnull().any(observations_mask_dim)).where(
+        forecasts.notnull().any(forecasts_mask_dim)
+    )
+    return res
