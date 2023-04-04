@@ -1149,7 +1149,7 @@ def _drop_intermediate(fpr, tpr):
             fpr.isel(probability_bin=0, drop=False).astype("bool"),
         ],
         "probability_bin",
-    )
+    ).compute()
     optimal_idxs["probability_bin"] = np.arange(optimal_idxs.probability_bin.size)
     if isinstance(optimal_idxs, xr.Dataset):
         optimal_idxs = optimal_idxs.to_array()
