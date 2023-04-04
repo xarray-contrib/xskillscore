@@ -44,8 +44,8 @@ extensions = [
 ]
 
 extlinks = {
-    "issue": ("https://github.com/xarray-contrib/xskillscore/issues/%s", "GH#"),
-    "pr": ("https://github.com/xarray-contrib/xskillscore/pull/%s", "GH#"),
+    "issue": ("https://github.com/xarray-contrib/xskillscore/issues/%s", "%s"),
+    "pr": ("https://github.com/xarray-contrib/xskillscore/pull/%s", "%s"),
 }
 
 autodoc_typehints = "none"
