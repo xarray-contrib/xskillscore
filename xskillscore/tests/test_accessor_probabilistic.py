@@ -118,7 +118,6 @@ def test_discrimination_accessor(o, f_prob, threshold, outer_bool):
         ds = ds.drop_vars("f_prob")
         expected = ds.xs.discrimination("o", (f_prob > threshold).mean("member"))
     else:
-
         expected = ds.xs.discrimination("o", "f_prob")
     assert_allclose(actual, expected)
 

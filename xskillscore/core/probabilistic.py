@@ -1336,7 +1336,6 @@ def roc(
     )
 
     if drop_intermediate and fpr.probability_bin.size > 2:
-
         fpr, tpr = _drop_intermediate(fpr, tpr)
         fpr_pad, tpr_pad = _drop_intermediate(fpr_pad, tpr_pad)
 

@@ -774,7 +774,7 @@ class Contingency:
             a = (1.0 - p_sum) / p_sum
             k = a.shape[-1]
             s = np.zeros(table.shape, dtype=float)
-            for (i, j) in np.ndindex(*s.shape[-2:]):
+            for i, j in np.ndindex(*s.shape[-2:]):
                 if i == j:
                     s[..., i, j] = (
                         1.0
