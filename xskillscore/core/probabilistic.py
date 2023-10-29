@@ -532,7 +532,7 @@ def _assign_rps_category_bounds(
 def rps(
     observations: XArray,
     forecasts: XArray,
-    category_edges: np.array | XArray | Tuple[XArray, XArray] | None,
+    category_edges: np.ndarray | XArray | Tuple[XArray, XArray] | None,
     dim: Dim = None,
     fair: bool = False,
     weights: XArray = None,
@@ -577,7 +577,7 @@ def rps(
         category_edge are expected in absolute units or probabilities consistently.
         dtypes are handled accordingly:
 
-        - np.array (1d): will be internally converted and broadcasted to observations.
+        - np.ndarray (1d): will be internally converted and broadcasted to observations.
           Use this if you wish to use the same category edges for all elements of both
           forecasts and observations.
 
@@ -588,7 +588,7 @@ def rps(
           vary across dimensions of forecasts and observations, but are the same for
           both.
 
-        - tuple of np.array/xr.Dataset/xr.DataArray: same as above, where the
+        - tuple of np.ndarray/xr.Dataset/xr.DataArray: same as above, where the
           first item is taken as ``category_edges`` for observations and the second item
           for ``category_edges`` for forecasts. Use this if your category edges vary
           across dimensions of forecasts and observations, and are different for each.
@@ -977,7 +977,7 @@ def discrimination(
     observations: XArray,
     forecasts: XArray,
     dim: Dim = None,
-    probability_bin_edges: xr.DataArray | np.array = np.linspace(0, 1, 6),
+    probability_bin_edges: xr.DataArray | np.ndarray = np.linspace(0, 1, 6),
 ) -> XArray:
     """Returns the data required to construct the discrimination diagram for an event;
        the histogram of forecasts likelihood when observations indicate an event has
@@ -1062,7 +1062,7 @@ def reliability(
     observations: XArray,
     forecasts: XArray,
     dim: Dim = None,
-    probability_bin_edges: xr.DataArray | np.array = np.linspace(0, 1, 6),
+    probability_bin_edges: xr.DataArray | np.ndarray = np.linspace(0, 1, 6),
     keep_attrs: bool = False,
 ) -> XArray:
     """Returns the data required to construct the reliability diagram for an event;
@@ -1204,7 +1204,7 @@ def _auc(fpr, tpr, dim="probability_bin"):
 def roc(
     observations: XArray,
     forecasts: XArray,
-    bin_edges: str | np.array | xr.DataArray = "continuous",
+    bin_edges: str | np.ndarray | xr.DataArray = "continuous",
     dim: Dim = None,
     drop_intermediate: bool = False,
     return_results: Literal["area", "all_as_tuple", "all_as_metric_dim"] = "area",
