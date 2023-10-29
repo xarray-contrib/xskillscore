@@ -83,7 +83,3 @@ repos:
       hooks:
       - id: check-github-workflows
       - id: check-readthedocs
-
-  -   repo: meta
-      hooks:
-      - id: check-hooks-apply
