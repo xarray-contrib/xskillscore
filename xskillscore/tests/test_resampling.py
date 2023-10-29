@@ -148,7 +148,7 @@ def test_resample_inputs(a_1d, func, input, chunk, replace):
     # check dask collection preserved
     assert is_dask_collection(actual) if chunk else not is_dask_collection(actual)
     # input type preserved
-    assert type(actual) == type(a_1d)
+    assert isinstance(a_1d, type(actual))
 
 
 @pytest.mark.parametrize("func", resample_iterations_funcs)

@@ -72,7 +72,7 @@ def assert_keep_attrs(actual, o, keep_attrs):
 
 
 def assign_type_input_output(actual, o):
-    assert type(o) == type(actual)
+    assert isinstance(o, type(actual))
 
 
 @pytest.mark.parametrize("chunk_bool", [True, False])
