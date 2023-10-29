@@ -22,7 +22,7 @@ jobs:
     outputs:
       triggered: ${{ steps.detect-trigger.outputs.trigger-found }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - uses: xarray-contrib/ci-trigger@v1.1
@@ -51,22 +51,23 @@ jobs:
     outputs:
       artifacts_availability: ${{ steps.status.outputs.ARTIFACTS_AVAILABLE }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch all history for all branches and tags
-      - uses: conda-incubator/setup-miniconda@v2
+          fetch-depth: 0 # Fetch all history for all branches and tags.
+      - name: setup conda (micromamba)
+        uses: mamba-org/setup-micromamba@v1
         with:
-          channels: conda-forge
-          channel-priority: strict
-          mamba-version: "*"
-          activate-environment: xskillscore-dev
-          auto-update-conda: false
-          python-version: ${{ matrix.python-version }}
+          environment-file: ci/dev.yml
+          environment-name: xskillscore-dev
+          cache-environment: true
+          create-args: >-
+            python=${{ matrix.python-version }}
+            pytest-reportlog
+            conda
       - name: Set up conda environment
         run: |
-          mamba env update -f ci/dev.yml
           bash ci/install-upstream-wheels.sh
-      - name: Install xskillscore
+      - name: Install xskillscore no deps
         run: |
           python -m pip install --no-deps -e .
       - name: Version info
