@@ -15,7 +15,7 @@ OBSERVATIONS_NAME = "observations"
 FORECASTS_NAME = "forecasts"
 
 
-def _get_category_bounds(category_edges: XArray | np.array) -> List[str]:
+def _get_category_bounds(category_edges: XArray | np.ndarray) -> List[str]:
     """Return formatted string of category bounds given list of category edges"""
     bounds = [
         f"[{str(category_edges[i])}, {str(category_edges[i + 1])})"
@@ -104,8 +104,8 @@ class Contingency:
         self,
         observations: XArray,
         forecasts: XArray,
-        observation_category_edges: xr.DataArray | np.array,
-        forecast_category_edges: xr.DataArray | np.array,
+        observation_category_edges: xr.DataArray | np.ndarray,
+        forecast_category_edges: xr.DataArray | np.ndarray,
         dim: Dim,
     ):
         self._observations = observations.copy()
