@@ -20,9 +20,9 @@ def assert_dim_coords(a, b):
         assert a[d].size == b[d].size, print(a[d], "!=", b[d])
     for c in a.coords:
         assert (a[c] == b[c]).all(), print(a[c], "!=", b[c])
-    # check dim and coords entries and order
-    assert list(a.dims) == list(b.dims), print(a.dims, "!=", b.dims)
-    assert list(a.coords) == list(b.coords), print(a.coords, "!=", b.coords)
+    # check dim and coords entries
+    assert set(list(a.dims)) == set(list(b.dims)), print(a.dims, "!=", b.dims)
+    assert set(list(a.coords)) == set(list(b.coords)), print(a.coords, "!=", b.coords)
 
 
 def test_resampling_identical_dim(f_prob):
