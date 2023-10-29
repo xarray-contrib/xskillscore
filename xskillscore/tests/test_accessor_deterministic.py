@@ -82,7 +82,6 @@ def adjust_weights(dim, weight_bool, weights):
 def test_deterministic_metrics_accessor(
     a, b, dim, skipna_bool, weight_bool, weights_cos_lat, metric, outer_bool
 ):
-
     # Update dim to time if testing temporal only metrics
     if (dim != "time") and (metric in temporal_only_metrics):
         dim = "time"

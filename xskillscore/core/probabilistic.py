@@ -91,16 +91,17 @@ def crps_gaussian(
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
-    ...                             coords=[('x', np.arange(3)),
-    ...                                     ('y', np.arange(3))])
-    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
-    ...                          coords=[('x', np.arange(3)),
-    ...                                  ('y', np.arange(3)),
-    ...                                  ('member', np.arange(3))])
-    >>> mu = forecasts.mean('member')
-    >>> sig = forecasts.std('member')
-    >>> crps_gaussian(observations, mu, sig, dim='x')
+    >>> observations = xr.DataArray(
+    ...     np.random.normal(size=(3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
+    ... )
+    >>> forecasts = xr.DataArray(
+    ...     np.random.normal(size=(3, 3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
+    ... )
+    >>> mu = forecasts.mean("member")
+    >>> sig = forecasts.std("member")
+    >>> crps_gaussian(observations, mu, sig, dim="x")
     <xarray.DataArray (y: 3)>
     array([1.0349773 , 0.36521376, 0.39017126])
     Coordinates:
@@ -171,9 +172,10 @@ def crps_quadrature(
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(3, 3)),
-    ...                             coords=[('x', np.arange(3)),
-    ...                                     ('y', np.arange(3))])
+    >>> observations = xr.DataArray(
+    ...     np.random.normal(size=(3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
+    ... )
     >>> from scipy.stats import norm
     >>> xs.crps_quadrature(observations, norm, dim="x")
     <xarray.DataArray (y: 3)>
@@ -249,14 +251,15 @@ def crps_ensemble(
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
-    ...                             coords=[('x', np.arange(3)),
-    ...                                     ('y', np.arange(3))])
-    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
-    ...                          coords=[('x', np.arange(3)),
-    ...                                  ('y', np.arange(3)),
-    ...                                  ('member', np.arange(3))])
-    >>> crps_ensemble(observations, forecasts, dim='x')
+    >>> observations = xr.DataArray(
+    ...     np.random.normal(size=(3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
+    ... )
+    >>> forecasts = xr.DataArray(
+    ...     np.random.normal(size=(3, 3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
+    ... )
+    >>> crps_ensemble(observations, forecasts, dim="x")
     <xarray.DataArray (y: 3)>
     array([1.04497153, 0.48997746, 0.47994095])
     Coordinates:
@@ -335,16 +338,15 @@ def brier_score(
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(3, 3)),
-    ...                             coords=[('x', np.arange(3)),
-    ...                                     ('y', np.arange(3))])
-    >>> forecasts = xr.DataArray(np.random.normal(size=(3, 3, 3)),
-    ...                          coords=[('x', np.arange(3)),
-    ...                                  ('y', np.arange(3)),
-    ...                                  ('member', np.arange(3))])
-    >>> xs.brier_score(observations > .5,
-    ...                (forecasts > .5).mean('member'),
-    ...                dim="y")
+    >>> observations = xr.DataArray(
+    ...     np.random.normal(size=(3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
+    ... )
+    >>> forecasts = xr.DataArray(
+    ...     np.random.normal(size=(3, 3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
+    ... )
+    >>> xs.brier_score(observations > 0.5, (forecasts > 0.5).mean("member"), dim="y")
     <xarray.DataArray (x: 3)>
     array([0.37037037, 0.14814815, 0.51851852])
     Coordinates:
@@ -439,14 +441,15 @@ def threshold_brier_score(
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
-    ...                             coords=[('x', np.arange(3)),
-    ...                                     ('y', np.arange(3))])
-    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
-    ...                          coords=[('x', np.arange(3)),
-    ...                                  ('y', np.arange(3)),
-    ...                                  ('member', np.arange(3))])
-    >>> threshold = [.2, .5, .8]
+    >>> observations = xr.DataArray(
+    ...     np.random.normal(size=(3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
+    ... )
+    >>> forecasts = xr.DataArray(
+    ...     np.random.normal(size=(3, 3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
+    ... )
+    >>> threshold = [0.2, 0.5, 0.8]
     >>> xs.threshold_brier_score(observations, forecasts, threshold)
     <xarray.DataArray (threshold: 3)>
     array([0.27160494, 0.34567901, 0.18518519])
@@ -628,15 +631,16 @@ def rps(
     --------
     In the examples below `o` is used for observations and `f` for forecasts.
 
-    >>> o = xr.DataArray(np.random.random(size=(3, 3)),
-    ...                  coords=[('x', np.arange(3)),
-    ...                          ('y', np.arange(3))])
-    >>> f = xr.DataArray(np.random.random(size=(3, 3, 3)),
-    ...                  coords=[('x', np.arange(3)),
-    ...                          ('y', np.arange(3)),
-    ...                          ('member', np.arange(3))])
-    >>> category_edges = np.array([.33, .66])
-    >>> xs.rps(o, f, category_edges, dim='x')
+    >>> o = xr.DataArray(
+    ...     np.random.random(size=(3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
+    ... )
+    >>> f = xr.DataArray(
+    ...     np.random.random(size=(3, 3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
+    ... )
+    >>> category_edges = np.array([0.33, 0.66])
+    >>> xs.rps(o, f, category_edges, dim="x")
     <xarray.DataArray (y: 3)>
     array([0.37037037, 0.81481481, 1.        ])
     Coordinates:
@@ -648,8 +652,10 @@ def rps(
     However, you still need to ensure that ``category_edges`` covers the forecasts
     and observations distributions.
 
-    >>> category_edges = o.quantile(q=[.33, .66]).rename({'quantile': 'category_edge'})
-    >>> xs.rps(o, f, category_edges, dim='x')
+    >>> category_edges = o.quantile(q=[0.33, 0.66]).rename(
+    ...     {"quantile": "category_edge"}
+    ... )
+    >>> xs.rps(o, f, category_edges, dim="x")
     <xarray.DataArray (y: 3)>
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
@@ -662,29 +668,41 @@ def rps(
     distribution inputs by specifying ``category_edges=None`` and
     ``input_distributions``:
 
-    >>> category_edges = category_edges.rename({'category_edge': 'category'})
+    >>> category_edges = category_edges.rename({"category_edge": "category"})
     >>> categories = ["below normal", "normal", "above_normal"]
-    >>> o_p = xr.concat([
-    ...     (o < category_edges.isel(category=0)
-    ...         ).assign_coords(category=categories[0]),
-    ...     ((o >= category_edges.isel(category=0)) & (
-    ...         o < category_edges.isel(category=1))
+    >>> o_p = xr.concat(
+    ...     [
+    ...         (o < category_edges.isel(category=0)).assign_coords(
+    ...             category=categories[0]
+    ...         ),
+    ...         (
+    ...             (o >= category_edges.isel(category=0))
+    ...             & (o < category_edges.isel(category=1))
     ...         ).assign_coords(category=categories[1]),
-    ...     (o >= category_edges.isel(category=1)
-    ...         ).assign_coords(category=categories[2])
-    ... ], 'category')
-    >>> assert (o_p.sum('category')==1).all()
-    >>> f_p = xr.concat([
-    ...     (f < category_edges.isel(category=0)
-    ...         ).assign_coords(category=categories[0]),
-    ...     ((f >= category_edges.isel(category=0)
-    ...         ) & (f < category_edges.isel(category=1))
+    ...         (o >= category_edges.isel(category=1)).assign_coords(
+    ...             category=categories[2]
+    ...         ),
+    ...     ],
+    ...     "category",
+    ... )
+    >>> assert (o_p.sum("category") == 1).all()
+    >>> f_p = xr.concat(
+    ...     [
+    ...         (f < category_edges.isel(category=0)).assign_coords(
+    ...             category=categories[0]
+    ...         ),
+    ...         (
+    ...             (f >= category_edges.isel(category=0))
+    ...             & (f < category_edges.isel(category=1))
     ...         ).assign_coords(category=categories[1]),
-    ...     (f >= category_edges.isel(category=1)
-    ...         ).assign_coords(category=categories[2])
-    ... ], 'category').mean('member')
-    >>> assert (f_p.sum('category')==1).all()
-    >>> xs.rps(o_p, f_p, category_edges=None, dim='x', input_distributions='p')
+    ...         (f >= category_edges.isel(category=1)).assign_coords(
+    ...             category=categories[2]
+    ...         ),
+    ...     ],
+    ...     "category",
+    ... ).mean("member")
+    >>> assert (f_p.sum("category") == 1).all()
+    >>> xs.rps(o_p, f_p, category_edges=None, dim="x", input_distributions="p")
     <xarray.DataArray (y: 3)>
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
@@ -694,8 +712,8 @@ def rps(
     category equals 1 by default and can be ignored:
 
     >>> o_c = o < category_edges
-    >>> f_c = (f < category_edges).mean('member')
-    >>> xs.rps(o_c, f_c, category_edges=None, dim='x', input_distributions='c')
+    >>> f_c = (f < category_edges).mean("member")
+    >>> xs.rps(o_c, f_c, category_edges=None, dim="x", input_distributions="c")
     <xarray.DataArray (y: 3)>
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
@@ -886,14 +904,15 @@ def rank_histogram(
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(3, 3)),
-    ...                             coords=[('x', np.arange(3)),
-    ...                                     ('y', np.arange(3))])
-    >>> forecasts = xr.DataArray(np.random.normal(size=(3, 3, 3)),
-    ...                          coords=[('x', np.arange(3)),
-    ...                                  ('y', np.arange(3)),
-    ...                                  ('member', np.arange(3))])
-    >>> xs.rank_histogram(observations, forecasts, dim='x')
+    >>> observations = xr.DataArray(
+    ...     np.random.normal(size=(3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
+    ... )
+    >>> forecasts = xr.DataArray(
+    ...     np.random.normal(size=(3, 3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
+    ... )
+    >>> xs.rank_histogram(observations, forecasts, dim="x")
     <xarray.DataArray 'histogram_rank' (y: 3, rank: 4)>
     array([[0, 0, 1, 2],
            [0, 1, 2, 0],
@@ -989,16 +1008,21 @@ def discrimination(
 
     Examples
     --------
-    >>> observations = xr.DataArray(np.random.normal(size=(30, 30)),
-    ...                             coords=[('x', np.arange(30)),
-    ...                                     ('y', np.arange(30))])
-    >>> forecasts = xr.DataArray(np.random.normal(size=(30, 30, 10)),
-    ...                          coords=[('x', np.arange(30)),
-    ...                                  ('y', np.arange(30)),
-    ...                                  ('member', np.arange(10))])
-    >>> forecast_event_likelihood = (forecasts > 0).mean('member')
+    >>> observations = xr.DataArray(
+    ...     np.random.normal(size=(30, 30)),
+    ...     coords=[("x", np.arange(30)), ("y", np.arange(30))],
+    ... )
+    >>> forecasts = xr.DataArray(
+    ...     np.random.normal(size=(30, 30, 10)),
+    ...     coords=[
+    ...         ("x", np.arange(30)),
+    ...         ("y", np.arange(30)),
+    ...         ("member", np.arange(10)),
+    ...     ],
+    ... )
+    >>> forecast_event_likelihood = (forecasts > 0).mean("member")
     >>> observed_event = observations > 0
-    >>> xs.discrimination(observed_event, forecast_event_likelihood, dim=['x','y'])
+    >>> xs.discrimination(observed_event, forecast_event_likelihood, dim=["x", "y"])
     <xarray.DataArray (event: 2, forecast_probability: 5)>
     array([[0.00437637, 0.15536105, 0.66739606, 0.12472648, 0.04814004],
            [0.00451467, 0.16704289, 0.66365688, 0.1241535 , 0.04063205]])
@@ -1073,16 +1097,15 @@ def reliability(
 
     Examples
     --------
-    >>> forecasts = xr.DataArray(np.random.normal(size=(3,3,3)),
-    ...                          coords=[('x', np.arange(3)),
-    ...                                  ('y', np.arange(3)),
-    ...                                  ('member', np.arange(3))])
-    >>> observations = xr.DataArray(np.random.normal(size=(3,3)),
-    ...                             coords=[('x', np.arange(3)),
-    ...                                     ('y', np.arange(3))])
-    >>> xs.reliability(observations > 0.1,
-    ...                (forecasts > 0.1).mean('member'),
-    ...                dim='x')
+    >>> forecasts = xr.DataArray(
+    ...     np.random.normal(size=(3, 3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
+    ... )
+    >>> observations = xr.DataArray(
+    ...     np.random.normal(size=(3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
+    ... )
+    >>> xs.reliability(observations > 0.1, (forecasts > 0.1).mean("member"), dim="x")
     <xarray.DataArray (y: 3, forecast_probability: 5)>
     array([[nan, 0. , nan, 1. , nan],
            [1. , 0.5, nan, nan, nan],
@@ -1229,11 +1252,12 @@ def roc(
 
     Examples
     --------
-    >>> f = xr.DataArray(np.random.normal(size=(1000)),
-    ...                  coords=[('time', np.arange(1000))])
+    >>> f = xr.DataArray(
+    ...     np.random.normal(size=(1000)), coords=[("time", np.arange(1000))]
+    ... )
     >>> o = f.copy()
     >>> category_edges = np.linspace(-2, 2, 5)
-    >>> xs.roc(o, f, category_edges, dim=['time'])
+    >>> xs.roc(o, f, category_edges, dim=["time"])
     <xarray.DataArray 'histogram_observations_forecasts' ()>
     array(1.)
 
@@ -1336,7 +1360,6 @@ def roc(
     )
 
     if drop_intermediate and fpr.probability_bin.size > 2:
-
         fpr, tpr = _drop_intermediate(fpr, tpr)
         fpr_pad, tpr_pad = _drop_intermediate(fpr_pad, tpr_pad)
 

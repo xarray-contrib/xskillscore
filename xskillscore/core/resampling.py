@@ -84,8 +84,8 @@ def resample_iterations(
 
     Examples
     --------
-    >>> a = xr.DataArray(np.random.rand(1000, 3, 3), dims=['time', 'x', 'y'])
-    >>> xs.resample_iterations(a, 500, 'time')  # doctest: +SKIP
+    >>> a = xr.DataArray(np.random.rand(1000, 3, 3), dims=["time", "x", "y"])
+    >>> xs.resample_iterations(a, 500, "time")  # doctest: +SKIP
     <xarray.DataArray (time: 1000, x: 3, y: 3, iteration: 500)>
 
     See also
@@ -171,11 +171,15 @@ def resample_iterations_idx(
 
     Examples
     --------
-    >>> a = xr.DataArray(np.random.rand(1000, 3, 3),
-    ...                  coords=[("time", np.arange(1000)),
-    ...                          ("x", np.arange(3)),
-    ...                          ("y", np.arange(3))])
-    >>> xs.resample_iterations_idx(a, 500, 'time') # doctest: +SKIP
+    >>> a = xr.DataArray(
+    ...     np.random.rand(1000, 3, 3),
+    ...     coords=[
+    ...         ("time", np.arange(1000)),
+    ...         ("x", np.arange(3)),
+    ...         ("y", np.arange(3)),
+    ...     ],
+    ... )
+    >>> xs.resample_iterations_idx(a, 500, "time")  # doctest: +SKIP
     <xarray.DataArray (time: 1000, x: 3, y: 3, iteration: 500)>
 
     See also

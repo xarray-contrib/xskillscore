@@ -56,7 +56,6 @@ class Generate:
     repeat = (2, 5, 20)
 
     def make_ds(self, nmember, nx, ny, chunks=None):
-
         # ds
         self.ds = xr.Dataset()
         self.nmember = nmember

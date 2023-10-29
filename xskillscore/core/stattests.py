@@ -98,11 +98,13 @@ def multipletests(
 
     Examples
     --------
-        >>> p = xr.DataArray(np.random.normal(size=(3,3)),
-        ...                  coords=[('x', np.arange(3)),
-        ...                          ('y', np.arange(3))])
-        >>> result = xs.multipletests(p, alpha=0.1, method='fdr_bh',
-        ...     return_results='all_as_result_dim')
+        >>> p = xr.DataArray(
+        ...     np.random.normal(size=(3, 3)),
+        ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
+        ... )
+        >>> result = xs.multipletests(
+        ...     p, alpha=0.1, method="fdr_bh", return_results="all_as_result_dim"
+        ... )
         >>> result
         <xarray.DataArray (result: 4, x: 3, y: 3)>
         array([[[ 0.        ,  1.        ,  0.        ],
