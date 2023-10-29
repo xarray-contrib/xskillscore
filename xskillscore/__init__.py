@@ -40,7 +40,7 @@ from .core.stattests import multipletests
 from .versioning.print_versions import show_versions
 
 try:
-    __version__ = _get_version("climpred")
+    __version__ = _get_version("xskillscore")
 except PackageNotFoundError:  # pragma: no cover
     # package is not installed
     pass
