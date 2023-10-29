@@ -189,7 +189,7 @@ def _bool_to_int(ds):
 
 def _check_identical_xr_types(a, b):
     """Check that a and b are both xr.Dataset or both xr.DataArray."""
-    if type(a) != type(b):
+    if not isinstance(a, type(b)):
         raise ValueError(f"a and b must be same type, found {type(a)} and {type(b)}")
     for d in [a, b]:
         if not isinstance(d, (xr.Dataset, xr.DataArray)):
