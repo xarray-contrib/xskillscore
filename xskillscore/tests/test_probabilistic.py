@@ -446,7 +446,7 @@ def test_reliability_values(o, f_prob):
                 o_1d, f_1d, probability_bin_edges=np.linspace(0, 1 + 1e-8, 6)
             )
             expected, _ = calibration_curve(
-                o_1d, f_1d, normalize=False, n_bins=5, strategy="uniform"
+                o_1d, f_1d, n_bins=5, strategy="uniform"
             )
             npt.assert_allclose(actual.where(actual.notnull(), drop=True), expected)
             npt.assert_allclose(actual["samples"].sum(), o_1d.size)
