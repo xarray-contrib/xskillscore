@@ -80,19 +80,17 @@ def sign_test(
 
     Examples
     --------
-    >>> f1 = xr.DataArray(np.random.normal(size=(30)),
-    ...                   coords=[('time', np.arange(30))])
+    >>> f1 = xr.DataArray(np.random.normal(size=(30)), coords=[("time", np.arange(30))])
     >>> f2 = f1 + 2
-    >>> o = xr.DataArray(np.random.normal(size=(30)),
-    ...                  coords=[('time', np.arange(30))])
+    >>> o = xr.DataArray(np.random.normal(size=(30)), coords=[("time", np.arange(30))])
     >>> significantly_different, walk, confidence = xs.sign_test(
-    ... f1, f2, o, time_dim='time', metric='mae', orientation='negative'
+    ...     f1, f2, o, time_dim="time", metric="mae", orientation="negative"
     ... )
-    >>> walk.plot() # doctest: +ELLIPSIS
+    >>> walk.plot()  # doctest: +ELLIPSIS
     [<matplotlib.lines.Line2D object at 0x...>]
-    >>> confidence.plot(color='gray') # doctest: +ELLIPSIS
+    >>> confidence.plot(color="gray")  # doctest: +ELLIPSIS
     [<matplotlib.lines.Line2D object at 0x...>]
-    >>> (-1 * confidence).plot(color='gray') # doctest: +ELLIPSIS
+    >>> (-1 * confidence).plot(color="gray")  # doctest: +ELLIPSIS
     [<matplotlib.lines.Line2D object at 0x...>]
     >>> walk
     <xarray.DataArray (time: 30)>
@@ -268,14 +266,11 @@ def halfwidth_ci_test(
 
     Examples
     --------
-    >>> f1 = xr.DataArray(np.random.normal(size=(30)),
-    ...                   coords=[('time', np.arange(30))])
-    >>> f2 = xr.DataArray(np.random.normal(size=(30)),
-    ...                   coords=[('time', np.arange(30))])
-    >>> o = xr.DataArray(np.random.normal(size=(30)),
-    ...                  coords=[('time', np.arange(30))])
+    >>> f1 = xr.DataArray(np.random.normal(size=(30)), coords=[("time", np.arange(30))])
+    >>> f2 = xr.DataArray(np.random.normal(size=(30)), coords=[("time", np.arange(30))])
+    >>> o = xr.DataArray(np.random.normal(size=(30)), coords=[("time", np.arange(30))])
     >>> significantly_different, diff, hwci = xs.halfwidth_ci_test(
-    ...    f1, f2, o, "mae", time_dim='time', dim=[], alpha=0.05
+    ...     f1, f2, o, "mae", time_dim="time", dim=[], alpha=0.05
     ... )
     >>> significantly_different
     <xarray.DataArray ()>
@@ -290,7 +285,7 @@ def halfwidth_ci_test(
     >>> # confidence interval, therefore not significant at level alpha=0.05
     >>> # now comparing against an offset f2, the difference in MAE is significant
     >>> significantly_different, diff, hwci = xs.halfwidth_ci_test(
-    ... f1, f2 + 2., o, "mae", time_dim='time', dim=[], alpha=0.05
+    ...     f1, f2 + 2.0, o, "mae", time_dim="time", dim=[], alpha=0.05
     ... )
     >>> significantly_different
     <xarray.DataArray ()>

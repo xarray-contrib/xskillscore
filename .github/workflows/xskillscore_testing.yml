@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.8, 3.9]
+        python-version: ["3.9", "3.10", "3.11"]
     steps:
       - uses: actions/checkout@v2
       - name: Set up conda
@@ -78,7 +78,7 @@ jobs:
           channels: conda-forge
           mamba-version: "*"
           activate-environment: xskillscore-minimum-tests
-          python-version: 3.8
+          python-version: 3.9
       - name: Set up conda environment
         run: |
           mamba env update -f ci/minimum-tests.yml
@@ -109,7 +109,7 @@ jobs:
           channels: conda-forge
           mamba-version: "*"
           activate-environment: xskillscore-docs-notebooks
-          python-version: 3.8
+          python-version: 3.9
       - name: Set up conda environment
         run: |
           mamba env update -f ci/docs_notebooks.yml

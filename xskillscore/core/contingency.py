@@ -74,15 +74,17 @@ class Contingency:
 
     Examples
     --------
-    >>> da = xr.DataArray(np.random.normal(size=(3, 3)),
-    ...                   coords=[("x", np.arange(3)), ("y", np.arange(3))])
+    >>> da = xr.DataArray(
+    ...     np.random.normal(size=(3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
+    ... )
     >>> o = xr.Dataset({"var1": da, "var2": da})
     >>> f = o * 1.1
     >>> o_category_edges = np.linspace(-2, 2, 5)
     >>> f_category_edges = np.linspace(-3, 3, 5)
-    >>> xs.Contingency(o, f,
-    ...                o_category_edges, f_category_edges,
-    ...                dim=['x', 'y']) # doctest: +SKIP
+    >>> xs.Contingency(
+    ...     o, f, o_category_edges, f_category_edges, dim=["x", "y"]
+    ... )  # doctest: +SKIP
     <xskillscore.Contingency>
     Dimensions:                       (forecasts_category: 4, observations_category: 4)
     Coordinates:
@@ -774,7 +776,7 @@ class Contingency:
             a = (1.0 - p_sum) / p_sum
             k = a.shape[-1]
             s = np.zeros(table.shape, dtype=float)
-            for (i, j) in np.ndindex(*s.shape[-2:]):
+            for i, j in np.ndindex(*s.shape[-2:]):
                 if i == j:
                     s[..., i, j] = (
                         1.0

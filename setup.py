@@ -9,7 +9,7 @@ LONG_DESCRIPTION = """Metrics for verifying forecasts"""
 URL = "https://github.com/xarray-contrib/xskillscore"
 with open("requirements.txt") as f:
     INSTALL_REQUIRES = f.read().strip().split("\n")
-PYTHON_REQUIRE = ">=3.8"
+PYTHON_REQUIRE = ">=3.9"
 
 EXTRAS_REQUIRE = {
     "accel": ["numba>=0.52", "bottleneck"],
@@ -24,7 +24,7 @@ EXTRAS_REQUIRE["test"] = [
     "matplotlib",
     "pytest-cov",
     "pytest-xdist",
-    "pytest-lazyfixures",
+    "pytest-lazy-fixures",
     "pre-commit",
 ]
 EXTRAS_REQUIRE["docs"] = EXTRAS_REQUIRE["complete"] + [

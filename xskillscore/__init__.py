@@ -1,5 +1,5 @@
 # flake8: noqa
-from pkg_resources import DistributionNotFound, get_distribution  # type: ignore
+from importlib.metadata import PackageNotFoundError, version as _get_version
 
 from .core import resampling
 from .core.accessor import XSkillScoreAccessor
@@ -40,7 +40,7 @@ from .core.stattests import multipletests
 from .versioning.print_versions import show_versions
 
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
+    __version__ = _get_version("xskillscore")
+except PackageNotFoundError:  # pragma: no cover
     # package is not installed
     pass
