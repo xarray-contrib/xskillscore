@@ -1,7 +1,6 @@
 from setuptools import find_packages, setup
 
 DISTNAME = "xskillscore"
-LICENSE = "Apache"
 AUTHOR = "Ray Bell"
 AUTHOR_EMAIL = "rayjohnbell0@gmail.com"
 DESCRIPTION = "xskillscore"
@@ -10,42 +9,54 @@ URL = "https://github.com/xarray-contrib/xskillscore"
 with open("requirements.txt") as f:
     INSTALL_REQUIRES = f.read().strip().split("\n")
 PYTHON_REQUIRE = ">=3.9"
+CLASSIFIERS = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
 
 EXTRAS_REQUIRE = {
     "accel": ["numba>=0.52", "bottleneck"],
 }
-
 EXTRAS_REQUIRE["complete"] = sorted({v for req in EXTRAS_REQUIRE.values() for v in req})
 # after complete is set, add in test
 EXTRAS_REQUIRE["test"] = [
-    "pytest",
-    "scikit-learn",
     "cftime",
     "matplotlib",
-    "pytest-cov",
-    "pytest-xdist",
-    "pytest-lazy-fixures",
     "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "pytest-lazy-fixtures",
+    "pytest-xdist",
+    "scikit-learn",
 ]
 EXTRAS_REQUIRE["docs"] = EXTRAS_REQUIRE["complete"] + [
+    "doc8",
     "nbsphinx",
     "nbstripout",
-    "doc8",
     "sphinx",
     "sphinx-autosummary-accessors",
-    "sphinxcontrib-napoleon",
-    "sphinx_rtd_theme",
     "sphinx-copybutton",
+    "sphinx-rtd-theme>=1.0",
+    "sphinxcontrib-napoleon",
 ]
-
 
 setup(
     name=DISTNAME,
-    license=LICENSE,
+    license_files = ('LICENSE.txt',),
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
+    classifiers=CLASSIFIERS,
     url=URL,
     packages=find_packages(),
     install_requires=INSTALL_REQUIRES,
