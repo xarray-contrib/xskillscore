@@ -51,7 +51,7 @@ EXTRAS_REQUIRE["docs"] = EXTRAS_REQUIRE["complete"] + [
 
 setup(
     name=DISTNAME,
-    license_files = ('LICENSE.txt',),
+    license_files=("LICENSE.txt",),
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     description=DESCRIPTION,
