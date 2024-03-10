@@ -37,4 +37,4 @@ from xskillscore.core.resampling import resample_iterations, resample_iterations
 from xskillscore.core.stattests import multipletests
 from xskillscore.versioning.print_versions import show_versions
 
-__version__ = "0.0.25"
+__version__ = "0.0.26"
