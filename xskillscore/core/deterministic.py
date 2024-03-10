@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import List
+from typing import List, Optional
 
 import xarray as xr
 
@@ -82,8 +82,8 @@ def _determine_input_core_dims(
 def linslope(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -156,8 +156,8 @@ def linslope(
 def pearson_r(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -235,8 +235,8 @@ def pearson_r(
 def pearson_r_p_value(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -394,7 +394,7 @@ def effective_sample_size(a, b, dim="time", skipna=False, keep_attrs=False):
 def pearson_r_eff_p_value(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -502,8 +502,8 @@ def pearson_r_eff_p_value(
 def spearman_r(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -576,8 +576,8 @@ def spearman_r(
 def spearman_r_p_value(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -645,7 +645,7 @@ def spearman_r_p_value(
 def spearman_r_eff_p_value(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -753,8 +753,8 @@ def spearman_r_eff_p_value(
 def r2(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -850,8 +850,8 @@ def r2(
 def me(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -916,8 +916,8 @@ def me(
 def rmse(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -990,8 +990,8 @@ def rmse(
 def mse(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -1065,8 +1065,8 @@ def mse(
 def mae(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -1139,7 +1139,7 @@ def mae(
 def median_absolute_error(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -1205,8 +1205,8 @@ def median_absolute_error(
 def mape(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
@@ -1288,8 +1288,8 @@ def mape(
 def smape(
     a: XArray,
     b: XArray,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:

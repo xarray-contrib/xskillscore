@@ -2,8 +2,6 @@
 # See "Writing benchmarks" in the asv docs for more information.
 
 
-import numpy as np
-import xarray as xr
 from scipy.stats import norm
 
 from xskillscore import (

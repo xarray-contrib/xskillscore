@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from typing import Literal, Mapping, Tuple
+from typing import Literal, Mapping, Optional, Tuple
 
-import numpy as np
 import xarray as xr
 from statsmodels.stats.multitest import multipletests as statsmodels_multipletests
 
@@ -12,18 +11,20 @@ from .types import XArray
 def multipletests(
     p: XArray,
     alpha: float = 0.05,
-    method: Literal[
-        "bonferroni",
-        "sidak",
-        "holm-sidak",
-        "hs",
-        "holm",
-        "simes-hochberg",
-        "hommel",
-        "fdr_bh",
-        "fdr_by",
-        "fdr_tsbh",
-        "fdr_tsbky",
+    method: Optional[
+        Literal[
+            "bonferroni",
+            "sidak",
+            "holm-sidak",
+            "hs",
+            "holm",
+            "simes-hochberg",
+            "hommel",
+            "fdr_bh",
+            "fdr_by",
+            "fdr_tsbh",
+            "fdr_tsbky",
+        ]
     ] = None,
     keep_attrs=True,
     return_results: Literal[

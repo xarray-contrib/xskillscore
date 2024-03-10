@@ -1,10 +1,6 @@
 # Write the benchmarking functions here.
 # See "Writing benchmarks" in the asv docs for more information.
 
-import os
-
-import numpy as np
-import xarray as xr
 
 from xskillscore import mae, mse, pearson_r, pearson_r_p_value, rmse
 

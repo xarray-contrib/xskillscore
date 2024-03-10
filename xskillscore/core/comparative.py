@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import inspect
 import warnings
-from typing import Callable, List, Literal, Mapping, Tuple
+from typing import Callable, Literal, Mapping, Optional, Tuple
 
 import numpy as np
 import scipy.stats as st
-import xarray as xr
 
 from . import deterministic as dm
 from .types import Dim, XArray
@@ -15,7 +14,7 @@ from .types import Dim, XArray
 def sign_test(
     forecasts1: XArray,
     forecasts2: XArray,
-    observations: XArray = None,
+    observations: Optional[XArray] = None,
     time_dim: str = "time",
     dim: Dim = [],
     alpha: float = 0.05,
@@ -202,9 +201,9 @@ def sign_test(
 def halfwidth_ci_test(
     forecasts1: XArray,
     forecasts2: XArray,
-    observations: XArray = None,
-    metric: str = None,
-    dim: Dim = None,
+    observations: Optional[XArray] = None,
+    metric: Optional[str] = None,
+    dim: Optional[Dim] = None,
     time_dim: str = "time",
     alpha: float = 0.05,
     **kwargs: Mapping,
@@ -258,9 +257,11 @@ def halfwidth_ci_test(
     Returns
     -------
     xarray.DataArray or xarray.Dataset
-        boolean whether the difference in scores (score(f2) - score(f1)) are significant.
+        boolean whether the difference in scores
+        (score(f2) - score(f1)) are significant.
     xarray.DataArray or xarray.Dataset
-        difference in scores (score(f2) - score(f1)) reduced by ``dim`` and ``time_dim``.
+        difference in scores (score(f2) - score(f1))
+        reduced by ``dim`` and ``time_dim``.
     xarray.DataArray or xarray.Dataset
         half-width of the confidence interval at the significance level ``alpha``.
 

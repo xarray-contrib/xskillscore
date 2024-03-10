@@ -76,7 +76,7 @@ def _check_weights(weights):
     if weights is None:
         return None
     # catch if np.ndarray values are None
-    elif (weights == None).all():
+    elif (weights is None).all():
         return None
     elif np.all(np.isnan(weights)):
         return None

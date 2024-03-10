@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, List, Literal, Tuple
+from typing import Callable, List, Literal, Optional, Tuple
 
 import numpy as np
 import properscoring
@@ -59,8 +59,8 @@ def crps_gaussian(
     observations: XArray,
     mu: XArray | float | int,
     sig: XArray | float | int,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Continuous Ranked Probability Score with a Gaussian distribution.
@@ -136,11 +136,11 @@ def crps_gaussian(
 def crps_quadrature(
     observations: XArray,
     cdf_or_dist: Callable,
-    xmin: float = None,
-    xmax: float = None,
+    xmin: Optional[float] = None,
+    xmax: Optional[float] = None,
     tol: float = 1e-6,
-    dim: Dim = None,
-    weights: bool = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[bool] = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Continuous Ranked Probability Score with numerical integration
@@ -208,11 +208,11 @@ def crps_quadrature(
 def crps_ensemble(
     observations: XArray,
     forecasts: XArray,
-    member_weights: XArray = None,
+    member_weights: Optional[XArray] = None,
     issorted: bool = False,
     member_dim: str = "member",
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Continuous Ranked Probability Score with the ensemble distribution.
@@ -293,8 +293,8 @@ def brier_score(
     forecasts: XArray,
     member_dim: str = "member",
     fair=False,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     keep_attrs: bool = False,
 ):
     """Calculate Brier score (BS).
@@ -403,8 +403,8 @@ def threshold_brier_score(
     threshold: float | List[float] | XArray,
     issorted: bool = False,
     member_dim: str = "member",
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Calculate the Brier scores of an ensemble for exceeding given thresholds.
@@ -523,9 +523,11 @@ def _assign_rps_category_bounds(
                 )
             }
         )
-        res[
-            f"{name}_category_edge"
-        ] = f"[-np.inf, {edges[bin_dim].isel({bin_dim:0}).values}), {str(res[f'{name}_category_edge'].values)[:-1]}), [{edges[bin_dim].isel({bin_dim:-1}).values}, np.inf]"
+        res[f"{name}_category_edge"] = (
+            f"[-np.inf, {edges[bin_dim].isel({bin_dim:0}).values}), "
+            f"{str(res[f'{name}_category_edge'].values)[:-1]}), "
+            f"[{edges[bin_dim].isel({bin_dim:-1}).values}, np.inf]"
+        )
     return res
 
 
@@ -533,12 +535,12 @@ def rps(
     observations: XArray,
     forecasts: XArray,
     category_edges: np.ndarray | XArray | Tuple[XArray, XArray] | None,
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     fair: bool = False,
-    weights: XArray = None,
+    weights: Optional[XArray] = None,
     keep_attrs: bool = False,
     member_dim: str = "member",
-    input_distributions: Literal["c", "p"] = None,
+    input_distributions: Optional[Literal["c", "p"]] = None,
 ) -> XArray:
     """Calculate Ranked Probability Score.
 
@@ -867,7 +869,7 @@ def rps(
 def rank_histogram(
     observations: XArray,
     forecasts: XArray,
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     member_dim: str = "member",
     random_for_tied: bool = True,
     keep_attrs: bool = True,
@@ -976,7 +978,7 @@ def rank_histogram(
 def discrimination(
     observations: XArray,
     forecasts: XArray,
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     probability_bin_edges: xr.DataArray | np.ndarray = np.linspace(0, 1, 6),
 ) -> XArray:
     """Returns the data required to construct the discrimination diagram for an event;
@@ -1061,7 +1063,7 @@ def discrimination(
 def reliability(
     observations: XArray,
     forecasts: XArray,
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     probability_bin_edges: xr.DataArray | np.ndarray = np.linspace(0, 1, 6),
     keep_attrs: bool = False,
 ) -> XArray:
@@ -1196,7 +1198,7 @@ def _auc(fpr, tpr, dim="probability_bin"):
                     np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
                 )
     area = abs(area)
-    if ((area > 1)).any():
+    if (area > 1).any():
         area = area.clip(0, 1)  # allow only values between 0 and 1
     return area
 
@@ -1205,7 +1207,7 @@ def roc(
     observations: XArray,
     forecasts: XArray,
     bin_edges: str | np.ndarray | xr.DataArray = "continuous",
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     drop_intermediate: bool = False,
     return_results: Literal["area", "all_as_tuple", "all_as_metric_dim"] = "area",
 ) -> XArray:
@@ -1220,10 +1222,14 @@ def roc(
         Labeled array(s) over which to apply the function.
         If ``bin_edges=='continuous'``, forecasts are probabilities.
     bin_edges : array_like, str, default='continuous'
-        Bin edges for categorising observations and forecasts. Similar to np.histogram, \
-        all but the last (righthand-most) bin include the left edge and exclude the \
-        right edge. The last bin includes both edges. ``bin_edges`` will be sorted in \
-        ascending order. If ``bin_edges=='continuous'``, calculate ``bin_edges`` from \
+        Bin edges for categorising observations and forecasts.
+        Similar to np.histogram,
+        all but the last (righthand-most) bin include the left edge
+        and exclude the
+        right edge. The last bin includes both edges. ``bin_edges``
+        will be sorted in
+        ascending order. If ``bin_edges=='continuous'``, calculate
+        ``bin_edges`` from
         forecasts, equal to ``sklearn.metrics.roc_curve(f_boolean, o_prob)``.
     dim : str, list
         The dimension(s) over which to compute the contingency table
@@ -1288,7 +1294,10 @@ def roc(
             if str(o_check.dtype) != "bool":
                 if not ((o_check == 0) | (o_check == 1)).all():
                     raise ValueError(
-                        'Input "observations" must represent logical (True/False) outcomes',
+                        (
+                            'Input "observations" must represent '
+                            "logical (True/False) outcomes"
+                        ),
                         o_check,
                     )
 

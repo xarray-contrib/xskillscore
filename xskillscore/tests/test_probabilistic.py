@@ -440,8 +440,10 @@ def test_reliability_values(o, f_prob):
         for lat in f_prob.lat:
             o_1d = o.sel(lon=lon, lat=lat) > 0.5
             f_1d = (f_prob.sel(lon=lon, lat=lat) > 0.5).mean("member")
-            # scipy bins are only left-edge inclusive and 1e-8 is added to the last bin, whereas
-            # xhistogram the rightmost edge of xhistogram bins is included - mimic scipy behaviour
+            # scipy bins are only left-edge inclusive and 1e-8 is
+            # added to the last bin, whereas
+            # xhistogram the rightmost edge of xhistogram bins
+            # is included - mimic scipy behaviour
             actual = reliability(
                 o_1d, f_1d, probability_bin_edges=np.linspace(0, 1 + 1e-8, 6)
             )
@@ -475,14 +477,16 @@ def test_rps_reduce_dim(o, f_prob, category_edges, dim, fair_bool):
 
 
 def test_rps_category_edges_None_fails(o, f_prob):
-    """Test that rps expects inputs to have category_edges dim if category_edges is None."""
+    """Test that rps expects inputs to have category_edges dim
+    if category_edges is None."""
     with pytest.raises(ValueError, match="Expected dimension"):
         rps(o, f_prob, category_edges=None, dim=[], input_distributions="c")
 
 
 @pytest.mark.parametrize("input_distributions", ["c", "p"])
 def test_rps_category_edges_None_works(o, f_prob, input_distributions):
-    """Test that rps expects inputs to have category_edges dim if category_edges is None."""
+    """Test that rps expects inputs to have category_edges dim if
+    category_edges is None."""
     o = o.rename({"time": "category"})
     f_prob = f_prob.rename({"time": "category"}).mean("member")
     rps(o, f_prob, category_edges=None, dim=[], input_distributions=input_distributions)
@@ -725,7 +729,8 @@ def test_rps_vs_fair_rps(o, f_prob, category_edges, dim):
 
 @pytest.mark.parametrize("fair_bool", [True, False])
 def test_rps_category_edges_xrDataArray(o, f_prob, fair_bool):
-    """Test rps with category_edges as xrDataArray for forecast and observations edges."""
+    """Test rps with category_edges as xrDataArray for
+    forecast and observations edges."""
     category_edges = f_prob.quantile(
         q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]
     ).rename({"quantile": "category_edge"})
@@ -742,7 +747,8 @@ def test_rps_category_edges_xrDataArray(o, f_prob, fair_bool):
 
 @pytest.mark.parametrize("fair_bool", [True, False])
 def test_rps_category_edges_xrDataset(o, f_prob, fair_bool):
-    """Test rps with category_edges as xrDataArray for forecast and observations edges."""
+    """Test rps with category_edges as xrDataArray
+    for forecast and observations edges."""
     o = o.to_dataset(name="var")
     o["var2"] = o["var"] ** 2
     f_prob = f_prob.to_dataset(name="var")
@@ -763,7 +769,8 @@ def test_rps_category_edges_xrDataset(o, f_prob, fair_bool):
 
 @pytest.mark.parametrize("fair_bool", [True, False])
 def test_rps_category_edges_tuple(o, f_prob, fair_bool):
-    """Test rps with category_edges as tuple of xrDataArray for forecast and observations edges separately."""
+    """Test rps with category_edges as tuple of xrDataArray
+    for forecast and observations edges separately."""
     o_edges = o.quantile(q=[0.2, 0.4, 0.6, 0.8], dim="time").rename(
         {"quantile": "category_edge"}
     )

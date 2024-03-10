@@ -2,19 +2,23 @@
 # See "Writing benchmarks" in the asv docs for more information.
 
 
-import os
-import shutil
-
 import bottleneck as bn
 import numpy as np
-import pandas as pd
 import xarray as xr
 
 from xskillscore import (
     mae as xs_mae,
+)
+from xskillscore import (
     mse as xs_mse,
+)
+from xskillscore import (
     pearson_r as xs_pearson_r,
+)
+from xskillscore import (
     rmse as xs_rmse,
+)
+from xskillscore import (
     spearman_r as xs_spearman_r,
 )
 

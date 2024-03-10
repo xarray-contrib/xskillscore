@@ -93,7 +93,7 @@ ignore-path = [".eggs/", "docs/source/api/"]
 
 [tool.ruff]
 extend-include = ["*.ipynb"]
-select = [
+lint.select = [
     # Pyflakes
     "E",
     # pycodestyle
@@ -103,7 +103,7 @@ select = [
 ]
 
 # Ignore `F401` (imported but unused) in all `__init__.py` files
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 
 [tool.mypy]
