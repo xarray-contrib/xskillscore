@@ -8,6 +8,8 @@ Release Procedure
  * Update ``CHANGELOG.rst``
  * Make sure all new changes, features are reflected in the documentation.
 
+ * Update ``pyproject.toml`` and `version` in `xskillscore/__init__`
+
 #. Open a new pull request for this branch targeting `main`
 
 #. After all tests pass and the PR has been approved, merge the PR into ``main``

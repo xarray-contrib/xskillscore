@@ -1,0 +1,111 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xskillscore"
+version = "0.0.25"
+dependencies = [
+  "dask[array]",
+  "numpy",
+  "properscoring",
+  "scipy",
+  "statsmodels",
+  "xarray>=0.16.1",
+  "xhistogram>=0.3.0",
+]
+authors = [{name = "Ray Bell", email = "rayjohnbell0@gmail.com"}]
+description = "Metrics for verifying forecasts"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+requires-python = ">=3.9"
+license = {file = "LICENSE.txt"}
+dynamic = ["readme"]
+
+[project.optional-dependencies]
+accel = ["bottleneck", "numba>=0.52"]
+test = [
+    "bottleneck",
+    "cftime",
+    "matplotlib",
+    "numba>=0.52",
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "pytest-lazy-fixtures",
+    "pytest-xdist",
+    "scikit-learn",
+]
+complete = [
+    "bottleneck",
+    "cftime",
+    "doc8",
+    "matplotlib",
+    "nbsphinx",
+    "nbstripout",
+    "numba>=0.52",
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "pytest-lazy-fixtures",
+    "pytest-xdist",
+    "pytest-sugar",
+    "scikit-learn",
+    "sphinx",
+    "sphinx-autosummary-accessors",
+    "sphinx-copybutton",
+    "sphinx-rtd-theme>=1.0",
+    "sphinxcontrib-napoleon",
+]
+
+[project.urls]
+repository = "https://github.com/xarray-contrib/xskillscore"
+documentation = "https://xskillscore.readthedocs.io/en/stable/"
+
+[tool.setuptools]
+packages = ["xskillscore"]
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.rst"], content-type = "text/markdown"}
+
+[tool.pytest.ini_options]
+python_files = "test_*.py"
+testpaths = ["xskillscore/tests"]
+addopts = "--color=yes --verbose"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
+[tool.doc8]
+max-line-length = 100
+ignore-path = [".eggs/", "docs/source/api/"]
+
+[tool.ruff]
+extend-include = ["*.ipynb"]
+select = [
+    # Pyflakes
+    "E",
+    # pycodestyle
+    "F",
+    # isort
+    "I001",
+]
+
+# Ignore `F401` (imported but unused) in all `__init__.py` files
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.mypy]
+ignore_missing_imports = true
+follow_imports = "silent"

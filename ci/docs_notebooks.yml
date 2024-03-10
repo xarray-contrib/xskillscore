@@ -6,30 +6,27 @@ dependencies:
   - bottleneck
   - cftime
   - dask-core
+  - doc8
   - numba>=0.52
   - numpy
   - properscoring
-  - scikit-learn
-  - scipy
-  - xarray>=0.16.1
-  - xhistogram>=0.3.0
   - ipykernel
   - jupyterlab
   - jupyterlab_code_formatter
   - matplotlib-base
-  - statsmodels
   - nbsphinx
   - nbstripout
+  - pip
+  - pre-commit
+  - scikit-learn
+  - scipy
   - sphinx
   - sphinx-autosummary-accessors
   - sphinx_rtd_theme
   - sphinxcontrib-napoleon
-  - black
-  - doc8
-  - isort
-  - flake8
-  - pre-commit
-  - pip
+  - statsmodels
+  - xarray>=0.16.1
+  - xhistogram>=0.3.0
   - pip:
       # Install latest version of xskillscore.
       - -e ..

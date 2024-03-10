@@ -4,17 +4,17 @@ channels:
 dependencies:
   - python >= 3.9,<3.12
   # Documentation
+  - matplotlib-base
   - nbsphinx
   - nbstripout
   - sphinx
   - sphinx_rtd_theme
   - sphinx-autosummary-accessors
-  - matplotlib-base
+  - sphinxcontrib-napoleon
   # IDE
   - jupyterlab
   # Numerics
   - bottleneck
-  - statsmodels
   - cftime
   - dask-core
   - numba>=0.52
@@ -22,18 +22,19 @@ dependencies:
   - properscoring
   - scikit-learn
   - scipy
+  - statsmodels
   - xarray>=0.16.1
   - xhistogram>=0.3.0
   # Package Management
   - asv
-  - black
+  - build
   - coveralls
   - doc8
-  - isort
-  - flake8
   - pre-commit
   - pytest
   - pytest-cov
   - pytest-lazy-fixture
+  - pytest-xdist
   - pytest-sugar
   - mypy
+  - ruff

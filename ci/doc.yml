@@ -4,24 +4,24 @@ channels:
 dependencies:
   - python >=3.9
   - bottleneck
+  - cftime
+  - dask-core
   - doc8
   - ipykernel
   - ipython
+  - matplotlib-base
   - nbsphinx
   - numpy
   - pip
   - properscoring
-  - statsmodels
-  - matplotlib-base
+  - scikit-learn
   - scipy
   - sphinx!=4.4.0
   - sphinx_rtd_theme
   - sphinx-autosummary-accessors
   - sphinx-copybutton
+  - statsmodels
   - xarray>=0.16.1
   - xhistogram>=0.3.0
-  - scikit-learn
-  - cftime
-  - dask-core
   - pip:
       - -e ..

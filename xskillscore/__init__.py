@@ -39,8 +39,4 @@ from .core.resampling import resample_iterations, resample_iterations_idx
 from .core.stattests import multipletests
 from .versioning.print_versions import show_versions
 
-try:
-    __version__ = _get_version("xskillscore")
-except PackageNotFoundError:  # pragma: no cover
-    # package is not installed
-    pass
+__version__ = "0.0.25"
