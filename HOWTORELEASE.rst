@@ -5,6 +5,8 @@ Release Procedure
 
 #. Create a new branch ``release-v0.0.xx`` with the version for the release.
 
+    $ git checkout -b release-v0.0.xx
+
  * Update ``CHANGELOG.rst``
  * Make sure all new changes, features are reflected in the documentation.
 

@@ -2,7 +2,7 @@
 Changelog History
 =================
 
-xskillscore v0.0.25 (2021-xx-xx)
+xskillscore v0.0.25 (2024-03-10)
 --------------------------------
 
 Bug Fixes
@@ -22,6 +22,7 @@ Internal Changes
   (:issue:`317`, :pr:`366`) `Aaron Spring`_.
 - Refactor masking ``NaN`` in :py:func:`~xskillscore.rps`.
   (:pr:`397`) `Aaron Spring`_.
+- Use to ``pyproject.toml`` and use ``ruff`` for linting `Ray Bell`_.
 
 xskillscore v0.0.24 (2021-10-08)
 --------------------------------
