@@ -16,9 +16,10 @@ Release Procedure
 
 #. After all tests pass and the PR has been approved, merge the PR into ``main``
 
-#. Tag a release and push to github::
+#. Clone the core repo and tag a release and push to github::
 
-    $ git pull
+    $ git clone git@github.com:xarray-contrib/xskillscore.git
+    $ cd xskillscore
     $ git tag -a v0.0.xx -m "Version 0.0.xx"
     $ git push origin main --tags
 

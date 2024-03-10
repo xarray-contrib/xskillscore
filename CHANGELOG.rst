@@ -2,6 +2,14 @@
 Changelog History
 =================
 
+xskillscore v0.0.26 (2024-03-10)
+--------------------------------
+
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Fix build `Ray Bell`_.
+
+
 xskillscore v0.0.25 (2024-03-10)
 --------------------------------
 

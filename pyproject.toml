@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "xskillscore"
-version = "0.0.25"
+version = "0.0.26"
 dependencies = [
   "dask[array]",
   "numpy",
@@ -73,6 +73,9 @@ documentation = "https://xskillscore.readthedocs.io/en/stable/"
 
 [tool.setuptools]
 packages = ["xskillscore"]
+
+[tool.setuptools_scm]
+fallback_version = "9999"
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.rst"], content-type = "text/markdown"}
