@@ -12,7 +12,6 @@ dependencies:
   - properscoring
   - pytest
   - pytest-cov
-  - pytest-lazy-fixture
   - pytest-xdist
   - scikit-learn
   - scipy
