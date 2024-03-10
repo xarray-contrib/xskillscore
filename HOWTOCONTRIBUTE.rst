@@ -154,6 +154,12 @@ Preparing Pull Requests
 
     $ pytest --doctest-modules xskillscore --ignore xskillscore/tests
 
+   You can also test notebooks by doing::
+
+    $ cd docs
+    $ nbstripout source/*.ipynb
+    $ make -j4 html
+
   Please stick to `xarray <http://xarray.pydata.org/en/stable/contributing.html>`_'s testing recommendations.
 
 #. Running the performance test suite
