@@ -99,37 +99,36 @@ def multipletests(
 
     Examples
     --------
-        >>> p = xr.DataArray(
-        ...     np.random.normal(size=(3, 3)),
-        ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
-        ... )
-        >>> result = xs.multipletests(
-        ...     p, alpha=0.1, method="fdr_bh", return_results="all_as_result_dim"
-        ... )
-        >>> result
-        <xarray.DataArray (result: 4, x: 3, y: 3)>
-        array([[[ 0.        ,  1.        ,  0.        ],
-                [ 0.        ,  1.        ,  1.        ],
-                [ 0.        ,  0.        ,  1.        ]],
-        <BLANKLINE>
-               [[ 0.49671415, -0.1382643 ,  0.64768854],
-                [ 1.        , -0.23415337, -0.23413696],
-                [ 1.        ,  0.76743473, -0.46947439]],
-        <BLANKLINE>
-               [[ 0.1       ,  0.1       ,  0.1       ],
-                [ 0.1       ,  0.1       ,  0.1       ],
-                [ 0.1       ,  0.1       ,  0.1       ]],
-        <BLANKLINE>
-               [[ 0.1       ,  0.1       ,  0.1       ],
-                [ 0.1       ,  0.1       ,  0.1       ],
-                [ 0.1       ,  0.1       ,  0.1       ]]])
-        Coordinates:
-          * x                     (x) int64 0 1 2
-          * y                     (y) int64 0 1 2
-            multipletests_method  <U6 'fdr_bh'
-            multipletests_alpha   float64 0.1
-          * result                (result) <U15 'reject' ... 'alphacBonf'
-
+    >>> p = xr.DataArray(
+    ...     np.random.normal(size=(3, 3)),
+    ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
+    ... )
+    >>> result = xs.multipletests(
+    ...     p, alpha=0.1, method="fdr_bh", return_results="all_as_result_dim"
+    ... )
+    >>> result
+    <xarray.DataArray (result: 4, x: 3, y: 3)> Size: 288B
+    array([[[ 0.        ,  1.        ,  0.        ],
+            [ 0.        ,  1.        ,  1.        ],
+            [ 0.        ,  0.        ,  1.        ]],
+    <BLANKLINE>
+           [[ 0.49671415, -0.1382643 ,  0.64768854],
+            [ 1.        , -0.23415337, -0.23413696],
+            [ 1.        ,  0.76743473, -0.46947439]],
+    <BLANKLINE>
+           [[ 0.1       ,  0.1       ,  0.1       ],
+            [ 0.1       ,  0.1       ,  0.1       ],
+            [ 0.1       ,  0.1       ,  0.1       ]],
+    <BLANKLINE>
+           [[ 0.1       ,  0.1       ,  0.1       ],
+            [ 0.1       ,  0.1       ,  0.1       ],
+            [ 0.1       ,  0.1       ,  0.1       ]]])
+    Coordinates:
+      * x                     (x) int64 24B 0 1 2
+      * y                     (y) int64 24B 0 1 2
+        multipletests_method  <U6 24B 'fdr_bh'
+        multipletests_alpha   float64 8B 0.1
+      * result                (result) <U15 240B 'reject' ... 'alphacBonf'
     """
     MULTIPLE_TESTS = [
         "bonferroni",

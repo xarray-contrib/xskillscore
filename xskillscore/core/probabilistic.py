@@ -101,11 +101,11 @@ def crps_gaussian(
     ... )
     >>> mu = forecasts.mean("member")
     >>> sig = forecasts.std("member")
-    >>> crps_gaussian(observations, mu, sig, dim="x")
-    <xarray.DataArray (y: 3)>
+    >>> xs.crps_gaussian(observations, mu, sig, dim="x")
+    <xarray.DataArray (y: 3)> Size: 24B
     array([1.0349773 , 0.36521376, 0.39017126])
     Coordinates:
-      * y        (y) int64 0 1 2
+      * y        (y) int64 24B 0 1 2
 
     See Also
     --------
@@ -178,10 +178,10 @@ def crps_quadrature(
     ... )
     >>> from scipy.stats import norm
     >>> xs.crps_quadrature(observations, norm, dim="x")
-    <xarray.DataArray (y: 3)>
+    <xarray.DataArray (y: 3)> Size: 24B
     array([0.80280921, 0.31818197, 0.32364912])
     Coordinates:
-      * y        (y) int64 0 1 2
+      * y        (y) int64 24B 0 1 2
 
     See Also
     --------
@@ -259,11 +259,11 @@ def crps_ensemble(
     ...     np.random.normal(size=(3, 3, 3)),
     ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
     ... )
-    >>> crps_ensemble(observations, forecasts, dim="x")
-    <xarray.DataArray (y: 3)>
+    >>> xs.crps_ensemble(observations, forecasts, dim="x")
+    <xarray.DataArray (y: 3)> Size: 24B
     array([1.04497153, 0.48997746, 0.47994095])
     Coordinates:
-      * y        (y) int64 0 1 2
+      * y        (y) int64 24B 0 1 2
 
     See Also
     --------
@@ -347,10 +347,10 @@ def brier_score(
     ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
     ... )
     >>> xs.brier_score(observations > 0.5, (forecasts > 0.5).mean("member"), dim="y")
-    <xarray.DataArray (x: 3)>
+    <xarray.DataArray (x: 3)> Size: 24B
     array([0.37037037, 0.14814815, 0.51851852])
     Coordinates:
-      * x        (x) int64 0 1 2
+      * x        (x) int64 24B 0 1 2
 
     See Also
     --------
@@ -451,10 +451,10 @@ def threshold_brier_score(
     ... )
     >>> threshold = [0.2, 0.5, 0.8]
     >>> xs.threshold_brier_score(observations, forecasts, threshold)
-    <xarray.DataArray (threshold: 3)>
+    <xarray.DataArray (threshold: 3)> Size: 24B
     array([0.27160494, 0.34567901, 0.18518519])
     Coordinates:
-      * threshold  (threshold) float64 0.2 0.5 0.8
+      * threshold  (threshold) float64 24B 0.2 0.5 0.8
 
     See Also
     --------
@@ -643,12 +643,12 @@ def rps(
     ... )
     >>> category_edges = np.array([0.33, 0.66])
     >>> xs.rps(o, f, category_edges, dim="x")
-    <xarray.DataArray (y: 3)>
+    <xarray.DataArray (y: 3)> Size: 24B
     array([0.37037037, 0.81481481, 1.        ])
     Coordinates:
-      * y                           (y) int64 0 1 2
-        observations_category_edge  <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
-        forecasts_category_edge     <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
+      * y                           (y) int64 24B 0 1 2
+        observations_category_edge  <U45 180B '[-np.inf, 0.33), [0.33, 0.66), [0....
+        forecasts_category_edge     <U45 180B '[-np.inf, 0.33), [0.33, 0.66), [0....
 
     You can also define multi-dimensional ``category_edges``, e.g. with xr.quantile.
     However, you still need to ensure that ``category_edges`` covers the forecasts
@@ -658,12 +658,12 @@ def rps(
     ...     {"quantile": "category_edge"}
     ... )
     >>> xs.rps(o, f, category_edges, dim="x")
-    <xarray.DataArray (y: 3)>
+    <xarray.DataArray (y: 3)> Size: 24B
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
-      * y                           (y) int64 0 1 2
-        observations_category_edge  <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
-        forecasts_category_edge     <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
+      * y                           (y) int64 24B 0 1 2
+        observations_category_edge  <U45 180B '[-np.inf, 0.33), [0.33, 0.66), [0....
+        forecasts_category_edge     <U45 180B '[-np.inf, 0.33), [0.33, 0.66), [0....
 
     If you have probabilistic forecasts, i.e. without a ``member`` dimension but
     different ``category`` probabilities, you can also provide probability
@@ -705,10 +705,10 @@ def rps(
     ... ).mean("member")
     >>> assert (f_p.sum("category") == 1).all()
     >>> xs.rps(o_p, f_p, category_edges=None, dim="x", input_distributions="p")
-    <xarray.DataArray (y: 3)>
+    <xarray.DataArray (y: 3)> Size: 24B
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
-      * y        (y) int64 0 1 2
+      * y        (y) int64 24B 0 1 2
 
     Providing cumulative distribution inputs yields identical results, where highest
     category equals 1 by default and can be ignored:
@@ -716,10 +716,10 @@ def rps(
     >>> o_c = o < category_edges
     >>> f_c = (f < category_edges).mean("member")
     >>> xs.rps(o_c, f_c, category_edges=None, dim="x", input_distributions="c")
-    <xarray.DataArray (y: 3)>
+    <xarray.DataArray (y: 3)> Size: 24B
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
-      * y        (y) int64 0 1 2
+      * y        (y) int64 24B 0 1 2
 
     References
     ----------
@@ -915,13 +915,13 @@ def rank_histogram(
     ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
     ... )
     >>> xs.rank_histogram(observations, forecasts, dim="x")
-    <xarray.DataArray 'histogram_rank' (y: 3, rank: 4)>
+    <xarray.DataArray 'histogram_rank' (y: 3, rank: 4)> Size: 96B
     array([[0, 0, 1, 2],
            [0, 1, 2, 0],
            [0, 0, 2, 1]])
     Coordinates:
-      * y        (y) int64 0 1 2
-      * rank     (rank) float64 1.0 2.0 3.0 4.0
+      * y        (y) int64 24B 0 1 2
+      * rank     (rank) float64 32B 1.0 2.0 3.0 4.0
 
     Notes
     -----
@@ -1025,12 +1025,12 @@ def discrimination(
     >>> forecast_event_likelihood = (forecasts > 0).mean("member")
     >>> observed_event = observations > 0
     >>> xs.discrimination(observed_event, forecast_event_likelihood, dim=["x", "y"])
-    <xarray.DataArray (event: 2, forecast_probability: 5)>
+    <xarray.DataArray (event: 2, forecast_probability: 5)> Size: 80B
     array([[0.00437637, 0.15536105, 0.66739606, 0.12472648, 0.04814004],
            [0.00451467, 0.16704289, 0.66365688, 0.1241535 , 0.04063205]])
     Coordinates:
-      * forecast_probability  (forecast_probability) float64 0.1 0.3 0.5 0.7 0.9
-      * event                 (event) bool True False
+      * forecast_probability  (forecast_probability) float64 40B 0.1 0.3 0.5 0.7 0.9
+      * event                 (event) bool 2B True False
 
     References
     ----------
@@ -1108,14 +1108,14 @@ def reliability(
     ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
     ... )
     >>> xs.reliability(observations > 0.1, (forecasts > 0.1).mean("member"), dim="x")
-    <xarray.DataArray (y: 3, forecast_probability: 5)>
+    <xarray.DataArray (y: 3, forecast_probability: 5)> Size: 120B
     array([[nan, 0. , nan, 1. , nan],
            [1. , 0.5, nan, nan, nan],
            [nan, 0. , nan, 0. , nan]])
     Coordinates:
-      * y                     (y) int64 0 1 2
-      * forecast_probability  (forecast_probability) float64 0.1 0.3 0.5 0.7 0.9
-        samples               (y, forecast_probability) float64 0.0 2.0 ... 1.0 0.0
+      * y                     (y) int64 24B 0 1 2
+      * forecast_probability  (forecast_probability) float64 40B 0.1 0.3 0.5 0.7 0.9
+        samples               (y, forecast_probability) float64 120B 0.0 2.0 ... 0.0
 
     Notes
     -----
@@ -1264,7 +1264,7 @@ def roc(
     >>> o = f.copy()
     >>> category_edges = np.linspace(-2, 2, 5)
     >>> xs.roc(o, f, category_edges, dim=["time"])
-    <xarray.DataArray 'histogram_observations_forecasts' ()>
+    <xarray.DataArray 'histogram_observations_forecasts' ()> Size: 8B
     array(1.)
 
     See also

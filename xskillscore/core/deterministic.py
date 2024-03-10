@@ -126,7 +126,7 @@ def linslope(
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.linslope(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[-0.30948771, -0.21562529, -0.63141304],
            [ 0.31446077,  2.23858011,  0.44743617],
            [-0.22243944,  0.47034784,  1.08512859]])
@@ -205,7 +205,7 @@ def pearson_r(
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.pearson_r(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[-0.17455755, -0.26648379, -0.74265833],
            [ 0.32535918,  0.42496646,  0.1940647 ],
            [-0.3203094 ,  0.33207755,  0.89250429]])
@@ -275,7 +275,7 @@ def pearson_r_p_value(
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.pearson_r_p_value(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[0.77888033, 0.66476199, 0.15051516],
            [0.59316935, 0.47567465, 0.75446898],
            [0.59925464, 0.58509064, 0.04161894]])
@@ -357,7 +357,7 @@ def effective_sample_size(a, b, dim="time", skipna=False, keep_attrs=False):
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.effective_sample_size(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[4., 0., 4.],
            [3., 4., 4.],
            [3., 4., 2.]])
@@ -465,7 +465,7 @@ def pearson_r_eff_p_value(
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.pearson_r_eff_p_value(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[0.82544245,        nan, 0.25734167],
            [0.78902959, 0.57503354, 0.8059353 ],
            [0.79242625, 0.66792245,        nan]])
@@ -547,7 +547,7 @@ def spearman_r(
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.spearman_r(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[-0.6, -0.5, -0.7],
            [ 0.4,  0.3,  0.3],
            [-0.3, -0.1,  0.9]])
@@ -616,7 +616,7 @@ def spearman_r_p_value(
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.spearman_r_p_value(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[0.28475698, 0.39100222, 0.1881204 ],
            [0.50463158, 0.62383766, 0.62383766],
            [0.62383766, 0.87288857, 0.03738607]])
@@ -716,7 +716,7 @@ def spearman_r_eff_p_value(
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.spearman_r_eff_p_value(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[0.4       ,        nan, 0.3       ],
            [0.73802024, 0.7       , 0.7       ],
            [0.80602663, 0.9       ,        nan]])
@@ -819,8 +819,8 @@ def r2(
     --------
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
-    >>> r2(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    >>> xs.r2(a, b, dim="time")
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[ -3.77828319,  -1.25687543,  -2.52495914],
            [ -0.67280201, -39.45271514,  -5.78241791],
            [ -1.66615797,  -1.56749317,   0.09843265]])
@@ -888,8 +888,8 @@ def me(
     --------
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
-    >>> me(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    >>> xs.me(a, b, dim="time")
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[ 0.01748202, -0.14165293,  0.22455357],
            [ 0.13893709, -0.23513353, -0.18174132],
            [-0.29317762,  0.16887445, -0.17297527]])
@@ -963,7 +963,7 @@ def rmse(
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.rmse(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[0.30366872, 0.5147618 , 0.57410211],
            [0.2963848 , 0.37177283, 0.40563885],
            [0.55686111, 0.38189299, 0.21317579]])
@@ -1038,7 +1038,7 @@ def mse(
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.mse(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[0.09221469, 0.26497971, 0.32959323],
            [0.08784395, 0.13821504, 0.16454288],
            [0.31009429, 0.14584225, 0.04544392]])
@@ -1111,8 +1111,8 @@ def mae(
     --------
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
-    >>> mae(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    >>> xs.mae(a, b, dim="time")
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[0.26014863, 0.40137207, 0.48871634],
            [0.18809417, 0.30197826, 0.2984658 ],
            [0.52934554, 0.19820357, 0.17335851]])
@@ -1181,7 +1181,7 @@ def median_absolute_error(
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.median_absolute_error(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[0.28798217, 0.23322591, 0.62067468],
            [0.12146232, 0.20314509, 0.23442927],
            [0.59041981, 0.03289321, 0.21343494]])
@@ -1261,7 +1261,7 @@ def mape(
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.mape(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[0.6268041 , 9.45134297, 3.28717608],
            [0.27099746, 1.58105176, 1.48258713],
            [6.55806162, 0.22271096, 0.39302745]])
@@ -1338,7 +1338,7 @@ def smape(
     >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
     >>> xs.smape(a, b, dim="time")
-    <xarray.DataArray (x: 3, y: 3)>
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[0.35591619, 0.43662087, 0.55372571],
            [0.1864336 , 0.45831965, 0.38473469],
            [0.58730494, 0.18081757, 0.14960832]])

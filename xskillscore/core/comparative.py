@@ -92,20 +92,20 @@ def sign_test(
     >>> (-1 * confidence).plot(color="gray")  # doctest: +ELLIPSIS
     [<matplotlib.lines.Line2D object at 0x...>]
     >>> walk
-    <xarray.DataArray (time: 30)>
+    <xarray.DataArray (time: 30)> Size: 240B
     array([ 1,  0,  1,  2,  1,  2,  3,  4,  5,  6,  5,  6,  7,  6,  7,  8,  9,
            10,  9, 10, 11, 12, 13, 12, 11, 12, 13, 14, 15, 14])
     Coordinates:
-      * time     (time) int64 0 1 2 3 4 5 6 7 8 9 ... 20 21 22 23 24 25 26 27 28 29
+      * time     (time) int64 240B 0 1 2 3 4 5 6 7 8 ... 21 22 23 24 25 26 27 28 29
     >>> significantly_different
-    <xarray.DataArray (time: 30)>
+    <xarray.DataArray (time: 30)> Size: 30B
     array([False, False, False, False, False, False, False, False, False,
            False, False, False, False, False, False,  True,  True,  True,
             True,  True,  True,  True,  True,  True,  True,  True,  True,
             True,  True,  True])
     Coordinates:
-      * time     (time) int64 0 1 2 3 4 5 6 7 8 9 ... 20 21 22 23 24 25 26 27 28 29
-        alpha    float64 0.05
+      * time     (time) int64 240B 0 1 2 3 4 5 6 7 8 ... 21 22 23 24 25 26 27 28 29
+        alpha    float64 8B 0.05
 
     References
     ----------
@@ -274,13 +274,13 @@ def halfwidth_ci_test(
     ...     f1, f2, o, "mae", time_dim="time", dim=[], alpha=0.05
     ... )
     >>> significantly_different
-    <xarray.DataArray ()>
+    <xarray.DataArray ()> Size: 1B
     array(False)
     >>> diff
-    <xarray.DataArray ()>
+    <xarray.DataArray ()> Size: 8B
     array(-0.01919449)
     >>> hwci
-    <xarray.DataArray ()>
+    <xarray.DataArray ()> Size: 8B
     array(0.38729387)
     >>> # absolute magnitude of difference is smaller than half-width of
     >>> # confidence interval, therefore not significant at level alpha=0.05
@@ -289,7 +289,7 @@ def halfwidth_ci_test(
     ...     f1, f2 + 2.0, o, "mae", time_dim="time", dim=[], alpha=0.05
     ... )
     >>> significantly_different
-    <xarray.DataArray ()>
+    <xarray.DataArray ()> Size: 1B
     array(True)
 
     References
