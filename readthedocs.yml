@@ -18,8 +18,3 @@ sphinx:
   fail_on_warning: false
 
 formats: []
-
-python:
-  install:
-    - method: pip
-      path: .
