@@ -103,7 +103,6 @@ lint.select = [
 # Ignore `F401` (imported but unused) in all `__init__.py` files
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
-"xskillscore/core/np_deterministic.py" = ["E711"]
 
 [tool.mypy]
 ignore_missing_imports = true
