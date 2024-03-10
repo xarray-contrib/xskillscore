@@ -125,7 +125,7 @@ Preparing Pull Requests
 
 #. Install dependencies into a new conda environment::
 
-    $ conda env update -f ci/dev.yml
+    $ mamba env update -f ci/dev.yml
     $ conda activate xskillscore-dev
 
 #. Make an editable install of xskillscore by running::
@@ -153,6 +153,12 @@ Preparing Pull Requests
    You can also test the code in the docstrings by doing::
 
     $ pytest --doctest-modules xskillscore --ignore xskillscore/tests
+
+   You can also test notebooks by doing::
+
+    $ cd docs
+    $ nbstripout source/*.ipynb
+    $ make -j4 html
 
   Please stick to `xarray <http://xarray.pydata.org/en/stable/contributing.html>`_'s testing recommendations.
 

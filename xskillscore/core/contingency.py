@@ -171,25 +171,25 @@ class Contingency:
         # Add some coordinates to simplify interpretation/post-processing
         table = table.assign_coords(
             {
-                OBSERVATIONS_NAME
-                + "_bin": _get_category_bounds(self.observation_category_edges)
+                OBSERVATIONS_NAME + "_bin": _get_category_bounds(
+                    self.observation_category_edges
+                )
             }
         ).rename({OBSERVATIONS_NAME + "_bin": OBSERVATIONS_NAME + "_category_bounds"})
         table = table.assign_coords(
             {
-                FORECASTS_NAME
-                + "_bin": _get_category_bounds(self.forecast_category_edges)
+                FORECASTS_NAME + "_bin": _get_category_bounds(
+                    self.forecast_category_edges
+                )
             }
         ).rename({FORECASTS_NAME + "_bin": FORECASTS_NAME + "_category_bounds"})
         table = table.assign_coords(
             {
-                OBSERVATIONS_NAME
-                + "_category": (
+                OBSERVATIONS_NAME + "_category": (
                     OBSERVATIONS_NAME + "_category_bounds",
                     range(1, len(self.observation_category_edges)),
                 ),
-                FORECASTS_NAME
-                + "_category": (
+                FORECASTS_NAME + "_category": (
                     FORECASTS_NAME + "_category_bounds",
                     range(1, len(self.forecast_category_edges)),
                 ),
@@ -687,9 +687,7 @@ class Contingency:
         ).sum(
             dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
             skipna=True,
-        ) / self._sum_categories(
-            "total"
-        )
+        ) / self._sum_categories("total")
         numer_2 = (
             self._sum_categories("observations") * self._sum_categories("forecasts")
         ).sum(dim="category", skipna=True) / self._sum_categories("total") ** 2
@@ -722,9 +720,7 @@ class Contingency:
         ).sum(
             dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
             skipna=True,
-        ) / self._sum_categories(
-            "total"
-        )
+        ) / self._sum_categories("total")
         numer_2 = (
             self._sum_categories("observations") * self._sum_categories("forecasts")
         ).sum(dim="category", skipna=True) / self._sum_categories("total") ** 2

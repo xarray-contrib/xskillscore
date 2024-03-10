@@ -1,7 +1,5 @@
-import numpy as np
 import pytest
 from dask import is_dask_collection
-from xarray.testing import assert_equal
 
 import xskillscore as xs
 from xskillscore import multipletests

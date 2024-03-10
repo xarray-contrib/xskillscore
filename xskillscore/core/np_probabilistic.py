@@ -20,7 +20,8 @@ def _reliability(o, f, bin_edges):
         N = np.zeros_like(r)
 
     for i in range(len(bin_edges) - 1):
-        # Follow xhistogram behaviour: all bins are half-open, except for the right-most bin
+        # Follow xhistogram behaviour: all bins are half-open,
+        # except for the right-most bin
         # which adds an epsilon to the right edge
         # see https://github.com/xgcm/xhistogram/issues/18
         if i == (len(bin_edges) - 2):

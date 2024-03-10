@@ -370,7 +370,8 @@ def test_correlation_broadcasts(a, b, metrics):
     if (
         "eff" not in metric.__name__
     ):  # effective metrics require to be applied over time
-        with pytest.raises(
-            ValueError, match="ndex"
-        ):  # match "indexes along dimension" and "cannot align objects with join='exact' where index/labels/sizes are not equal along these coordinates (dimensions)"
+        with pytest.raises(ValueError, match="ndex"):
+            # match "indexes along dimension" and "cannot align objects
+            # with join='exact' where index/labels/sizes are not
+            # equal along these coordinates (dimensions)"
             metric(a, b_changed_coords, dim="lat")

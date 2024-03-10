@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import inspect
 import warnings
-from typing import Callable, List, Literal, Mapping, Tuple
+from typing import Callable, Literal, Mapping, Optional, Tuple
 
 import numpy as np
 import scipy.stats as st
-import xarray as xr
 
 from . import deterministic as dm
 from .types import Dim, XArray
@@ -15,7 +14,7 @@ from .types import Dim, XArray
 def sign_test(
     forecasts1: XArray,
     forecasts2: XArray,
-    observations: XArray = None,
+    observations: Optional[XArray] = None,
     time_dim: str = "time",
     dim: Dim = [],
     alpha: float = 0.05,
@@ -93,20 +92,20 @@ def sign_test(
     >>> (-1 * confidence).plot(color="gray")  # doctest: +ELLIPSIS
     [<matplotlib.lines.Line2D object at 0x...>]
     >>> walk
-    <xarray.DataArray (time: 30)>
+    <xarray.DataArray (time: 30)> Size: 240B
     array([ 1,  0,  1,  2,  1,  2,  3,  4,  5,  6,  5,  6,  7,  6,  7,  8,  9,
            10,  9, 10, 11, 12, 13, 12, 11, 12, 13, 14, 15, 14])
     Coordinates:
-      * time     (time) int64 0 1 2 3 4 5 6 7 8 9 ... 20 21 22 23 24 25 26 27 28 29
+      * time     (time) int64 240B 0 1 2 3 4 5 6 7 8 ... 21 22 23 24 25 26 27 28 29
     >>> significantly_different
-    <xarray.DataArray (time: 30)>
+    <xarray.DataArray (time: 30)> Size: 30B
     array([False, False, False, False, False, False, False, False, False,
            False, False, False, False, False, False,  True,  True,  True,
             True,  True,  True,  True,  True,  True,  True,  True,  True,
             True,  True,  True])
     Coordinates:
-      * time     (time) int64 0 1 2 3 4 5 6 7 8 9 ... 20 21 22 23 24 25 26 27 28 29
-        alpha    float64 0.05
+      * time     (time) int64 240B 0 1 2 3 4 5 6 7 8 ... 21 22 23 24 25 26 27 28 29
+        alpha    float64 8B 0.05
 
     References
     ----------
@@ -202,9 +201,9 @@ def sign_test(
 def halfwidth_ci_test(
     forecasts1: XArray,
     forecasts2: XArray,
-    observations: XArray = None,
-    metric: str = None,
-    dim: Dim = None,
+    observations: Optional[XArray] = None,
+    metric: Optional[str] = None,
+    dim: Optional[Dim] = None,
     time_dim: str = "time",
     alpha: float = 0.05,
     **kwargs: Mapping,
@@ -258,9 +257,11 @@ def halfwidth_ci_test(
     Returns
     -------
     xarray.DataArray or xarray.Dataset
-        boolean whether the difference in scores (score(f2) - score(f1)) are significant.
+        boolean whether the difference in scores
+        (score(f2) - score(f1)) are significant.
     xarray.DataArray or xarray.Dataset
-        difference in scores (score(f2) - score(f1)) reduced by ``dim`` and ``time_dim``.
+        difference in scores (score(f2) - score(f1))
+        reduced by ``dim`` and ``time_dim``.
     xarray.DataArray or xarray.Dataset
         half-width of the confidence interval at the significance level ``alpha``.
 
@@ -273,13 +274,13 @@ def halfwidth_ci_test(
     ...     f1, f2, o, "mae", time_dim="time", dim=[], alpha=0.05
     ... )
     >>> significantly_different
-    <xarray.DataArray ()>
+    <xarray.DataArray ()> Size: 1B
     array(False)
     >>> diff
-    <xarray.DataArray ()>
+    <xarray.DataArray ()> Size: 8B
     array(-0.01919449)
     >>> hwci
-    <xarray.DataArray ()>
+    <xarray.DataArray ()> Size: 8B
     array(0.38729387)
     >>> # absolute magnitude of difference is smaller than half-width of
     >>> # confidence interval, therefore not significant at level alpha=0.05
@@ -288,7 +289,7 @@ def halfwidth_ci_test(
     ...     f1, f2 + 2.0, o, "mae", time_dim="time", dim=[], alpha=0.05
     ... )
     >>> significantly_different
-    <xarray.DataArray ()>
+    <xarray.DataArray ()> Size: 1B
     array(True)
 
     References

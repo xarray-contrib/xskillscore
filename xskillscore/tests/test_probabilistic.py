@@ -4,7 +4,6 @@ import properscoring
 import pytest
 import xarray as xr
 from dask import is_dask_collection
-from pytest_lazyfixture import lazy_fixture
 from scipy.stats import norm
 from sklearn.calibration import calibration_curve
 from sklearn.metrics import roc_auc_score, roc_curve
@@ -440,8 +439,10 @@ def test_reliability_values(o, f_prob):
         for lat in f_prob.lat:
             o_1d = o.sel(lon=lon, lat=lat) > 0.5
             f_1d = (f_prob.sel(lon=lon, lat=lat) > 0.5).mean("member")
-            # scipy bins are only left-edge inclusive and 1e-8 is added to the last bin, whereas
-            # xhistogram the rightmost edge of xhistogram bins is included - mimic scipy behaviour
+            # scipy bins are only left-edge inclusive and 1e-8 is
+            # added to the last bin, whereas
+            # xhistogram the rightmost edge of xhistogram bins
+            # is included - mimic scipy behaviour
             actual = reliability(
                 o_1d, f_1d, probability_bin_edges=np.linspace(0, 1 + 1e-8, 6)
             )
@@ -475,14 +476,16 @@ def test_rps_reduce_dim(o, f_prob, category_edges, dim, fair_bool):
 
 
 def test_rps_category_edges_None_fails(o, f_prob):
-    """Test that rps expects inputs to have category_edges dim if category_edges is None."""
+    """Test that rps expects inputs to have category_edges dim
+    if category_edges is None."""
     with pytest.raises(ValueError, match="Expected dimension"):
         rps(o, f_prob, category_edges=None, dim=[], input_distributions="c")
 
 
 @pytest.mark.parametrize("input_distributions", ["c", "p"])
 def test_rps_category_edges_None_works(o, f_prob, input_distributions):
-    """Test that rps expects inputs to have category_edges dim if category_edges is None."""
+    """Test that rps expects inputs to have category_edges dim if
+    category_edges is None."""
     o = o.rename({"time": "category"})
     f_prob = f_prob.rename({"time": "category"}).mean("member")
     rps(o, f_prob, category_edges=None, dim=[], input_distributions=input_distributions)
@@ -725,7 +728,8 @@ def test_rps_vs_fair_rps(o, f_prob, category_edges, dim):
 
 @pytest.mark.parametrize("fair_bool", [True, False])
 def test_rps_category_edges_xrDataArray(o, f_prob, fair_bool):
-    """Test rps with category_edges as xrDataArray for forecast and observations edges."""
+    """Test rps with category_edges as xrDataArray for
+    forecast and observations edges."""
     category_edges = f_prob.quantile(
         q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]
     ).rename({"quantile": "category_edge"})
@@ -742,7 +746,8 @@ def test_rps_category_edges_xrDataArray(o, f_prob, fair_bool):
 
 @pytest.mark.parametrize("fair_bool", [True, False])
 def test_rps_category_edges_xrDataset(o, f_prob, fair_bool):
-    """Test rps with category_edges as xrDataArray for forecast and observations edges."""
+    """Test rps with category_edges as xrDataArray
+    for forecast and observations edges."""
     o = o.to_dataset(name="var")
     o["var2"] = o["var"] ** 2
     f_prob = f_prob.to_dataset(name="var")
@@ -763,7 +768,8 @@ def test_rps_category_edges_xrDataset(o, f_prob, fair_bool):
 
 @pytest.mark.parametrize("fair_bool", [True, False])
 def test_rps_category_edges_tuple(o, f_prob, fair_bool):
-    """Test rps with category_edges as tuple of xrDataArray for forecast and observations edges separately."""
+    """Test rps with category_edges as tuple of xrDataArray
+    for forecast and observations edges separately."""
     o_edges = o.quantile(q=[0.2, 0.4, 0.6, 0.8], dim="time").rename(
         {"quantile": "category_edge"}
     )
@@ -872,19 +878,7 @@ def test_rps_mask_Dataset_additional_var(o, f_prob):
     assert "var2" not in actual.data_vars
 
 
-@pytest.mark.parametrize(
-    "observation,forecast",
-    [
-        (
-            lazy_fixture("observation_1d_long"),
-            lazy_fixture("forecast_1d_long"),
-        ),
-        (
-            lazy_fixture("observation_3d"),
-            lazy_fixture("forecast_3d"),
-        ),
-    ],
-)
+@pytest.mark.parametrize("ndim_data", ["1d_long", "3d"])
 @pytest.mark.parametrize("dim", ["time", None])
 @pytest.mark.parametrize("drop_intermediate_bool", [True, False])
 @pytest.mark.parametrize("chunk", [True, False])
@@ -893,8 +887,7 @@ def test_rps_mask_Dataset_additional_var(o, f_prob):
     "return_results", ["all_as_tuple", "area", "all_as_metric_dim"]
 )
 def test_roc_returns(
-    observation,
-    forecast,
+    ndim_data,
     symmetric_edges,
     dim,
     return_results,
@@ -903,6 +896,27 @@ def test_roc_returns(
     drop_intermediate_bool,
 ):
     """testing keywords and inputs pass"""
+    # A lazy fix to deprecate pytest-lazy-fixture
+    # Copied the functions from conftest.py
+    if ndim_data == "1d_long":
+        observation = xr.DataArray(
+            np.random.normal(size=(100)), coords=[("time", np.arange(100))]
+        )
+        forecast = xr.DataArray(
+            np.random.normal(size=(100)), coords=[("time", np.arange(100))]
+        )
+    else:
+        times = xr.cftime_range(start="2000", freq="D", periods=10)
+        lats = np.arange(4)
+        lons = np.arange(5)
+        data_obs = np.random.randint(0, 10, size=(len(times), len(lats), len(lons)))
+        observation = xr.DataArray(
+            data_obs, coords=[times, lats, lons], dims=["time", "lat", "lon"]
+        )
+        data_fct = np.random.randint(0, 10, size=(len(times), len(lats), len(lons)))
+        forecast = xr.DataArray(
+            data_fct, coords=[times, lats, lons], dims=["time", "lat", "lon"]
+        )
     if "Dataset" in input:
         name = "var"
         forecast = forecast.to_dataset(name=name)

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 import xarray as xr
 
-CONCAT_KWARGS = {"coords": "minimal", "compat": "override"}
+from .types import XArray
 
-from .types import Dim, XArray
+CONCAT_KWARGS = {"coords": "minimal", "compat": "override"}
 
 
 def _gen_idx(
@@ -50,7 +50,7 @@ def resample_iterations(
     forecast: XArray,
     iterations: int,
     dim: str = "member",
-    dim_max: int = None,
+    dim_max: Optional[int] = None,
     replace: bool = True,
 ) -> XArray:
     """Resample over ``dim`` by index ``iterations`` times.
@@ -136,7 +136,7 @@ def resample_iterations_idx(
     forecast: XArray,
     iterations: int,
     dim: str = "member",
-    dim_max: int = None,
+    dim_max: Optional[int] = None,
     replace: bool = True,
 ) -> XArray:
     """Resample over ``dim`` by index ``iterations`` times.

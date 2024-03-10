@@ -1,9 +1,8 @@
 from typing import Callable, List
 
-import dask
 import numpy as np
 import pytest
-from xarray.tests import CountingScheduler, assert_allclose, raise_if_dask_computes
+from xarray.tests import assert_allclose, raise_if_dask_computes
 
 from xskillscore.core.deterministic import (
     linslope,

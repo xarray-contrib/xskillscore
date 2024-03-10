@@ -1,10 +1,9 @@
 import numpy as np
 import numpy.testing as npt
 import pytest
-import xarray as xr
-from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
+from sklearn.metrics import confusion_matrix
 
-from xskillscore import Contingency, roc
+from xskillscore import Contingency
 
 DIMS = (["time"], ["lon"], ["lat"], "time", ["lon", "lat", "time"])
 CATEGORY_EDGES = [

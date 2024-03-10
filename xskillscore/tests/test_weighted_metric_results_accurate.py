@@ -7,7 +7,6 @@ from sklearn.metrics import (
     r2_score,
 )
 
-import xskillscore as xs
 from xskillscore.core.deterministic import (
     linslope,
     mae,
@@ -15,12 +14,9 @@ from xskillscore.core.deterministic import (
     me,
     mse,
     pearson_r,
-    pearson_r_p_value,
     r2,
     rmse,
     smape,
-    spearman_r,
-    spearman_r_p_value,
 )
 
 xs_skl_metrics = [

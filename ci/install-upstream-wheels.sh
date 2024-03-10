@@ -27,6 +27,6 @@ python -m pip install \
     --upgrade \
     git+https://github.com/dask/dask \
     git+https://github.com/Unidata/cftime \
-    git+https://github.com/pydata/xarray  \
-    git+https://github.com/pydata/bottleneck  \
+    git+https://github.com/pydata/xarray \
+    git+https://github.com/pydata/bottleneck \
     git+https://github.com/xgcm/xhistogram

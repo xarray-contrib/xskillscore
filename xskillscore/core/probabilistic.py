@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, List, Literal, Tuple
+from typing import Callable, List, Literal, Optional, Tuple
 
 import numpy as np
 import properscoring
@@ -59,8 +59,8 @@ def crps_gaussian(
     observations: XArray,
     mu: XArray | float | int,
     sig: XArray | float | int,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Continuous Ranked Probability Score with a Gaussian distribution.
@@ -101,11 +101,11 @@ def crps_gaussian(
     ... )
     >>> mu = forecasts.mean("member")
     >>> sig = forecasts.std("member")
-    >>> crps_gaussian(observations, mu, sig, dim="x")
-    <xarray.DataArray (y: 3)>
+    >>> xs.crps_gaussian(observations, mu, sig, dim="x")
+    <xarray.DataArray (y: 3)> Size: 24B
     array([1.0349773 , 0.36521376, 0.39017126])
     Coordinates:
-      * y        (y) int64 0 1 2
+      * y        (y) int64 24B 0 1 2
 
     See Also
     --------
@@ -136,11 +136,11 @@ def crps_gaussian(
 def crps_quadrature(
     observations: XArray,
     cdf_or_dist: Callable,
-    xmin: float = None,
-    xmax: float = None,
+    xmin: Optional[float] = None,
+    xmax: Optional[float] = None,
     tol: float = 1e-6,
-    dim: Dim = None,
-    weights: bool = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[bool] = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Continuous Ranked Probability Score with numerical integration
@@ -178,10 +178,10 @@ def crps_quadrature(
     ... )
     >>> from scipy.stats import norm
     >>> xs.crps_quadrature(observations, norm, dim="x")
-    <xarray.DataArray (y: 3)>
+    <xarray.DataArray (y: 3)> Size: 24B
     array([0.80280921, 0.31818197, 0.32364912])
     Coordinates:
-      * y        (y) int64 0 1 2
+      * y        (y) int64 24B 0 1 2
 
     See Also
     --------
@@ -208,11 +208,11 @@ def crps_quadrature(
 def crps_ensemble(
     observations: XArray,
     forecasts: XArray,
-    member_weights: XArray = None,
+    member_weights: Optional[XArray] = None,
     issorted: bool = False,
     member_dim: str = "member",
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Continuous Ranked Probability Score with the ensemble distribution.
@@ -259,11 +259,11 @@ def crps_ensemble(
     ...     np.random.normal(size=(3, 3, 3)),
     ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
     ... )
-    >>> crps_ensemble(observations, forecasts, dim="x")
-    <xarray.DataArray (y: 3)>
+    >>> xs.crps_ensemble(observations, forecasts, dim="x")
+    <xarray.DataArray (y: 3)> Size: 24B
     array([1.04497153, 0.48997746, 0.47994095])
     Coordinates:
-      * y        (y) int64 0 1 2
+      * y        (y) int64 24B 0 1 2
 
     See Also
     --------
@@ -293,8 +293,8 @@ def brier_score(
     forecasts: XArray,
     member_dim: str = "member",
     fair=False,
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     keep_attrs: bool = False,
 ):
     """Calculate Brier score (BS).
@@ -347,10 +347,10 @@ def brier_score(
     ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
     ... )
     >>> xs.brier_score(observations > 0.5, (forecasts > 0.5).mean("member"), dim="y")
-    <xarray.DataArray (x: 3)>
+    <xarray.DataArray (x: 3)> Size: 24B
     array([0.37037037, 0.14814815, 0.51851852])
     Coordinates:
-      * x        (x) int64 0 1 2
+      * x        (x) int64 24B 0 1 2
 
     See Also
     --------
@@ -403,8 +403,8 @@ def threshold_brier_score(
     threshold: float | List[float] | XArray,
     issorted: bool = False,
     member_dim: str = "member",
-    dim: Dim = None,
-    weights: XArray = None,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Calculate the Brier scores of an ensemble for exceeding given thresholds.
@@ -451,10 +451,10 @@ def threshold_brier_score(
     ... )
     >>> threshold = [0.2, 0.5, 0.8]
     >>> xs.threshold_brier_score(observations, forecasts, threshold)
-    <xarray.DataArray (threshold: 3)>
+    <xarray.DataArray (threshold: 3)> Size: 24B
     array([0.27160494, 0.34567901, 0.18518519])
     Coordinates:
-      * threshold  (threshold) float64 0.2 0.5 0.8
+      * threshold  (threshold) float64 24B 0.2 0.5 0.8
 
     See Also
     --------
@@ -523,9 +523,11 @@ def _assign_rps_category_bounds(
                 )
             }
         )
-        res[
-            f"{name}_category_edge"
-        ] = f"[-np.inf, {edges[bin_dim].isel({bin_dim:0}).values}), {str(res[f'{name}_category_edge'].values)[:-1]}), [{edges[bin_dim].isel({bin_dim:-1}).values}, np.inf]"
+        res[f"{name}_category_edge"] = (
+            f"[-np.inf, {edges[bin_dim].isel({bin_dim:0}).values}), "
+            f"{str(res[f'{name}_category_edge'].values)[:-1]}), "
+            f"[{edges[bin_dim].isel({bin_dim:-1}).values}, np.inf]"
+        )
     return res
 
 
@@ -533,12 +535,12 @@ def rps(
     observations: XArray,
     forecasts: XArray,
     category_edges: np.ndarray | XArray | Tuple[XArray, XArray] | None,
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     fair: bool = False,
-    weights: XArray = None,
+    weights: Optional[XArray] = None,
     keep_attrs: bool = False,
     member_dim: str = "member",
-    input_distributions: Literal["c", "p"] = None,
+    input_distributions: Optional[Literal["c", "p"]] = None,
 ) -> XArray:
     """Calculate Ranked Probability Score.
 
@@ -641,12 +643,12 @@ def rps(
     ... )
     >>> category_edges = np.array([0.33, 0.66])
     >>> xs.rps(o, f, category_edges, dim="x")
-    <xarray.DataArray (y: 3)>
+    <xarray.DataArray (y: 3)> Size: 24B
     array([0.37037037, 0.81481481, 1.        ])
     Coordinates:
-      * y                           (y) int64 0 1 2
-        observations_category_edge  <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
-        forecasts_category_edge     <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
+      * y                           (y) int64 24B 0 1 2
+        observations_category_edge  <U45 180B '[-np.inf, 0.33), [0.33, 0.66), [0....
+        forecasts_category_edge     <U45 180B '[-np.inf, 0.33), [0.33, 0.66), [0....
 
     You can also define multi-dimensional ``category_edges``, e.g. with xr.quantile.
     However, you still need to ensure that ``category_edges`` covers the forecasts
@@ -656,12 +658,12 @@ def rps(
     ...     {"quantile": "category_edge"}
     ... )
     >>> xs.rps(o, f, category_edges, dim="x")
-    <xarray.DataArray (y: 3)>
+    <xarray.DataArray (y: 3)> Size: 24B
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
-      * y                           (y) int64 0 1 2
-        observations_category_edge  <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
-        forecasts_category_edge     <U45 '[-np.inf, 0.33), [0.33, 0.66), [0.66, n...
+      * y                           (y) int64 24B 0 1 2
+        observations_category_edge  <U45 180B '[-np.inf, 0.33), [0.33, 0.66), [0....
+        forecasts_category_edge     <U45 180B '[-np.inf, 0.33), [0.33, 0.66), [0....
 
     If you have probabilistic forecasts, i.e. without a ``member`` dimension but
     different ``category`` probabilities, you can also provide probability
@@ -703,10 +705,10 @@ def rps(
     ... ).mean("member")
     >>> assert (f_p.sum("category") == 1).all()
     >>> xs.rps(o_p, f_p, category_edges=None, dim="x", input_distributions="p")
-    <xarray.DataArray (y: 3)>
+    <xarray.DataArray (y: 3)> Size: 24B
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
-      * y        (y) int64 0 1 2
+      * y        (y) int64 24B 0 1 2
 
     Providing cumulative distribution inputs yields identical results, where highest
     category equals 1 by default and can be ignored:
@@ -714,10 +716,10 @@ def rps(
     >>> o_c = o < category_edges
     >>> f_c = (f < category_edges).mean("member")
     >>> xs.rps(o_c, f_c, category_edges=None, dim="x", input_distributions="c")
-    <xarray.DataArray (y: 3)>
+    <xarray.DataArray (y: 3)> Size: 24B
     array([0.37037037, 0.81481481, 0.88888889])
     Coordinates:
-      * y        (y) int64 0 1 2
+      * y        (y) int64 24B 0 1 2
 
     References
     ----------
@@ -867,7 +869,7 @@ def rps(
 def rank_histogram(
     observations: XArray,
     forecasts: XArray,
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     member_dim: str = "member",
     random_for_tied: bool = True,
     keep_attrs: bool = True,
@@ -913,13 +915,13 @@ def rank_histogram(
     ...     coords=[("x", np.arange(3)), ("y", np.arange(3)), ("member", np.arange(3))],
     ... )
     >>> xs.rank_histogram(observations, forecasts, dim="x")
-    <xarray.DataArray 'histogram_rank' (y: 3, rank: 4)>
+    <xarray.DataArray 'histogram_rank' (y: 3, rank: 4)> Size: 96B
     array([[0, 0, 1, 2],
            [0, 1, 2, 0],
            [0, 0, 2, 1]])
     Coordinates:
-      * y        (y) int64 0 1 2
-      * rank     (rank) float64 1.0 2.0 3.0 4.0
+      * y        (y) int64 24B 0 1 2
+      * rank     (rank) float64 32B 1.0 2.0 3.0 4.0
 
     Notes
     -----
@@ -976,7 +978,7 @@ def rank_histogram(
 def discrimination(
     observations: XArray,
     forecasts: XArray,
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     probability_bin_edges: xr.DataArray | np.ndarray = np.linspace(0, 1, 6),
 ) -> XArray:
     """Returns the data required to construct the discrimination diagram for an event;
@@ -1023,12 +1025,12 @@ def discrimination(
     >>> forecast_event_likelihood = (forecasts > 0).mean("member")
     >>> observed_event = observations > 0
     >>> xs.discrimination(observed_event, forecast_event_likelihood, dim=["x", "y"])
-    <xarray.DataArray (event: 2, forecast_probability: 5)>
+    <xarray.DataArray (event: 2, forecast_probability: 5)> Size: 80B
     array([[0.00437637, 0.15536105, 0.66739606, 0.12472648, 0.04814004],
            [0.00451467, 0.16704289, 0.66365688, 0.1241535 , 0.04063205]])
     Coordinates:
-      * forecast_probability  (forecast_probability) float64 0.1 0.3 0.5 0.7 0.9
-      * event                 (event) bool True False
+      * forecast_probability  (forecast_probability) float64 40B 0.1 0.3 0.5 0.7 0.9
+      * event                 (event) bool 2B True False
 
     References
     ----------
@@ -1061,7 +1063,7 @@ def discrimination(
 def reliability(
     observations: XArray,
     forecasts: XArray,
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     probability_bin_edges: xr.DataArray | np.ndarray = np.linspace(0, 1, 6),
     keep_attrs: bool = False,
 ) -> XArray:
@@ -1106,14 +1108,14 @@ def reliability(
     ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
     ... )
     >>> xs.reliability(observations > 0.1, (forecasts > 0.1).mean("member"), dim="x")
-    <xarray.DataArray (y: 3, forecast_probability: 5)>
+    <xarray.DataArray (y: 3, forecast_probability: 5)> Size: 120B
     array([[nan, 0. , nan, 1. , nan],
            [1. , 0.5, nan, nan, nan],
            [nan, 0. , nan, 0. , nan]])
     Coordinates:
-      * y                     (y) int64 0 1 2
-      * forecast_probability  (forecast_probability) float64 0.1 0.3 0.5 0.7 0.9
-        samples               (y, forecast_probability) float64 0.0 2.0 ... 1.0 0.0
+      * y                     (y) int64 24B 0 1 2
+      * forecast_probability  (forecast_probability) float64 40B 0.1 0.3 0.5 0.7 0.9
+        samples               (y, forecast_probability) float64 120B 0.0 2.0 ... 0.0
 
     Notes
     -----
@@ -1196,7 +1198,7 @@ def _auc(fpr, tpr, dim="probability_bin"):
                     np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
                 )
     area = abs(area)
-    if ((area > 1)).any():
+    if (area > 1).any():
         area = area.clip(0, 1)  # allow only values between 0 and 1
     return area
 
@@ -1205,7 +1207,7 @@ def roc(
     observations: XArray,
     forecasts: XArray,
     bin_edges: str | np.ndarray | xr.DataArray = "continuous",
-    dim: Dim = None,
+    dim: Optional[Dim] = None,
     drop_intermediate: bool = False,
     return_results: Literal["area", "all_as_tuple", "all_as_metric_dim"] = "area",
 ) -> XArray:
@@ -1220,10 +1222,14 @@ def roc(
         Labeled array(s) over which to apply the function.
         If ``bin_edges=='continuous'``, forecasts are probabilities.
     bin_edges : array_like, str, default='continuous'
-        Bin edges for categorising observations and forecasts. Similar to np.histogram, \
-        all but the last (righthand-most) bin include the left edge and exclude the \
-        right edge. The last bin includes both edges. ``bin_edges`` will be sorted in \
-        ascending order. If ``bin_edges=='continuous'``, calculate ``bin_edges`` from \
+        Bin edges for categorising observations and forecasts.
+        Similar to np.histogram,
+        all but the last (righthand-most) bin include the left edge
+        and exclude the
+        right edge. The last bin includes both edges. ``bin_edges``
+        will be sorted in
+        ascending order. If ``bin_edges=='continuous'``, calculate
+        ``bin_edges`` from
         forecasts, equal to ``sklearn.metrics.roc_curve(f_boolean, o_prob)``.
     dim : str, list
         The dimension(s) over which to compute the contingency table
@@ -1258,7 +1264,7 @@ def roc(
     >>> o = f.copy()
     >>> category_edges = np.linspace(-2, 2, 5)
     >>> xs.roc(o, f, category_edges, dim=["time"])
-    <xarray.DataArray 'histogram_observations_forecasts' ()>
+    <xarray.DataArray 'histogram_observations_forecasts' ()> Size: 8B
     array(1.)
 
     See also
@@ -1288,7 +1294,10 @@ def roc(
             if str(o_check.dtype) != "bool":
                 if not ((o_check == 0) | (o_check == 1)).all():
                     raise ValueError(
-                        'Input "observations" must represent logical (True/False) outcomes',
+                        (
+                            'Input "observations" must represent '
+                            "logical (True/False) outcomes"
+                        ),
                         o_check,
                     )
 
