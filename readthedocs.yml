@@ -9,7 +9,7 @@ build:
       - (git --no-pager log --pretty="tformat:%s" -1 | grep -vqF "[skip-rtd]") || exit 183
       - git fetch --unshallow || true
     pre_install:
-      - git update-index --assume-unchanged doc/conf.py ci/doc.yml
+      - git update-index --assume-unchanged docs/source/conf.py ci/doc.yml
 
 conda:
   environment: ci/doc.yml
