@@ -15,7 +15,7 @@ ci:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: check-added-large-files
       - id: check-docstring-first
@@ -33,8 +33,8 @@ repos:
         exclude: ".ipynb|asv.conf.json"
       - id: trailing-whitespace
 
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.1.14"
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.3.5"
     hooks:
       - id: ruff
         args: ["--select", "E,F,I001"]
@@ -43,13 +43,13 @@ repos:
         types_or: [python, pyi, jupyter]
 
   - repo: https://github.com/keewis/blackdoc
-    rev: v0.3.8
+    rev: v0.3.9
     hooks:
       - id: blackdoc
         additional_dependencies: ["black==23.10.1"]
 
   - repo: https://github.com/PyCQA/doc8
-    rev: v1.0.0
+    rev: v1.1.1
     hooks:
       - id: doc8
         args:
@@ -62,7 +62,7 @@ repos:
           ]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.8.0"
+    rev: "v1.9.0"
     hooks:
       - id: mypy
         exclude: "asv_bench"
@@ -78,7 +78,7 @@ repos:
           ]
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.27.0
+    rev: 0.28.1
     hooks:
       - id: check-github-workflows
       - id: check-readthedocs
