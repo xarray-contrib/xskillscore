@@ -1,6 +1,6 @@
 import pytest
 import xarray as xr
-from xarray.tests import assert_allclose
+from xarray.testing import assert_allclose
 
 from xskillscore.core.deterministic import (
     effective_sample_size,
