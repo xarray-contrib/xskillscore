@@ -1,6 +1,6 @@
-import numpy as np
+import warnings
 
-from .utils import suppress_warnings
+import numpy as np
 
 __all__ = ["_reliability"]
 
@@ -35,12 +35,10 @@ def _reliability(o, f, bin_edges):
             r.append(N_o_f_in_bin / N_f_in_bin)
             N.append(N_f_in_bin)
         else:
-            with suppress_warnings("invalid value encountered in true_divide"):
-                with suppress_warnings("invalid value encountered in long_scalars"):
-                    with suppress_warnings("invalid value encountered in scalar divide"):
-                        with suppress_warnings("invalid value encountered in divide"):
-                            r[..., i] = N_o_f_in_bin / N_f_in_bin
-                            N[..., i] = N_f_in_bin
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", RuntimeWarning)
+                r[..., i] = N_o_f_in_bin / N_f_in_bin
+                N[..., i] = N_f_in_bin
 
     if is_dask_array:
         import dask.array as da
