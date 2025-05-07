@@ -15,3 +15,6 @@ build
 
 # Mac stuff
 .DS_Store
+
+# JetBrains
+.idea
