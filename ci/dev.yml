@@ -3,6 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python >= 3.9,<3.12
+  - pip >= 23.0
   # Documentation
   - matplotlib-base
   - nbsphinx
@@ -10,15 +11,14 @@ dependencies:
   - sphinx
   - sphinx_rtd_theme
   - sphinx-autosummary-accessors
-  - sphinxcontrib-napoleon
   # IDE
   - jupyterlab
   # Numerics
   - bottleneck
   - cftime
   - dask-core
-  - numba>=0.52
-  - numpy
+  - numba >=0.57
+  - numpy >=1.25
   - properscoring
   - scikit-learn
   - scipy
@@ -33,7 +33,8 @@ dependencies:
   - pre-commit
   - pytest
   - pytest-cov
-  - pytest-xdist
   - pytest-sugar
+  - pytest-timeout
+  - pytest-xdist
   - mypy
   - ruff

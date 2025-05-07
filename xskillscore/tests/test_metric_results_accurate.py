@@ -62,7 +62,7 @@ def test_xs_same_as_skl(a_1d, b_1d, xs_skl_metrics):
 
 def test_xs_same_as_skl_rmse(a_1d, b_1d):
     actual = rmse(a_1d, b_1d, "time")
-    expected = mean_squared_error(a_1d, b_1d, squared=False)
+    expected = np.sqrt(mean_squared_error(a_1d, b_1d))
     assert np.allclose(actual, expected)
 
 

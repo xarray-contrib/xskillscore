@@ -2,16 +2,18 @@ name: xskillscore-minimum-tests
 channels:
   - conda-forge
 dependencies:
+  - python >=3.9
+  - pip >=23.0
   - bottleneck
   - cftime
   - coveralls
   - dask-core
   - matplotlib-base
-  - numpy
-  - pip
+  - numpy >=1.25
   - properscoring
   - pytest
   - pytest-cov
+  - pytest-timeout
   - pytest-xdist
   - scikit-learn
   - scipy

@@ -70,9 +70,9 @@ def test_xs_same_as_skl_weighted(a_1d, b_1d, weights_linear_time_1d, xs_skl_metr
 
 def test_xs_same_as_skl_rmse_weighted(a_1d, b_1d, weights_linear_time_1d):
     actual = rmse(a_1d, b_1d, "time", weights_linear_time_1d)
-    expected = mean_squared_error(
-        a_1d, b_1d, squared=False, sample_weight=weights_linear_time_1d
-    )
+    expected = np.sqrt(mean_squared_error(
+        a_1d.values, b_1d.values, sample_weight=weights_linear_time_1d
+    ))
     assert np.allclose(actual, expected)
 
 

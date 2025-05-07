@@ -3,6 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python >=3.9
+  - pip >=23.0
   - bottleneck
   - cftime
   - dask-core
@@ -11,13 +12,12 @@ dependencies:
   - ipython
   - matplotlib-base
   - nbsphinx
-  - numpy
-  - pip
+  - numpy >=1.25
   - properscoring
   - scikit-learn
   - scipy
-  - sphinx!=4.4.0
-  - sphinx_rtd_theme
+  - sphinx !=4.4.0
+  - sphinx_rtd_theme >=1.0
   - sphinx-autosummary-accessors
   - sphinx-copybutton
   - statsmodels

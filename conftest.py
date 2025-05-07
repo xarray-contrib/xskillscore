@@ -21,7 +21,7 @@ def add_standard_imports(doctest_namespace):
 
 @pytest.fixture
 def times():
-    return xr.cftime_range(start="2000", periods=PERIODS, freq="D")
+    return xr.date_range(start="2000", periods=PERIODS, freq="D", use_cftime=True)
 
 
 @pytest.fixture
@@ -165,7 +165,7 @@ def b_1d(b):
 
 @pytest.fixture
 def a_1d_fixed_nan():
-    time = xr.cftime_range("2000-01-01", "2000-01-03", freq="D")
+    time = xr.date_range("2000-01-01", "2000-01-03", freq="D", use_cftime=True)
     return xr.DataArray([3, np.nan, 5], dims=["time"], coords=[time])
 
 
@@ -211,7 +211,7 @@ def weights_lonlat(a):
 
 @pytest.fixture
 def weights_time():
-    time = xr.cftime_range("2000-01-01", "2000-01-03", freq="D")
+    time = xr.date_range("2000-01-01", "2000-01-03", freq="D", use_cftime=True)
     return xr.DataArray([1, 2, 3], dims=["time"], coords=[time])
 
 
@@ -232,7 +232,7 @@ def category_edges():
 @pytest.fixture
 def forecast_3d_int():
     """Random integer 3D forecast used for testing Contingency."""
-    times = xr.cftime_range(start="2000", freq="D", periods=10)
+    times = xr.date_range(start="2000", freq="D", periods=10, use_cftime=True)
     lats = np.arange(4)
     lons = np.arange(5)
     data = np.random.randint(0, 10, size=(len(times), len(lats), len(lons)))

@@ -21,7 +21,6 @@ python -m pip install \
     scipy \
     matplotlib \
     pandas
-python -m pip install pytest-timeout
 python -m pip install \
     --no-deps \
     --upgrade \

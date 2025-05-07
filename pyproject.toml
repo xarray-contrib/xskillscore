@@ -7,7 +7,7 @@ name = "xskillscore"
 version = "0.0.26"
 dependencies = [
   "dask[array]",
-  "numpy",
+  "numpy >=1.25",
   "properscoring",
   "scipy",
   "statsmodels",
@@ -26,6 +26,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Atmospheric Science",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
@@ -39,28 +40,21 @@ test = [
     "bottleneck",
     "cftime",
     "matplotlib",
-    "numba>=0.52",
+    "numba >=0.57",
     "pre-commit",
     "pytest",
     "pytest-cov",
+    "pytest-timeout",
     "pytest-xdist",
     "scikit-learn",
 ]
 complete = [
-    "bottleneck",
-    "cftime",
+    "xskillscore[test]",
     "doc8",
-    "matplotlib",
     "nbsphinx",
     "nbstripout",
-    "numba>=0.52",
-    "pre-commit",
-    "pytest",
-    "pytest-cov",
-    "pytest-xdist",
     "pytest-sugar",
-    "scikit-learn",
-    "sphinx",
+    "sphinx !=4.4.0",
     "sphinx-autosummary-accessors",
     "sphinx-copybutton",
     "sphinx-rtd-theme>=1.0",
@@ -86,6 +80,8 @@ testpaths = ["xskillscore/tests"]
 addopts = "--color=yes --verbose"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "flaky: marks tests as flaky (deselect with '-m \"not flaky\"')",
+    "network: marks tests that require network access (deselect with '-m \"not network\"')",
 ]
 
 [tool.doc8]

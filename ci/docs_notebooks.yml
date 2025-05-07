@@ -3,12 +3,14 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
+  - python >=3.9
+  - pip >=23.0
   - bottleneck
   - cftime
   - dask-core
   - doc8
-  - numba>=0.52
-  - numpy
+  - numba >=0.57
+  - numpy >=1.25
   - properscoring
   - ipykernel
   - jupyterlab
@@ -16,14 +18,12 @@ dependencies:
   - matplotlib-base
   - nbsphinx
   - nbstripout
-  - pip
   - pre-commit
   - scikit-learn
   - scipy
   - sphinx
   - sphinx-autosummary-accessors
   - sphinx_rtd_theme
-  - sphinxcontrib-napoleon
   - statsmodels
   - xarray>=0.16.1
   - xhistogram>=0.3.0

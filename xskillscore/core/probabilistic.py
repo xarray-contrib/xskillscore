@@ -1195,7 +1195,7 @@ def _auc(fpr, tpr, dim="probability_bin"):
         with suppress_warnings("invalid value encountered in long_scalars"):
             with suppress_warnings("invalid value encountered in true_divide"):
                 area = xr.apply_ufunc(
-                    np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
+                    np.trapezoid, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
                 )
     area = abs(area)
     if (area > 1).any():

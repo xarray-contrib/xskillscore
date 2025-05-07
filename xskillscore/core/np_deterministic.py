@@ -96,8 +96,9 @@ def __compute_anomalies(a, b, weights, axis, skipna):
     # the denominator gets inflated when there are masked regions.
     if weights is not None:
         with suppress_warnings("invalid value encountered in true_divide"):
-            ma = sumfunc(a * weights, axis=axis) / sumfunc(weights, axis=axis)
-            mb = sumfunc(b * weights, axis=axis) / sumfunc(weights, axis=axis)
+            with suppress_warnings("invalid value encountered in divide"):
+                ma = sumfunc(a * weights, axis=axis) / sumfunc(weights, axis=axis)
+                mb = sumfunc(b * weights, axis=axis) / sumfunc(weights, axis=axis)
     else:
         with suppress_warnings("Mean of empty slice"):
             ma = meanfunc(a, axis=axis)
@@ -144,7 +145,7 @@ def _effective_sample_size(a, b, axis, skipna):
     b = np.rollaxis(b, axis)
 
     # count total number of samples that are non-nan.
-    n = np.count_nonzero(~np.isnan(a), axis=0)
+    n = np.count_nonzero(~np.isnan(np.atleast_1d(a)), axis=0)
 
     # compute lag-1 autocorrelation.
     am, bm = __compute_anomalies(a, b, weights=None, axis=0, skipna=skipna)
@@ -153,7 +154,8 @@ def _effective_sample_size(a, b, axis, skipna):
 
     # compute effective sample size per Bretherton et al. 1999
     with suppress_warnings("divide by zero encountered in true_divide"):
-        n_eff = n * (1 - a_auto * b_auto) / (1 + a_auto * b_auto)
+        with suppress_warnings("divide by zero encountered in divide"):
+           n_eff = n * (1 - a_auto * b_auto) / (1 + a_auto * b_auto)
     n_eff = np.floor(n_eff)
     n_eff = np.clip(n_eff, 0, n)
     return n_eff
@@ -203,8 +205,10 @@ def _linslope(a, b, weights, axis, skipna):
         s_den = sumfunc(am * am, axis=0)
 
     with suppress_warnings("invalid value encountered in true_divide"):
-        with suppress_warnings("invalid value encountered in double_scalars"):
-            res = s_num / s_den
+        with suppress_warnings("invalid value encountered in divide"):
+            with suppress_warnings("invalid value encountered in double_scalars"):
+                with suppress_warnings("invalid value encountered in scalar divide"):
+                    res = s_num / s_den
     return res
 
 
@@ -257,10 +261,14 @@ def _r2(a, b, weights, axis, skipna):
     num = sumfunc(squared_error, axis=0)
     den = sumfunc(am_squared, axis=0)
     with suppress_warnings("invalid value encountered in true_divide"):
-        with suppress_warnings("divide by zero encountered in true_divide"):
-            with suppress_warnings("divide by zero encountered in double_scalars"):
-                with suppress_warnings("invalid value encountered in double_scalars"):
-                    r2 = 1 - (num / den)
+        with suppress_warnings("invalid value encountered in divide"):
+            with suppress_warnings("divide by zero encountered in true_divide"):
+                with suppress_warnings("divide by zero encountered in divide"):
+                    with suppress_warnings("divide by zero encountered in scalar divide"):
+                        with suppress_warnings("divide by zero encountered in double_scalars"):
+                            with suppress_warnings("invalid value encountered in double_scalars"):
+                                with suppress_warnings("invalid value encountered in scalar divide"):
+                                    r2 = 1 - (num / den)
     return r2
 
 
@@ -310,8 +318,10 @@ def _pearson_r(a, b, weights, axis, skipna):
         r_den = np.sqrt(sumfunc(am * am, axis=0) * sumfunc(bm * bm, axis=0))
 
     with suppress_warnings("invalid value encountered in true_divide"):
-        with suppress_warnings("invalid value encountered in double_scalars"):
-            r = r_num / r_den
+        with suppress_warnings("invalid value encountered in divide"):
+            with suppress_warnings("invalid value encountered in double_scalars"):
+                with suppress_warnings("invalid value encountered in scalar divide"):
+                    r = r_num / r_den
     res = np.clip(r, -1.0, 1.0)
     return res
 
@@ -351,10 +361,11 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         a = np.rollaxis(a, axis)
         b = np.rollaxis(b, axis)
         # count non-nans
-        dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
+        dof = np.count_nonzero(~np.isnan(np.atleast_1d(a)), axis=0) - 2
         with suppress_warnings("invalid value encountered in true_divide"):
-            t_squared = r**2 * (dof / ((1.0 - r) * (1.0 + r)))
-            _x = dof / (dof + t_squared)
+            with suppress_warnings("invalid value encountered in divide"):
+                t_squared = r**2 * (dof / ((1.0 - r) * (1.0 + r)))
+                _x = dof / (dof + t_squared)
         _x = np.asarray(_x)
         _x = np.where(_x < 1.0, _x, 1.0)
         _a = 0.5 * dof
@@ -365,7 +376,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         # on 0d arrays is deprecated, as it behaves surprisingly. Use
         # `atleast_1d(cond).nonzero()` if the old behavior was intended. If the context
         # of this warning is of the form `arr[nonzero(cond)]`, just use `arr[cond]`.
-        nan_locs = np.where(np.isnan(r))
+        nan_locs = np.where(np.isnan(np.atleast_1d(r)))
         if len(nan_locs[0]) > 0:
             res[nan_locs] = np.nan
         return res
@@ -492,10 +503,12 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     # count non-nans
-    dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
+    dof = np.count_nonzero(~np.isnan(np.atleast_1d(a)), axis=0) - 2
     with suppress_warnings("invalid value encountered in true_divide"):
-        with suppress_warnings("divide by zero encountered in true_divide"):
-            t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
+        with suppress_warnings("invalid value encountered in divide"):
+            with suppress_warnings("divide by zero encountered in true_divide"):
+                with suppress_warnings("divide by zero encountered in divide"):
+                   t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
     p = 2 * distributions.t.sf(np.abs(t), dof)
     return p
 
@@ -576,9 +589,10 @@ def _me(a, b, weights, axis, skipna):
     error = a - b
     if weights is not None:
         with suppress_warnings("invalid value encountered in true_divide"):
-            mean_error = sumfunc(error * weights, axis=axis) / sumfunc(
-                weights, axis=axis
-            )
+            with suppress_warnings("invalid value encountered in divide"):
+                mean_error = sumfunc(error * weights, axis=axis) / sumfunc(
+                    weights, axis=axis
+                )
     else:
         with suppress_warnings("Mean of empty slice"):
             mean_error = meanfunc(error, axis=axis)
@@ -618,9 +632,10 @@ def _rmse(a, b, weights, axis, skipna):
     squared_error = (a - b) ** 2
     if weights is not None:
         with suppress_warnings("invalid value encountered in true_divide"):
-            mean_squared_error = sumfunc(squared_error * weights, axis=axis) / sumfunc(
-                weights, axis=axis
-            )
+            with suppress_warnings("invalid value encountered in divide"):
+                mean_squared_error = sumfunc(squared_error * weights, axis=axis) / sumfunc(
+                    weights, axis=axis
+                )
     else:
         with suppress_warnings("Mean of empty slice"):
             mean_squared_error = meanfunc(squared_error, axis=axis)
@@ -661,9 +676,10 @@ def _mse(a, b, weights, axis, skipna):
     squared_error = (a - b) ** 2
     if weights is not None:
         with suppress_warnings("invalid value encountered in true_divide"):
-            return sumfunc(squared_error * weights, axis=axis) / sumfunc(
-                weights, axis=axis
-            )
+            with suppress_warnings("invalid value encountered in divide"):
+                return sumfunc(squared_error * weights, axis=axis) / sumfunc(
+                    weights, axis=axis
+                )
     else:
         with suppress_warnings("Mean of empty slice"):
             return meanfunc(squared_error, axis=axis)
@@ -702,9 +718,10 @@ def _mae(a, b, weights, axis, skipna):
     absolute_error = np.absolute(a - b)
     if weights is not None:
         with suppress_warnings("invalid value encountered in true_divide"):
-            return sumfunc(absolute_error * weights, axis=axis) / sumfunc(
-                weights, axis=axis
-            )
+            with suppress_warnings("invalid value encountered in divide"):
+                return sumfunc(absolute_error * weights, axis=axis) / sumfunc(
+                    weights, axis=axis
+                )
     else:
         with suppress_warnings("Mean of empty slice"):
             return meanfunc(absolute_error, axis=axis)
@@ -742,12 +759,12 @@ def _median_absolute_error(a, b, axis, skipna):
 
 
 def _mape(a, b, weights, axis, skipna):
-    """Mean Absolute Percentage Error.
+    r"""Mean Absolute Percentage Error.
 
     .. math::
-        \\mathrm{MAPE} = \\frac{1}{n} \\sum_{i=1}^{n}
-                         \\frac{\\vert a_{i} - b_{i} \\vert}
-                               {max(\epsilon, \\vert a_{i} \\vert)}
+        \mathrm{MAPE} = \frac{1}{n} \sum_{i=1}^{n}
+                         \frac{\vert a_{i} - b_{i} \vert}
+                               {max(\epsilon, \vert a_{i} \vert)}
 
     Parameters
     ----------
@@ -771,8 +788,7 @@ def _mape(a, b, weights, axis, skipna):
     -----
     The percent error is calculated in reference to ``a``.
 
-    Percent error is reported as decimal percent. I.e., a value of
-    1 is 100%.
+    Percent error is reported as decimal percent. i.e., a value of 1 is 100%.
 
     \epsilon is an arbitrary small yet strictly positive number to avoid
     undefined results when ``a`` is zero.
@@ -793,7 +809,8 @@ def _mape(a, b, weights, axis, skipna):
     mape = np.absolute(a - b) / np.maximum(np.absolute(a), epsilon)
     if weights is not None:
         with suppress_warnings("invalid value encountered in true_divide"):
-            return sumfunc(mape * weights, axis=axis) / sumfunc(weights, axis=axis)
+            with suppress_warnings("invalid value encountered in divide"):
+                return sumfunc(mape * weights, axis=axis) / sumfunc(weights, axis=axis)
     else:
         with suppress_warnings("Mean of empty slice"):
             return meanfunc(mape, axis=axis)
@@ -841,7 +858,8 @@ def _smape(a, b, weights, axis, skipna):
     smape = np.absolute(a - b) / (np.absolute(a) + np.absolute(b))
     if weights is not None:
         with suppress_warnings("invalid value encountered in true_divide"):
-            return sumfunc(smape * weights, axis=axis) / sumfunc(weights, axis=axis)
+            with suppress_warnings("invalid value encountered in divide"):
+                return sumfunc(smape * weights, axis=axis) / sumfunc(weights, axis=axis)
     else:
         with suppress_warnings("Mean of empty slice"):
             return meanfunc(smape, axis=axis)
