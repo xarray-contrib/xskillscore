@@ -33,8 +33,8 @@ print("xskillscore: %s, %s" % (xskillscore.__version__, xskillscore.__file__))
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
-    "sphinx.ext.intersphinx",
     "sphinx.ext.extlinks",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "IPython.sphinxext.ipython_directive",

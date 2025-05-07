@@ -27,6 +27,3 @@ dependencies:
   - statsmodels
   - xarray>=0.16.1
   - xhistogram>=0.3.0
-  - pip:
-      # Install latest version of xskillscore.
-      - -e ..

@@ -1,9 +1,9 @@
 version: 2
 
 build:
-  os: "ubuntu-22.04"
+  os: "ubuntu-24.04"
   tools:
-    python: "mambaforge-22.9"
+    python: "mambaforge-23.11"
   jobs:
     post_checkout:
       - (git --no-pager log --pretty="tformat:%s" -1 | grep -vqF "[skip-rtd]") || exit 183
@@ -18,3 +18,8 @@ sphinx:
   fail_on_warning: false
 
 formats: []
+
+python:
+  install:
+    - method: pip
+      path: .

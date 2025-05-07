@@ -20,5 +20,3 @@ dependencies:
   - statsmodels
   - xarray>=0.16.1
   - xhistogram>=0.3.0
-  - pip:
-      - -e ..
