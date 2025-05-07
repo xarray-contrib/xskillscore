@@ -15,7 +15,7 @@ conda:
   environment: ci/doc.yml
 
 sphinx:
-  configuration: .readthedocs.yml
+  configuration: docs/source/conf.py
   fail_on_warning: false
 
 formats: []
