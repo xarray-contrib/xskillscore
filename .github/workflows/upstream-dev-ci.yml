@@ -24,8 +24,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          persist-credentials: false
           fetch-depth: 2
-      - uses: xarray-contrib/ci-trigger@v1.1
+      - uses: xarray-contrib/ci-trigger@v1.1.1
         id: detect-trigger
         with:
           keyword: "[test-upstream]"
@@ -57,9 +58,10 @@ jobs:
       - name: setup conda (micromamba)
         uses: mamba-org/setup-micromamba@v1
         with:
+          cache-downloads: true
+          cache-environment: true
           environment-file: ci/dev.yml
           environment-name: xskillscore-dev
-          cache-environment: true
           create-args: >-
             python=${{ matrix.python-version }}
             pytest-reportlog
@@ -110,8 +112,10 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
       - uses: actions/download-artifact@v2
@@ -127,7 +131,7 @@ jobs:
           wget https://raw.githubusercontent.com/pydata/xarray/master/.github/workflows/parse_logs.py
           python parse_logs.py logs/**/*-log
       - name: Report failures
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
