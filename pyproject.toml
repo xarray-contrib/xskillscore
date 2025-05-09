@@ -6,13 +6,13 @@ build-backend = "setuptools.build_meta"
 name = "xskillscore"
 version = "0.0.26"
 dependencies = [
-  "dask[array]",
-  "numpy >=1.25",
+  "dask[array] >=2023.4.0",
+  "numpy >=1.24",
   "properscoring",
-  "scipy",
+  "scipy >=1.10",
   "statsmodels",
-  "xarray>=0.16.1",
-  "xhistogram>=0.3.0",
+  "xarray>=2023.4.0",
+  "xhistogram>=0.3.2",
 ]
 authors = [{name = "Ray Bell", email = "rayjohnbell0@gmail.com"}]
 description = "Metrics for verifying forecasts"
@@ -27,6 +27,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Atmospheric Science",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
@@ -57,11 +58,10 @@ complete = [
     "nbstripout",
     "properscoring",
     "pytest-sugar",
-    "sphinx !=4.4.0",
+    "sphinx >=6.0.0",
     "sphinx-autosummary-accessors",
     "sphinx-copybutton",
     "sphinx-rtd-theme>=1.0",
-    "sphinxcontrib-napoleon",
 ]
 
 [project.urls]

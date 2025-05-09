@@ -2,24 +2,24 @@ name: xskillscore-docs
 channels:
   - conda-forge
 dependencies:
-  - python >=3.9
+  - python >=3.9,<3.14
   - pip >=23.0
   - bottleneck
   - cftime
-  - dask-core
+  - dask-core >=2023.4.0
   - doc8
   - ipykernel
   - ipython
   - matplotlib-base
   - nbsphinx
-  - numpy >=1.25
+  - numpy >=1.24
   - properscoring
   - scikit-learn
-  - scipy
-  - sphinx !=4.4.0
+  - scipy >=1.10
+  - sphinx >=6.0.0
   - sphinx_rtd_theme >=1.0
   - sphinx-autosummary-accessors
   - sphinx-copybutton
   - statsmodels
-  - xarray>=0.16.1
-  - xhistogram>=0.3.0
+  - xarray >=2023.4.0
+  - xhistogram>=0.3.2
