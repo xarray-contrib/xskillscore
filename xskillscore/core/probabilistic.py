@@ -46,7 +46,7 @@ FORECAST_PROBABILITY_DIM = "forecast_probability"
 
 def probabilistic_broadcast(
     observations: XArray, forecasts: XArray, member_dim: str = "member"
-) -> XArray:
+) -> Tuple[XArray, ...]:
     """Broadcast dimension except for member_dim in forecasts."""
     observations = observations.broadcast_like(
         forecasts.isel({member_dim: 0}, drop=True)
@@ -113,9 +113,9 @@ def crps_gaussian(
     """
     xmu = xr.DataArray(mu) if isinstance(mu, (int, float)) else mu
     xsig = xr.DataArray(sig) if isinstance(sig, (int, float)) else sig
-    if xmu.dims != observations.dims:
+    if xmu.sizes != observations.sizes:
         observations, xmu = xr.broadcast(observations, xmu)
-    if xsig.dims != observations.dims:
+    if xsig.sizes != observations.sizes:
         observations, xsig = xr.broadcast(observations, xsig)
     res = xr.apply_ufunc(
         properscoring.crps_gaussian,
