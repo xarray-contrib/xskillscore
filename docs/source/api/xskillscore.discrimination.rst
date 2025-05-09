@@ -1,4 +1,4 @@
-xskillscore.discrimination
+﻿xskillscore.discrimination
 ==========================
 
 .. currentmodule:: xskillscore

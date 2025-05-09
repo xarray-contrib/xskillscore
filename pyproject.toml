@@ -51,8 +51,11 @@ test = [
 complete = [
     "xskillscore[test]",
     "doc8",
+    "ipykernel",
+    "ipython",
     "nbsphinx",
     "nbstripout",
+    "properscoring",
     "pytest-sugar",
     "sphinx !=4.4.0",
     "sphinx-autosummary-accessors",

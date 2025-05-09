@@ -1210,12 +1210,12 @@ def mape(
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
-    """Mean Absolute Percentage Error.
+    r"""Mean Absolute Percentage Error.
 
     .. math::
-        \\mathrm{MAPE} = \\frac{1}{n} \\sum_{i=1}^{n}
-                         \\frac{\\vert a_{i} - b_{i} \\vert}
-                               {max(\epsilon, \\vert a_{i} \\vert)}
+        \mathrm{MAPE} = \frac{1}{n} \sum_{i=1}^{n}
+                         \frac{\vert a_{i} - b_{i} \vert}
+                               {max(\epsilon, \vert a_{i} \vert)}
 
     .. note::
         The percent error is calculated in reference to ``a``. Percent

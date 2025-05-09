@@ -1,4 +1,4 @@
-xskillscore.halfwidth\_ci\_test
+﻿xskillscore.halfwidth\_ci\_test
 ===============================
 
 .. currentmodule:: xskillscore
