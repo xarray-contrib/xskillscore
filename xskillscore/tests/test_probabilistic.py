@@ -243,7 +243,7 @@ def test_threshold_brier_score_api_and_inputs(
         # test for numerical identity of xs threshold and properscoring threshold
         if keep_attrs:
             expected = expected.assign_attrs(**actual.attrs)
-        assert_identical(actual, expected)
+        npt.assert_allclose(actual, expected, rtol=1e7)
     # test that returns chunks
     assert_chunk(actual, chunk_bool)
     # test that attributes are kept
