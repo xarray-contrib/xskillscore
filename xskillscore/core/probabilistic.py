@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Callable, List, Literal, Optional, Tuple
 
 import numpy as np
@@ -20,7 +21,6 @@ from .utils import (
     _preprocess_dims,
     _stack_input_if_needed,
     histogram,
-    suppress_warnings,
 )
 
 try:
@@ -46,7 +46,7 @@ FORECAST_PROBABILITY_DIM = "forecast_probability"
 
 def probabilistic_broadcast(
     observations: XArray, forecasts: XArray, member_dim: str = "member"
-) -> XArray:
+) -> Tuple[XArray, ...]:
     """Broadcast dimension except for member_dim in forecasts."""
     observations = observations.broadcast_like(
         forecasts.isel({member_dim: 0}, drop=True)
@@ -113,9 +113,9 @@ def crps_gaussian(
     """
     xmu = xr.DataArray(mu) if isinstance(mu, (int, float)) else mu
     xsig = xr.DataArray(sig) if isinstance(sig, (int, float)) else sig
-    if xmu.dims != observations.dims:
+    if xmu.sizes != observations.sizes:
         observations, xmu = xr.broadcast(observations, xmu)
-    if xsig.dims != observations.dims:
+    if xsig.sizes != observations.sizes:
         observations, xsig = xr.broadcast(observations, xsig)
     res = xr.apply_ufunc(
         properscoring.crps_gaussian,
@@ -524,9 +524,9 @@ def _assign_rps_category_bounds(
             }
         )
         res[f"{name}_category_edge"] = (
-            f"[-np.inf, {edges[bin_dim].isel({bin_dim:0}).values}), "
+            f"[-np.inf, {edges[bin_dim].isel({bin_dim: 0}).values}), "
             f"{str(res[f'{name}_category_edge'].values)[:-1]}), "
-            f"[{edges[bin_dim].isel({bin_dim:-1}).values}, np.inf]"
+            f"[{edges[bin_dim].isel({bin_dim: -1}).values}, np.inf]"
         )
     return res
 
@@ -1178,11 +1178,11 @@ def _drop_intermediate(fpr, tpr):
     optimal_idxs["probability_bin"] = np.arange(optimal_idxs.probability_bin.size)
     if isinstance(optimal_idxs, xr.Dataset):
         optimal_idxs = optimal_idxs.to_array()
-    with suppress_warnings("invalid value encountered in true_divide"):
-        with suppress_warnings("invalid value encountered in long_scalars"):
-            optimal_idxs = optimal_idxs.where(
-                optimal_idxs, drop=True
-            ).probability_bin.values
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        optimal_idxs = optimal_idxs.where(
+            optimal_idxs, drop=True
+        ).probability_bin.values
     tpr = tpr.isel(probability_bin=optimal_idxs)
     fpr = fpr.isel(probability_bin=optimal_idxs)
     return fpr, tpr
@@ -1191,12 +1191,15 @@ def _drop_intermediate(fpr, tpr):
 def _auc(fpr, tpr, dim="probability_bin"):
     """Get area under the curve with trapez method."""
     # reverse tpr, fpr to fpr, tpr, see numpy.trapz(y, x=None)
-    with suppress_warnings("The `numpy.trapz` function is not implemented"):
-        with suppress_warnings("invalid value encountered in long_scalars"):
-            with suppress_warnings("invalid value encountered in true_divide"):
-                area = xr.apply_ufunc(
-                    np.trapz, tpr, fpr, input_core_dims=[[dim], [dim]], dask="allowed"
-                )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        area = xr.apply_ufunc(
+            np.trapezoid,
+            tpr,
+            fpr,
+            input_core_dims=[[dim], [dim]],
+            dask="allowed",
+        )
     area = abs(area)
     if (area > 1).any():
         area = area.clip(0, 1)  # allow only values between 0 and 1
@@ -1274,7 +1277,7 @@ def roc(
 
     References
     ----------
-    http://www.cawcr.gov.au/projects/verification/
+    https://www.cawcr.gov.au/projects/verification/
     """
 
     if dim is None:

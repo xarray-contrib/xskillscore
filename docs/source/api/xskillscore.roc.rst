@@ -1,4 +1,4 @@
-xskillscore.roc
+﻿xskillscore.roc
 ===============
 
 .. currentmodule:: xskillscore

@@ -333,7 +333,7 @@ def test_dim_None(a, b, metrics):
     else:
         metric, _metric = metrics
         res = metric(a, b, dim=None)
-        assert len(res.dims) == 0, print(res.dims)
+        assert len(res.sizes) == 0, print(res.sizes)
 
 
 @pytest.mark.parametrize(
@@ -352,7 +352,7 @@ def test_dim_empty_list(a, b, metrics):
     elif metrics in distance_metrics:
         metric, _metric = metrics
         res = metric(a, b, dim=[])
-        assert len(res.dims) == len(a.dims), print(res.dims)
+        assert len(res.sizes) == len(a.sizes), print(res.sizes)
 
 
 @pytest.mark.parametrize(

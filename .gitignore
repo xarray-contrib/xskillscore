@@ -8,6 +8,7 @@ build
 .ipynb_checkpoints/
 .eggs/
 
+# Visual Studio Code
 .vscode
 
 # asv environments
@@ -15,3 +16,9 @@ build
 
 # Mac stuff
 .DS_Store
+
+# JetBrains
+.idea
+
+# Documentation
+docs/build/

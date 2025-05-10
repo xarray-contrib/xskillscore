@@ -53,13 +53,13 @@ __all__ = [
 
 def _determine_input_core_dims(
     dim: str | List[str], weights: XArray | None
-) -> List[object]:
+) -> List[List[str]]:
     """
     Determine input_core_dims based on type of dim and weights.
 
     Parameters
     ----------
-    dim : str, list
+    dim : str or list of str
         The dimension(s) to apply the metric along.
     weights : xarray.Dataset or xarray.DataArray or None
         Weights matching dimensions of ``dim`` to apply during the function.
@@ -1210,12 +1210,12 @@ def mape(
     skipna: bool = False,
     keep_attrs: bool = False,
 ) -> XArray:
-    """Mean Absolute Percentage Error.
+    r"""Mean Absolute Percentage Error.
 
     .. math::
-        \\mathrm{MAPE} = \\frac{1}{n} \\sum_{i=1}^{n}
-                         \\frac{\\vert a_{i} - b_{i} \\vert}
-                               {max(\epsilon, \\vert a_{i} \\vert)}
+        \mathrm{MAPE} = \frac{1}{n} \sum_{i=1}^{n}
+                         \frac{\vert a_{i} - b_{i} \vert}
+                               {max(\epsilon, \vert a_{i} \vert)}
 
     .. note::
         The percent error is calculated in reference to ``a``. Percent

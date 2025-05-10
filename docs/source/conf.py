@@ -33,8 +33,8 @@ print("xskillscore: %s, %s" % (xskillscore.__version__, xskillscore.__file__))
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
-    "sphinx.ext.intersphinx",
     "sphinx.ext.extlinks",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "IPython.sphinxext.ipython_directive",
@@ -65,7 +65,7 @@ numpydoc_show_class_members = False
 templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
 
 # The suffix of source filenames.
-source_suffix = ".rst"
+source_suffix = {".rst": "restructuredtext"}
 
 # The master toctree document.
 master_doc = "index"

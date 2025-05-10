@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import contextlib
-import warnings
 from typing import List, Tuple
 
 import numpy as np
@@ -11,16 +9,6 @@ from xhistogram.xarray import histogram as xhist
 from .types import Dim, XArray
 
 __all__ = ["histogram"]
-
-
-@contextlib.contextmanager
-def suppress_warnings(msg=None):
-    """Catch warnings with message msg. From
-    https://github.com/TheClimateCorporation/properscoring/blob/master/properscoring/
-    _utils.py#L23."""
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", msg)
-        yield
 
 
 def _preprocess_dims(dim: Dim | None, a: XArray) -> Tuple[List[str], Tuple[int, ...]]:
@@ -142,9 +130,9 @@ def histogram(*args, bins=None, bin_names=None, **kwargs):
         if isinstance(kwargs["dim"], str):
             kwargs["dim"] = [kwargs["dim"]]
     for bin in bins:
-        assert isinstance(
-            bin, np.ndarray
-        ), f"all bins must be numpy arrays, found {type(bin)}"
+        assert isinstance(bin, np.ndarray), (
+            f"all bins must be numpy arrays, found {type(bin)}"
+        )
 
     if isinstance(args[0], xr.Dataset):
         # Get list of variables that are shared across all Datasets

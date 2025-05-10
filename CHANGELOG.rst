@@ -2,13 +2,30 @@
 Changelog History
 =================
 
+
+xskillscore v0.0.27 (unreleased)
+--------------------------------
+
+Bug Fixes
+~~~~~~~~~
+- Updated and corrected the build configurations in the GitHub workflows so that the correct
+  Python is used when running automated build tests. (:pr:`426`) `Trevor James Smith`_
+
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Adapted code base for modern `numpy` and `xarray`. (:pr:`426`) `Trevor James Smith`_
+- Removed :py:func:`xskillscore.core.utils.suppress_warnings` in lieu of
+  :py:func:`warnings.filterwarnings`. (:pr:`426`) `Trevor James Smith`_
+- The minimum supported versions for several dependencies have been
+  updated. (:pr:`426`) `Trevor James Smith`_
+
+
 xskillscore v0.0.26 (2024-03-10)
 --------------------------------
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
 - Fix build `Ray Bell`_.
-
 
 xskillscore v0.0.25 (2024-03-10)
 --------------------------------
@@ -21,7 +38,6 @@ Bug Fixes
 - Allow singleton dimension in :py:func:`~xskillscore.resample_iterations_idx` as
   this is allowed in :py:func:`~xskillscore.resample_iterations` also.
   (:issue:`375`, :pr:`376`) `Aaron Spring`_.
-
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
@@ -47,7 +63,6 @@ Features
 ~~~~~~~~
 - :py:func:`~xskillscore.multipletests` controlling the false discovery rate for
   multiple hypothesis tests. (:issue:`365`, :pr:`370`) `Aaron Spring`_.
-
 
 Bug Fixes
 ~~~~~~~~~
@@ -76,7 +91,6 @@ xskillscore v0.0.21 (2021-06-13)
 
 - Allow ``float`` or ``integer`` forecasts in :py:func:`~xskillscore.brier_score`
   (:issue:`285`, :pr:`342`) `Aaron Spring`_
-
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
@@ -324,13 +338,11 @@ Deprecations
 ~~~~~~~~~~~~
 - ``mad`` no longer works and is replaced by ``median_absolute_error``. `Riley X. Brady`_
 
-
 Bug Fixes
 ~~~~~~~~~
 - ``skipna`` for ``pearson_r`` and ``spearman_r`` and their p-values now reports
   accurate results when there are pairwise nans (i.e., nans that occur in different
   indices in ``a`` and ``b``) `Riley X. Brady`_
-
 
 Testing
 ~~~~~~~
@@ -348,4 +360,5 @@ Testing
 .. _`Riley X. Brady`: https://github.com/bradyrx
 .. _`Ray Bell`: https://github.com/raybellwaves
 .. _`Taher Chegini`: https://github.com/cheginit
+.. _`Trevor James Smith`: https://github.com/Zeitsperre
 .. _`Zachary Blackwood`: https://github.com/blackary

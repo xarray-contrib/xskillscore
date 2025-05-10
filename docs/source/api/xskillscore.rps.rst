@@ -1,4 +1,4 @@
-xskillscore.rps
+﻿xskillscore.rps
 ===============
 
 .. currentmodule:: xskillscore

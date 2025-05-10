@@ -6,13 +6,13 @@ build-backend = "setuptools.build_meta"
 name = "xskillscore"
 version = "0.0.26"
 dependencies = [
-  "dask[array]",
-  "numpy",
+  "dask[array] >=2023.4.0",
+  "numpy >=1.24",
   "properscoring",
-  "scipy",
+  "scipy >=1.10",
   "statsmodels",
-  "xarray>=0.16.1",
-  "xhistogram>=0.3.0",
+  "xarray>=2023.4.0",
+  "xhistogram>=0.3.2",
 ]
 authors = [{name = "Ray Bell", email = "rayjohnbell0@gmail.com"}]
 description = "Metrics for verifying forecasts"
@@ -26,6 +26,8 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Atmospheric Science",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
@@ -39,32 +41,27 @@ test = [
     "bottleneck",
     "cftime",
     "matplotlib",
-    "numba>=0.52",
+    "numba >=0.57",
     "pre-commit",
     "pytest",
     "pytest-cov",
+    "pytest-timeout",
     "pytest-xdist",
     "scikit-learn",
 ]
 complete = [
-    "bottleneck",
-    "cftime",
+    "xskillscore[test]",
     "doc8",
-    "matplotlib",
+    "ipykernel",
+    "ipython",
     "nbsphinx",
     "nbstripout",
-    "numba>=0.52",
-    "pre-commit",
-    "pytest",
-    "pytest-cov",
-    "pytest-xdist",
+    "properscoring",
     "pytest-sugar",
-    "scikit-learn",
-    "sphinx",
+    "sphinx >=6.0.0",
     "sphinx-autosummary-accessors",
     "sphinx-copybutton",
     "sphinx-rtd-theme>=1.0",
-    "sphinxcontrib-napoleon",
 ]
 
 [project.urls]
@@ -86,6 +83,8 @@ testpaths = ["xskillscore/tests"]
 addopts = "--color=yes --verbose"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "flaky: marks tests as flaky (deselect with '-m \"not flaky\"')",
+    "network: marks tests that require network access (deselect with '-m \"not network\"')",
 ]
 
 [tool.doc8]

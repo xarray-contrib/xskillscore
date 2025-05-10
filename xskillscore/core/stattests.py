@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Mapping, Optional, Tuple
+from typing import Literal, Mapping, Optional, Tuple, Union
 
 import xarray as xr
 from statsmodels.stats.multitest import multipletests as statsmodels_multipletests
@@ -31,9 +31,9 @@ def multipletests(
         "pvals_corrected", "all_as_result_dim", "all_as_tuple"
     ] = "all_as_result_dim",
     **multipletests_kwargs: Mapping,
-) -> Tuple[XArray, XArray]:
+) -> Union[XArray, Tuple[XArray, ...]]:
     """Apply statsmodels.stats.multitest.multipletests for controlling the false
-    discovery rate for multiple hypothesis tests for multi-dimensional
+    discovery rate for multiple hypothesis tests for multidimensional
     xr.DataArray and xr.Datasets.
 
     Parameters
@@ -73,7 +73,6 @@ def multipletests(
 
     **multipletests_kwargs : dict, optional
         is_sorted, returnsorted, see statsmodels.stats.multitest.multitest
-
 
     Returns
     -------
@@ -143,7 +142,7 @@ def multipletests(
         "fdr_tsbh",
         "fdr_tsbky",
     ]
-    msg = "alpha must be float between 0.0 and 1.0"
+    msg = "Alpha must be float between 0.0 and 1.0."
     if not isinstance(alpha, float):
         raise ValueError(msg)
     elif alpha <= 0.0 or alpha >= 1.0:
@@ -162,7 +161,7 @@ def multipletests(
     allowed_return_results = ["all_as_tuple", "pvals_corrected", "all_as_result_dim"]
     if return_results not in allowed_return_results:
         raise ValueError(
-            f"expect `return_results` from {allowed_return_results}, "
+            f"Expected `return_results` from {allowed_return_results}, "
             f"found {return_results}"
         )
 
@@ -180,10 +179,10 @@ def multipletests(
 
     ret = tuple(r.unstack("s").transpose(*p.dims, ...) for r in ret)
 
-    def _add_kwargs_as_coords(ret):
-        ret.coords["multipletests_method"] = method
-        ret.coords["multipletests_alpha"] = alpha
-        return ret
+    def _add_kwargs_as_coords(r: XArray):
+        r.coords["multipletests_method"] = method
+        r.coords["multipletests_alpha"] = alpha
+        return r
 
     ret = tuple(_add_kwargs_as_coords(r) for r in ret)
 
@@ -195,5 +194,5 @@ def multipletests(
         for i, r in enumerate(ret):
             r.coords["result"] = returns[i]
         return ret
-    elif return_results == "pvals_corrected":
+    else:
         return ret[1].assign_coords(result="pvals_corrected")

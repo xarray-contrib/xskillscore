@@ -15,7 +15,7 @@ ci:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
       - id: check-docstring-first
@@ -34,7 +34,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.3.5"
+    rev: "v0.11.8"
     hooks:
       - id: ruff
         args: ["--select", "E,F,I001"]
@@ -49,7 +49,7 @@ repos:
         additional_dependencies: ["black==23.10.1"]
 
   - repo: https://github.com/PyCQA/doc8
-    rev: v1.1.1
+    rev: v1.1.2
     hooks:
       - id: doc8
         args:
@@ -62,14 +62,14 @@ repos:
           ]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.9.0"
+    rev: "v1.15.0"
     hooks:
       - id: mypy
         exclude: "asv_bench"
         additional_dependencies: [
             # Type stubs
             types-python-dateutil,
-            types-pkg_resources,
+            types-setuptools,
             types-PyYAML,
             types-pytz,
             typing-extensions,
@@ -78,7 +78,7 @@ repos:
           ]
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.28.1
+    rev: 0.33.0
     hooks:
       - id: check-github-workflows
       - id: check-readthedocs
