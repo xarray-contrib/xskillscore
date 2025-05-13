@@ -1,3 +1,5 @@
+from importlib.metadata import version, PackageNotFoundError
+
 # ruff: noqa
 from xskillscore.core import resampling
 from xskillscore.core.accessor import XSkillScoreAccessor
@@ -37,4 +39,8 @@ from xskillscore.core.resampling import resample_iterations, resample_iterations
 from xskillscore.core.stattests import multipletests
 from xskillscore.versioning.print_versions import show_versions
 
-__version__ = "0.0.26"
+try:
+    __version__ = version("xskillscore")
+except PackageNotFoundError:
+    # package is not installed
+    pass
