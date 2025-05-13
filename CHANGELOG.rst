@@ -18,6 +18,8 @@ Internal Changes
   :py:func:`warnings.filterwarnings`. (:pr:`426`) `Trevor James Smith`_
 - The minimum supported versions for several dependencies have been
   updated. (:pr:`426`) `Trevor James Smith`_
+- `xskillscore` now uses `setuptools-scm` to automatically determine the
+  version number. (:pr:`427`) `Trevor James Smith`_
 
 
 xskillscore v0.0.26 (2024-03-10)
