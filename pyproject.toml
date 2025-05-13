@@ -35,12 +35,11 @@ license = {file = "LICENSE.txt"}
 dynamic = ["readme", "version"]
 
 [project.optional-dependencies]
-accel = ["bottleneck", "numba>=0.52"]
+accel = ["bottleneck", "numba >=0.57"]
 test = [
-    "bottleneck",
+    "xskillscore[accel]",
     "cftime",
     "matplotlib",
-    "numba >=0.57",
     "pre-commit",
     "pytest",
     "pytest-cov",
