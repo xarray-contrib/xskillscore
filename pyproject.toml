@@ -1,10 +1,9 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools>=64", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "xskillscore"
-version = "0.0.26"
 dependencies = [
   "dask[array] >=2023.4.0",
   "numpy >=1.24",
@@ -33,15 +32,14 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 license = {file = "LICENSE.txt"}
-dynamic = ["readme"]
+dynamic = ["readme", "version"]
 
 [project.optional-dependencies]
-accel = ["bottleneck", "numba>=0.52"]
+accel = ["bottleneck", "numba >=0.57"]
 test = [
-    "bottleneck",
+    "xskillscore[accel]",
     "cftime",
     "matplotlib",
-    "numba >=0.57",
     "pre-commit",
     "pytest",
     "pytest-cov",
@@ -73,6 +71,7 @@ packages = ["xskillscore"]
 
 [tool.setuptools_scm]
 fallback_version = "9999"
+version_file = "xskillscore/_version.py"
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.rst"], content-type = "text/markdown"}

@@ -22,3 +22,6 @@ build
 
 # Documentation
 docs/build/
+
+# setuptools-scm
+xskillscore/_version.py
