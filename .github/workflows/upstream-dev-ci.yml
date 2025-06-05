@@ -1,4 +1,5 @@
 name: CI Upstream
+
 on:
   push:
     branches:
@@ -11,8 +12,11 @@ on:
   workflow_dispatch: # allows you to trigger the workflow run manually
 
 concurrency:
-   group: ${{ github.workflow }}-${{ github.ref }}
-   cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   detect-ci-trigger:
@@ -24,9 +28,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false
           fetch-depth: 2
-      - uses: xarray-contrib/ci-trigger@v1.1.1
+          persist-credentials: false
+      - uses: xarray-contrib/ci-trigger@v1
         id: detect-trigger
         with:
           keyword: "[test-upstream]"
@@ -48,15 +52,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11"]
+        python-version: [ "3.11" ]
     outputs:
       artifacts_availability: ${{ steps.status.outputs.ARTIFACTS_AVAILABLE }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Fetch all history for all branches and tags.
+          persist-credentials: false
       - name: setup conda (micromamba)
-        uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v2
         with:
           cache-downloads: true
           cache-environment: true
@@ -93,7 +98,7 @@ jobs:
           && steps.status.outcome == 'failure'
           && github.event_name == 'schedule'
           && github.repository == 'xarray-contrib/xskillscore'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: output-${{ matrix.python-version }}-log
           path: output-${{ matrix.python-version }}-log
@@ -108,6 +113,8 @@ jobs:
       && github.repository == 'xarray-contrib/xskillscore'
       && needs.upstream-dev.outputs.artifacts_availability == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     defaults:
       run:
         shell: bash
@@ -118,7 +125,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         with:
           path: /tmp/workspace/logs
       - name: Move all log files into a single directory
@@ -131,7 +138,7 @@ jobs:
           wget https://raw.githubusercontent.com/pydata/xarray/master/.github/workflows/parse_logs.py
           python parse_logs.py logs/**/*-log
       - name: Report failures
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
