@@ -9,7 +9,7 @@ from dask import is_dask_collection
 from scipy.stats import norm
 from sklearn.calibration import calibration_curve
 from sklearn.metrics import roc_auc_score, roc_curve
-from xarray.tests import assert_allclose, assert_identical
+from xarray.testing import assert_allclose, assert_identical
 
 from xskillscore.core.probabilistic import (
     brier_score,
