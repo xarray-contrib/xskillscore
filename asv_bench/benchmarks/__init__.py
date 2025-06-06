@@ -93,6 +93,4 @@ class Generate:
         self.ds.attrs = {"history": "created for xskillscore benchmarking"}
 
         # set nans for land sea mask
-        self.ds = self.ds.where(
-            (abs(self.ds.lat) > 20) | (self.ds.lat < 100) | (self.ds.lat > 160)
-        )
+        self.ds = self.ds.where((abs(self.ds.lat) > 20) | (self.ds.lat < 100) | (self.ds.lat > 160))

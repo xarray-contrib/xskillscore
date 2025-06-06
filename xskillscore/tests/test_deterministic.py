@@ -326,9 +326,8 @@ def test_dim_None(a, b, metrics):
     if metric in [effective_sample_size, spearman_r_eff_p_value, pearson_r_eff_p_value]:
         with pytest.raises(ValueError) as excinfo:
             metric(a, b, dim=None)
-        assert (
-            "Effective sample size should only be applied to a singular time dimension."
-            in str(excinfo.value)
+        assert "Effective sample size should only be applied to a singular time dimension." in str(
+            excinfo.value
         )
     else:
         metric, _metric = metrics
@@ -367,9 +366,7 @@ def test_correlation_broadcasts(a, b, metrics):
     metric(a, b.isel(lat=0), dim="time")
     metric(a, b.isel(lat=[0]), dim="time")
     b_changed_coords = b.isel(lat=[0]).assign_coords(lat=[123])
-    if (
-        "eff" not in metric.__name__
-    ):  # effective metrics require to be applied over time
+    if "eff" not in metric.__name__:  # effective metrics require to be applied over time
         with pytest.raises(ValueError, match="ndex"):
             # match "indexes along dimension" and "cannot align objects
             # with join='exact' where index/labels/sizes are not

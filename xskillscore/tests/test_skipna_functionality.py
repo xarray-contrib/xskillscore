@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 from typing import Callable, List
 
 import numpy as np
@@ -20,7 +21,6 @@ from xskillscore.core.deterministic import (
     spearman_r_p_value,
 )
 
-from contextlib import nullcontext
 try:
     import dask
 except ImportError:
@@ -42,8 +42,7 @@ class CountingScheduler:
         self.total_computes += 1
         if self.total_computes > self.max_computes:
             raise RuntimeError(
-                "Too many computes. Total: %d > max: %d."
-                % (self.total_computes, self.max_computes)
+                "Too many computes. Total: %d > max: %d." % (self.total_computes, self.max_computes)
             )
         return dask.get(dsk, keys, **kwargs)
 
@@ -54,6 +53,7 @@ def raise_if_dask_computes(max_computes=0):
         return nullcontext()
     scheduler = CountingScheduler(max_computes)
     return dask.config.set(scheduler=scheduler)
+
 
 WEIGHTED_METRICS: List[Callable] = [
     linslope,
@@ -86,9 +86,7 @@ def drop_nans(a, b, weights=None, dim="time"):
 
 
 @pytest.mark.parametrize("metric", WEIGHTED_METRICS + NON_WEIGHTED_METRICS)
-def test_skipna_returns_same_value_as_dropped_pairwise_nans(
-    a_1d_fixed_nan, b_1d_fixed_nan, metric
-):
+def test_skipna_returns_same_value_as_dropped_pairwise_nans(a_1d_fixed_nan, b_1d_fixed_nan, metric):
     """Tests that DataArrays with pairwise nans return the same result
     as the same two with those nans dropped."""
     a_dropped, b_dropped, _ = drop_nans(a_1d_fixed_nan, b_1d_fixed_nan)
@@ -111,9 +109,7 @@ def test_skipna_returns_same_value_as_dropped_pairwise_nans_with_weights(
         res_with_nans = metric(
             a_1d_fixed_nan, b_1d_fixed_nan, "time", skipna=True, weights=weights_time
         )
-        res_dropped_nans = metric(
-            a_dropped, b_dropped, "time", weights=weights_time_dropped
-        )
+        res_dropped_nans = metric(a_dropped, b_dropped, "time", weights=weights_time_dropped)
     assert_allclose(res_with_nans, res_dropped_nans)
 
 
@@ -133,9 +129,7 @@ def test_skipna_broadcast_weights_assignment_destination(
     """Tests that 'assignment destination is read-only' is not raised
     https://github.com/xarray-contrib/xskillscore/issues/79"""
     with raise_if_dask_computes():
-        metric(
-            a_rand_nan, b_rand_nan, ["lat", "lon"], weights=weights_lonlat, skipna=True
-        )
+        metric(a_rand_nan, b_rand_nan, ["lat", "lon"], weights=weights_lonlat, skipna=True)
 
 
 def test_nan_skipna(a, b):
