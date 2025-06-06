@@ -9,7 +9,7 @@ from dask import is_dask_collection
 from scipy.stats import norm
 from sklearn.calibration import calibration_curve
 from sklearn.metrics import roc_auc_score, roc_curve
-from xarray.tests import assert_allclose, assert_identical
+from xarray.testing import assert_allclose, assert_identical
 
 from xskillscore.core.probabilistic import (
     brier_score,
@@ -184,9 +184,7 @@ def test_crps_quadrature_args(o_dask, f_prob_dask, keep_attrs):
     f_prob_dask = f_prob_dask.isel(time=0, drop=True)
     xmin, xmax, tol = -10, 10, 1e-6
     cdf_or_dist = norm
-    actual = crps_quadrature(
-        o_dask, cdf_or_dist, xmin, xmax, tol, keep_attrs=keep_attrs
-    )
+    actual = crps_quadrature(o_dask, cdf_or_dist, xmin, xmax, tol, keep_attrs=keep_attrs)
     expected = properscoring.crps_quadrature(o_dask, cdf_or_dist, xmin, xmax, tol)
     expected = xr.DataArray(expected, coords=o_dask.coords).mean()
     # test for numerical identity of xskillscore crps and crps
@@ -228,9 +226,7 @@ def test_crps_gaussian_args(o, keep_attrs, input_type):
 @pytest.mark.parametrize("chunk_bool", [True, False])
 @pytest.mark.parametrize("input_type", ["Dataset", "multidim Dataset", "DataArray"])
 @pytest.mark.parametrize("keep_attrs", [True, False])
-def test_threshold_brier_score_api_and_inputs(
-    o, f_prob, keep_attrs, input_type, chunk_bool
-):
+def test_threshold_brier_score_api_and_inputs(o, f_prob, keep_attrs, input_type, chunk_bool):
     """Test that threshold_brier_score keeps attributes, chunking, input types and
     equals properscoring.threshold_brier_score."""
     o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
@@ -289,9 +285,7 @@ def test_threshold_brier_score_threshold_dataset(o_dask, f_prob_dask):
 @pytest.mark.parametrize("input_type", ["Dataset", "multidim Dataset", "DataArray"])
 @pytest.mark.parametrize("fair_bool", [True, False])
 @pytest.mark.parametrize("keep_attrs", [True, False])
-def test_brier_score_api_and_inputs(
-    o, f_prob, keep_attrs, fair_bool, chunk_bool, input_type
-):
+def test_brier_score_api_and_inputs(o, f_prob, keep_attrs, fair_bool, chunk_bool, input_type):
     """Test that brier_score keeps attributes, chunking, input types."""
     o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
     f_prob > 0.5
@@ -390,9 +384,7 @@ def test_discrimination_sum(o, f_prob, dim, chunk_bool, input_type):
         # don't understand the error message here, but it appeared
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
-            hist_event_sum = (
-                disc.sel(event=True).sum("forecast_probability", skipna=False).values
-            )
+            hist_event_sum = disc.sel(event=True).sum("forecast_probability", skipna=False).values
             hist_no_event_sum = (
                 disc.sel(event=False).sum("forecast_probability", skipna=False).values
             )
@@ -445,9 +437,7 @@ def test_reliability_values(o, f_prob):
             # added to the last bin, whereas
             # xhistogram the rightmost edge of xhistogram bins
             # is included - mimic scipy behaviour
-            actual = reliability(
-                o_1d, f_1d, probability_bin_edges=np.linspace(0, 1 + 1e-8, 6)
-            )
+            actual = reliability(o_1d, f_1d, probability_bin_edges=np.linspace(0, 1 + 1e-8, 6))
             expected, _ = calibration_curve(o_1d, f_1d, n_bins=5, strategy="uniform")
             npt.assert_allclose(actual.where(actual.notnull(), drop=True), expected)
             npt.assert_allclose(actual["samples"].sum(), o_1d.size)
@@ -496,9 +486,7 @@ def test_rps_category_edges_None_works(o, f_prob, input_distributions):
 @pytest.mark.parametrize("chunk_bool", [True, False])
 @pytest.mark.parametrize("input_type", ["Dataset", "multidim Dataset", "DataArray"])
 @pytest.mark.parametrize("keep_attrs", [True, False])
-def test_rps_api_and_inputs(
-    o, f_prob, category_edges, keep_attrs, input_type, chunk_bool
-):
+def test_rps_api_and_inputs(o, f_prob, category_edges, keep_attrs, input_type, chunk_bool):
     """Test that rps keeps attributes, chunking, input types."""
     o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
     category_edges = xr.DataArray(category_edges, dims="category_edge")
@@ -568,9 +556,7 @@ def rps_xhist(
             dim=[member_dim],
         )
     if "category_edge_bin" in observations_bins.dims:
-        observations_bins = observations_bins.rename(
-            {"category_edge_bin": "category_edge"}
-        )
+        observations_bins = observations_bins.rename({"category_edge_bin": "category_edge"})
 
     forecasts = histogram(
         forecasts,
@@ -607,9 +593,7 @@ def rps_xhist(
     )
 
     # keep nans and prevent 0 for all nan grids
-    res = _keep_nans_masked(
-        observations, forecasts, res, dim=dim, member_dim=member_dim
-    )
+    res = _keep_nans_masked(observations, forecasts, res, dim=dim, member_dim=member_dim)
     # res = _keep_nans_masked(observations, res, dim, ignore=["category_edge"])
     return res
 
@@ -622,12 +606,8 @@ def test_rps_wilks_example():
     # first example
     # xhistogram way with np.array category_edges
     Obs = xr.DataArray([0.0001])  # .expand_dims('time')  # no precip
-    F1 = xr.DataArray(
-        [0] * 2 + [0.1] * 5 + [0.3] * 3, dims="member"
-    )  # .expand_dims('time')
-    F2 = xr.DataArray(
-        [0] * 2 + [0.1] * 3 + [0.3] * 5, dims="member"
-    )  # .expand_dims('time')
+    F1 = xr.DataArray([0] * 2 + [0.1] * 5 + [0.3] * 3, dims="member")  # .expand_dims('time')
+    F2 = xr.DataArray([0] * 2 + [0.1] * 3 + [0.3] * 5, dims="member")  # .expand_dims('time')
     np.testing.assert_allclose(rps_xhist(Obs, F1, category_edges), 0.73)
     np.testing.assert_allclose(rps_xhist(Obs, F2, category_edges), 0.89)
     # xr way with xr.DataArray category_edges
@@ -654,21 +634,13 @@ def test_rps_wilks_example_pdf():
     Obs = xr.DataArray([1.0, 0.0, 0.0], dims="category")  # no precip
     F1 = xr.DataArray([0.2, 0.5, 0.3], dims="category")
     F2 = xr.DataArray([0.2, 0.3, 0.5], dims="category")
-    np.testing.assert_allclose(
-        rps(Obs, F1, category_edges=None, input_distributions="p"), 0.73
-    )
-    np.testing.assert_allclose(
-        rps(Obs, F2, category_edges=None, input_distributions="p"), 0.89
-    )
+    np.testing.assert_allclose(rps(Obs, F1, category_edges=None, input_distributions="p"), 0.73)
+    np.testing.assert_allclose(rps(Obs, F2, category_edges=None, input_distributions="p"), 0.89)
 
     # second example
     Obs = xr.DataArray([0.0, 0.0, 1.0], dims="category")  # larger than 0.25
-    np.testing.assert_allclose(
-        rps(Obs, F1, category_edges=None, input_distributions="p"), 0.53
-    )
-    np.testing.assert_allclose(
-        rps(Obs, F2, category_edges=None, input_distributions="p"), 0.29
-    )
+    np.testing.assert_allclose(rps(Obs, F1, category_edges=None, input_distributions="p"), 0.53)
+    np.testing.assert_allclose(rps(Obs, F2, category_edges=None, input_distributions="p"), 0.29)
 
 
 @pytest.mark.parametrize("fair_bool", [True, False])
@@ -692,9 +664,7 @@ def test_rps_fair_category_edges_None(o, f_prob):
     set."""
     rps(
         o.rename({"time": "category"}),
-        f_prob.mean("member")
-        .rename({"time": "category"})
-        .assign_coords(member=f_prob.member.size),
+        f_prob.mean("member").rename({"time": "category"}).assign_coords(member=f_prob.member.size),
         category_edges=None,
         dim=None,
         fair=True,
@@ -714,8 +684,7 @@ def test_rps_perfect_values(o, category_edges, fair_bool):
 def test_rps_dask(o_dask, f_prob_dask, category_edges, fair_bool):
     """Test that rps returns dask array if provided dask array"""
     assert (
-        rps(o_dask, f_prob_dask, category_edges=category_edges, fair=fair_bool).chunks
-        is not None
+        rps(o_dask, f_prob_dask, category_edges=category_edges, fair=fair_bool).chunks is not None
     )
 
 
@@ -732,9 +701,9 @@ def test_rps_vs_fair_rps(o, f_prob, category_edges, dim):
 def test_rps_category_edges_xrDataArray(o, f_prob, fair_bool):
     """Test rps with category_edges as xrDataArray for
     forecast and observations edges."""
-    category_edges = f_prob.quantile(
-        q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]
-    ).rename({"quantile": "category_edge"})
+    category_edges = f_prob.quantile(q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]).rename(
+        {"quantile": "category_edge"}
+    )
     actual = rps(
         o,
         f_prob,
@@ -754,9 +723,9 @@ def test_rps_category_edges_xrDataset(o, f_prob, fair_bool):
     o["var2"] = o["var"] ** 2
     f_prob = f_prob.to_dataset(name="var")
     f_prob["var2"] = f_prob["var"] ** 2
-    category_edges = f_prob.quantile(
-        q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]
-    ).rename({"quantile": "category_edge"})
+    category_edges = f_prob.quantile(q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]).rename(
+        {"quantile": "category_edge"}
+    )
     actual = rps(
         o,
         f_prob,
@@ -772,9 +741,7 @@ def test_rps_category_edges_xrDataset(o, f_prob, fair_bool):
 def test_rps_category_edges_tuple(o, f_prob, fair_bool):
     """Test rps with category_edges as tuple of xrDataArray
     for forecast and observations edges separately."""
-    o_edges = o.quantile(q=[0.2, 0.4, 0.6, 0.8], dim="time").rename(
-        {"quantile": "category_edge"}
-    )
+    o_edges = o.quantile(q=[0.2, 0.4, 0.6, 0.8], dim="time").rename({"quantile": "category_edge"})
     f_edges = f_prob.quantile(q=[0.2, 0.4, 0.6, 0.8], dim=["time", "member"]).rename(
         {"quantile": "category_edge"}
     )
@@ -837,9 +804,9 @@ def test_rps_keeps_masked(o, f_prob, fair_bool, category_edges):
         in actual.coords["forecasts_category_edge"].values
     )
     # one more category internally used than category_edges provided
-    assert len(category_edges) + 1 == str(
-        actual.coords["forecasts_category_edge"].values
-    ).count("[")
+    assert len(category_edges) + 1 == str(actual.coords["forecasts_category_edge"].values).count(
+        "["
+    )
 
 
 @pytest.mark.parametrize("fair_bool", [True, False], ids=["bool=fair", "fair=False"])
@@ -886,9 +853,7 @@ def test_rps_mask_Dataset_additional_var(o, f_prob):
 @pytest.mark.parametrize("drop_intermediate_bool", [True, False])
 @pytest.mark.parametrize("chunk", [True, False])
 @pytest.mark.parametrize("input", ["Dataset", "DataArray"])
-@pytest.mark.parametrize(
-    "return_results", ["all_as_tuple", "area", "all_as_metric_dim"]
-)
+@pytest.mark.parametrize("return_results", ["all_as_tuple", "area", "all_as_metric_dim"])
 def test_roc_returns(
     ndim_data,
     symmetric_edges,
@@ -902,12 +867,8 @@ def test_roc_returns(
     # A lazy fix to deprecate pytest-lazy-fixture
     # Copied the functions from conftest.py
     if ndim_data == "1d_long":
-        observation = xr.DataArray(
-            np.random.normal(size=(100)), coords=[("time", np.arange(100))]
-        )
-        forecast = xr.DataArray(
-            np.random.normal(size=(100)), coords=[("time", np.arange(100))]
-        )
+        observation = xr.DataArray(np.random.normal(size=(100)), coords=[("time", np.arange(100))])
+        forecast = xr.DataArray(np.random.normal(size=(100)), coords=[("time", np.arange(100))])
     else:
         times = xr.date_range(start="2000", freq="D", periods=10, use_cftime=True)
         lats = np.arange(4)
@@ -917,9 +878,7 @@ def test_roc_returns(
             data_obs, coords=[times, lats, lons], dims=["time", "lat", "lon"]
         )
         data_fct = np.random.randint(0, 10, size=(len(times), len(lats), len(lons)))
-        forecast = xr.DataArray(
-            data_fct, coords=[times, lats, lons], dims=["time", "lat", "lon"]
-        )
+        forecast = xr.DataArray(data_fct, coords=[times, lats, lons], dims=["time", "lat", "lon"])
     if "Dataset" in input:
         name = "var"
         forecast = forecast.to_dataset(name=name)
@@ -938,9 +897,7 @@ def test_roc_returns(
     )
 
 
-def test_roc_auc_score_random_forecast(
-    forecast_1d_long, observation_1d_long, symmetric_edges
-):
+def test_roc_auc_score_random_forecast(forecast_1d_long, observation_1d_long, symmetric_edges):
     """Test that ROC AUC around 0.5 for random forecast."""
     area = roc(
         observation_1d_long,
@@ -1073,9 +1030,7 @@ def test_roc_bin_edges_drop_intermediate(forecast_1d_long, observation_1d_long):
     assert len(fxs_tpr) >= len(txs_tpr)
 
 
-def test_roc_keeps_probability_bin_as_coord(
-    observation_1d_long, forecast_1d_long, symmetric_edges
-):
+def test_roc_keeps_probability_bin_as_coord(observation_1d_long, forecast_1d_long, symmetric_edges):
     """Test that roc keeps probability_bin as coords."""
     fpr, tpr, area = roc(
         observation_1d_long,

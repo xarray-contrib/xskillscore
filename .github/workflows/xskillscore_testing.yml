@@ -8,6 +8,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   detect-ci-trigger:
     name: detect ci trigger
@@ -17,9 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false
           fetch-depth: 2
-      - uses: xarray-contrib/ci-trigger@v1.1.1
+          persist-credentials: false
+      - uses: xarray-contrib/ci-trigger@v1
         id: detect-trigger
         with:
           keyword: "[skip-ci]"
@@ -35,13 +38,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
       - name: Set up conda (micromamba)
-        uses: mamba-org/setup-micromamba@v2.0.4
+        uses: mamba-org/setup-micromamba@v2
         with:
           cache-downloads: true
           cache-environment: true
@@ -52,10 +55,10 @@ jobs:
         run: |
           pytest -n 4 --cov=xskillscore --cov-report=xml --verbose
       - name: Upload coverage to codecov
-        uses: codecov/codecov-action@v1.5.2
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
+          files: ./coverage.xml
           fail_ci_if_error: false
 
   doctest:  # Tests all docstrings
@@ -75,7 +78,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up conda (micromamba)
-        uses: mamba-org/setup-micromamba@v2.0.4
+        uses: mamba-org/setup-micromamba@v2
         with:
           cache-downloads: true
           cache-environment: true
@@ -104,7 +107,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up conda (micromamba)
-        uses: mamba-org/setup-micromamba@v2.0.4
+        uses: mamba-org/setup-micromamba@v2
         with:
           cache-downloads: true
           cache-environment: true

@@ -23,9 +23,7 @@ def test_multipletests_inputs(r_p, input, chunk):
             r_p["var2"] = r_p["var"] * 2
     if chunk:
         r_p = r_p.chunk()
-    ret = multipletests(
-        r_p, method=method, alpha=alpha, return_results="all_as_result_dim"
-    )
+    ret = multipletests(r_p, method=method, alpha=alpha, return_results="all_as_result_dim")
     # check dask collection preserved
     assert is_dask_collection(ret) if chunk else not is_dask_collection(ret)
     # check coords added
@@ -37,9 +35,7 @@ def test_multipletests_alpha(r_p):
     """Test that larger alpha leads to more rejected in multipletests."""
     method = "fdr_bh"
     reject = multipletests(r_p, alpha=0.05, method=method).sel(result="reject")
-    reject_larger_alpha = multipletests(r_p, alpha=0.5, method=method).sel(
-        result="reject"
-    )
+    reject_larger_alpha = multipletests(r_p, alpha=0.5, method=method).sel(result="reject")
     # check more reject
     assert reject_larger_alpha.sum() > reject.sum()
 

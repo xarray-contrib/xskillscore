@@ -275,9 +275,7 @@ def dichotomous_Contingency_1d():
         np.array(2 * [0] + 2 * [0] + 1 * [1] + 2 * [1]), coords=[("x", np.arange(7))]
     )
     category_edges = np.array([-np.inf, 0.5, np.inf])
-    return Contingency(
-        observations, forecasts, category_edges, category_edges, dim=["x"]
-    )
+    return Contingency(observations, forecasts, category_edges, category_edges, dim=["x"])
 
 
 @pytest.fixture

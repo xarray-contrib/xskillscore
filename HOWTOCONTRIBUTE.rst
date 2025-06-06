@@ -9,16 +9,11 @@ reporting `issues <https://github.com/xarray-contrib/xskillscore/issues>`__.
 The following sections cover some general guidelines
 regarding development in ``xskillscore`` for maintainers and contributors.
 
-
 Nothing here is set in stone and can't be changed.
 Feel free to suggest improvements or changes in the workflow.
 
-
-
 .. contents:: Contribution links
    :depth: 2
-
-
 
 .. _submitfeedback:
 
@@ -32,7 +27,6 @@ with the label "feature request."
 
 Please make sure to explain in detail how the feature should work and keep the scope as
 narrow as possible. This will make it easier to implement in small PRs.
-
 
 .. _reportbugs:
 
@@ -53,7 +47,6 @@ If you are reporting a bug, please include:
 If you can write a demonstration test that currently fails but should passm
 that is a very useful commit to make as well, even if you cannot fix the bug itself.
 
-
 .. _fixbugs:
 
 Fix bugs
@@ -62,7 +55,6 @@ Fix bugs
 Look through the `GitHub issues for bugs <https://github.com/xarray-contrib/xskillscore/labels/bug>`_.
 
 Talk to developers to find out how you can fix specific bugs.
-
 
 Write documentation
 -------------------
@@ -102,7 +94,6 @@ If you are adding new functions to the API, run ``sphinx-autogen -o api api.rst`
 
 Preparing Pull Requests
 -----------------------
-
 
 #. Fork the
    `xskillscore GitHub repository <https://github.com/xarray-contrib/xskillscore>`__.  It's

@@ -142,15 +142,11 @@ class XSkillScoreAccessor(object):
         x = self._in_ds(x)
         return crps_quadrature(x, cdf_or_dist, *args, **kwargs)
 
-    def threshold_brier_score(
-        self, observations, forecasts, threshold, *args, **kwargs
-    ):
+    def threshold_brier_score(self, observations, forecasts, threshold, *args, **kwargs):
         observations = self._in_ds(observations)
         forecasts = self._in_ds(forecasts)
         threshold = self._in_ds(threshold)
-        return threshold_brier_score(
-            observations, forecasts, threshold, *args, **kwargs
-        )
+        return threshold_brier_score(observations, forecasts, threshold, *args, **kwargs)
 
     def brier_score(self, observations, forecasts, *args, **kwargs):
         observations = self._in_ds(observations)

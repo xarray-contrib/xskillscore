@@ -15,9 +15,7 @@ CATEGORY_EDGES = [
 @pytest.mark.parametrize("type", ["da", "ds", "chunked_da", "chunked_ds"])
 @pytest.mark.parametrize("dim", DIMS)
 @pytest.mark.parametrize("category_edges", CATEGORY_EDGES)
-def test_Contingency_table(
-    observation_3d_int, forecast_3d_int, category_edges, dim, type
-):
+def test_Contingency_table(observation_3d_int, forecast_3d_int, category_edges, dim, type):
     """Test that contingency table builds successfully"""
     if "ds" in type:
         name = "var"
@@ -52,9 +50,7 @@ def test_Contingency_table_values(observation_3d_int, forecast_3d_int, category_
     )
     for lon in forecast_3d_int.lon:
         for lat in forecast_3d_int.lat:
-            observation_1d = logical(
-                observation_3d_int.sel(lon=lon, lat=lat), category_edges
-            )
+            observation_1d = logical(observation_3d_int.sel(lon=lon, lat=lat), category_edges)
             forecast_1d = logical(forecast_3d_int.sel(lon=lon, lat=lat), category_edges)
             sklearn_cont_table_1d = confusion_matrix(
                 observation_1d, forecast_1d, labels=range(len(category_edges) - 1)

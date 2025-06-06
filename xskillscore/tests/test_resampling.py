@@ -39,9 +39,7 @@ def test_resampling_roughly_identical_mean(f_prob):
     iterations = 1000
     r1 = resample_iterations(da, iterations=iterations, replace=True)
     r2 = resample_iterations_idx(da, iterations=iterations, replace=True)
-    xr.testing.assert_allclose(
-        r1.mean("iteration"), r2.mean("iteration"), atol=0.05, rtol=0.05
-    )
+    xr.testing.assert_allclose(r1.mean("iteration"), r2.mean("iteration"), atol=0.05, rtol=0.05)
 
 
 @pytest.mark.parametrize("iterations", [1, 2])
@@ -92,9 +90,7 @@ def test_gen_idx_replace(f_prob, replace):
                 return True
         return False
 
-    actual = _gen_idx(
-        f_prob, "member", 10, f_prob["member"].size, replace, f_prob["member"]
-    )
+    actual = _gen_idx(f_prob, "member", 10, f_prob["member"].size, replace, f_prob["member"])
     if replace:  # find identical values
         assert find_duplicate(actual)
     else:  # find no identicals

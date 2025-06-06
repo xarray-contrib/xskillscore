@@ -122,9 +122,7 @@ def resample_iterations(
     forecast_smp_list: List[XArray] = []
     for i in np.arange(iterations):
         idx = idx_da.sel(iteration=i).data
-        forecast_smp_list.append(
-            forecast.isel({dim: idx}).assign_coords({dim: new_dim})
-        )
+        forecast_smp_list.append(forecast.isel({dim: idx}).assign_coords({dim: new_dim}))
     forecast_smp = xr.concat(forecast_smp_list, dim="iteration", **CONCAT_KWARGS)
     forecast_smp["iteration"] = np.arange(iterations)
     if dim not in forecast.coords:
@@ -223,9 +221,7 @@ def resample_iterations_idx(
     # generate random indices to select from
     idx_da = _gen_idx(forecast, dim, iterations, select_dim_items, replace, new_dim)
     # select those indices in one go
-    transpose_kwargs = (
-        {"transpose_coords": False} if isinstance(forecast, xr.DataArray) else {}
-    )
+    transpose_kwargs = {"transpose_coords": False} if isinstance(forecast, xr.DataArray) else {}
     # bug fix if singleton dimension
     singleton_dims = []
     for d in forecast.dims:
