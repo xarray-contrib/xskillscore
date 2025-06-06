@@ -91,6 +91,7 @@ max-line-length = 100
 ignore-path = [".eggs/", "docs/source/api/"]
 
 [tool.ruff]
+line-length = 100
 extend-include = ["*.ipynb"]
 lint.select = [
     # Pyflakes
@@ -108,3 +109,7 @@ lint.select = [
 [tool.mypy]
 ignore_missing_imports = true
 follow_imports = "silent"
+
+[tool.black]
+target-version = ["py39", "py310", "py311", "py312", "py313"]
+line-length = 100

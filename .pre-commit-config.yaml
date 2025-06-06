@@ -34,10 +34,10 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.11.8"
+    rev: "v0.11.13"
     hooks:
-      - id: ruff
-        args: ["--select", "E,F,I001"]
+      - id: ruff-check
+        args: [ "--fix" ]
         types_or: [python, pyi, jupyter]
       - id: ruff-format
         types_or: [python, pyi, jupyter]
@@ -46,7 +46,7 @@ repos:
     rev: v0.3.9
     hooks:
       - id: blackdoc
-        additional_dependencies: ["black==23.10.1"]
+        additional_dependencies: ["black==25.1.0"]
 
   - repo: https://github.com/PyCQA/doc8
     rev: v1.1.2
@@ -62,7 +62,7 @@ repos:
           ]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.15.0"
+    rev: "v1.16.0"
     hooks:
       - id: mypy
         exclude: "asv_bench"
