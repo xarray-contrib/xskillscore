@@ -3,7 +3,7 @@ Changelog History
 =================
 
 
-xskillscore v0.0.27 (unreleased)
+xskillscore v0.0.27 (2025-07-09)
 --------------------------------
 
 Bug Fixes
