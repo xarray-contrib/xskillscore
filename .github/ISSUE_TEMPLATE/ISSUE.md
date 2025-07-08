@@ -17,7 +17,6 @@ A "Minimal, Complete and Verifiable Example" will make it much easier for mainta
 
 ```python
 # Your code here
-
 ```
 
 #### Problem description
