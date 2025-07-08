@@ -1,7 +1,0 @@
-dask[array]
-numpy
-properscoring
-scipy
-statsmodels
-xarray>=0.16.1
-xhistogram>=0.3.0

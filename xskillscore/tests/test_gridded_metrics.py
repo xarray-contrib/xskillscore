@@ -66,8 +66,6 @@ def test_single_grid_cell_matches_individual_time_series_nans(a, b, metric):
         for y in range(a_masked["lat"].size):
             ts_a_masked = a_masked.isel(lat=y, lon=x)
             ts_b_masked = b_masked.isel(lat=y, lon=x)
-            gridded_res = metric(a_masked, b_masked, "time", skipna=True).isel(
-                lat=y, lon=x
-            )
+            gridded_res = metric(a_masked, b_masked, "time", skipna=True).isel(lat=y, lon=x)
             ts_res = metric(ts_a_masked, ts_b_masked, "time", skipna=True)
             assert np.allclose(gridded_res, ts_res, equal_nan=True)

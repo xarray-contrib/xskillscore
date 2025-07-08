@@ -148,6 +148,4 @@ class Compute_large_dask(Compute_small):
 
     def setup(self, *args, **kwargs):
         requires_dask()
-        self.make_ds(
-            ntime, large_lon_lat, large_lon_lat, chunks={"lon": large_lon_lat_chunksize}
-        )
+        self.make_ds(ntime, large_lon_lat, large_lon_lat, chunks={"lon": large_lon_lat_chunksize})

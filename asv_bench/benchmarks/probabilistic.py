@@ -57,9 +57,7 @@ class Compute_small(Generate):
             threshold = 0.5
             metric(self.ds["tos"], self.ds["sos"], threshold).compute()
         elif metric is brier_score:
-            metric(
-                self.ds["tos"] > 0.5, (self.ds["sos"] > 0.5).mean("member")
-            ).compute()
+            metric(self.ds["tos"] > 0.5, (self.ds["sos"] > 0.5).mean("member")).compute()
 
     @parameterized("metric", PROBABILISTIC_METRICS)
     def peakmem_xskillscore_metric(self, metric):
@@ -81,9 +79,7 @@ class Compute_small(Generate):
             threshold = 0.5
             metric(self.ds["tos"], self.ds["sos"], threshold).compute()
         elif metric is brier_score:
-            metric(
-                self.ds["tos"] > 0.5, (self.ds["sos"] > 0.5).mean("member")
-            ).compute()
+            metric(self.ds["tos"] > 0.5, (self.ds["sos"] > 0.5).mean("member")).compute()
 
 
 class Compute_large(Compute_small):

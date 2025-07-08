@@ -82,9 +82,7 @@ class Contingency:
     >>> f = o * 1.1
     >>> o_category_edges = np.linspace(-2, 2, 5)
     >>> f_category_edges = np.linspace(-3, 3, 5)
-    >>> xs.Contingency(
-    ...     o, f, o_category_edges, f_category_edges, dim=["x", "y"]
-    ... )  # doctest: +SKIP
+    >>> xs.Contingency(o, f, o_category_edges, f_category_edges, dim=["x", "y"])  # doctest: +SKIP
     <xskillscore.Contingency>
     Dimensions:                       (forecasts_category: 4, observations_category: 4)
     Coordinates:
@@ -116,8 +114,7 @@ class Contingency:
         self._forecast_category_edges = forecast_category_edges.copy()
         self._dichotomous = (
             True
-            if (len(observation_category_edges) - 1 == 2)
-            & (len(forecast_category_edges) - 1 == 2)
+            if (len(observation_category_edges) - 1 == 2) & (len(forecast_category_edges) - 1 == 2)
             else False
         )
         self._table = self._get_contingency_table(dim)
@@ -170,18 +167,10 @@ class Contingency:
 
         # Add some coordinates to simplify interpretation/post-processing
         table = table.assign_coords(
-            {
-                OBSERVATIONS_NAME + "_bin": _get_category_bounds(
-                    self.observation_category_edges
-                )
-            }
+            {OBSERVATIONS_NAME + "_bin": _get_category_bounds(self.observation_category_edges)}
         ).rename({OBSERVATIONS_NAME + "_bin": OBSERVATIONS_NAME + "_category_bounds"})
         table = table.assign_coords(
-            {
-                FORECASTS_NAME + "_bin": _get_category_bounds(
-                    self.forecast_category_edges
-                )
-            }
+            {FORECASTS_NAME + "_bin": _get_category_bounds(self.forecast_category_edges)}
         ).rename({FORECASTS_NAME + "_bin": FORECASTS_NAME + "_category_bounds"})
         table = table.assign_coords(
             {
@@ -414,9 +403,7 @@ class Contingency:
         https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
-        return self.hits(yes_category) / (
-            self.hits(yes_category) + self.misses(yes_category)
-        )
+        return self.hits(yes_category) / (self.hits(yes_category) + self.misses(yes_category))
 
     @dichotomous_only
     def false_alarm_ratio(self, yes_category: int = 2) -> XArray:
@@ -498,9 +485,7 @@ class Contingency:
         https://www.cawcr.gov.au/projects/verification/#Contingency_table
         """
 
-        return self.hits(yes_category) / (
-            self.hits(yes_category) + self.false_alarms(yes_category)
-        )
+        return self.hits(yes_category) / (self.hits(yes_category) + self.false_alarms(yes_category))
 
     @dichotomous_only
     def threat_score(self, yes_category: int = 2) -> XArray:
@@ -525,9 +510,7 @@ class Contingency:
         """
 
         return self.hits(yes_category) / (
-            self.hits(yes_category)
-            + self.misses(yes_category)
-            + self.false_alarms(yes_category)
+            self.hits(yes_category) + self.misses(yes_category) + self.false_alarms(yes_category)
         )
 
     @dichotomous_only
@@ -649,8 +632,7 @@ class Contingency:
         """
 
         corr = self.table.where(
-            self.table[OBSERVATIONS_NAME + "_category"]
-            == self.table[FORECASTS_NAME + "_category"]
+            self.table[OBSERVATIONS_NAME + "_category"] == self.table[FORECASTS_NAME + "_category"]
         ).sum(
             dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
             skipna=True,
@@ -682,15 +664,14 @@ class Contingency:
         """
 
         numer_1 = self.table.where(
-            self.table[OBSERVATIONS_NAME + "_category"]
-            == self.table[FORECASTS_NAME + "_category"]
+            self.table[OBSERVATIONS_NAME + "_category"] == self.table[FORECASTS_NAME + "_category"]
         ).sum(
             dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
             skipna=True,
         ) / self._sum_categories("total")
-        numer_2 = (
-            self._sum_categories("observations") * self._sum_categories("forecasts")
-        ).sum(dim="category", skipna=True) / self._sum_categories("total") ** 2
+        numer_2 = (self._sum_categories("observations") * self._sum_categories("forecasts")).sum(
+            dim="category", skipna=True
+        ) / self._sum_categories("total") ** 2
         denom = 1 - numer_2
 
         return (numer_1 - numer_2) / denom
@@ -715,18 +696,17 @@ class Contingency:
         """
 
         numer_1 = self.table.where(
-            self.table[OBSERVATIONS_NAME + "_category"]
-            == self.table[FORECASTS_NAME + "_category"]
+            self.table[OBSERVATIONS_NAME + "_category"] == self.table[FORECASTS_NAME + "_category"]
         ).sum(
             dim=(OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"),
             skipna=True,
         ) / self._sum_categories("total")
-        numer_2 = (
-            self._sum_categories("observations") * self._sum_categories("forecasts")
-        ).sum(dim="category", skipna=True) / self._sum_categories("total") ** 2
-        denom = 1 - (self._sum_categories("observations") ** 2).sum(
+        numer_2 = (self._sum_categories("observations") * self._sum_categories("forecasts")).sum(
             dim="category", skipna=True
-        ) / (self._sum_categories("total") ** 2)
+        ) / self._sum_categories("total") ** 2
+        denom = 1 - (self._sum_categories("observations") ** 2).sum(dim="category", skipna=True) / (
+            self._sum_categories("total") ** 2
+        )
 
         return (numer_1 - numer_2) / denom
 
@@ -777,10 +757,7 @@ class Contingency:
                     s[..., i, j] = (
                         1.0
                         / (k - 1.0)
-                        * (
-                            np.sum(1.0 / a[..., 0:j], axis=-1)
-                            + np.sum(a[..., j : k - 1], axis=-1)
-                        )
+                        * (np.sum(1.0 / a[..., 0:j], axis=-1) + np.sum(a[..., j : k - 1], axis=-1))
                     )
                 elif i < j:
                     s[..., i, j] = (
@@ -799,12 +776,8 @@ class Contingency:
         s = xr.apply_ufunc(
             _gerrity_s,
             self.table,
-            input_core_dims=[
-                [OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"]
-            ],
-            output_core_dims=[
-                [OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"]
-            ],
+            input_core_dims=[[OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"]],
+            output_core_dims=[[OBSERVATIONS_NAME + "_category", FORECASTS_NAME + "_category"]],
             dask="allowed",
         )
 

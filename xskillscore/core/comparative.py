@@ -119,8 +119,7 @@ def sign_test(
 
     if orientation not in ["negative", "positive"]:
         raise ValueError(
-            '`orientation` requires to be either "positive" or'
-            f'"negative"], found {orientation}.'
+            f'`orientation` requires to be either "positive" or"negative"], found {orientation}.'
         )
 
     if isinstance(dim, str):
@@ -183,9 +182,7 @@ def sign_test(
             metric_f1o = -metric_f1o
             metric_f2o = -metric_f2o
 
-    walk = (1 * (metric_f1o < metric_f2o) - 1 * (metric_f2o < metric_f1o)).cumsum(
-        time_dim
-    )
+    walk = (1 * (metric_f1o < metric_f2o) - 1 * (metric_f2o < metric_f1o)).cumsum(time_dim)
 
     # Estimate 1 - alpha confidence interval -----
     notnan = 1 * (metric_f1o.notnull() & metric_f2o.notnull())
@@ -339,9 +336,8 @@ def halfwidth_ci_test(
             if v.default == inspect._empty and p not in kwargs and p not in ["a", "b"]  # type: ignore
         ]
         if len(missing_args) > 0:
-            msg = (
-                f"The following positional arguments for {metric} are missing:\n"
-                ", ".join(missing_args)
+            msg = f"The following positional arguments for {metric} are missing:\n, ".join(
+                missing_args
             )
             raise ValueError(msg)
 
@@ -352,10 +348,7 @@ def halfwidth_ci_test(
         score_f1o = forecasts1
         score_f2o = forecasts2
     else:
-        msg = (
-            "Both `metric` and `observations` arguments must be either None or "
-            "valid inputs."
-        )
+        msg = "Both `metric` and `observations` arguments must be either None or valid inputs."
         raise ValueError(msg)
 
     pearson_r_f1f2 = dm.pearson_r(score_f1o, score_f2o, dim=time_dim)

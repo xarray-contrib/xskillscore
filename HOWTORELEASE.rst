@@ -1,18 +1,19 @@
 Release Procedure
 -----------------
 
-#. Clone xskillscore from xarray-contrib, not a personal fork.
+#. Clone `xskillscore` from xarray-contrib, not a personal fork.
 
 #. Create a new branch ``release-v0.0.xx`` with the version for the release.
 
     $ git checkout -b release-v0.0.xx
 
- * Update ``CHANGELOG.rst``
- * Make sure all new changes, features are reflected in the documentation.
+#. Update ``CHANGELOG.rst``
 
- * Update ``pyproject.toml`` and `version` in `xskillscore/__init__`
+ * Make sure all new changes and features are reflected in the documentation.
 
-#. Open a new pull request for this branch targeting `main`
+ * Ensure that the release date is set to the current date.
+
+#. Open a new pull request for this branch targeting ``main``
 
 #. After all tests pass and the PR has been approved, merge the PR into ``main``
 

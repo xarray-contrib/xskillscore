@@ -48,9 +48,7 @@ def probabilistic_broadcast(
     observations: XArray, forecasts: XArray, member_dim: str = "member"
 ) -> Tuple[XArray, ...]:
     """Broadcast dimension except for member_dim in forecasts."""
-    observations = observations.broadcast_like(
-        forecasts.isel({member_dim: 0}, drop=True)
-    )
+    observations = observations.broadcast_like(forecasts.isel({member_dim: 0}, drop=True))
     forecasts = forecasts.broadcast_like(observations)
     return observations, forecasts
 
@@ -468,9 +466,7 @@ def threshold_brier_score(
     """
     if isinstance(threshold, list):
         threshold.sort()
-        threshold = xr.DataArray(
-            threshold, dims="threshold", coords={"threshold": threshold}
-        )
+        threshold = xr.DataArray(threshold, dims="threshold", coords={"threshold": threshold})
 
     if isinstance(threshold, (xr.DataArray, xr.Dataset)):
         if "threshold" not in threshold.dims:
@@ -517,11 +513,7 @@ def _assign_rps_category_bounds(
     Additionally adds left-most -np.inf category and right-most +np.inf category."""
     if edges[bin_dim].size >= 2:
         res = res.assign_coords(
-            {
-                f"{name}_category_edge": ", ".join(
-                    _get_category_bounds(edges[bin_dim].values)
-                )
-            }
+            {f"{name}_category_edge": ", ".join(_get_category_bounds(edges[bin_dim].values))}
         )
         res[f"{name}_category_edge"] = (
             f"[-np.inf, {edges[bin_dim].isel({bin_dim: 0}).values}), "
@@ -654,9 +646,7 @@ def rps(
     However, you still need to ensure that ``category_edges`` covers the forecasts
     and observations distributions.
 
-    >>> category_edges = o.quantile(q=[0.33, 0.66]).rename(
-    ...     {"quantile": "category_edge"}
-    ... )
+    >>> category_edges = o.quantile(q=[0.33, 0.66]).rename({"quantile": "category_edge"})
     >>> xs.rps(o, f, category_edges, dim="x")
     <xarray.DataArray (y: 3)> Size: 24B
     array([0.37037037, 0.81481481, 0.88888889])
@@ -674,32 +664,22 @@ def rps(
     >>> categories = ["below normal", "normal", "above_normal"]
     >>> o_p = xr.concat(
     ...     [
-    ...         (o < category_edges.isel(category=0)).assign_coords(
-    ...             category=categories[0]
-    ...         ),
+    ...         (o < category_edges.isel(category=0)).assign_coords(category=categories[0]),
     ...         (
-    ...             (o >= category_edges.isel(category=0))
-    ...             & (o < category_edges.isel(category=1))
+    ...             (o >= category_edges.isel(category=0)) & (o < category_edges.isel(category=1))
     ...         ).assign_coords(category=categories[1]),
-    ...         (o >= category_edges.isel(category=1)).assign_coords(
-    ...             category=categories[2]
-    ...         ),
+    ...         (o >= category_edges.isel(category=1)).assign_coords(category=categories[2]),
     ...     ],
     ...     "category",
     ... )
     >>> assert (o_p.sum("category") == 1).all()
     >>> f_p = xr.concat(
     ...     [
-    ...         (f < category_edges.isel(category=0)).assign_coords(
-    ...             category=categories[0]
-    ...         ),
+    ...         (f < category_edges.isel(category=0)).assign_coords(category=categories[0]),
     ...         (
-    ...             (f >= category_edges.isel(category=0))
-    ...             & (f < category_edges.isel(category=1))
+    ...             (f >= category_edges.isel(category=0)) & (f < category_edges.isel(category=1))
     ...         ).assign_coords(category=categories[1]),
-    ...         (f >= category_edges.isel(category=1)).assign_coords(
-    ...             category=categories[2]
-    ...         ),
+    ...         (f >= category_edges.isel(category=1)).assign_coords(category=categories[2]),
     ...     ],
     ...     "category",
     ... ).mean("member")
@@ -736,8 +716,7 @@ def rps(
     if category_edges is not None:
         if member_dim not in forecasts.dims:
             raise ValueError(
-                f"Expect to find {member_dim} in forecasts dimensions, found"
-                f"{forecasts.dims}."
+                f"Expect to find {member_dim} in forecasts dimensions, found{forecasts.dims}."
             )
         if fair:
             M = forecasts[member_dim].size
@@ -808,8 +787,7 @@ def rps(
         category_dim = "category"
         if category_dim not in forecasts.dims:
             raise ValueError(
-                f"Expected dimension {category_dim} in cumulative forecasts, "
-                f"found {forecasts.dims}"
+                f"Expected dimension {category_dim} in cumulative forecasts, found {forecasts.dims}"
             )
         if category_dim not in observations.dims:
             raise ValueError(
@@ -852,9 +830,7 @@ def rps(
     # combine many forecasts-observations pairs
     res = res.mean(dim)
 
-    res = _keep_nans_masked(
-        observations, forecasts, res, dim=dim, member_dim=member_dim
-    )
+    res = _keep_nans_masked(observations, forecasts, res, dim=dim, member_dim=member_dim)
 
     if keep_attrs:  # attach by hand
         res.attrs.update(forecasts.attrs)
@@ -935,9 +911,7 @@ def rank_histogram(
         if random_for_tied:
             ranks_min = scipy.stats.rankdata(xy, axis=-1, method="min")
             ranks_max = scipy.stats.rankdata(xy, axis=-1, method="max")
-            ranks = ranks_min + np.int32(
-                (ranks_max - ranks_min + 1) * np.random.rand(*xy.shape)
-            )
+            ranks = ranks_min + np.int32((ranks_max - ranks_min + 1) * np.random.rand(*xy.shape))
         else:  # no special handling of ties
             ranks = rankdata(xy, axis=-1)
         ranks = ranks[..., 0]  # take obs rank
@@ -962,9 +936,7 @@ def rank_histogram(
     )
 
     bin_edges = np.arange(0.5, len(forecasts[member_dim]) + 2)
-    hist = histogram(
-        ranks, bins=[bin_edges], bin_names=["rank"], dim=dim, bin_dim_suffix=""
-    )
+    hist = histogram(ranks, bins=[bin_edges], bin_names=["rank"], dim=dim, bin_dim_suffix="")
     if keep_attrs:  # attach by hand
         hist.attrs.update(observations.attrs)
         hist.attrs.update(forecasts.attrs)
@@ -1144,12 +1116,8 @@ def reliability(
     )
 
     # Add probability bin coordinate
-    rel = rel.assign_coords(
-        {FORECAST_PROBABILITY_DIM: _get_bin_centers(probability_bin_edges)}
-    )
-    samp = samp.assign_coords(
-        {FORECAST_PROBABILITY_DIM: _get_bin_centers(probability_bin_edges)}
-    )
+    rel = rel.assign_coords({FORECAST_PROBABILITY_DIM: _get_bin_centers(probability_bin_edges)})
+    samp = samp.assign_coords({FORECAST_PROBABILITY_DIM: _get_bin_centers(probability_bin_edges)})
 
     # Move samples to a coordinate
     return _add_as_coord(rel, samp, coordinate_suffix="samples")
@@ -1168,9 +1136,7 @@ def _drop_intermediate(fpr, tpr):
     optimal_idxs = xr.concat(
         [
             fpr.isel(probability_bin=0, drop=False).astype("bool"),
-            np.logical_or(
-                fpr.diff("probability_bin", 2), tpr.diff("probability_bin", 2)
-            ),
+            np.logical_or(fpr.diff("probability_bin", 2), tpr.diff("probability_bin", 2)),
             fpr.isel(probability_bin=0, drop=False).astype("bool"),
         ],
         "probability_bin",
@@ -1180,9 +1146,7 @@ def _drop_intermediate(fpr, tpr):
         optimal_idxs = optimal_idxs.to_array()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
-        optimal_idxs = optimal_idxs.where(
-            optimal_idxs, drop=True
-        ).probability_bin.values
+        optimal_idxs = optimal_idxs.where(optimal_idxs, drop=True).probability_bin.values
     tpr = tpr.isel(probability_bin=optimal_idxs)
     fpr = fpr.isel(probability_bin=optimal_idxs)
     return fpr, tpr
@@ -1261,9 +1225,7 @@ def roc(
 
     Examples
     --------
-    >>> f = xr.DataArray(
-    ...     np.random.normal(size=(1000)), coords=[("time", np.arange(1000))]
-    ... )
+    >>> f = xr.DataArray(np.random.normal(size=(1000)), coords=[("time", np.arange(1000))])
     >>> o = f.copy()
     >>> category_edges = np.linspace(-2, 2, 5)
     >>> xs.roc(o, f, category_edges, dim=["time"])
@@ -1297,10 +1259,7 @@ def roc(
             if str(o_check.dtype) != "bool":
                 if not ((o_check == 0) | (o_check == 1)).all():
                     raise ValueError(
-                        (
-                            'Input "observations" must represent '
-                            "logical (True/False) outcomes"
-                        ),
+                        ('Input "observations" must represent logical (True/False) outcomes'),
                         o_check,
                     )
 
@@ -1343,12 +1302,8 @@ def roc(
         )
         fpr_list.append(dichotomous_contingency.false_alarm_rate())
         tpr_list.append(dichotomous_contingency.hit_rate())
-    tpr = xr.concat(tpr_list, "probability_bin").assign_coords(
-        probability_bin=bin_edges
-    )
-    fpr = xr.concat(fpr_list, "probability_bin").assign_coords(
-        probability_bin=bin_edges
-    )
+    tpr = xr.concat(tpr_list, "probability_bin").assign_coords(probability_bin=bin_edges)
+    fpr = xr.concat(fpr_list, "probability_bin").assign_coords(probability_bin=bin_edges)
 
     fpr = fpr.fillna(1.0)
     tpr = tpr.fillna(0.0)
