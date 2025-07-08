@@ -62,7 +62,7 @@ jobs:
           fail_ci_if_error: false
 
   doctest:  # Tests all docstrings
-    name: Doctests
+    name: Doctests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     needs: detect-ci-trigger
     if: needs.detect-ci-trigger.outputs.triggered == 'false'
@@ -93,6 +93,7 @@ jobs:
           python -m pytest --doctest-modules xskillscore --ignore xskillscore/tests
 
   docs_notebooks:  # Checks that pre-compiled notebooks in docs still work.
+    name: Test notebooks in docs (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     needs: detect-ci-trigger
     if: needs.detect-ci-trigger.outputs.triggered == 'false'
