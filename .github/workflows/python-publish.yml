@@ -5,15 +5,21 @@ on:
     tags:
       - "v*" # Push events to matching v*, i.e. v0.0.x,
 
+permissions:
+  contents: read
+
 jobs:
   release:
     name: Create Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Create Release
-        id: create_release
         uses: softprops/action-gh-release@v2
         with:
           body: |
@@ -23,11 +29,14 @@ jobs:
           prerelease: false
           tag_name: ${{ github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
   deploy:
     needs: release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

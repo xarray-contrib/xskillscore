@@ -83,8 +83,7 @@ def _check_weights(weights):
     else:
         if weights.min() < 0:
             raise ValueError(
-                "Weights has a minimum below 0. Please submit a weights array "
-                "of positive numbers."
+                "Weights has a minimum below 0. Please submit a weights array of positive numbers."
             )
         return weights
 
@@ -301,9 +300,7 @@ def _pearson_r(a, b, weights, axis, skipna):
 
     if weights is not None:
         r_num = sumfunc(weights * am * bm, axis=0)
-        r_den = np.sqrt(
-            sumfunc(weights * am * am, axis=0) * sumfunc(weights * bm * bm, axis=0)
-        )
+        r_den = np.sqrt(sumfunc(weights * am * am, axis=0) * sumfunc(weights * bm * bm, axis=0))
     else:
         r_num = sumfunc(am * bm, axis=0)
         r_den = np.sqrt(sumfunc(am * am, axis=0) * sumfunc(bm * bm, axis=0))
@@ -578,9 +575,7 @@ def _me(a, b, weights, axis, skipna):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         if weights is not None:
-            mean_error = sumfunc(error * weights, axis=axis) / sumfunc(
-                weights, axis=axis
-            )
+            mean_error = sumfunc(error * weights, axis=axis) / sumfunc(weights, axis=axis)
         else:
             mean_error = meanfunc(error, axis=axis)
     return mean_error
@@ -663,9 +658,7 @@ def _mse(a, b, weights, axis, skipna):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         if weights is not None:
-            return sumfunc(squared_error * weights, axis=axis) / sumfunc(
-                weights, axis=axis
-            )
+            return sumfunc(squared_error * weights, axis=axis) / sumfunc(weights, axis=axis)
         else:
             return meanfunc(squared_error, axis=axis)
 
@@ -704,9 +697,7 @@ def _mae(a, b, weights, axis, skipna):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         if weights is not None:
-            return sumfunc(absolute_error * weights, axis=axis) / sumfunc(
-                weights, axis=axis
-            )
+            return sumfunc(absolute_error * weights, axis=axis) / sumfunc(weights, axis=axis)
         else:
             return meanfunc(absolute_error, axis=axis)
 

@@ -97,9 +97,7 @@ def test_sign_test_identical(a_1d, a_1d_worse, b_1d, metric):
         a_1d, a_1d_worse, b_1d, time_dim="time", metric=metric, orientation="positive"
     )
     # check flat
-    assert (
-        actual_walk.diff(dim="time").isel(time=[i - 1 for i in identicals]) == 0
-    ).all()
+    assert (actual_walk.diff(dim="time").isel(time=[i - 1 for i in identicals]) == 0).all()
 
 
 def test_sign_test_alpha(a_1d, a_1d_worse, b_1d):
@@ -148,9 +146,7 @@ def test_sign_test_orientation(a_1d, a_1d_worse, b_1d, orientation):
 
 
 @pytest.mark.parametrize("metric", ["mae", "rmse", "mse"])
-def test_sign_test_already_compared_orientation_negative(
-    a_1d, a_1d_worse, b_1d, metric
-):
+def test_sign_test_already_compared_orientation_negative(a_1d, a_1d_worse, b_1d, metric):
     """Test sign_test with forecasts already previously evaluated with observation for
     negative orientation (smaller distances mean better forecast)."""
     a_b_diff = getattr(xs, metric)(a_1d, b_1d, dim=[])
@@ -168,9 +164,7 @@ def crpss(o, f_prob, dim=None):
 
 
 @pytest.mark.parametrize("metric", [crpss], ids=["crpss"])
-def test_sign_test_already_compared_orientation_positive_probabilistic(
-    f_prob, o, metric
-):
+def test_sign_test_already_compared_orientation_positive_probabilistic(f_prob, o, metric):
     """Test sign_test for probabilistic crpss metric with positive orientation."""
     o = o.isel(lon=0, lat=0, drop=True)
     f_prob = f_prob.isel(lon=0, lat=0, drop=True)
@@ -267,9 +261,7 @@ def test_sign_test_NaNs_confidence(a, a_worse, b):
 @pytest.mark.parametrize("alpha", [0.05])
 @pytest.mark.parametrize("chunk", [True, False])
 @pytest.mark.parametrize("input", ["Dataset", "multidim Dataset", "DataArray", "mixed"])
-def test_halfwidth_ci_test_inputs(
-    a_1d, a_1d_worse_less_corr, b_1d, input, chunk, alpha
-):
+def test_halfwidth_ci_test_inputs(a_1d, a_1d_worse_less_corr, b_1d, input, chunk, alpha):
     """Test halfwidth_ci_test with xr inputs and chunked."""
     if "Dataset" in input:
         name = "var"
@@ -312,9 +304,7 @@ def test_halfwidth_ci_test_metric_error(a_1d, a_1d_worse_less_corr, b_1d, metric
 
 
 @pytest.mark.parametrize("alpha", [0.05])
-@pytest.mark.parametrize(
-    "metric", ["me", "rmse", "mse", "mae", "median_absolute_error", "smape"]
-)
+@pytest.mark.parametrize("metric", ["me", "rmse", "mse", "mae", "median_absolute_error", "smape"])
 def test_halfwidth_ci_test(a_1d, a_1d_worse_less_corr, b_1d, metric, alpha):
     """Test halfwidth_ci_test favors better forecast."""
     a_1d_worse_less_corr = a_1d.copy()

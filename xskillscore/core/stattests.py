@@ -102,9 +102,7 @@ def multipletests(
     ...     np.random.normal(size=(3, 3)),
     ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
     ... )
-    >>> result = xs.multipletests(
-    ...     p, alpha=0.1, method="fdr_bh", return_results="all_as_result_dim"
-    ... )
+    >>> result = xs.multipletests(p, alpha=0.1, method="fdr_bh", return_results="all_as_result_dim")
     >>> result
     <xarray.DataArray (result: 4, x: 3, y: 3)> Size: 288B
     array([[[ 0.        ,  1.        ,  0.        ],
@@ -150,19 +148,15 @@ def multipletests(
 
     if method is None:
         raise ValueError(
-            f"Please indicate a method using the 'method=...' keyword. "
-            f"Select from {MULTIPLE_TESTS}"
+            f"Please indicate a method using the 'method=...' keyword. Select from {MULTIPLE_TESTS}"
         )
     elif method not in MULTIPLE_TESTS:
-        raise ValueError(
-            f"Your method '{method}' is not in the accepted methods: {MULTIPLE_TESTS}"
-        )
+        raise ValueError(f"Your method '{method}' is not in the accepted methods: {MULTIPLE_TESTS}")
 
     allowed_return_results = ["all_as_tuple", "pvals_corrected", "all_as_result_dim"]
     if return_results not in allowed_return_results:
         raise ValueError(
-            f"Expected `return_results` from {allowed_return_results}, "
-            f"found {return_results}"
+            f"Expected `return_results` from {allowed_return_results}, found {return_results}"
         )
 
     ret = xr.apply_ufunc(

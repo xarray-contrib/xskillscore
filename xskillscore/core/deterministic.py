@@ -51,9 +51,7 @@ __all__ = [
 ]
 
 
-def _determine_input_core_dims(
-    dim: str | List[str], weights: XArray | None
-) -> List[List[str]]:
+def _determine_input_core_dims(dim: str | List[str], weights: XArray | None) -> List[List[str]]:
     """
     Determine input_core_dims based on type of dim and weights.
 
@@ -375,8 +373,7 @@ def effective_sample_size(a, b, dim="time", skipna=False, keep_attrs=False):
         new_dim = dim[0]
     if new_dim != "time":
         warnings.warn(
-            f"{dim} is not 'time'. Make sure that you are applying this over a "
-            f"temporal dimension."
+            f"{dim} is not 'time'. Make sure that you are applying this over a temporal dimension."
         )
 
     return xr.apply_ufunc(
@@ -468,7 +465,7 @@ def pearson_r_eff_p_value(
     <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[0.82544245,        nan, 0.25734167],
            [0.78902959, 0.57503354, 0.8059353 ],
-           [0.79242625, 0.66792245,        nan]])
+           [0.79242625, 0.66792245, 1.        ]])
     Dimensions without coordinates: x, y
     """
     _fail_if_dim_empty(dim)
@@ -483,8 +480,7 @@ def pearson_r_eff_p_value(
         new_dim = dim[0]
     if new_dim != "time":
         warnings.warn(
-            f"{dim} is not 'time'. Make sure that you are applying this over a "
-            f"temporal dimension."
+            f"{dim} is not 'time'. Make sure that you are applying this over a temporal dimension."
         )
 
     return xr.apply_ufunc(
@@ -734,8 +730,7 @@ def spearman_r_eff_p_value(
         new_dim = dim[0]
     if new_dim != "time":
         warnings.warn(
-            f"{dim} is not 'time'. Make sure that you are applying this over a "
-            f"temporal dimension."
+            f"{dim} is not 'time'. Make sure that you are applying this over a temporal dimension."
         )
 
     return xr.apply_ufunc(

@@ -3,7 +3,7 @@ Changelog History
 =================
 
 
-xskillscore v0.0.27 (unreleased)
+xskillscore v0.0.27 (2025-07-14)
 --------------------------------
 
 Bug Fixes
@@ -20,6 +20,12 @@ Internal Changes
   updated. (:pr:`426`) `Trevor James Smith`_
 - `xskillscore` now uses `setuptools-scm` to automatically determine the
   version number. (:pr:`427`) `Trevor James Smith`_
+- Updated GitHub Actions and `pre-commit` hook versions to more modern versions.
+  (:pr:`428`) `Trevor James Smith`_
+- Release documentation steps have been updated to to refer to the new
+  `setuptools-scm`-based approach. (:pr:`428`) `Trevor James Smith`_
+- The test suite now refers to the `xarray.testing` submodule for basic testing helpers.
+  (:pr:`422`) `weipeng1999`_
 
 
 xskillscore v0.0.26 (2024-03-10)
@@ -363,4 +369,5 @@ Testing
 .. _`Ray Bell`: https://github.com/raybellwaves
 .. _`Taher Chegini`: https://github.com/cheginit
 .. _`Trevor James Smith`: https://github.com/Zeitsperre
+.. _`weipeng1999`: https://github.com/weipeng1999
 .. _`Zachary Blackwood`: https://github.com/blackary

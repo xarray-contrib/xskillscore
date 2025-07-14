@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import xarray as xr
 from scipy.stats import norm
-from xarray.tests import assert_allclose
+from xarray.testing import assert_allclose
 
 from xskillscore.core.probabilistic import (
     brier_score,

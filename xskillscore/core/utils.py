@@ -130,12 +130,10 @@ def histogram(*args, bins=None, bin_names=None, **kwargs):
         if isinstance(kwargs["dim"], str):
             kwargs["dim"] = [kwargs["dim"]]
     for bin in bins:
-        assert isinstance(bin, np.ndarray), (
-            f"all bins must be numpy arrays, found {type(bin)}"
-        )
+        assert isinstance(bin, np.ndarray), f"all bins must be numpy arrays, found {type(bin)}"
 
     if isinstance(args[0], xr.Dataset):
-        # Get list of variables that are shared across all Datasets
+        # Get a list of variables that are shared across all Datasets
         overlapping_vars = set.intersection(*map(set, [arg.data_vars for arg in args]))
         if overlapping_vars:
             # If bin_names not provided, use default ----

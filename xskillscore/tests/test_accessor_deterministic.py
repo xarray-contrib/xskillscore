@@ -1,6 +1,6 @@
 import pytest
 import xarray as xr
-from xarray.tests import assert_allclose
+from xarray.testing import assert_allclose
 
 from xskillscore.core.deterministic import (
     effective_sample_size,
@@ -102,11 +102,7 @@ def test_deterministic_metrics_accessor(
     else:
         actual = metric(a, b, dim=dim, weights=_weights, skipna=skipna_bool)
         if outer_bool:
-            expected = accessor_func(
-                "a", b, dim=dim, weights=_weights, skipna=skipna_bool
-            )
+            expected = accessor_func("a", b, dim=dim, weights=_weights, skipna=skipna_bool)
         else:
-            expected = accessor_func(
-                "a", "b", dim=dim, weights=_weights, skipna=skipna_bool
-            )
+            expected = accessor_func("a", "b", dim=dim, weights=_weights, skipna=skipna_bool)
     assert_allclose(actual, expected)
