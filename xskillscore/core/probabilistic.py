@@ -31,7 +31,7 @@ except ImportError:
 try:
     from numpy import trapezoid
 except ImportError:
-    from numpy import trapz as trapezoid
+    from numpy import trapz as trapezoid  # type: ignore[no-redef]
 
 __all__ = [
     "brier_score",
