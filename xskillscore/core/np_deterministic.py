@@ -417,7 +417,7 @@ def _pearson_r_eff_p_value(a, b, axis, skipna):
         _b = 0.5
         res = special.betainc(_a, _b, _x)
         # reset masked values to nan
-        nan_locs = np.where(np.isnan(r))
+        nan_locs = np.where(np.isnan(np.atleast_1d(r)))
         if len(nan_locs[0]) > 0:
             res[nan_locs] = np.nan
         return res
