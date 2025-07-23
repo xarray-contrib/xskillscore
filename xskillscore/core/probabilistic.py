@@ -28,6 +28,11 @@ try:
 except ImportError:
     from scipy.stats import rankdata
 
+try:
+    from numpy import trapezoid
+except ImportError:
+    from numpy import trapz as trapezoid  # type: ignore[no-redef]
+
 __all__ = [
     "brier_score",
     "crps_ensemble",
@@ -1158,7 +1163,7 @@ def _auc(fpr, tpr, dim="probability_bin"):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         area = xr.apply_ufunc(
-            np.trapezoid,
+            trapezoid,
             tpr,
             fpr,
             input_core_dims=[[dim], [dim]],

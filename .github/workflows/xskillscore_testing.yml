@@ -51,6 +51,10 @@ jobs:
           environment-file: ci/minimum-tests.yml
           create-args: >
             python=${{ matrix.python-version }}
+      - name: Install minimal numpy
+        if: matrix.python-version == '3.9'
+        run: |
+          micromamba install numpy==1.24
       - name: Run tests
         run: |
           pytest -n 4 --cov=xskillscore --cov-report=xml --verbose
