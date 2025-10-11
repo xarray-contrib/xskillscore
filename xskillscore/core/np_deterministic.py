@@ -362,10 +362,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         # on 0d arrays is deprecated, as it behaves surprisingly. Use
         # `atleast_1d(cond).nonzero()` if the old behavior was intended. If the context
         # of this warning is of the form `arr[nonzero(cond)]`, just use `arr[cond]`.
-        nan_locs = np.where(np.isnan(r))
-        if len(nan_locs[0]) > 0:
-            res[nan_locs] = np.nan
-        return res
+        return np.where(np.isnan(r), np.nan, res)
 
 
 def _pearson_r_eff_p_value(a, b, axis, skipna):
