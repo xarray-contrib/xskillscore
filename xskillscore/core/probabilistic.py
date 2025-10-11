@@ -1006,8 +1006,8 @@ def discrimination(
     array([[0.00437637, 0.15536105, 0.66739606, 0.12472648, 0.04814004],
            [0.00451467, 0.16704289, 0.66365688, 0.1241535 , 0.04063205]])
     Coordinates:
-      * forecast_probability  (forecast_probability) float64 40B 0.1 0.3 0.5 0.7 0.9
       * event                 (event) bool 2B True False
+      * forecast_probability  (forecast_probability) float64 40B 0.1 0.3 0.5 0.7 0.9
 
     References
     ----------
