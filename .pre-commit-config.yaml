@@ -46,7 +46,7 @@ repos:
     rev: v0.4.3
     hooks:
       - id: blackdoc
-        additional_dependencies: ["black==25.1.0"]
+        additional_dependencies: ["black==25.9.0"]
 
   - repo: https://github.com/PyCQA/doc8
     rev: v2.0.0
