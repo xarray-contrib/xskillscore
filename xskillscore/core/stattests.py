@@ -182,10 +182,7 @@ def multipletests(
     ret = tuple(r.unstack("s").transpose(*p.dims, ...) for r in ret)
 
     def _add_kwargs_as_coords(r: XArray):
-        return r.assign_coords(
-            multipletests_method=method,
-            multipletests_alpha=alpha
-        )
+        return r.assign_coords(multipletests_method=method, multipletests_alpha=alpha)
 
     ret = tuple(_add_kwargs_as_coords(r) for r in ret)
 
