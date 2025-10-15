@@ -1006,8 +1006,8 @@ def discrimination(
     array([[0.00437637, 0.15536105, 0.66739606, 0.12472648, 0.04814004],
            [0.00451467, 0.16704289, 0.66365688, 0.1241535 , 0.04063205]])
     Coordinates:
-      * forecast_probability  (forecast_probability) float64 40B 0.1 0.3 0.5 0.7 0.9
       * event                 (event) bool 2B True False
+      * forecast_probability  (forecast_probability) float64 40B 0.1 0.3 0.5 0.7 0.9
 
     References
     ----------
@@ -1032,8 +1032,19 @@ def discrimination(
         dim=dim,
     ) / (np.logical_not(observations)).sum(dim=dim)
 
-    return xr.concat([hist_event, hist_no_event], dim="event").assign_coords(
+    result = xr.concat([hist_event, hist_no_event], dim="event").assign_coords(
         {"event": [True, False]}
+    )
+    # Ensure consistent dimension and coordinate order across versions
+    result = result.transpose("event", FORECAST_PROBABILITY_DIM, ...)
+    # Reconstruct to ensure coordinate order
+    return xr.DataArray(
+        result.values,
+        dims=result.dims,
+        coords={
+            "event": result.coords["event"],
+            FORECAST_PROBABILITY_DIM: result.coords[FORECAST_PROBABILITY_DIM],
+        },
     )
 
 

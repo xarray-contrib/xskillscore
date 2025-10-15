@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Literal, Mapping, Optional, Tuple, Union
 
 import xarray as xr
@@ -159,24 +160,32 @@ def multipletests(
             f"Expected `return_results` from {allowed_return_results}, found {return_results}"
         )
 
-    ret = xr.apply_ufunc(
-        statsmodels_multipletests,
-        p.stack(s=p.dims),
-        input_core_dims=[[]],
-        vectorize=True,
-        output_core_dims=[[]] * 4,
-        output_dtypes=[bool, float, float, float],
-        kwargs=dict(method=method, alpha=alpha, **multipletests_kwargs),
-        dask="parallelized",
-        keep_attrs=keep_attrs,
-    )
+    # Suppress NumPy scalar conversion deprecation warning from internal numpy operations
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="Conversion of an array with ndim > 0 to a scalar is deprecated",
+            category=DeprecationWarning,
+        )
+        ret = xr.apply_ufunc(
+            statsmodels_multipletests,
+            p.stack(s=p.dims),
+            input_core_dims=[[]],
+            vectorize=True,
+            output_core_dims=[[]] * 4,
+            output_dtypes=[bool, float, float, float],
+            kwargs=dict(method=method, alpha=alpha, **multipletests_kwargs),
+            dask="parallelized",
+            keep_attrs=keep_attrs,
+        )
 
     ret = tuple(r.unstack("s").transpose(*p.dims, ...) for r in ret)
 
     def _add_kwargs_as_coords(r: XArray):
-        r.coords["multipletests_method"] = method
-        r.coords["multipletests_alpha"] = alpha
-        return r
+        return r.assign_coords(
+            multipletests_method=method,
+            multipletests_alpha=alpha
+        )
 
     ret = tuple(_add_kwargs_as_coords(r) for r in ret)
 
