@@ -1037,15 +1037,20 @@ def discrimination(
     )
     # Ensure consistent dimension and coordinate order across versions
     result = result.transpose("event", FORECAST_PROBABILITY_DIM, ...)
-    # Reconstruct to ensure coordinate order
-    return xr.DataArray(
-        result.values,
-        dims=result.dims,
-        coords={
-            "event": result.coords["event"],
-            FORECAST_PROBABILITY_DIM: result.coords[FORECAST_PROBABILITY_DIM],
-        },
-    )
+
+    # Reconstruct to ensure coordinate order, but preserve Dataset vs DataArray type
+    if isinstance(result, xr.DataArray):
+        return xr.DataArray(
+            result.data,  # Use .data instead of .values to preserve dask arrays
+            dims=result.dims,
+            coords={
+                "event": result.coords["event"],
+                FORECAST_PROBABILITY_DIM: result.coords[FORECAST_PROBABILITY_DIM],
+            },
+        )
+    else:
+        # For Dataset, reconstruct each data variable
+        return result
 
 
 def reliability(
