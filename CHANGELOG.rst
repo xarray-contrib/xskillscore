@@ -3,6 +3,18 @@ Changelog History
 =================
 
 
+xskillscore v0.0.28 (2025-10-15)
+--------------------------------
+
+Bug Fixes
+~~~~~~~~~
+- Fixed a bug introduced in v0.0.27 where `numpy` v1.x support was broken for some
+  algorithms. (:pr:`431`) `Trevor James Smith`_.
+- Removed all `numpy.atleast_1d()` calls that were causing numerical differences in
+  p-value calculations with `numpy` v2.x and fixed several doctest expected outputs.
+  (:pr:`440`) `Aaron Spring`_.
+
+
 xskillscore v0.0.27 (2025-07-14)
 --------------------------------
 
