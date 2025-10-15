@@ -143,7 +143,7 @@ def _effective_sample_size(a, b, axis, skipna):
     b = np.rollaxis(b, axis)
 
     # count total number of samples that are non-nan.
-    n = np.count_nonzero(~np.isnan(np.atleast_1d(a)), axis=0)
+    n = np.count_nonzero(~np.isnan(a), axis=0)
 
     # compute lag-1 autocorrelation.
     am, bm = __compute_anomalies(a, b, weights=None, axis=0, skipna=skipna)
@@ -347,7 +347,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         a = np.rollaxis(a, axis)
         b = np.rollaxis(b, axis)
         # count non-nans
-        dof = np.count_nonzero(~np.isnan(np.atleast_1d(a)), axis=0) - 2
+        dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
             t_squared = r**2 * (dof / ((1.0 - r) * (1.0 + r)))
@@ -358,14 +358,7 @@ def _pearson_r_p_value(a, b, weights, axis, skipna):
         _b = 0.5
         res = special.betainc(_a, _b, _x)
         # reset masked values to nan
-        # raises  <__array_function__ internals>:5: DeprecationWarning: Calling nonzero
-        # on 0d arrays is deprecated, as it behaves surprisingly. Use
-        # `atleast_1d(cond).nonzero()` if the old behavior was intended. If the context
-        # of this warning is of the form `arr[nonzero(cond)]`, just use `arr[cond]`.
-        nan_locs = np.where(np.isnan(np.atleast_1d(r)))
-        if len(nan_locs[0]) > 0:
-            res[nan_locs] = np.nan
-        return res
+        return np.where(np.isnan(r), np.nan, res)
 
 
 def _pearson_r_eff_p_value(a, b, axis, skipna):
@@ -417,10 +410,7 @@ def _pearson_r_eff_p_value(a, b, axis, skipna):
         _b = 0.5
         res = special.betainc(_a, _b, _x)
         # reset masked values to nan
-        nan_locs = np.where(np.isnan(np.atleast_1d(r)))
-        if len(nan_locs[0]) > 0:
-            res[nan_locs] = np.nan
-        return res
+        return np.where(np.isnan(r), np.nan, res)
 
 
 def _spearman_r(a, b, weights, axis, skipna):
@@ -490,7 +480,7 @@ def _spearman_r_p_value(a, b, weights, axis, skipna):
     a = np.rollaxis(a, axis)
     b = np.rollaxis(b, axis)
     # count non-nans
-    dof = np.count_nonzero(~np.isnan(np.atleast_1d(a)), axis=0) - 2
+    dof = np.count_nonzero(~np.isnan(a), axis=0) - 2
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         t = rs * np.sqrt((dof / ((rs + 1.0) * (1.0 - rs))).clip(0))
