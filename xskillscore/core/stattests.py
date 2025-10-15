@@ -122,11 +122,11 @@ def multipletests(
             [ 0.1       ,  0.1       ,  0.1       ],
             [ 0.1       ,  0.1       ,  0.1       ]]])
     Coordinates:
-      * result                (result) <U15 240B 'reject' ... 'alphacBonf'
       * x                     (x) int64 24B 0 1 2
       * y                     (y) int64 24B 0 1 2
         multipletests_method  <U6 24B 'fdr_bh'
         multipletests_alpha   float64 8B 0.1
+      * result                (result) <U15 240B 'reject' ... 'alphacBonf'
     """
     MULTIPLE_TESTS = [
         "bonferroni",

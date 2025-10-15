@@ -465,7 +465,7 @@ def pearson_r_eff_p_value(
     <xarray.DataArray (x: 3, y: 3)> Size: 72B
     array([[0.82544245,        nan, 0.25734167],
            [0.78902959, 0.57503354, 0.8059353 ],
-           [0.79242625, 0.66792245, 1.        ]])
+           [0.79242625, 0.66792245,        nan]])
     Dimensions without coordinates: x, y
     """
     _fail_if_dim_empty(dim)
