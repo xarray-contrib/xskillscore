@@ -28,10 +28,11 @@ try:
 except ImportError:
     from scipy.stats import rankdata
 
+# Remove when `numpy` v1.x support is dropped
 try:
     from numpy import trapezoid
 except ImportError:
-    from numpy import trapz as trapezoid  # type: ignore[no-redef]
+    from numpy import trapz as trapezoid  # type: ignore[attr-defined,no-redef]
 
 __all__ = [
     "brier_score",

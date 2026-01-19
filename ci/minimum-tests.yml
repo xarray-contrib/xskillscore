@@ -9,7 +9,8 @@ dependencies:
   - coveralls
   - dask-core >=2023.4.0
   - matplotlib-base
-  - numpy >=1.24
+  - numba >=0.57
+  - numpy >=1.24,<2.4
   - properscoring
   - pytest
   - pytest-cov
