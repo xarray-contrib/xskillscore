@@ -17,7 +17,8 @@ Bug Fixes
 Internal Changes
 ~~~~~~~~~~~~~~~~
 - Pinned `numpy` below v2.4 due to breaking API changes. (:pr:`441`) `Trevor James Smith`_
-- Adjusted tests to adapt to new `xarray` attributes preservation behaviour. (:pr:`441`) `Trevor James Smith`_
+- Adjusted tests to adapt to new `xarray` attributes preservation
+  behaviour. (:pr:`441`) `Trevor James Smith`_
 
 xskillscore v0.0.27 (2025-07-14)
 --------------------------------
