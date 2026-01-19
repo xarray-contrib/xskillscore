@@ -12,7 +12,8 @@ dependencies:
   - ipython
   - matplotlib-base
   - nbsphinx
-  - numpy >=1.24
+  - numba >=0.57
+  - numpy >=1.24,<2.4
   - properscoring
   - scikit-learn
   - scipy >=1.10
