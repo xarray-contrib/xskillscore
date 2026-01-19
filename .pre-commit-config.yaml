@@ -9,7 +9,7 @@ ci:
   autofix_prs: true
   autoupdate_branch: ""
   autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
-  autoupdate_schedule: quarterly
+  autoupdate_schedule: 'quarterly'
   skip: []
   submodules: false
 
@@ -24,17 +24,17 @@ repos:
       - id: check-merge-conflict
       - id: check-toml
       - id: check-yaml
-        args: ["--allow-multiple-documents"]
+        args: [ "--allow-multiple-documents" ]
       - id: debug-statements
       - id: end-of-file-fixer
       - id: no-commit-to-branch
       - id: pretty-format-json
-        args: ["--autofix", "--no-ensure-ascii", "--no-sort-keys"]
+        args: [ "--autofix", "--no-ensure-ascii", "--no-sort-keys" ]
         exclude: ".ipynb|asv.conf.json"
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.13.3"
+    rev: "v0.14.13"
     hooks:
       - id: ruff-check
         args: [ "--fix" ]
@@ -43,10 +43,10 @@ repos:
         types_or: [python, pyi, jupyter]
 
   - repo: https://github.com/keewis/blackdoc
-    rev: v0.4.3
+    rev: v0.4.6
     hooks:
       - id: blackdoc
-        additional_dependencies: ["black==25.9.0"]
+        additional_dependencies: [ 'black==25.9.0' ]
 
   - repo: https://github.com/PyCQA/doc8
     rev: v2.0.0
@@ -62,23 +62,23 @@ repos:
           ]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.18.2"
+    rev: "v1.19.1"
     hooks:
       - id: mypy
         exclude: "asv_bench"
         additional_dependencies: [
             # Type stubs
-            types-python-dateutil,
-            types-setuptools,
-            types-PyYAML,
-            types-pytz,
-            typing-extensions,
+            'types-python-dateutil',
+            'types-setuptools',
+            'types-PyYAML',
+            'types-pytz',
+            'typing-extensions',
             # Dependencies that are typed
-            numpy,
+            'numpy',
           ]
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.34.0
+    rev: 0.36.0
     hooks:
       - id: check-github-workflows
       - id: check-readthedocs
