@@ -2,6 +2,7 @@ import warnings
 
 import numpy as np
 import numpy.testing as npt
+from packaging.version import Version
 import properscoring
 import pytest
 import xarray as xr
@@ -64,12 +65,18 @@ def assert_chunk(actual, chunk_bool):
 
 
 def assert_keep_attrs(actual, o, keep_attrs):
-    """check that actual kept attributes only if keep_attrs==True."""
+    """
+    check that actual kept attributes only if keep_attrs==True.
+    
+    For newer xarray versions, attributes are preserved by default.
+    """
     if keep_attrs:
         assert actual.attrs == o.attrs
     else:
+        if Version(xr.__version__) >= Version("2025.11.0"):
+            if "source" in actual.attrs:
+                del actual.attrs["source"]
         assert actual.attrs == {}
-
 
 def assign_type_input_output(actual, o):
     assert isinstance(o, type(actual))
