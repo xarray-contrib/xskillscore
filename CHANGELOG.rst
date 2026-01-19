@@ -3,7 +3,7 @@ Changelog History
 =================
 
 
-xskillscore v0.0.28 (2025-10-15)
+xskillscore v0.0.28 (2025-01-19)
 --------------------------------
 
 Bug Fixes
@@ -14,6 +14,10 @@ Bug Fixes
   p-value calculations with `numpy` v2.x and fixed several doctest expected outputs.
   (:pr:`440`) `Aaron Spring`_.
 
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Pinned `numpy` below v2.4 due to breaking API changes. (:pr:`441`) `Trevor James Smith`_
+- Adjusted tests to adapt to new `xarray` attributes preservation behaviour. (:pr:`441`) `Trevor James Smith`_
 
 xskillscore v0.0.27 (2025-07-14)
 --------------------------------
