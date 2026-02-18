@@ -16,6 +16,8 @@ Bug Fixes
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
+- Lifted `numpy<2` dependency constraint and bumped minimum to `numpy>=1.25`.
+  (:pr:`444`) `Aaron Spring`_
 - Pinned `numpy` below v2.4 due to breaking API changes. (:pr:`441`) `Trevor James Smith`_
 - Adjusted tests to adapt to new `xarray` attributes preservation
   behaviour. (:pr:`441`) `Trevor James Smith`_
