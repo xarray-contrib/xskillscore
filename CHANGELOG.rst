@@ -3,7 +3,16 @@ Changelog History
 =================
 
 
-xskillscore v0.0.28 (2025-01-19)
+xskillscore v0.0.29 (2026-02-18)
+--------------------------------
+
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Lifted `numpy<2` dependency constraint and bumped minimum to `numpy>=1.25`.
+  (:pr:`444`) `Aaron Spring`_
+
+
+xskillscore v0.0.28 (2026-01-19)
 --------------------------------
 
 Bug Fixes
@@ -16,11 +25,10 @@ Bug Fixes
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
-- Lifted `numpy<2` dependency constraint and bumped minimum to `numpy>=1.25`.
-  (:pr:`444`) `Aaron Spring`_
 - Pinned `numpy` below v2.4 due to breaking API changes. (:pr:`441`) `Trevor James Smith`_
 - Adjusted tests to adapt to new `xarray` attributes preservation
   behaviour. (:pr:`441`) `Trevor James Smith`_
+- Updated pre-commit configuration. (:pr:`434`)
 
 xskillscore v0.0.27 (2025-07-14)
 --------------------------------
