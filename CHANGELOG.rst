@@ -8,7 +8,7 @@ xskillscore v0.0.29 (2026-02-18)
 
 Internal Changes
 ~~~~~~~~~~~~~~~~
-- Lifted `numpy<2` dependency constraint and bumped minimum to `numpy>=1.25`.
+- Lifted `numpy<2.4` dependency constraint and bumped minimum to `numpy>=1.25`.
   (:pr:`444`) `Aaron Spring`_
 
 
