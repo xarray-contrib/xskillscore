@@ -16,7 +16,7 @@ Originally developed to parallelize forecast metrics for multi-model-multi-ensem
 
 Run full test suite:
 ```bash
-pytest -n 4 --cov=xskillscore --cov-report=xml --verbose
+pytest -n auto --cov=xskillscore --cov-report=xml --verbose
 ```
 
 Run tests for a single file:
@@ -208,7 +208,7 @@ Optional acceleration:
 2. Make changes and add tests in `xskillscore/tests/`
 3. Add docstring examples (they are tested via doctest)
 4. Run `pre-commit run --all-files` before committing
-5. Ensure tests pass: `pytest -n 4`
+5. Ensure tests pass: `pytest -n auto`
 6. Ensure doctests pass: `python -m pytest --doctest-modules xskillscore --ignore xskillscore/tests`
 7. Update CHANGELOG.rst if appropriate
 8. Submit PR to main branch

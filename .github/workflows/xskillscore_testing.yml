@@ -57,7 +57,7 @@ jobs:
           micromamba install numpy==1.24
       - name: Run tests
         run: |
-          pytest -n 4 --cov=xskillscore --cov-report=xml --verbose
+          pytest -n auto --cov=xskillscore --cov-report=xml --verbose
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v5
         with:
