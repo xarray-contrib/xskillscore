@@ -1,12 +1,14 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI coding agents when working with code in this repository.
 
 ## Project Overview
 
 **xskillscore** is a Python package for computing forecast verification metrics using xarray. It provides both deterministic and probabilistic forecast verification metrics designed to work with multi-dimensional labeled arrays, with support for Dask parallel computing.
 
 Originally developed to parallelize forecast metrics for multi-model-multi-ensemble forecasts in the SubX project.
+
+**Related Projects**: [climpred](https://github.com/pangeo-data/climpred) is a key consumer of xskillscore, providing higher-level prediction skill assessment workflows.
 
 ## Development Commands
 
