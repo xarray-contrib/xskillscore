@@ -1020,6 +1020,40 @@ def test_roc_bin_edges_continuous_against_sklearn(
         assert (xs_tpr == sk_tpr).all()
 
 
+@pytest.mark.parametrize("drop_intermediate_bool", [False, True])
+def test_roc_continuous_forecast_out_of_unit_range_against_sklearn(drop_intermediate_bool):
+    """Continuous ROC must match sklearn even when forecasts lie outside [0, 1].
+
+    Regression test for GH #442: observations are binary but were categorised
+    with the forecast-derived threshold, so events were never detected once
+    forecast magnitudes exceeded the [0, 1] range of the observations.
+    """
+    np.random.seed(1512)
+    obs_raw = xr.DataArray(
+        np.random.normal(0.5, 0.2, size=(20, 10)),
+        coords=[("time", np.arange(20)), ("points", np.arange(10))],
+    )
+    da_obs = (obs_raw > 0.5).astype(int)
+    # forecast shifted out of [0, 1] per point and with a transposed dim order
+    alpha = xr.DataArray(np.linspace(0, 1, num=10), coords=[("points", np.arange(10))])
+    err = xr.DataArray(np.random.normal(0.0, 0.03, size=20), coords=[("time", np.arange(20))])
+    da_forecast = alpha + obs_raw + err
+
+    xs_area = roc(
+        da_obs,
+        da_forecast,
+        "continuous",
+        dim="time",
+        drop_intermediate=drop_intermediate_bool,
+        return_results="area",
+    )
+    for point in range(da_obs.points.size):
+        sk_area = roc_auc_score(
+            da_obs.isel(points=point).values, da_forecast.isel(points=point).values
+        )
+        np.testing.assert_allclose(xs_area.isel(points=point), sk_area)
+
+
 def test_roc_bin_edges_drop_intermediate(forecast_1d_long, observation_1d_long):
     """Test that drop_intermediate reduces probability_bins in xs.roc ."""
     fp = forecast_1d_long.clip(0, 1)  # prob

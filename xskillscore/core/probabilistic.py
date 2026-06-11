@@ -1310,6 +1310,11 @@ def roc(
 
     # loop over each bin_edge and get true positive rate and false positive rate
     # from contingency
+    if continuous:
+        # observations are binary (0/1); categorise them with a fixed split at 0.5
+        # rather than the forecast-derived threshold ``i`` (which may lie outside
+        # the [0, 1] range of the observations). See GH #442.
+        observation_category_edges = np.array([-np.inf, 0.5, np.inf])
     tpr_list, fpr_list = [], []
     for i in bin_edges:
         dichotomous_category_edges = np.array(
@@ -1318,7 +1323,7 @@ def roc(
         dichotomous_contingency = Contingency(
             observations,
             forecasts,
-            dichotomous_category_edges,
+            observation_category_edges if continuous else dichotomous_category_edges,
             dichotomous_category_edges,
             dim=dim,
         )
