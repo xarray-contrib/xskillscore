@@ -3,6 +3,18 @@ Changelog History
 =================
 
 
+xskillscore unreleased
+----------------------
+
+Bug Fixes
+~~~~~~~~~
+- Fixed :py:func:`~xskillscore.roc` with ``bin_edges="continuous"`` returning
+  incorrect areas (down to ``0.0`` instead of ``1.0``) when forecast values fall
+  outside the ``[0, 1]`` range of the binary observations. Observations are now
+  categorised with a fixed split rather than the forecast-derived threshold, so
+  results match ``sklearn.metrics.roc_auc_score``. (:issue:`442`) `Aaron Spring`_
+
+
 xskillscore v0.0.29 (2026-02-18)
 --------------------------------
 
