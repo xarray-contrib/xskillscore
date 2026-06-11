@@ -11,9 +11,7 @@ from .types import XArray
 
 def _multipletests_numpy(pvals, **kwargs):
     """Call statsmodels multipletests and broadcast scalar outputs to match pvals shape."""
-    reject, pvals_corrected, alphacSidak, alphacBonf = statsmodels_multipletests(
-        pvals, **kwargs
-    )
+    reject, pvals_corrected, alphacSidak, alphacBonf = statsmodels_multipletests(pvals, **kwargs)
     n = len(pvals)
     return (
         reject.astype(float),
