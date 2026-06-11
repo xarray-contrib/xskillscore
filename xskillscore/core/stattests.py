@@ -1,12 +1,26 @@
 from __future__ import annotations
 
-import warnings
 from typing import Literal, Mapping, Optional, Tuple, Union
 
+import numpy as np
 import xarray as xr
 from statsmodels.stats.multitest import multipletests as statsmodels_multipletests
 
 from .types import XArray
+
+
+def _multipletests_numpy(pvals, **kwargs):
+    """Call statsmodels multipletests and broadcast scalar outputs to match pvals shape."""
+    reject, pvals_corrected, alphacSidak, alphacBonf = statsmodels_multipletests(
+        pvals, **kwargs
+    )
+    n = len(pvals)
+    return (
+        reject.astype(float),
+        pvals_corrected,
+        np.full(n, float(alphacSidak)),
+        np.full(n, float(alphacBonf)),
+    )
 
 
 def multipletests(
@@ -99,6 +113,7 @@ def multipletests(
 
     Examples
     --------
+    >>> np.random.seed(42)
     >>> p = xr.DataArray(
     ...     np.random.normal(size=(3, 3)),
     ...     coords=[("x", np.arange(3)), ("y", np.arange(3))],
@@ -110,17 +125,17 @@ def multipletests(
             [ 0.        ,  1.        ,  1.        ],
             [ 0.        ,  0.        ,  1.        ]],
     <BLANKLINE>
-           [[ 0.49671415, -0.1382643 ,  0.64768854],
-            [ 1.        , -0.23415337, -0.23413696],
-            [ 1.        ,  0.76743473, -0.46947439]],
+           [[ 0.89408548, -0.31109468,  0.97153281],
+            [ 1.        , -1.05369019, -0.70241087],
+            [ 1.        ,  0.98670179, -4.22526947]],
     <BLANKLINE>
-           [[ 0.1       ,  0.1       ,  0.1       ],
-            [ 0.1       ,  0.1       ,  0.1       ],
-            [ 0.1       ,  0.1       ,  0.1       ]],
+           [[ 0.01163847,  0.01163847,  0.01163847],
+            [ 0.01163847,  0.01163847,  0.01163847],
+            [ 0.01163847,  0.01163847,  0.01163847]],
     <BLANKLINE>
-           [[ 0.1       ,  0.1       ,  0.1       ],
-            [ 0.1       ,  0.1       ,  0.1       ],
-            [ 0.1       ,  0.1       ,  0.1       ]]])
+           [[ 0.01111111,  0.01111111,  0.01111111],
+            [ 0.01111111,  0.01111111,  0.01111111],
+            [ 0.01111111,  0.01111111,  0.01111111]]])
     Coordinates:
       * result                (result) <U15 240B 'reject' ... 'alphacBonf'
       * x                     (x) int64 24B 0 1 2
@@ -160,24 +175,17 @@ def multipletests(
             f"Expected `return_results` from {allowed_return_results}, found {return_results}"
         )
 
-    # Suppress NumPy scalar conversion deprecation warning from internal numpy operations
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            "ignore",
-            message="Conversion of an array with ndim > 0 to a scalar is deprecated",
-            category=DeprecationWarning,
-        )
-        ret = xr.apply_ufunc(
-            statsmodels_multipletests,
-            p.stack(s=p.dims),
-            input_core_dims=[[]],
-            vectorize=True,
-            output_core_dims=[[]] * 4,
-            output_dtypes=[bool, float, float, float],
-            kwargs=dict(method=method, alpha=alpha, **multipletests_kwargs),
-            dask="parallelized",
-            keep_attrs=keep_attrs,
-        )
+    ret = xr.apply_ufunc(
+        _multipletests_numpy,
+        p.stack(s=p.dims),
+        input_core_dims=[["s"]],
+        vectorize=False,
+        output_core_dims=[["s"], ["s"], ["s"], ["s"]],
+        output_dtypes=[float, float, float, float],
+        kwargs=dict(method=method, alpha=alpha, **multipletests_kwargs),
+        dask="parallelized",
+        keep_attrs=keep_attrs,
+    )
 
     ret = tuple(r.unstack("s").transpose(*p.dims, ...) for r in ret)
 
