@@ -1,4 +1,6 @@
+import numpy as np
 import pytest
+import xarray as xr
 from dask import is_dask_collection
 
 import xskillscore as xs
@@ -31,11 +33,16 @@ def test_multipletests_inputs(r_p, input, chunk):
     assert ret.coords["multipletests_alpha"] == alpha
 
 
-def test_multipletests_alpha(r_p):
+def test_multipletests_alpha():
     """Test that larger alpha leads to more rejected in multipletests."""
     method = "fdr_bh"
-    reject = multipletests(r_p, alpha=0.05, method=method).sel(result="reject")
-    reject_larger_alpha = multipletests(r_p, alpha=0.5, method=method).sel(result="reject")
+    # Use explicit p-values spanning a wide range so BH correction can distinguish alphas
+    p = xr.DataArray(
+        np.array([0.001, 0.003, 0.01, 0.05, 0.1, 0.3, 0.5, 0.7, 0.9, 1.0]),
+        dims=["x"],
+    )
+    reject = multipletests(p, alpha=0.05, method=method).sel(result="reject")
+    reject_larger_alpha = multipletests(p, alpha=0.5, method=method).sel(result="reject")
     # check more reject
     assert reject_larger_alpha.sum() > reject.sum()
 
