@@ -67,8 +67,8 @@ complete = [
 repository = "https://github.com/xarray-contrib/xskillscore"
 documentation = "https://xskillscore.readthedocs.io/en/stable/"
 
-[tool.setuptools]
-packages = ["xskillscore"]
+[tool.setuptools.packages.find]
+where = ["."]
 
 [tool.setuptools_scm]
 fallback_version = "9999"
