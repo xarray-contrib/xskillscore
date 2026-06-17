@@ -3,6 +3,19 @@ Changelog History
 =================
 
 
+.. _whats-new.unreleased:
+
+Unreleased
+----------
+
+Documentation
+~~~~~~~~~~~~~
+- Made the documentation discoverable and parseable by LLMs and coding agents by
+  generating ``llms.txt`` and ``llms-full.txt`` during the docs build (via
+  ``sphinx-llms-txt``) and adding documentation breadcrumbs to the package
+  ``__init__``. (:pr:`451`) `Aaron Spring`_
+
+
 xskillscore v0.0.29 (2026-02-18)
 --------------------------------
 

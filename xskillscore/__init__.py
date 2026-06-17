@@ -1,3 +1,16 @@
+"""xskillscore: Metrics for verifying forecasts.
+
+xskillscore computes deterministic and probabilistic forecast verification
+metrics on :py:mod:`xarray` objects, with Dask support for parallel computing.
+
+Documentation breadcrumbs (for humans and LLMs/coding agents):
+
+- Documentation: https://xskillscore.readthedocs.io/en/stable/
+- LLM-friendly docs: https://xskillscore.readthedocs.io/en/stable/llms.txt
+  (full text: https://xskillscore.readthedocs.io/en/stable/llms-full.txt)
+- Source: https://github.com/xarray-contrib/xskillscore
+"""
+
 from importlib.metadata import version, PackageNotFoundError
 
 # ruff: noqa
