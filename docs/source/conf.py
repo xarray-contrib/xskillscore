@@ -41,17 +41,16 @@ extensions = [
     "IPython.sphinxext.ipython_console_highlighting",
     "nbsphinx",
     "sphinx_autosummary_accessors",
-    "sphinx_llms_txt",
+    "sphinx_llm.txt",
 ]
 
-# -- Options for LLM-friendly output (sphinx-llms-txt) -----------------------
-# Generate ``llms.txt`` (a summary) and ``llms-full.txt`` (the full docs as a
-# single context-efficient text file) during the HTML build so coding agents
-# and LLMs can discover and parse the documentation. See
-# https://sphinx-llms-txt.readthedocs.io and the llms.txt standard at
-# https://llmstxt.org.
-llms_txt_title = "xskillscore: Metrics for verifying forecasts"
-llms_txt_summary = (
+# -- Options for LLM-friendly output (sphinx-llm) ---------------------------
+# Generate ``llms.txt`` (a sitemap), ``llms-full.txt`` (the full docs as a
+# single context-efficient markdown file) and per-page ``.md`` files during
+# the HTML build so coding agents and LLMs can discover and parse the
+# documentation. See https://github.com/NVIDIA/sphinx-llm and the llms.txt
+# standard at https://llmstxt.org.
+llms_txt_description = (
     "xskillscore is a Python package for computing deterministic and "
     "probabilistic forecast verification metrics on xarray objects, with "
     "Dask support for parallel computing."
@@ -112,10 +111,6 @@ pygments_style = "sphinx"
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
-
-# Base URL of the published docs. Used by sphinx-llms-txt to build absolute
-# links in the generated llms.txt files.
-html_baseurl = "https://xskillscore.readthedocs.io/en/stable/"
 
 # Can add below once we have a logo.
 # html_logo = 'images/esmtools-logo.png'

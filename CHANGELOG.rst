@@ -11,8 +11,8 @@ Unreleased
 Documentation
 ~~~~~~~~~~~~~
 - Made the documentation discoverable and parseable by LLMs and coding agents by
-  generating ``llms.txt`` and ``llms-full.txt`` during the docs build (via
-  ``sphinx-llms-txt``) and adding documentation breadcrumbs to the package
+  generating ``llms.txt``, ``llms-full.txt`` and per-page markdown during the docs
+  build (via ``sphinx-llm``) and adding documentation breadcrumbs to the package
   ``__init__``. (:pr:`451`) `Aaron Spring`_
 
 
