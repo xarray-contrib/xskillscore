@@ -22,6 +22,9 @@ xskillscore: Metrics for verifying forecasts
 .. image:: https://img.shields.io/conda/dn/conda-forge/xskillscore.svg
    :target: https://anaconda.org/conda-forge/xskillscore
 
+.. image:: https://img.shields.io/badge/Context7-Docs-6366f1?logo=readthedocs&logoColor=white
+   :target: https://context7.com/xarray-contrib/xskillscore
+
 .. image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/raybellwaves/xskillscore-tutorial/master?urlpath=lab
 

@@ -14,6 +14,8 @@ Documentation
   generating ``llms.txt``, ``llms-full.txt`` and per-page markdown during the docs
   build (via ``sphinx-llm``) and adding documentation breadcrumbs to the package
   ``__init__``. (:pr:`451`) `Aaron Spring`_
+- Added a `Context7 <https://context7.com/xarray-contrib/xskillscore>`_ documentation
+  badge to the README and docs landing page. (:pr:`451`) `Aaron Spring`_
 
 
 xskillscore v0.0.29 (2026-02-18)
