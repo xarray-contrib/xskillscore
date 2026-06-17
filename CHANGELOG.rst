@@ -3,6 +3,23 @@ Changelog History
 =================
 
 
+xskillscore vNext (unreleased)
+------------------------------
+
+Breaking Changes
+~~~~~~~~~~~~~~~~
+- Dropped support for Python 3.9. The minimum supported version is now Python 3.10.
+  `Aaron Spring`_
+
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Bumped GitHub Actions to versions running on Node.js 24 (``actions/checkout@v5``,
+  ``actions/setup-python@v6``, ``actions/upload-artifact@v6``,
+  ``actions/download-artifact@v7``, ``actions/github-script@v8``,
+  ``mamba-org/setup-micromamba@v3``) to silence Node.js 20 deprecation warnings.
+  `Aaron Spring`_
+
+
 xskillscore v0.0.29 (2026-02-18)
 --------------------------------
 
