@@ -57,7 +57,6 @@ You can also install the bleeding edge (pre-release versions) by running:
     :caption: Getting Started
 
     quick-start.ipynb
-    geophysical-data.ipynb
     tabular-data.ipynb
 
 **Help & Reference**
