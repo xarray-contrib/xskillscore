@@ -1,35 +1,15 @@
 xskillscore: Metrics for verifying forecasts
 ============================================
 
-.. image:: https://github.com/xarray-contrib/xskillscore/actions/workflows/xskillscore_testing.yml/badge.svg
-   :target: https://github.com/xarray-contrib/xskillscore/actions/workflows/xskillscore_testing.yml
-
-.. image:: https://github.com/xarray-contrib/xskillscore/actions/workflows/upstream-dev-ci.yml/badge.svg
-   :target: https://github.com/xarray-contrib/xskillscore/actions/workflows/upstream-dev-ci.yml
-
-.. image:: https://results.pre-commit.ci/badge/github/xarray-contrib/xskillscore/main.svg
-   :target: https://results.pre-commit.ci/latest/github/xarray-contrib/xskillscore/main
-
-.. image:: https://img.shields.io/pypi/v/xskillscore.svg
-   :target: https://pypi.python.org/pypi/xskillscore/
-
-.. image:: https://anaconda.org/conda-forge/xskillscore/badges/version.svg
-   :target: https://anaconda.org/conda-forge/xskillscore/
-
-.. image:: https://codecov.io/gh/xarray-contrib/xskillscore/branch/main/graph/badge.svg
-   :target: https://codecov.io/gh/xarray-contrib/xskillscore
-
-.. image:: https://img.shields.io/conda/dn/conda-forge/xskillscore.svg
-   :target: https://anaconda.org/conda-forge/xskillscore
-
-.. image:: https://img.shields.io/badge/Context7-Docs-6366f1?logo=readthedocs&logoColor=white
-   :target: https://context7.com/xarray-contrib/xskillscore
-
-.. image:: https://mybinder.org/badge_logo.svg
-   :target: https://mybinder.org/v2/gh/raybellwaves/xskillscore-tutorial/master?urlpath=lab
-
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.5173152.svg
-   :target: https://doi.org/10.5281/zenodo.5173152
++---------------------------+-------------------------------------------+
+| Documentation and Support | |docs| |context7| |binder|                |
++---------------------------+-------------------------------------------+
+| Open Source               | |pypi| |conda-forge| |license| |zenodo|   |
++---------------------------+-------------------------------------------+
+| Coding Standards          | |codecov| |pre-commit|                    |
++---------------------------+-------------------------------------------+
+| Development Status        | |status| |testing| |upstream|             |
++---------------------------+-------------------------------------------+
 
 Installation
 ============
@@ -60,7 +40,6 @@ You can also install the bleeding edge (pre-release versions) by running:
     :caption: Getting Started
 
     quick-start.ipynb
-    geophysical-data.ipynb
     tabular-data.ipynb
 
 **Help & Reference**
@@ -83,3 +62,51 @@ You can also install the bleeding edge (pre-release versions) by running:
    release_procedure
    related-projects
    contributors
+
+.. |binder| image:: https://mybinder.org/badge_logo.svg
+        :target: https://mybinder.org/v2/gh/raybellwaves/xskillscore-tutorial/master?urlpath=lab
+        :alt: Binder
+
+.. |codecov| image:: https://codecov.io/gh/xarray-contrib/xskillscore/branch/main/graph/badge.svg
+        :target: https://codecov.io/gh/xarray-contrib/xskillscore
+        :alt: Codecov
+
+.. |conda-forge| image:: https://img.shields.io/conda/vn/conda-forge/xskillscore.svg
+        :target: https://anaconda.org/conda-forge/xskillscore
+        :alt: conda-forge
+
+.. |context7| image:: https://img.shields.io/badge/Context7-Docs-6366f1?logo=readthedocs&logoColor=white
+        :target: https://context7.com/xarray-contrib/xskillscore
+        :alt: Context7 Documentation
+
+.. |docs| image:: https://img.shields.io/readthedocs/xskillscore/stable.svg?style=flat
+        :target: https://xskillscore.readthedocs.io/en/stable/?badge=stable
+        :alt: Documentation Status
+
+.. |license| image:: https://img.shields.io/github/license/xarray-contrib/xncml.svg
+        :target: https://github.com/xarray-contrib/xncml/blob/main/LICENSE
+        :alt: License
+
+.. |pre-commit| image:: https://results.pre-commit.ci/badge/github/xarray-contrib/xskillscore/main.svg
+        :target: https://results.pre-commit.ci/latest/github/xarray-contrib/xskillscore/main
+        :alt: Pre-Commit
+
+.. |pypi| image:: https://img.shields.io/pypi/v/xskillscore.svg
+        :target: https://pypi.python.org/pypi/xskillscore/
+        :alt: PyPI
+
+.. |status| image:: https://www.repostatus.org/badges/latest/active.svg
+        :target: https://www.repostatus.org/#active
+        :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
+
+.. |testing| image:: https://github.com/xarray-contrib/xskillscore/actions/workflows/xskillscore_testing.yml/badge.svg
+        :target: https://github.com/xarray-contrib/xskillscore/actions/workflows/xskillscore_testing.yml
+        :alt: Testing
+
+.. |upstream| image:: https://github.com/xarray-contrib/xskillscore/actions/workflows/upstream-dev-ci.yml/badge.svg
+        :target: https://github.com/xarray-contrib/xskillscore/actions/workflows/upstream-dev-ci.yml
+        :alt: Upstream Testing
+
+.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.5173152.svg
+        :target: https://doi.org/10.5281/zenodo.5173152
+        :alt: Zenodo DOI
