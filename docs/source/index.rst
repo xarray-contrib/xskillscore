@@ -4,7 +4,8 @@ xskillscore: Metrics for verifying forecasts
 +---------------------------+-------------------------------------------+
 | Documentation and Support | |docs| |context7| |binder|                |
 +---------------------------+-------------------------------------------+
-| Open Source               | |pypi| |conda-forge| |license| |zenodo|   |
+| Open Source               | |pypi| |conda-forge| |conda-downloads|    |
+|                           | |license| |zenodo|                        |
 +---------------------------+-------------------------------------------+
 | Coding Standards          | |codecov| |pre-commit|                    |
 +---------------------------+-------------------------------------------+
@@ -74,6 +75,10 @@ You can also install the bleeding edge (pre-release versions) by running:
 .. |conda-forge| image:: https://img.shields.io/conda/vn/conda-forge/xskillscore.svg
         :target: https://anaconda.org/conda-forge/xskillscore
         :alt: conda-forge
+
+.. |conda-downloads| image:: https://img.shields.io/conda/dn/conda-forge/xskillscore.svg
+        :target: https://anaconda.org/conda-forge/xskillscore
+        :alt: conda-forge downloads
 
 .. |context7| image:: https://img.shields.io/badge/Context7-Docs-6366f1?logo=readthedocs&logoColor=white
         :target: https://context7.com/xarray-contrib/xskillscore

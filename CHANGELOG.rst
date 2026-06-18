@@ -5,8 +5,13 @@ Changelog History
 
 .. _whats-new.unreleased:
 
-Unreleased
-----------
+xskillscore vNext (unreleased)
+------------------------------
+
+Breaking Changes
+~~~~~~~~~~~~~~~~
+- Dropped support for Python 3.9. The minimum supported version is now Python 3.10.
+  `Aaron Spring`_
 
 Documentation
 ~~~~~~~~~~~~~
@@ -16,6 +21,14 @@ Documentation
   ``__init__``. (:pr:`451`) `Aaron Spring`_
 - Added a `Context7 <https://context7.com/xarray-contrib/xskillscore>`_ documentation
   badge to the README and docs landing page. (:pr:`451`) `Aaron Spring`_
+
+Internal Changes
+~~~~~~~~~~~~~~~~
+- Bumped GitHub Actions to versions running on Node.js 24 (``actions/checkout@v5``,
+  ``actions/setup-python@v6``, ``actions/upload-artifact@v6``,
+  ``actions/download-artifact@v7``, ``actions/github-script@v8``,
+  ``mamba-org/setup-micromamba@v3``) to silence Node.js 20 deprecation warnings.
+  `Aaron Spring`_
 
 
 xskillscore v0.0.29 (2026-02-18)
