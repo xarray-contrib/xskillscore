@@ -3,6 +3,8 @@ Changelog History
 =================
 
 
+.. _whats-new.unreleased:
+
 xskillscore vNext (unreleased)
 ------------------------------
 
@@ -10,6 +12,15 @@ Breaking Changes
 ~~~~~~~~~~~~~~~~
 - Dropped support for Python 3.9. The minimum supported version is now Python 3.10.
   `Aaron Spring`_
+
+Documentation
+~~~~~~~~~~~~~
+- Made the documentation discoverable and parseable by LLMs and coding agents by
+  generating ``llms.txt``, ``llms-full.txt`` and per-page markdown during the docs
+  build (via ``sphinx-llm``) and adding documentation breadcrumbs to the package
+  ``__init__``. (:pr:`451`) `Aaron Spring`_
+- Added a `Context7 <https://context7.com/xarray-contrib/xskillscore>`_ documentation
+  badge to the README and docs landing page. (:pr:`451`) `Aaron Spring`_
 
 Internal Changes
 ~~~~~~~~~~~~~~~~

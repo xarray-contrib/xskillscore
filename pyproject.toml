@@ -59,6 +59,7 @@ complete = [
     "sphinx >=6.0.0",
     "sphinx-autosummary-accessors",
     "sphinx-copybutton",
+    "sphinx-llm",
     "sphinx-rtd-theme>=1.0",
 ]
 

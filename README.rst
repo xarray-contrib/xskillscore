@@ -2,7 +2,7 @@ xskillscore: Metrics for verifying forecasts
 ============================================
 
 +---------------------------+-------------------------------------------+
-| Documentation and Support | |docs| |binder|                           |
+| Documentation and Support | |docs| |context7| |binder|                |
 +---------------------------+-------------------------------------------+
 | Open Source               | |pypi| |conda-forge| |license| |zenodo|   |
 +---------------------------+-------------------------------------------+
@@ -55,6 +55,10 @@ We are indebted to the **xarray** community for their `advice <https://groups.go
 .. |conda-forge| image:: https://img.shields.io/conda/vn/conda-forge/xskillscore.svg
         :target: https://anaconda.org/conda-forge/xskillscore
         :alt: conda-forge
+
+.. |context7| image:: https://img.shields.io/badge/Context7-Docs-6366f1?logo=readthedocs&logoColor=white
+        :target: https://context7.com/xarray-contrib/xskillscore
+        :alt: Context7 Documentation
 
 .. |docs| image:: https://img.shields.io/readthedocs/xskillscore/stable.svg?style=flat
         :target: https://xskillscore.readthedocs.io/en/stable/?badge=stable

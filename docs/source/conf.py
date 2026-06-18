@@ -41,7 +41,20 @@ extensions = [
     "IPython.sphinxext.ipython_console_highlighting",
     "nbsphinx",
     "sphinx_autosummary_accessors",
+    "sphinx_llm.txt",
 ]
+
+# -- Options for LLM-friendly output (sphinx-llm) ---------------------------
+# Generate ``llms.txt`` (a sitemap), ``llms-full.txt`` (the full docs as a
+# single context-efficient markdown file) and per-page ``.md`` files during
+# the HTML build so coding agents and LLMs can discover and parse the
+# documentation. See https://github.com/NVIDIA/sphinx-llm and the llms.txt
+# standard at https://llmstxt.org.
+llms_txt_description = (
+    "xskillscore is a Python package for computing deterministic and "
+    "probabilistic forecast verification metrics on xarray objects, with "
+    "Dask support for parallel computing."
+)
 
 extlinks = {
     "issue": ("https://github.com/xarray-contrib/xskillscore/issues/%s", "GH%s"),
