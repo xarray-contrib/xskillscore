@@ -222,6 +222,13 @@ def halfwidth_ci_test(
         Source: NIST/SEMATECH e-Handbook of Statistical Methods.
         https://www.itl.nist.gov/div898/handbook/prc/section1/prc14.htm
 
+    .. note::
+        The sign of the returned difference follows the argument convention of the
+        selected metric, which is called as ``metric(observations, forecast)``. For
+        example, ``me(a, b)`` computes the mean of ``a - b``, so ``metric="me"``
+        returns ``me(observations, forecasts2) - me(observations, forecasts1)``.
+        This has the opposite sign from a forecast-minus-observation convention.
+
     Parameters
     ----------
     forecasts1 : xarray.Dataset or xarray.DataArray
