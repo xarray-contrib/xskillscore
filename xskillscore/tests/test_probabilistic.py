@@ -377,18 +377,25 @@ def test_rank_histogram_values(o, f_prob):
 @pytest.mark.parametrize("dim", DIMS)
 @pytest.mark.parametrize("chunk_bool", [True, False])
 @pytest.mark.parametrize("input_type", ["DataArray", "Dataset", "multidim Dataset"])
-def test_discrimination_sum(o, f_prob, dim, chunk_bool, input_type):
+@pytest.mark.parametrize("keep_attrs", [True, False])
+def test_discrimination_sum(o, f_prob, dim, chunk_bool, input_type, keep_attrs):
     """Test that the probabilities sum to 1"""
     o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
     if dim == []:
         with pytest.raises(ValueError):
             discrimination(o > 0.5, (f_prob > 0.5).mean("member"), dim=dim)
     else:
-        disc = discrimination(o > 0.5, (f_prob > 0.5).mean("member"), dim=dim)
+        disc = discrimination(
+            o > 0.5,
+            (f_prob > 0.5).mean("member"),
+            dim=dim,
+            keep_attrs=keep_attrs,
+        )
         # test that input types equal output types
         assign_type_input_output(disc, o)
         if "Dataset" in input_type:
             disc = disc[list(o.data_vars)[0]]
+            o = o[list(o.data_vars)[0]]
         # don't understand the error message here, but it appeared
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
@@ -402,8 +409,8 @@ def test_discrimination_sum(o, f_prob, dim, chunk_bool, input_type):
 
         # test that returns chunks
         assert_chunk(disc, chunk_bool)
-        # test that attributes are kept # TODO: add
-        # assert_keep_attrs(disc, o, keep_attrs)
+        # test that attributes are kept
+        assert_keep_attrs(disc, o, keep_attrs)
 
 
 def test_discrimination_perfect_values(o):
@@ -419,20 +426,29 @@ def test_discrimination_perfect_values(o):
 @pytest.mark.parametrize("dim", DIMS)
 @pytest.mark.parametrize("chunk_bool", [True, False])
 @pytest.mark.parametrize("input_type", ["DataArray", "Dataset", "multidim Dataset"])
-def test_reliability_api_and_inputs(o, f_prob, dim, chunk_bool, input_type):
+@pytest.mark.parametrize("keep_attrs", [True, False])
+def test_reliability_api_and_inputs(o, f_prob, dim, chunk_bool, input_type, keep_attrs):
     """Test that reliability keeps chunking and input types."""
     o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
     if isinstance(dim, list) and len(dim) == 0:
         with pytest.raises(ValueError):
             reliability(o > 0.5, (f_prob > 0.5).mean("member"), dim)
     else:
-        actual = reliability(o > 0.5, (f_prob > 0.5).mean("member"), dim=dim)
+        actual = reliability(
+            o > 0.5,
+            (f_prob > 0.5).mean("member"),
+            dim=dim,
+            keep_attrs=keep_attrs,
+        )
         # test that returns chunks
         assert_chunk(actual, chunk_bool)
-        # test that attributes are kept
-        # assert_keep_attrs(actual, o, keep_attrs) # TODO: implement
         # test that input types equal output types
         assign_type_input_output(actual, o)
+        # test that attributes are kept
+        if "Dataset" in input_type:
+            actual = actual[list(o.data_vars)[0]]
+            o = o[list(o.data_vars)[0]]
+        assert_keep_attrs(actual, o, keep_attrs)
 
 
 def test_reliability_values(o, f_prob):
