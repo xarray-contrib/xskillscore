@@ -228,6 +228,8 @@ def halfwidth_ci_test(
         example, ``me(a, b)`` computes the mean of ``a - b``, so ``metric="me"``
         returns ``me(observations, forecasts2) - me(observations, forecasts1)``.
         This has the opposite sign from a forecast-minus-observation convention.
+        The sign does not affect ``significantly_different``, which compares the
+        absolute difference with the confidence-interval half-width.
 
     Parameters
     ----------
