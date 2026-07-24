@@ -184,6 +184,15 @@ def test_crps_ensemble_fair_nan_members(o, f_prob):
     assert actual.notnull().all()
 
 
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_crps_ensemble_keep_attrs_from_observations(o, f_prob, fair_bool):
+    """Test that crps_ensemble keeps the attributes of observations, not forecasts."""
+    o.attrs = {"source": "observations"}
+    f_prob.attrs = {"source": "forecasts"}
+    actual = crps_ensemble(o, f_prob, fair=fair_bool, keep_attrs=True)
+    assert actual.attrs == o.attrs
+
+
 def test_crps_ensemble_fair_member_weights_raises(o, f_prob):
     """Test that fair crps_ensemble raises for weighted members."""
     member_weights = xr.ones_like(f_prob)

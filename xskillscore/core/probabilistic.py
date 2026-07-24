@@ -335,8 +335,10 @@ def crps_ensemble(
             M = M.where(M > 1)  # fair CRPS is undefined for M < 2
             skill = abs(forecasts - observations).mean(member_dim)
             # spread = skill - res = 1 / (2 * M ** 2) * sum_ij |x_i - x_j|
-            # hence: fair = skill - spread * M / (M - 1) without O(M**2) memory
-            res = skill - (skill - res) * M / (M - 1)
+            # hence: fair = skill - spread * M / (M - 1) = res - spread / (M - 1),
+            # which avoids O(M**2) memory. res stays the left operand so that
+            # keep_attrs takes the attributes of observations, as for fair=False.
+            res = res - (skill - res) / (M - 1)
     if weights is not None:
         return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
