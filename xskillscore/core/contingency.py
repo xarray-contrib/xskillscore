@@ -641,6 +641,64 @@ class Contingency:
 
         return corr / N
 
+    def cramers_v(self) -> XArray:
+        """Return Cramér's V for a contingency table.
+
+        Cramér's V measures the association between categorical observations
+        and forecasts. It ranges from 0 (no association) to 1 (perfect
+        association).
+
+        .. math::
+            V = \\sqrt{\\frac{\\chi^2}{N \\min(r - 1, c - 1)}}
+
+        where :math:`N` is the number of samples and :math:`r` and :math:`c`
+        are the numbers of non-empty observation and forecast categories,
+        respectively.
+
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            An array containing Cramér's V.
+
+        See Also
+        --------
+        scipy.stats.contingency.association
+
+        References
+        ----------
+        https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
+        """
+        observation_dim = OBSERVATIONS_NAME + "_category"
+        forecast_dim = FORECASTS_NAME + "_category"
+        declared_degrees = min(
+            self.table.sizes[observation_dim] - 1,
+            self.table.sizes[forecast_dim] - 1,
+        )
+        if declared_degrees < 1:
+            raise ValueError("Cramér's V requires at least two observation and forecast categories")
+
+        total = self._sum_categories("total")
+        observation_totals = self.table.sum(dim=forecast_dim, skipna=True)
+        forecast_totals = self.table.sum(dim=observation_dim, skipna=True)
+        expected = observation_totals * forecast_totals / total
+        valid_expected = expected.where(expected > 0)
+        contributions = ((self.table - valid_expected) ** 2 / valid_expected).fillna(0)
+        chi_squared = contributions.sum(
+            dim=(observation_dim, forecast_dim),
+            skipna=True,
+        )
+        degrees = (
+            xr.apply_ufunc(
+                np.minimum,
+                (observation_totals > 0).sum(dim=observation_dim),
+                (forecast_totals > 0).sum(dim=forecast_dim),
+                dask="allowed",
+            )
+            - 1
+        )
+
+        return np.sqrt(chi_squared / (total * degrees)).where(degrees > 0)
+
     def heidke_score(self) -> XArray:
         """Returns the Heidke skill score(s) for a contingency table with K categories
 
