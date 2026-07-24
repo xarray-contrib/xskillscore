@@ -119,6 +119,103 @@ def test_crps_ensemble_weighted(o, f_prob, weights_cos_lat):
     assert not (actual_no_weights == actual).all()
 
 
+def crps_ensemble_double_sum(observations, forecasts, fair, member_dim="member"):
+    """Direct O(M**2) double-sum implementation of the (fair) ensemble CRPS."""
+    x_i = forecasts.rename({member_dim: "_i"})
+    x_j = forecasts.rename({member_dim: "_j"})
+    M = forecasts.notnull().sum(member_dim)
+    denominator = 2 * M * (M - 1) if fair else 2 * M**2
+    skill = abs(forecasts - observations).mean(member_dim)
+    spread = abs(x_i - x_j).sum(["_i", "_j"]) / denominator
+    return skill - spread
+
+
+def test_crps_ensemble_fair_hand_computed():
+    """Test fair crps_ensemble against a hand-computed reference."""
+    observations = xr.DataArray(2.0)
+    forecasts = xr.DataArray([1.0, 3.0, 4.0], coords=[("member", [0, 1, 2])])
+    # skill = (1 + 1 + 2) / 3 = 4 / 3
+    # sum_ij |x_i - x_j| = 2 * (2 + 3 + 1) = 12
+    # fair = 4 / 3 - 12 / (2 * 3 * 2) = 1 / 3
+    npt.assert_allclose(
+        crps_ensemble(forecasts=forecasts, observations=observations, fair=True), 1 / 3
+    )
+    # standard = 4 / 3 - 12 / (2 * 3 ** 2) = 2 / 3
+    npt.assert_allclose(crps_ensemble(observations, forecasts, fair=False), 2 / 3)
+
+
+@pytest.mark.parametrize("fair_bool", [True, False])
+def test_crps_ensemble_fair_equals_double_sum(o, f_prob, fair_bool):
+    """Test that the efficient reconstruction equals the direct double-sum."""
+    actual = crps_ensemble(o, f_prob, dim=[], fair=fair_bool)
+    expected = crps_ensemble_double_sum(o, f_prob, fair=fair_bool)
+    assert_allclose(actual, expected)
+
+
+def test_crps_ensemble_fair_default_False(o, f_prob):
+    """Test that fair=False is identical to not specifying fair."""
+    assert_identical(crps_ensemble(o, f_prob), crps_ensemble(o, f_prob, fair=False))
+
+
+def test_crps_ensemble_fair_smaller_than_unfair(o, f_prob):
+    """Test that fair crps_ensemble is smaller than the biased crps_ensemble."""
+    fair = crps_ensemble(o, f_prob, dim=[], fair=True)
+    unfair = crps_ensemble(o, f_prob, dim=[], fair=False)
+    assert (fair <= unfair).all()
+
+
+def test_crps_ensemble_fair_less_biased_than_unfair(o, f_prob):
+    """Test that fair crps_ensemble depends less on ensemble size than unfair."""
+    large = f_prob
+    small = f_prob.isel(member=slice(None, 2))
+    fair_bias = abs(crps_ensemble(o, small, fair=True) - crps_ensemble(o, large, fair=True))
+    unfair_bias = abs(crps_ensemble(o, small, fair=False) - crps_ensemble(o, large, fair=False))
+    assert fair_bias < unfair_bias
+
+
+def test_crps_ensemble_fair_nan_members(o, f_prob):
+    """Test that fair crps_ensemble counts only non-NaN members as M."""
+    f_prob_nan = f_prob.copy()
+    f_prob_nan[-1] = np.nan
+    actual = crps_ensemble(o, f_prob_nan, dim=[], fair=True)
+    # equals dropping the all-NaN member, i.e. M = number of non-NaN members
+    expected = crps_ensemble(o, f_prob.isel(member=slice(None, -1)), dim=[], fair=True)
+    assert_allclose(actual, expected)
+    assert actual.notnull().all()
+
+
+def test_crps_ensemble_fair_member_weights_raises(o, f_prob):
+    """Test that fair crps_ensemble raises for weighted members."""
+    member_weights = xr.ones_like(f_prob)
+    with pytest.raises(ValueError, match="equally weighted members"):
+        crps_ensemble(o, f_prob, member_weights=member_weights, fair=True)
+
+
+def test_crps_ensemble_fair_one_member_raises(o, f_prob):
+    """Test that fair crps_ensemble raises for a single member."""
+    with pytest.raises(ValueError, match="at least 2 members"):
+        crps_ensemble(o, f_prob.isel(member=[0]), fair=True)
+
+
+@pytest.mark.parametrize("chunk_bool", [True, False])
+@pytest.mark.parametrize("input_type", ["Dataset", "multidim Dataset", "DataArray"])
+@pytest.mark.parametrize("keep_attrs", [True, False])
+def test_crps_ensemble_fair_api_and_inputs(o, f_prob, keep_attrs, input_type, chunk_bool):
+    """Test that fair crps_ensemble keeps attributes, chunking and input types."""
+    o, f_prob = modify_inputs(o, f_prob, input_type, chunk_bool)
+    actual = crps_ensemble(o, f_prob, fair=True, keep_attrs=keep_attrs)
+    assert_chunk(actual, chunk_bool)
+    assert_keep_attrs(actual, o, keep_attrs)
+    assign_type_input_output(actual, o)
+
+
+@pytest.mark.parametrize("dim", DIMS)
+def test_crps_ensemble_fair_dim(o, f_prob, dim):
+    """Check that fair crps_ensemble reduces only dim."""
+    actual = crps_ensemble(o, f_prob, dim=dim, fair=True)
+    assert_only_dim_reduced(dim, actual, o)
+
+
 @pytest.mark.parametrize("chunk_bool", [True, False])
 @pytest.mark.parametrize("input_type", ["Dataset", "multidim Dataset", "DataArray"])
 @pytest.mark.parametrize("keep_attrs", [True, False])
