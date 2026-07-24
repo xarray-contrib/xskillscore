@@ -13,6 +13,13 @@ Breaking Changes
 - Dropped support for Python 3.9. The minimum supported version is now Python 3.10.
   `Aaron Spring`_
 
+Features
+~~~~~~~~
+- Added ``fair`` keyword to :py:func:`~xskillscore.crps_ensemble` implementing the
+  ensemble-size adjusted, unbiased CRPS of Ferro (2014), matching the ``fair``
+  keyword of :py:func:`~xskillscore.rps` and :py:func:`~xskillscore.brier_score`.
+  (:issue:`461`, :pr:`462`) `Aaron Spring`_
+
 Documentation
 ~~~~~~~~~~~~~
 - Made the documentation discoverable and parseable by LLMs and coding agents by
