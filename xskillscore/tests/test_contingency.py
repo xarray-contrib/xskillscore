@@ -1,6 +1,8 @@
 import numpy as np
 import numpy.testing as npt
 import pytest
+import xarray as xr
+from scipy.stats.contingency import association
 from sklearn.metrics import confusion_matrix
 
 from xskillscore import Contingency
@@ -91,3 +93,67 @@ def test_dichotomous_scores(dichotomous_Contingency_1d, method, expected):
     """
     xs_score = getattr(dichotomous_Contingency_1d, method)().item()
     npt.assert_almost_equal(xs_score, expected)
+
+
+def test_cramers_v_matches_scipy(dichotomous_Contingency_1d):
+    """Test Cramer's V against scipy.stats.contingency.association."""
+    table = dichotomous_Contingency_1d.table.transpose(
+        "observations_category", "forecasts_category"
+    )
+
+    actual = dichotomous_Contingency_1d.cramers_v().item()
+
+    npt.assert_allclose(actual, association(table.values, method="cramer"))
+
+
+def test_cramers_v_dataset_and_dask(observation_3d_int, forecast_3d_int):
+    """Test that Cramer's V preserves non-reduced dimensions and laziness."""
+    category_edges = np.array([-np.inf, 2.5, 5.5, np.inf])
+    contingency = Contingency(
+        observation_3d_int.to_dataset(name="var").chunk(),
+        forecast_3d_int.to_dataset(name="var").chunk(),
+        category_edges,
+        category_edges,
+        dim="time",
+    )
+
+    result = contingency.cramers_v()
+
+    assert result["var"].dims == ("lat", "lon")
+    assert result["var"].chunks is not None
+    assert ((result >= 0) & (result <= 1)).to_array().all().compute().item()
+
+
+def test_cramers_v_ignores_empty_categories():
+    """Test that declared but empty categories do not change Cramér's V."""
+    observations = xr.DataArray([0, 0, 0, 1, 1, 1], dims="x")
+    forecasts = xr.DataArray([0, 0, 1, 0, 1, 1], dims="x")
+    category_edges = np.array([-0.5, 0.5, 1.5, 2.5])
+    contingency = Contingency(
+        observations,
+        forecasts,
+        category_edges,
+        category_edges,
+        dim="x",
+    )
+
+    actual = contingency.cramers_v().item()
+    expected = association(np.array([[2, 1], [1, 2]]), method="cramer")
+
+    npt.assert_allclose(actual, expected)
+
+
+def test_cramers_v_requires_two_categories():
+    """Test that Cramer's V rejects a table with only one category."""
+    values = np.arange(4)
+    category_edges = np.array([-0.5, 3.5])
+    contingency = Contingency(
+        xr.DataArray(values, dims="x"),
+        xr.DataArray(values, dims="x"),
+        category_edges,
+        category_edges,
+        dim="x",
+    )
+
+    with pytest.raises(ValueError, match="at least two observation and forecast categories"):
+        contingency.cramers_v()
