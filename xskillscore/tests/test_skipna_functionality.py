@@ -3,6 +3,7 @@ from typing import Callable, List
 
 import numpy as np
 import pytest
+from dask import is_dask_collection
 from xarray.testing import assert_allclose
 
 from xskillscore.core.deterministic import (
@@ -71,6 +72,15 @@ WEIGHTED_METRICS: List[Callable] = [
 ]
 
 NON_WEIGHTED_METRICS: List[Callable] = [median_absolute_error]
+
+
+@pytest.mark.parametrize("metric", WEIGHTED_METRICS + NON_WEIGHTED_METRICS)
+def test_deterministic_metrics_do_not_compute_chunked_inputs(a_dask, b_dask, metric):
+    """All deterministic metrics preserve lazy execution for chunked inputs."""
+    with raise_if_dask_computes():
+        result = metric(a_dask, b_dask, dim="time", skipna=True)
+
+    assert is_dask_collection(result.data)
 
 
 def drop_nans(a, b, weights=None, dim="time"):
