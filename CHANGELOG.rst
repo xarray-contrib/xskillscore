@@ -29,7 +29,7 @@ Internal Changes
   ``Autosummary.create_documenter``, removed in Sphinx 9, so importing it in
   ``docs/source/conf.py`` aborted the build. Pinned ``sphinx <9`` in ``ci/doc.yml``,
   ``ci/dev.yml``, ``ci/docs_notebooks.yml`` and the ``complete`` extra until the
-  extension supports Sphinx 9. (:pr:`466`) `Aaron Spring`_
+  extension supports Sphinx 9. (:pr:`467`) `Aaron Spring`_
 - Bumped GitHub Actions to versions running on Node.js 24 (``actions/checkout@v5``,
   ``actions/setup-python@v6``, ``actions/upload-artifact@v6``,
   ``actions/download-artifact@v7``, ``actions/github-script@v8``,
