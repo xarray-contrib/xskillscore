@@ -21,7 +21,9 @@ dependencies:
   - pre-commit
   - scikit-learn
   - scipy >=1.10
-  - sphinx >=6.0.0
+  # sphinx <9: sphinx-autosummary-accessors 2025.3.1 (latest) calls
+  # Autosummary.create_documenter, removed in Sphinx 9 -> conf.py import fails
+  - sphinx >=6.0.0,<9
   - sphinx-autosummary-accessors
   - sphinx_rtd_theme >=1.0
   - statsmodels
