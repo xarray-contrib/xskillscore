@@ -15,8 +15,12 @@ CATEGORY_EDGES = [
 @pytest.mark.parametrize("type", ["da", "ds", "chunked_da", "chunked_ds"])
 @pytest.mark.parametrize("dim", DIMS)
 @pytest.mark.parametrize("category_edges", CATEGORY_EDGES)
-def test_Contingency_table(observation_3d_int, forecast_3d_int, category_edges, dim, type):
+@pytest.mark.parametrize("keep_attrs", [True, False])
+def test_Contingency_table(
+    observation_3d_int, forecast_3d_int, category_edges, dim, type, keep_attrs
+):
     """Test that contingency table builds successfully"""
+    observation_3d_int.attrs = {"source": "observations"}
     if "ds" in type:
         name = "var"
         observation_3d_int = observation_3d_int.to_dataset(name=name)
@@ -25,9 +29,20 @@ def test_Contingency_table(observation_3d_int, forecast_3d_int, category_edges, 
         observation_3d_int = observation_3d_int.chunk()
         forecast_3d_int = forecast_3d_int.chunk()
     cont_table = Contingency(
-        observation_3d_int, forecast_3d_int, category_edges, category_edges, dim=dim
+        observation_3d_int,
+        forecast_3d_int,
+        category_edges,
+        category_edges,
+        dim=dim,
+        keep_attrs=keep_attrs,
     )
     assert cont_table
+    actual = cont_table.table["var"] if "ds" in type else cont_table.table
+    expected = observation_3d_int["var"] if "ds" in type else observation_3d_int
+    if keep_attrs:
+        assert actual.attrs == expected.attrs
+    else:
+        assert actual.attrs == {}
 
 
 @pytest.mark.parametrize("category_edges", CATEGORY_EDGES)

@@ -958,6 +958,7 @@ def discrimination(
     forecasts: XArray,
     dim: Optional[Dim] = None,
     probability_bin_edges: xr.DataArray | np.ndarray = np.linspace(0, 1, 6),
+    keep_attrs: bool = False,
 ) -> XArray:
     """Returns the data required to construct the discrimination diagram for an event;
        the histogram of forecasts likelihood when observations indicate an event has
@@ -979,6 +980,8 @@ def discrimination(
         all but the last (righthand-most) bin include the left edge and exclude the \
         right edge. The last bin includes both edges. Defaults to 6 equally spaced \
         edges between 0 and 1
+    keep_attrs : bool, optional
+        Whether to copy attributes from the first argument to the output.
 
     Returns
     -------
@@ -1041,17 +1044,24 @@ def discrimination(
 
     # Reconstruct to ensure coordinate order, but preserve Dataset vs DataArray type
     if isinstance(result, xr.DataArray):
-        return xr.DataArray(
+        result = xr.DataArray(
             result.data,  # Use .data instead of .values to preserve dask arrays
             dims=result.dims,
             coords={
                 "event": result.coords["event"],
                 FORECAST_PROBABILITY_DIM: result.coords[FORECAST_PROBABILITY_DIM],
             },
+            attrs=observations.attrs if keep_attrs else None,
         )
+    elif keep_attrs:
+        result.attrs.update(observations.attrs)
+        for var in result.data_vars:
+            result[var].attrs.update(observations[var].attrs)
     else:
-        # For Dataset, reconstruct each data variable
-        return result
+        result.attrs.clear()
+        for var in result.data_vars:
+            result[var].attrs.clear()
+    return result
 
 
 def reliability(

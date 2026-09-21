@@ -67,6 +67,8 @@ class Contingency:
         exclude the right edge. The last bin includes both edges.
     dim : str, list
         The dimension(s) over which to compute the contingency table
+    keep_attrs : bool, optional
+        Whether to copy attributes from the observations to the contingency table.
 
     Returns
     -------
@@ -107,6 +109,7 @@ class Contingency:
         observation_category_edges: xr.DataArray | np.ndarray,
         forecast_category_edges: xr.DataArray | np.ndarray,
         dim: Dim,
+        keep_attrs: bool = False,
     ):
         self._observations = observations.copy()
         self._forecasts = forecasts.copy()
@@ -117,7 +120,7 @@ class Contingency:
             if (len(observation_category_edges) - 1 == 2) & (len(forecast_category_edges) - 1 == 2)
             else False
         )
-        self._table = self._get_contingency_table(dim)
+        self._table = self._get_contingency_table(dim, keep_attrs)
 
     @property
     def observations(self):
@@ -143,13 +146,15 @@ class Contingency:
     def table(self):
         return self._table
 
-    def _get_contingency_table(self, dim: Dim) -> XArray:
+    def _get_contingency_table(self, dim: Dim, keep_attrs: bool) -> XArray:
         """Build the contingency table
 
         Parameters
         ----------
         dim : str, list
             The dimension(s) over which to compute the contingency table
+        keep_attrs : bool
+            Whether to copy attributes from the observations to the table.
 
         Returns
         -------
@@ -190,6 +195,17 @@ class Contingency:
                 FORECASTS_NAME + "_category_bounds": FORECASTS_NAME + "_category",
             }
         )
+
+        if keep_attrs:
+            table.attrs.update(self.observations.attrs)
+            if isinstance(table, xr.Dataset):
+                for var in table.data_vars:
+                    table[var].attrs.update(self.observations[var].attrs)
+        else:
+            table.attrs.clear()
+            if isinstance(table, xr.Dataset):
+                for var in table.data_vars:
+                    table[var].attrs.clear()
 
         return table
 
