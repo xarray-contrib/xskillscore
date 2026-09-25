@@ -185,8 +185,8 @@ All metrics support Dask arrays via `dask="parallelized"` in `xr.apply_ufunc`. N
 
 ## Python Support
 
-- Minimum Python version: 3.9
-- Supported versions: 3.9, 3.10, 3.11, 3.12, 3.13
+- Minimum Python version: 3.11
+- Supported versions: 3.11, 3.12, 3.13, 3.14 (following xarray)
 
 ## Key Dependencies
 

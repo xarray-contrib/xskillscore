@@ -10,7 +10,8 @@ xskillscore vNext (unreleased)
 
 Breaking Changes
 ~~~~~~~~~~~~~~~~
-- Dropped support for Python 3.9. The minimum supported version is now Python 3.10.
+- Dropped support for Python 3.9 and 3.10. The minimum supported version is now
+  Python 3.11, following xarray's support window (3.11 to 3.14). (:issue:`468`)
   `Aaron Spring`_
 
 Documentation
