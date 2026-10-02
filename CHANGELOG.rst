@@ -21,6 +21,14 @@ Features
   keyword of :py:func:`~xskillscore.rps` and :py:func:`~xskillscore.brier_score`.
   (:issue:`461`, :pr:`462`) `Aaron Spring`_
 
+Bug Fixes
+~~~~~~~~~
+- Fixed :py:func:`~xskillscore.roc` with ``bin_edges="continuous"`` returning
+  incorrect areas (down to ``0.0`` instead of ``1.0``) when forecast values fall
+  outside the ``[0, 1]`` range of the binary observations. Observations are now
+  categorised with a fixed split rather than the forecast-derived threshold, so
+  results match ``sklearn.metrics.roc_auc_score``. (:issue:`442`, :pr:`450`) `Aaron Spring`_
+
 Documentation
 ~~~~~~~~~~~~~
 - Made the documentation discoverable and parseable by LLMs and coding agents by
