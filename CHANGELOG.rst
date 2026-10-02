@@ -3,46 +3,6 @@ Changelog History
 =================
 
 
-.. _whats-new.unreleased:
-
-xskillscore vNext (unreleased)
-------------------------------
-
-Breaking Changes
-~~~~~~~~~~~~~~~~
-- Dropped support for Python 3.9 and 3.10. The minimum supported version is now
-  Python 3.11, following xarray's support window (3.11 to 3.14). (:issue:`468`)
-  `Aaron Spring`_
-
-Features
-~~~~~~~~
-- Added ``fair`` keyword to :py:func:`~xskillscore.crps_ensemble` implementing the
-  ensemble-size adjusted, unbiased CRPS of Ferro (2014), matching the ``fair``
-  keyword of :py:func:`~xskillscore.rps` and :py:func:`~xskillscore.brier_score`.
-  (:issue:`461`, :pr:`462`) `Aaron Spring`_
-
-Documentation
-~~~~~~~~~~~~~
-- Made the documentation discoverable and parseable by LLMs and coding agents by
-  generating ``llms.txt``, ``llms-full.txt`` and per-page markdown during the docs
-  build (via ``sphinx-llm``) and adding documentation breadcrumbs to the package
-  ``__init__``. (:pr:`451`) `Aaron Spring`_
-- Added a `Context7 <https://context7.com/xarray-contrib/xskillscore>`_ documentation
-  badge to the README and docs landing page. (:pr:`451`) `Aaron Spring`_
-
-Internal Changes
-~~~~~~~~~~~~~~~~
-- Fixed the Read the Docs build, which had been failing since Sphinx 9 was released:
-  ``sphinx-autosummary-accessors`` (2025.3.1, latest) calls
-  ``Autosummary.create_documenter``, removed in Sphinx 9, so importing it in
-  ``docs/source/conf.py`` aborted the build. Pinned ``sphinx <9`` in ``ci/doc.yml``,
-  ``ci/dev.yml``, ``ci/docs_notebooks.yml`` and the ``complete`` extra until the
-  extension supports Sphinx 9. (:pr:`467`) `Aaron Spring`_
-- Bumped GitHub Actions to versions running on Node.js 24 (``actions/checkout@v5``,
-  ``actions/setup-python@v6``, ``actions/upload-artifact@v6``,
-  ``actions/download-artifact@v7``, ``actions/github-script@v8``,
-  ``mamba-org/setup-micromamba@v3``) to silence Node.js 20 deprecation warnings.
-  `Aaron Spring`_
 
 
 xskillscore v0.0.29 (2026-02-18)
