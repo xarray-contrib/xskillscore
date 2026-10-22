@@ -703,15 +703,14 @@ class Contingency:
             dim=(observation_dim, forecast_dim),
             skipna=True,
         )
-        degrees = (
-            xr.apply_ufunc(
-                np.minimum,
+        category_counts = xr.concat(
+            [
                 (observation_totals > 0).sum(dim=observation_dim),
                 (forecast_totals > 0).sum(dim=forecast_dim),
-                dask="allowed",
-            )
-            - 1
+            ],
+            dim="contingency_axis",
         )
+        degrees = category_counts.min(dim="contingency_axis") - 1
 
         return np.sqrt(chi_squared / (total * degrees)).where(degrees > 0)
 
