@@ -39,6 +39,12 @@ Documentation
   ``__init__``. (:pr:`451`) `Aaron Spring`_
 - Added a `Context7 <https://context7.com/xarray-contrib/xskillscore>`_ documentation
   badge to the README and docs landing page. (:pr:`451`) `Aaron Spring`_
+- Made the Read the Docs build independent of the network and of builder speed:
+  the tabular data notebook now generates a synthetic house prices dataset instead
+  of downloading the California housing data with ``fetch_california_housing``, and
+  the ``%timeit`` cell in the quick start runs once per repeat. ``nbsphinx_timeout``
+  is raised to 300 s per cell. The docs notebooks CI job now builds with network
+  access blocked, so notebooks that download data fail there. `Aaron Spring`_
 
 Internal Changes
 ~~~~~~~~~~~~~~~~

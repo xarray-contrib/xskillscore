@@ -63,7 +63,8 @@ extlinks = {
 
 autodoc_typehints = "none"
 
-nbsphinx_timeout = 60
+# per cell; Read the Docs builders are slower than GitHub Actions runners
+nbsphinx_timeout = 300
 nbsphinx_execute = "always"
 
 autosummary_generate = True
