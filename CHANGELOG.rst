@@ -10,13 +10,26 @@ xskillscore vNext (unreleased)
 
 Breaking Changes
 ~~~~~~~~~~~~~~~~
-- Dropped support for Python 3.9. The minimum supported version is now Python 3.10.
+- Dropped support for Python 3.9 and 3.10. The minimum supported version is now
+  Python 3.11, following xarray's support window (3.11 to 3.14). (:issue:`468`)
   `Aaron Spring`_
 
 Features
 ~~~~~~~~
 - Added :py:meth:`xskillscore.Contingency.cramers_v` for measuring association
   between categorical observations and forecasts. (:pr:`459`) `Kkkakania`_
+- Added ``fair`` keyword to :py:func:`~xskillscore.crps_ensemble` implementing the
+  ensemble-size adjusted, unbiased CRPS of Ferro (2014), matching the ``fair``
+  keyword of :py:func:`~xskillscore.rps` and :py:func:`~xskillscore.brier_score`.
+  (:issue:`461`, :pr:`462`) `Aaron Spring`_
+
+Bug Fixes
+~~~~~~~~~
+- Fixed :py:func:`~xskillscore.roc` with ``bin_edges="continuous"`` returning
+  incorrect areas (down to ``0.0`` instead of ``1.0``) when forecast values fall
+  outside the ``[0, 1]`` range of the binary observations. Observations are now
+  categorised with a fixed split rather than the forecast-derived threshold, so
+  results match ``sklearn.metrics.roc_auc_score``. (:issue:`442`, :pr:`450`) `Aaron Spring`_
 
 Documentation
 ~~~~~~~~~~~~~

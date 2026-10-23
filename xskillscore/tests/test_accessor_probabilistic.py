@@ -54,6 +54,15 @@ def test_crps_ensemble_accessor(o, f_prob, outer_bool):
     assert_allclose(actual, expected)
 
 
+def test_crps_ensemble_fair_accessor(o, f_prob):
+    actual = crps_ensemble(o, f_prob, fair=True)
+    ds = xr.Dataset()
+    ds["o"] = o
+    ds["f_prob"] = f_prob
+    expected = ds.xs.crps_ensemble("o", "f_prob", fair=True)
+    assert_allclose(actual, expected)
+
+
 @pytest.mark.slow
 def test_crps_quadrature_accessor(o):
     # to speed things up

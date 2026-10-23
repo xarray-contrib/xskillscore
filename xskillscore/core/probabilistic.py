@@ -215,11 +215,27 @@ def crps_ensemble(
     member_weights: Optional[XArray] = None,
     issorted: bool = False,
     member_dim: str = "member",
+    fair: bool = False,
     dim: Optional[Dim] = None,
     weights: Optional[XArray] = None,
     keep_attrs: bool = False,
 ) -> XArray:
     """Continuous Ranked Probability Score with the ensemble distribution.
+
+    .. math::
+        CRPS(F, o) = \\frac{1}{M} \\sum_{m=1}^{M} |x_m - o|
+                     - \\frac{1}{2 M^{2}} \\sum_{i=1}^{M} \\sum_{j=1}^{M}
+                       |x_i - x_j|
+
+    The ensemble estimator above is biased for finite ensemble size ``M`` and
+    only converges to the true CRPS as ``M`` goes to infinity. ``fair=True``
+    replaces the denominator of the spread term by :math:`M (M-1)`, which
+    yields the unbiased, ensemble-size independent "fair" CRPS of Ferro (2014):
+
+    .. math::
+        CRPS_{fair}(F, o) = \\frac{1}{M} \\sum_{m=1}^{M} |x_m - o|
+                            - \\frac{1}{2 M (M-1)} \\sum_{i=1}^{M}
+                              \\sum_{j=1}^{M} |x_i - x_j|
 
     Parameters
     ----------
@@ -237,6 +253,10 @@ def crps_ensemble(
         already sorted along `axis`.
     member_dim : str, optional
         Name of ensemble member dimension. By default, 'member'.
+    fair: boolean
+        Apply ensemble member-size adjustment for unbiased, fair metric;
+        see Ferro (2014). Requires at least two members and equally weighted
+        members, i.e. ``member_weights=None``. Defaults to False.
     dim : str or list of str, optional
         Dimension over which to compute mean after computing ``crps_ensemble``.
         Defaults to None implying averaging over all dimensions.
@@ -269,13 +289,35 @@ def crps_ensemble(
     Coordinates:
       * y        (y) int64 24B 0 1 2
 
+    >>> xs.crps_ensemble(observations, forecasts, dim="x", fair=True)
+    <xarray.DataArray (y: 3)> Size: 24B
+    array([0.86487601, 0.26399584, 0.3083712 ])
+    Coordinates:
+      * y        (y) int64 24B 0 1 2
+
     See Also
     --------
     properscoring.crps_ensemble
+
+    References
+    ----------
+    * Ferro, C. A. T. (2014). Fair scores for ensemble forecasts. Quarterly
+      Journal of the Royal Meteorological Society, 140(683), 1917–1923.
+      doi: 10.1002/qj.2270.
     """
     observations, forecasts = probabilistic_broadcast(
         observations, forecasts, member_dim=member_dim
     )
+    if fair:
+        if member_weights is not None:
+            raise ValueError(
+                "fair=True is only defined for equally weighted members, "
+                "found member_weights not None."
+            )
+        if forecasts.sizes[member_dim] < 2:
+            raise ValueError(
+                f"fair=True requires at least 2 members, found {forecasts.sizes[member_dim]}."
+            )
     res = xr.apply_ufunc(
         properscoring.crps_ensemble,
         observations,
@@ -286,6 +328,17 @@ def crps_ensemble(
         output_dtypes=[float],
         keep_attrs=keep_attrs,
     )
+    if fair:  # for ensemble member adjustment, see Ferro 2014
+        with xr.set_options(keep_attrs=keep_attrs):
+            # M counts only non-NaN members, matching properscoring's nan handling
+            M = forecasts.notnull().sum(member_dim)
+            M = M.where(M > 1)  # fair CRPS is undefined for M < 2
+            skill = abs(forecasts - observations).mean(member_dim)
+            # spread = skill - res = 1 / (2 * M ** 2) * sum_ij |x_i - x_j|
+            # hence: fair = skill - spread * M / (M - 1) = res - spread / (M - 1),
+            # which avoids O(M**2) memory. res stays the left operand so that
+            # keep_attrs takes the attributes of observations, as for fair=False.
+            res = res - (skill - res) / (M - 1)
     if weights is not None:
         return res.weighted(weights).mean(dim, keep_attrs=keep_attrs)
     else:
@@ -1320,6 +1373,11 @@ def roc(
 
     # loop over each bin_edge and get true positive rate and false positive rate
     # from contingency
+    if continuous:
+        # observations are binary (0/1); categorise them with a fixed split at 0.5
+        # rather than the forecast-derived threshold ``i`` (which may lie outside
+        # the [0, 1] range of the observations). See GH #442.
+        observation_category_edges = np.array([-np.inf, 0.5, np.inf])
     tpr_list, fpr_list = [], []
     for i in bin_edges:
         dichotomous_category_edges = np.array(
@@ -1328,7 +1386,7 @@ def roc(
         dichotomous_contingency = Contingency(
             observations,
             forecasts,
-            dichotomous_category_edges,
+            observation_category_edges if continuous else dichotomous_category_edges,
             dichotomous_category_edges,
             dim=dim,
         )
