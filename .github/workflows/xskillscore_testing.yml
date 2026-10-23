@@ -125,10 +125,7 @@ jobs:
         env:
           HTTP_PROXY: http://127.0.0.1:9
           HTTPS_PROXY: http://127.0.0.1:9
-          http_proxy: http://127.0.0.1:9
-          https_proxy: http://127.0.0.1:9
           NO_PROXY: ""
-          no_proxy: ""
         run: |
           pushd docs
           nbstripout source/*.ipynb
