@@ -13,6 +13,11 @@ Breaking Changes
 - Dropped support for Python 3.9. The minimum supported version is now Python 3.10.
   `Aaron Spring`_
 
+Features
+~~~~~~~~
+- Added :py:meth:`xskillscore.Contingency.cramers_v` for measuring association
+  between categorical observations and forecasts. (:pr:`459`) `Kkkakania`_
+
 Documentation
 ~~~~~~~~~~~~~
 - Made the documentation discoverable and parseable by LLMs and coding agents by
@@ -425,6 +430,7 @@ Testing
 .. _`Aaron Spring`: https://github.com/aaronspring
 .. _`Andrew Huang`: https://github.com/ahuang11
 .. _`Dougie Squire`: https://github.com/dougiesquire
+.. _`Kkkakania`: https://github.com/Kkkakania
 .. _`mcsitter`: https://github.com/mcsitter
 .. _`Riley X. Brady`: https://github.com/bradyrx
 .. _`Ray Bell`: https://github.com/raybellwaves
