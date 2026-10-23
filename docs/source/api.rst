@@ -111,6 +111,7 @@ Multi-Category Metrics
     :toctree: api/
 
     Contingency.accuracy
+    Contingency.cramers_v
     Contingency.gerrity_score
     Contingency.heidke_score
     Contingency.peirce_score

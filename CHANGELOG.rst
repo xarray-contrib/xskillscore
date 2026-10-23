@@ -16,6 +16,8 @@ Breaking Changes
 
 Features
 ~~~~~~~~
+- Added :py:meth:`xskillscore.Contingency.cramers_v` for measuring association
+  between categorical observations and forecasts. (:pr:`459`) `Kkkakania`_
 - Added ``fair`` keyword to :py:func:`~xskillscore.crps_ensemble` implementing the
   ensemble-size adjusted, unbiased CRPS of Ferro (2014), matching the ``fair``
   keyword of :py:func:`~xskillscore.rps` and :py:func:`~xskillscore.brier_score`.
@@ -441,6 +443,7 @@ Testing
 .. _`Aaron Spring`: https://github.com/aaronspring
 .. _`Andrew Huang`: https://github.com/ahuang11
 .. _`Dougie Squire`: https://github.com/dougiesquire
+.. _`Kkkakania`: https://github.com/Kkkakania
 .. _`mcsitter`: https://github.com/mcsitter
 .. _`Riley X. Brady`: https://github.com/bradyrx
 .. _`Ray Bell`: https://github.com/raybellwaves
