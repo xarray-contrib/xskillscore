@@ -119,6 +119,13 @@ jobs:
         run: |
           python -m pip install --no-deps -e .
       - name: Test notebooks in docs
+        # Route HTTP(S) to a dead proxy so notebooks that download data at build
+        # time fail here, not only intermittently on Read the Docs.
+        # intersphinx inventories then fail too, which only emits warnings.
+        env:
+          HTTP_PROXY: http://127.0.0.1:9
+          HTTPS_PROXY: http://127.0.0.1:9
+          NO_PROXY: ""
         run: |
           pushd docs
           nbstripout source/*.ipynb
