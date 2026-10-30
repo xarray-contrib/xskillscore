@@ -3,6 +3,7 @@ import xarray as xr
 from xarray.testing import assert_allclose
 
 from xskillscore.core.deterministic import (
+    crmse,
     effective_sample_size,
     linslope,
     mae,
@@ -40,6 +41,7 @@ temporal_only_metrics = [
 ]
 
 distance_metrics = [
+    crmse,
     me,
     mse,
     rmse,

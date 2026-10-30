@@ -6,6 +6,7 @@ from typing import List, Optional
 import xarray as xr
 
 from .np_deterministic import (
+    _crmse,
     _effective_sample_size,
     _linslope,
     _mae,
@@ -32,6 +33,7 @@ from .utils import (
 )
 
 __all__ = [
+    "crmse",
     "effective_sample_size",
     "linslope",
     "mae",
@@ -971,6 +973,96 @@ def rmse(
 
     return xr.apply_ufunc(
         _rmse,
+        a,
+        b,
+        weights,
+        input_core_dims=input_core_dims,
+        kwargs={"axis": axis, "skipna": skipna},
+        dask="parallelized",
+        output_dtypes=[float],
+        keep_attrs=keep_attrs,
+    )
+
+
+def crmse(
+    a: XArray,
+    b: XArray,
+    dim: Optional[Dim] = None,
+    weights: Optional[XArray] = None,
+    skipna: bool = False,
+    keep_attrs: bool = False,
+) -> XArray:
+    """Centered Root Mean Squared Error.
+
+    The root mean squared difference between ``a`` and ``b`` after removing
+    their respective means along ``dim``, i.e. the RMSE of the anomalies. It
+    measures the error in the pattern of variability, excluding the overall
+    bias (mean error), and is the quantity shown as distance from the reference
+    point in a Taylor diagram.
+
+    .. math::
+        \\mathrm{CRMSE} = \\sqrt{\\frac{1}{n}\\sum_{i=1}^{n}
+                     \\left[(a_{i} - \\bar{a}) - (b_{i} - \\bar{b})\\right]^{2}}
+
+    It is related to :py:func:`~xskillscore.rmse` and :py:func:`~xskillscore.me` by
+
+    .. math::
+        \\mathrm{CRMSE}^{2} = \\mathrm{RMSE}^{2} - \\mathrm{ME}^{2}
+
+    Parameters
+    ----------
+    a : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    b : xarray.Dataset or xarray.DataArray
+        Labeled array(s) over which to apply the function.
+    dim : str, list
+        The dimension(s) to apply the crmse along. Note that this dimension will
+        be reduced as a result. Defaults to None reducing all dimensions.
+    weights : xarray.Dataset or xarray.DataArray or None
+        Weights matching dimensions of ``dim`` to apply during the function.
+        If given, both the means and the mean of the squared differences
+        are weighted.
+    skipna : bool
+        If True, skip NaNs when computing function.
+    keep_attrs : bool
+        If True, the attributes (attrs) will be copied
+        from the first input to the new one.
+        If False (default), the new object will
+        be returned without attributes.
+
+    Returns
+    -------
+    xarray.Dataset or xarray.DataArray
+        Centered Root Mean Squared Error.
+
+    See Also
+    --------
+    rmse, me
+
+    References
+    ----------
+    Taylor, K. E. (2001). Summarizing multiple aspects of model performance in a
+    single diagram. Journal of Geophysical Research: Atmospheres, 106(D7),
+    7183-7192. https://doi.org/10.1029/2000JD900719
+
+    Examples
+    --------
+    >>> a = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
+    >>> b = xr.DataArray(np.random.rand(5, 3, 3), dims=["time", "x", "y"])
+    >>> xs.crmse(a, b, dim="time")
+    <xarray.DataArray (x: 3, y: 3)> Size: 72B
+    array([[0.30316509, 0.49488802, 0.52836439],
+           [0.26180228, 0.28797094, 0.36264717],
+           [0.4734355 , 0.34252544, 0.12459323]])
+    Dimensions without coordinates: x, y
+    """
+    dim, axis = _preprocess_dims(dim, a)
+    a, b = xr.broadcast(a, b, exclude=dim)
+    weights = _preprocess_weights(a, dim, dim, weights)
+    input_core_dims = _determine_input_core_dims(dim, weights)
+
+    return xr.apply_ufunc(
+        _crmse,
         a,
         b,
         weights,

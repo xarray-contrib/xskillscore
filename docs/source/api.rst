@@ -32,6 +32,7 @@ Distance Metrics
 .. autosummary::
     :toctree: api/
 
+    crmse
     mae
     mape
     me

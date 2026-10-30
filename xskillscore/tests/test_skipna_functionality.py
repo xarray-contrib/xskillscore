@@ -7,6 +7,7 @@ from dask import is_dask_collection
 from xarray.testing import assert_allclose
 
 from xskillscore.core.deterministic import (
+    crmse,
     linslope,
     mae,
     mape,
@@ -69,6 +70,7 @@ WEIGHTED_METRICS: List[Callable] = [
     me,
     rmse,
     r2,
+    crmse,
 ]
 
 NON_WEIGHTED_METRICS: List[Callable] = [median_absolute_error]

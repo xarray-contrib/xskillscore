@@ -8,6 +8,7 @@ from sklearn.metrics import (
 )
 
 from xskillscore.core.deterministic import (
+    crmse,
     linslope,
     mae,
     mape,
@@ -52,6 +53,13 @@ xs_scipy_metrics = [(pearson_r, weighted_pearsonr), (linslope, weighted_linslope
 
 xs_np_metrics = [
     (me, lambda x, y, w: np.sum((x - y) * w) / np.sum(w)),
+    (
+        crmse,
+        lambda x, y, w: np.sqrt(
+            np.sum(((x - np.sum(x * w) / np.sum(w)) - (y - np.sum(y * w) / np.sum(w))) ** 2 * w)
+            / np.sum(w)
+        ),
+    ),
     (
         smape,
         lambda x, y, w: np.sum(np.abs(x - y) / (np.abs(x) + np.abs(y)) * w) / np.sum(w),

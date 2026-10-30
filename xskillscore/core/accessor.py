@@ -1,6 +1,7 @@
 import xarray as xr
 
 from .deterministic import (
+    crmse,
     effective_sample_size,
     linslope,
     mae,
@@ -101,6 +102,11 @@ class XSkillScoreAccessor(object):
         a = self._in_ds(a)
         b = self._in_ds(b)
         return rmse(a, b, *args, **kwargs)
+
+    def crmse(self, a, b, *args, **kwargs):
+        a = self._in_ds(a)
+        b = self._in_ds(b)
+        return crmse(a, b, *args, **kwargs)
 
     def mse(self, a, b, *args, **kwargs):
         a = self._in_ds(a)

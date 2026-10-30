@@ -11,6 +11,7 @@ from sklearn.metrics import (
 
 import xskillscore as xs
 from xskillscore.core.deterministic import (
+    crmse,
     linslope,
     mae,
     mape,
@@ -47,6 +48,7 @@ xs_scipy_metrics = [
 
 xs_np_metrics = [
     (me, lambda x, y: np.mean(x - y)),
+    (crmse, lambda x, y: np.sqrt(np.mean(((x - x.mean()) - (y - y.mean())) ** 2))),
     (smape, lambda x, y: np.mean(np.abs(x - y) / (np.abs(x) + np.abs(y)))),
 ]
 

@@ -22,6 +22,10 @@ Features
   ensemble-size adjusted, unbiased CRPS of Ferro (2014), matching the ``fair``
   keyword of :py:func:`~xskillscore.rps` and :py:func:`~xskillscore.brier_score`.
   (:issue:`461`, :pr:`462`) `Aaron Spring`_
+- Added :py:func:`~xskillscore.crmse`, the centered root mean squared error
+  (RMSE of the anomalies about each input's mean, Taylor 2001), supporting
+  ``dim``, ``weights``, ``skipna`` and ``keep_attrs`` like the other distance
+  metrics. (:issue:`284`, :pr:`480`) `Abderrahmane El Aoudi`_
 
 Bug Fixes
 ~~~~~~~~~
@@ -441,6 +445,7 @@ Testing
 
 
 .. _`Aaron Spring`: https://github.com/aaronspring
+.. _`Abderrahmane El Aoudi`: https://github.com/A2ELAOUDI
 .. _`Andrew Huang`: https://github.com/ahuang11
 .. _`Dougie Squire`: https://github.com/dougiesquire
 .. _`Kkkakania`: https://github.com/Kkkakania
