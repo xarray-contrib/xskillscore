@@ -11,6 +11,7 @@ except ImportError:
 
 
 __all__ = [
+    "_crmse",
     "_effective_sample_size",
     "_linslope",
     "_mae",
@@ -604,6 +605,52 @@ def _rmse(a, b, weights, axis, skipna):
     squared_error = (a - b) ** 2
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
+        if weights is not None:
+            mean_squared_error = sumfunc(squared_error * weights, axis=axis) / sumfunc(
+                weights, axis=axis
+            )
+        else:
+            mean_squared_error = meanfunc(squared_error, axis=axis)
+    res = np.sqrt(mean_squared_error)
+    return res
+
+
+def _crmse(a, b, weights, axis, skipna):
+    """Centered Root Mean Squared Error.
+
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    b : ndarray
+        Input array.
+    axis : int or tuple of ints
+        The axis to apply the crmse along.
+    weights : ndarray
+        Input array of weights for a and b.
+    skipna : bool
+        If True, skip NaNs when computing function.
+
+    Returns
+    -------
+    res : ndarray
+        Centered Root Mean Squared Error.
+    """
+    sumfunc, meanfunc = _get_numpy_funcs(skipna)
+    if skipna:
+        a, b, weights = _match_nans(a, b, weights)
+    weights = _check_weights(weights)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        if weights is not None:
+            sum_weights = sumfunc(weights, axis=axis, keepdims=True)
+            ma = sumfunc(a * weights, axis=axis, keepdims=True) / sum_weights
+            mb = sumfunc(b * weights, axis=axis, keepdims=True) / sum_weights
+        else:
+            ma = meanfunc(a, axis=axis, keepdims=True)
+            mb = meanfunc(b, axis=axis, keepdims=True)
+        squared_error = ((a - ma) - (b - mb)) ** 2
         if weights is not None:
             mean_squared_error = sumfunc(squared_error * weights, axis=axis) / sumfunc(
                 weights, axis=axis

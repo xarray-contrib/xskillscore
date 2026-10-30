@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from xskillscore.core.deterministic import (
+    crmse,
     linslope,
     mae,
     mape,
@@ -22,7 +23,7 @@ from xskillscore.core.deterministic import (
 # grid cells over space.
 AXES = ("time", "lat", "lon", ["lat", "lon"], ["time", "lat", "lon"])
 
-distance_metrics: List[Callable] = [mae, mape, median_absolute_error, mse, rmse, smape]
+distance_metrics: List[Callable] = [crmse, mae, mape, median_absolute_error, mse, rmse, smape]
 correlation_metrics: List[Callable] = [
     linslope,
     pearson_r,

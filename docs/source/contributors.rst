@@ -3,6 +3,7 @@ Contributors
 ************
 
 * Aaron Spring (`github <https://github.com/aaronspring/>`__)
+* Abderrahmane El Aoudi (`github <https://github.com/A2ELAOUDI/>`__)
 * Andrew Huang (`github <https://github.com/ahuang11/>`__)
 * Dougie Squire (`github <https://github.com/dougiesquire/>`__)
 * mcsitter (`github <https://github.com/mcsitter/>`__)

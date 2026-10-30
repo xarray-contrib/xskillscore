@@ -19,6 +19,7 @@ from xskillscore.core.accessor import XSkillScoreAccessor
 from xskillscore.core.comparative import halfwidth_ci_test, sign_test
 from xskillscore.core.contingency import Contingency
 from xskillscore.core.deterministic import (
+    crmse,
     effective_sample_size,
     linslope,
     mae,

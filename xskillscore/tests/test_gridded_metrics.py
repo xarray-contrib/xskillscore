@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from xskillscore.core.deterministic import (
+    crmse,
     linslope,
     mae,
     mape,
@@ -26,6 +27,7 @@ METRICS = [
     smape,
     me,
     rmse,
+    crmse,
     pearson_r,
     pearson_r_p_value,
     spearman_r,

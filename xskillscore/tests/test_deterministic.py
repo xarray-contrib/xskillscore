@@ -6,6 +6,7 @@ from xarray.testing import assert_allclose
 from xskillscore.core.deterministic import (
     _preprocess_dims,
     _preprocess_weights,
+    crmse,
     effective_sample_size,
     linslope,
     mae,
@@ -24,6 +25,7 @@ from xskillscore.core.deterministic import (
     spearman_r_p_value,
 )
 from xskillscore.core.np_deterministic import (
+    _crmse,
     _effective_sample_size,
     _linslope,
     _mae,
@@ -72,6 +74,7 @@ distance_metrics = [
     (median_absolute_error, _median_absolute_error),
     (mape, _mape),
     (smape, _smape),
+    (crmse, _crmse),
 ]
 distance_metrics_names = [
     "mse",
@@ -81,6 +84,7 @@ distance_metrics_names = [
     "median_absolute_error",
     "mape",
     "smape",
+    "crmse",
 ]
 
 AXES = ("time", "lat", "lon", ["lat", "lon"], ["time", "lat", "lon"])
@@ -275,6 +279,23 @@ def test_percentage_metric_in_interval_0_1(a, b, dim, metric):
     assert not (res < 0).any()
     assert not (res > 1).any()
     assert not res.isnull().any()
+
+
+@pytest.mark.parametrize("dim", AXES)
+@pytest.mark.parametrize("weight_bool", [True, False])
+def test_crmse_rmse_me_decomposition(a, b, dim, weight_bool, weights_cos_lat):
+    """Test that crmse**2 == rmse**2 - me**2 (Taylor, 2001)."""
+    weights = adjust_weights(dim, weight_bool, weights_cos_lat)
+    actual = crmse(a, b, dim, weights=weights)
+    expected = np.sqrt(rmse(a, b, dim, weights=weights) ** 2 - me(a, b, dim, weights=weights) ** 2)
+    assert_allclose(actual, expected)
+
+
+def test_crmse_insensitive_to_bias(a, b):
+    """Test that crmse removes constant offsets but rmse does not."""
+    assert_allclose(crmse(a, b + 10.0, "time"), crmse(a, b, "time"))
+    assert (rmse(a, b + 10.0, "time") > rmse(a, b, "time")).all()
+    assert_allclose(crmse(a, a + 10.0, "time"), xr.zeros_like(a.isel(time=0, drop=True)))
 
 
 def test_pearson_r_p_value_skipna(a, b_rand_nan):
