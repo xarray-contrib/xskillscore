@@ -1027,6 +1027,36 @@ def test_roc_returns(
     )
 
 
+@pytest.mark.parametrize("bin_edges", ["continuous", np.linspace(0, 1, 11)])
+@pytest.mark.parametrize("input", ["Dataset", "DataArray"])
+def test_roc_long_name_attrs(forecast_1d_long, observation_1d_long, bin_edges, input):
+    """Test that roc outputs carry long_name attrs, e.g. for plot labels (GH #240)."""
+    forecast = forecast_1d_long.clip(0, 1)
+    observation = observation_1d_long > 0.5
+    if input == "Dataset":
+        forecast = forecast.to_dataset(name="var")
+        observation = observation.to_dataset(name="var")
+
+    def _long_name(x):
+        return x["var"].attrs["long_name"] if input == "Dataset" else x.attrs["long_name"]
+
+    fpr, tpr, area = roc(
+        observation, forecast, bin_edges, dim="time", return_results="all_as_tuple"
+    )
+    assert _long_name(fpr) == "false positive rate"
+    assert _long_name(tpr) == "true positive rate"
+    assert _long_name(area) == "area under curve"
+    assert fpr.probability_bin.attrs["long_name"] == "probability bin edge"
+    assert tpr.probability_bin.attrs["long_name"] == "probability bin edge"
+
+    area = roc(observation, forecast, bin_edges, dim="time", return_results="area")
+    assert _long_name(area) == "area under curve"
+
+    results = roc(observation, forecast, bin_edges, dim="time", return_results="all_as_metric_dim")
+    assert _long_name(results) == "relative operating characteristic"
+    assert results.probability_bin.attrs["long_name"] == "probability bin edge"
+
+
 def test_roc_auc_score_random_forecast(forecast_1d_long, observation_1d_long, symmetric_edges):
     """Test that ROC AUC around 0.5 for random forecast."""
     area = roc(

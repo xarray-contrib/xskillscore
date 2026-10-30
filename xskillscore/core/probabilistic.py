@@ -1237,6 +1237,20 @@ def _drop_intermediate(fpr, tpr):
     return fpr, tpr
 
 
+def _assign_long_name(x, long_name):
+    """Assign ``long_name`` to a DataArray or to each data variable of a Dataset,
+    and give the ``probability_bin`` coordinate a ``long_name`` if present."""
+    x = x.copy()
+    if isinstance(x, xr.Dataset):
+        for v in x.data_vars:
+            x[v].attrs["long_name"] = long_name
+    else:
+        x.attrs["long_name"] = long_name
+    if "probability_bin" in x.coords:
+        x["probability_bin"].attrs["long_name"] = "probability bin edge"
+    return x
+
+
 def _auc(fpr, tpr, dim="probability_bin"):
     """Get area under the curve with trapez method."""
     # reverse tpr, fpr to fpr, tpr, see numpy.trapz(y, x=None)
@@ -1307,6 +1321,8 @@ def roc(
         reduced by dimensions ``dim``, see ``return_results`` parameter.
         ``true positive rate`` and ``false positive rate`` contain
         ``probability_bin`` dimension with ascending ``bin_edges`` as coordinates.
+        Each output carries a ``long_name`` attribute (``"false positive rate"``,
+        ``"true positive rate"``, ``"area under curve"``), e.g. for plot labels.
 
     Examples
     --------
@@ -1316,6 +1332,8 @@ def roc(
     >>> xs.roc(o, f, category_edges, dim=["time"])
     <xarray.DataArray 'histogram_observations_forecasts' ()> Size: 8B
     array(1.)
+    Attributes:
+        long_name:  area under curve
 
     See also
     --------
@@ -1439,6 +1457,11 @@ def roc(
     tpr = _keep_masked(tpr, forecasts, dim=dim)
     area = _keep_masked(area, forecasts, dim=dim)
 
+    # assign long_name attrs, e.g. for axis labels when plotting (GH #240)
+    fpr = _assign_long_name(fpr, "false positive rate")
+    tpr = _assign_long_name(tpr, "true positive rate")
+    area = _assign_long_name(area, "area under curve")
+
     if return_results == "area":
         return area
     elif return_results == "all_as_metric_dim":
@@ -1448,6 +1471,7 @@ def roc(
             "true positive rate",
             "area under curve",
         ]
+        results = _assign_long_name(results, "relative operating characteristic")
         return results
     elif return_results == "all_as_tuple":
         return fpr, tpr, area

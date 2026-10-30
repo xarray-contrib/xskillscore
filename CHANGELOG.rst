@@ -22,6 +22,10 @@ Features
   ensemble-size adjusted, unbiased CRPS of Ferro (2014), matching the ``fair``
   keyword of :py:func:`~xskillscore.rps` and :py:func:`~xskillscore.brier_score`.
   (:issue:`461`, :pr:`462`) `Aaron Spring`_
+- :py:func:`~xskillscore.roc` outputs now carry ``long_name`` attributes
+  (``"false positive rate"``, ``"true positive rate"``, ``"area under curve"``, and
+  ``"probability bin edge"`` on the ``probability_bin`` coordinate), giving proper
+  axis labels when plotting. (:issue:`240`, :pr:`479`) `Abderrahmane El Aoudi`_
 
 Bug Fixes
 ~~~~~~~~~
@@ -441,6 +445,7 @@ Testing
 
 
 .. _`Aaron Spring`: https://github.com/aaronspring
+.. _`Abderrahmane El Aoudi`: https://github.com/A2ELAOUDI
 .. _`Andrew Huang`: https://github.com/ahuang11
 .. _`Dougie Squire`: https://github.com/dougiesquire
 .. _`Kkkakania`: https://github.com/Kkkakania
