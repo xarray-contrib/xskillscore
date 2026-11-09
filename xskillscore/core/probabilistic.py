@@ -26,7 +26,10 @@ from .utils import (
 try:
     from bottleneck import nanrankdata as rankdata
 except ImportError:
-    from scipy.stats import rankdata
+    from scipy.stats import rankdata as _scipy_rankdata
+
+    def rankdata(a, axis=None):
+        return _scipy_rankdata(a, axis=axis, nan_policy="omit")
 
 # Remove when `numpy` v1.x support is dropped
 try:

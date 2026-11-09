@@ -7,7 +7,10 @@ from scipy.stats import distributions
 try:
     from bottleneck import nanrankdata as rankdata
 except ImportError:
-    from scipy.stats import rankdata
+    from scipy.stats import rankdata as _scipy_rankdata
+
+    def rankdata(a, axis=None):
+        return _scipy_rankdata(a, axis=axis, nan_policy="omit")
 
 
 __all__ = [
