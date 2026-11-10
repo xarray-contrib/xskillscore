@@ -31,6 +31,7 @@ except ImportError:
     def rankdata(a, axis=None):
         return _scipy_rankdata(a, axis=axis, nan_policy="omit")
 
+
 # Remove when `numpy` v1.x support is dropped
 try:
     from numpy import trapezoid
