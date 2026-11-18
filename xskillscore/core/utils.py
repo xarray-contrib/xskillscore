@@ -78,7 +78,7 @@ def _preprocess_weights(a, dim, new_dim, weights):
         One of the arrays over which the function will be applied.
     dim : str, list
         The original dimension(s) to apply the function along.
-    new_dim : str
+    new_dim : str, list
         The newly named dimension after running ``_preprocess_dims``
     weights : xarray.Dataset or xarray.DataArray or None
         Weights to apply to function, matching the dimension size of
@@ -91,7 +91,8 @@ def _preprocess_weights(a, dim, new_dim, weights):
         weights = weights / weights.max()
         # Check that the weights array has the same size
         # dimension(s) as those being applied over.
-        drop_dims = {k: 0 for k in a.dims if k not in new_dim}
+        weight_dims = [new_dim] if isinstance(new_dim, str) else new_dim
+        drop_dims = {k: 0 for k in a.dims if k not in weight_dims}
         if dict(weights.sizes) != dict(a.isel(drop_dims).sizes):
             raise ValueError(
                 f"weights dimension(s) {dim} of size {dict(weights.sizes)} "

@@ -92,6 +92,23 @@ temporal_only_metrics = [
 ]
 
 
+@pytest.mark.parametrize("metric", [pearson_r, linslope, r2])
+@pytest.mark.parametrize("dim", ["time", ["time"]])
+@pytest.mark.parametrize("chunked", [False, True])
+def test_weights_dimension_names_are_not_substrings(metric, dim, chunked):
+    a = xr.DataArray([[1.0, 2.0, 4.0], [2.0, 5.0, 7.0]], dims=("t", "time"))
+    weights = xr.DataArray([1.0, 2.0, 3.0], dims="time")
+    if chunked:
+        a = a.chunk({"t": 1, "time": -1})
+        weights = weights.chunk()
+
+    actual = metric(a, a, dim=dim, weights=weights)
+
+    # 't' is not a reduced dimension, even though it is a substring of 'time'.
+    expected = xr.DataArray([1.0, 1.0], dims="t")
+    assert_allclose(actual, expected)
+
+
 def adjust_weights(dim, weight_bool, weights):
     """
     Adjust the weights test data to only span the core dimension

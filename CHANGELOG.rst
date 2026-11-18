@@ -25,6 +25,9 @@ Features
 
 Bug Fixes
 ~~~~~~~~~
+- Fixed weighted deterministic metrics rejecting valid weights when an unreduced
+  dimension name is a substring of the reduction dimension, such as ``t`` and
+  ``time``.
 - Fixed :py:func:`~xskillscore.roc` with ``bin_edges="continuous"`` returning
   incorrect areas (down to ``0.0`` instead of ``1.0``) when forecast values fall
   outside the ``[0, 1]`` range of the binary observations. Observations are now
