@@ -212,11 +212,12 @@ def resample_iterations_idx(
     def select_bootstrap_indices_ufunc(x, idx):
         """Selects multi-level indices ``idx`` from xarray object ``x`` for all
         iterations."""
-        # `apply_ufunc` sometimes adds a singleton dimension on the end, so we squeeze
-        # it out here. This leverages multi-level indexing from numpy, so we can
+        # Remove only the trailing iteration broadcast axis added by `apply_ufunc`.
+        # Other singleton axes can be legitimate Dask chunks and must be preserved.
+        # This leverages multi-level indexing from numpy, so we can
         # select a different set of, e.g., ensemble members for each iteration and
         # construct one large DataArray with ``iterations`` as a dimension.
-        return np.moveaxis(x.squeeze()[idx.squeeze().transpose()], 0, -1)
+        return np.moveaxis(x[..., 0][idx.squeeze().transpose()], 0, -1)
 
     # generate random indices to select from
     idx_da = _gen_idx(forecast, dim, iterations, select_dim_items, replace, new_dim)
