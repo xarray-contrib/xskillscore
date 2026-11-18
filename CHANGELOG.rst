@@ -25,6 +25,8 @@ Features
 
 Bug Fixes
 ~~~~~~~~~
+- Fixed :py:func:`~xskillscore.resample_iterations_idx` adding a coordinate to its
+  input in place when the resampled dimension has no coordinate.
 - Fixed :py:func:`~xskillscore.roc` with ``bin_edges="continuous"`` returning
   incorrect areas (down to ``0.0`` instead of ``1.0``) when forecast values fall
   outside the ``[0, 1]`` range of the binary observations. Observations are now
