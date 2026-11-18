@@ -16,6 +16,8 @@ Breaking Changes
 
 Features
 ~~~~~~~~
+- Add sample weights to :py:class:`xskillscore.Contingency` for area-weighted categorical
+  forecast verification. (:issue:`411`)
 - Added :py:meth:`xskillscore.Contingency.cramers_v` for measuring association
   between categorical observations and forecasts. (:pr:`459`) `Kkkakania`_
 - Added ``fair`` keyword to :py:func:`~xskillscore.crps_ensemble` implementing the

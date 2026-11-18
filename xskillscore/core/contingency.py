@@ -69,6 +69,10 @@ class Contingency:
         The dimension(s) over which to compute the contingency table
     keep_attrs : bool, optional
         Whether to copy attributes from the observations to the contingency table.
+    weights : xarray.DataArray, optional
+        Sample weights broadcast against each pair of observations and forecasts.
+        For example, pass grid-cell area to accumulate area in each category.
+        Use zero weight to exclude a sample.
 
     Returns
     -------
@@ -97,6 +101,13 @@ class Contingency:
         var2                           (observations_category, forecasts_category) int64
 
 
+    >>> obs = xr.DataArray([0, 0, 1], dims="cell")
+    >>> fcst = xr.DataArray([0, 1, 1], dims="cell")
+    >>> area = xr.DataArray([3.0, 1.0, 2.0], dims="cell")
+    >>> edges = np.array([-0.5, 0.5, 1.5])
+    >>> xs.Contingency(obs, fcst, edges, edges, dim="cell", weights=area).accuracy().item()
+    0.8333333333333334
+
     References
     ----------
     http://www.cawcr.gov.au/projects/verification/
@@ -110,6 +121,7 @@ class Contingency:
         forecast_category_edges: xr.DataArray | np.ndarray,
         dim: Dim,
         keep_attrs: bool = False,
+        weights: xr.DataArray | None = None,
     ):
         self._observations = observations.copy()
         self._forecasts = forecasts.copy()
@@ -120,7 +132,7 @@ class Contingency:
             if (len(observation_category_edges) - 1 == 2) & (len(forecast_category_edges) - 1 == 2)
             else False
         )
-        self._table = self._get_contingency_table(dim, keep_attrs)
+        self._table = self._get_contingency_table(dim, keep_attrs, weights)
 
     @property
     def observations(self):
@@ -146,7 +158,9 @@ class Contingency:
     def table(self):
         return self._table
 
-    def _get_contingency_table(self, dim: Dim, keep_attrs: bool) -> XArray:
+    def _get_contingency_table(
+        self, dim: Dim, keep_attrs: bool, weights: xr.DataArray | None
+    ) -> XArray:
         """Build the contingency table
 
         Parameters
@@ -168,6 +182,7 @@ class Contingency:
             bin_names=[OBSERVATIONS_NAME, FORECASTS_NAME],
             dim=dim,
             bin_dim_suffix="_bin",
+            weights=weights,
         )
 
         # Add some coordinates to simplify interpretation/post-processing

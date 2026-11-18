@@ -172,3 +172,28 @@ def test_cramers_v_requires_two_categories():
 
     with pytest.raises(ValueError, match="at least two observation and forecast categories"):
         contingency.cramers_v()
+
+
+@pytest.mark.parametrize("dataset", [False, True])
+@pytest.mark.parametrize("chunked", [False, True])
+def test_cell_area_weighted_contingency(dataset, chunked):
+    obs = xr.DataArray([[0, 0, 1], [1, 1, 0]], dims=("time", "cell"))
+    fcst = xr.DataArray([[0, 1, 1], [0, 1, 1]], dims=obs.dims)
+    weights = xr.DataArray([0.5, 0.0, 2.0], dims="cell")
+    edges = np.array([-0.5, 0.5, 1.5])
+    if dataset:
+        obs = xr.Dataset({"a": obs, "b": 1 - obs})
+        fcst = xr.Dataset({"a": fcst, "b": 1 - fcst})
+    if chunked:
+        obs, fcst, weights = (x.chunk({"cell": 1}) for x in (obs, fcst, weights))
+
+    scores = Contingency(obs, fcst, edges, edges, "cell", weights=weights)
+    table = scores.table
+    if chunked:
+        assert table.chunks
+    expected = [[[0.5, 0], [0, 2]], [[0, 2], [0.5, 0]]]
+    npt.assert_allclose(table["a"] if dataset else table, expected)
+    if dataset:
+        npt.assert_allclose(table["b"], np.asarray(expected)[:, ::-1, ::-1])
+    accuracy = scores.accuracy()
+    npt.assert_allclose(accuracy["a"] if dataset else accuracy, [1, 0])
