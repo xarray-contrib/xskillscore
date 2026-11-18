@@ -156,3 +156,27 @@ def test_resample_dim_no_coord(func):
     )
     del da.coords["time"]
     assert "time" not in func(da, 2, dim="time").coords
+
+
+@pytest.mark.parametrize("site_chunk", [1, 2])
+@pytest.mark.parametrize("as_dataset", [False, True])
+@pytest.mark.parametrize("replace", [False, True])
+def test_resample_iterations_idx_singleton_chunks(site_chunk, as_dataset, replace):
+    forecast = xr.DataArray(
+        np.arange(30).reshape(3, 5, 2),
+        dims=("site", "time", "level"),
+        coords={"time": np.arange(5)},
+    )
+    if as_dataset:
+        forecast = forecast.to_dataset(name="forecast")
+    np.random.seed(42)
+    expected = resample_iterations_idx(forecast, 2, dim="time", replace=replace)
+    np.random.seed(42)
+    actual = resample_iterations_idx(
+        forecast.chunk({"time": -1, "site": site_chunk, "level": 1}),
+        2,
+        dim="time",
+        replace=replace,
+    )
+    assert is_dask_collection(actual)
+    xr.testing.assert_identical(actual.compute(), expected)

@@ -25,6 +25,8 @@ Features
 
 Bug Fixes
 ~~~~~~~~~
+- Fixed :py:func:`~xskillscore.resample_iterations_idx` failing during computation
+  when an unreduced dimension has Dask chunks of length one.
 - Fixed :py:func:`~xskillscore.roc` with ``bin_edges="continuous"`` returning
   incorrect areas (down to ``0.0`` instead of ``1.0``) when forecast values fall
   outside the ``[0, 1]`` range of the binary observations. Observations are now
