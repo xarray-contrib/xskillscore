@@ -156,3 +156,24 @@ def test_resample_dim_no_coord(func):
     )
     del da.coords["time"]
     assert "time" not in func(da, 2, dim="time").coords
+
+
+@pytest.mark.parametrize("func", resample_iterations_funcs)
+@pytest.mark.parametrize("iterations", [1, 2])
+@pytest.mark.parametrize("as_dataset", [False, True])
+@pytest.mark.parametrize("chunked", [False, True])
+def test_resample_preserves_input_without_dimension_coordinate(
+    func, iterations, as_dataset, chunked
+):
+    forecast = xr.DataArray(np.arange(12).reshape(4, 3), dims=("time", "site"))
+    if as_dataset:
+        forecast = forecast.to_dataset(name="forecast")
+    if chunked:
+        forecast = forecast.chunk({"time": -1, "site": 1})
+    original = forecast.copy(deep=True)
+
+    for _ in range(2):
+        actual = func(forecast, iterations, dim="time")
+        xr.testing.assert_identical(forecast, original)
+        assert "time" not in actual.coords
+        assert is_dask_collection(actual) == chunked
